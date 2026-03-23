@@ -1,0 +1,8 @@
+# CSVs grandes (dados brutos do Power BI)
+*.csv
+*.pbix
+
+# Temp
+pbix_extract/
+node_modules/
+*.log
