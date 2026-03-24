@@ -1,0 +1,41 @@
+name: Atualizar Dashboard CS diariamente
+
+on:
+  schedule:
+    # 4:00am horário de Brasília (UTC-3) = 07:00 UTC
+    - cron: '0 7 * * *'
+  workflow_dispatch: # permite rodar manualmente
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Atualizar dados do HubSpot (Oráculo + Churn)
+        env:
+          HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
+        run: node CS-Sucesso-do-cliente/update-hubspot.js
+
+      - name: Verificar se houve alteração
+        id: check
+        run: |
+          git diff --quiet CS-Sucesso-do-cliente/dados.js && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit e push
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CS-Sucesso-do-cliente/dados.js
+          git commit -m "Atualização automática HubSpot/Oráculo $(date +'%d/%m/%Y %H:%M')"
+          git push
