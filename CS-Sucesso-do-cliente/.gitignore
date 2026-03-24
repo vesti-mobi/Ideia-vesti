@@ -1,5 +1,6 @@
 # CSVs grandes (dados brutos do Power BI)
 *.csv
+!controle_geral_luana_csv.csv
 *.pbix
 
 # Temp
@@ -9,4 +10,5 @@ node_modules/
 
 # Secrets
 .env
+.new_refresh_token
 *.xlsx
