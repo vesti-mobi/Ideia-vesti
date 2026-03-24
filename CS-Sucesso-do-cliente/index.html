@@ -225,7 +225,8 @@
     <div class="empresa-info-item"><strong>Integracao:</strong> <span id="eiInteg">-</span></div>
     <div class="empresa-info-item"><strong>Mensalidade:</strong> <span id="eiMensal">-</span></div>
     <div class="empresa-info-item"><strong>Etapa Hub:</strong> <span id="eiHub">-</span></div>
-    <div class="empresa-info-item"><strong>Oraculo:</strong> <span id="eiOraculo">-</span></div>
+    <div class="empresa-info-item"><strong>Tem Oraculo:</strong> <span id="eiTemOraculo">-</span></div>
+    <div class="empresa-info-item"><strong>Coluna Oraculo:</strong> <span id="eiOraculoColuna">-</span></div>
     <div class="empresa-info-item"><strong>Risco Churn:</strong> <span id="eiChurn">-</span></div>
 </div>
 
@@ -233,7 +234,7 @@
     <div class="tab-nav">
         <button class="tab-btn active" onclick="switchTab(0)">Visao Geral</button>
         <button class="tab-btn" onclick="switchTab(1)">Transacoes</button>
-        <button class="tab-btn" onclick="switchTab(2)">Oraculo & Churn</button>
+        <button class="tab-btn" onclick="switchTab(2)">Analise de Churn</button>
         <button class="tab-btn" onclick="switchTab(3)">Dados para Exportacao</button>
     </div>
 
@@ -313,28 +314,34 @@
         </div>
     </div>
 
-    <!-- TAB 2: Oraculo & Churn -->
+    <!-- TAB 2: Analise de Churn -->
     <div class="tab-content" id="tab2">
         <div class="kpi-grid" id="kpiGrid2"></div>
         <div class="charts-grid">
             <div class="chart-card">
-                <div class="chart-header"><div><div class="chart-title">Oraculo por Etapa</div></div></div>
-                <div class="chart-wrapper tall"><canvas id="chartOracEtapa"></canvas></div>
+                <div class="chart-header"><div><div class="chart-title">Distribuicao de Risco de Churn</div><div class="chart-subtitle">Quantas empresas em cada nivel de risco</div></div></div>
+                <div class="chart-wrapper"><canvas id="chartChurnDist"></canvas></div>
             </div>
             <div class="chart-card">
-                <div class="chart-header"><div><div class="chart-title">Distribuicao Risco de Churn</div></div></div>
-                <div class="chart-wrapper"><canvas id="chartChurnDist"></canvas></div>
+                <div class="chart-header"><div><div class="chart-title">Principais Motivos de Churn</div><div class="chart-subtitle">Por que os clientes estao saindo</div></div><span class="chart-badge badge-orange">Diagnostico</span></div>
+                <div class="chart-wrapper tall"><canvas id="chartChurnMotivos"></canvas></div>
             </div>
         </div>
         <div class="charts-grid">
             <div class="chart-card">
-                <div class="chart-header"><div><div class="chart-title">Etapa Hub - Distribuicao</div></div></div>
-                <div class="chart-wrapper tall"><canvas id="chartHubDist"></canvas></div>
+                <div class="chart-header"><div><div class="chart-title">Saude por Etapa Hub</div><div class="chart-subtitle">Risco de churn por etapa do cliente</div></div></div>
+                <div class="chart-wrapper tall"><canvas id="chartHubChurn"></canvas></div>
             </div>
             <div class="chart-card">
-                <div class="chart-header"><div><div class="chart-title">Top 15 Empresas Risco Alto</div></div></div>
-                <div style="max-height:400px;overflow-y:auto;">
-                    <table class="churn-table"><thead><tr><th>Empresa</th><th>Score</th><th>Etapa Oraculo</th><th>Motivos</th></tr></thead><tbody id="churnTableBody"></tbody></table>
+                <div class="chart-header"><div><div class="chart-title">Churn Score vs GMV</div><div class="chart-subtitle">Empresas com maior risco e maior valor</div></div><span class="chart-badge badge-blue">Impacto</span></div>
+                <div class="chart-wrapper tall"><canvas id="chartChurnGMV"></canvas></div>
+            </div>
+        </div>
+        <div class="charts-grid">
+            <div class="chart-card full-width">
+                <div class="chart-header"><div><div class="chart-title">Empresas com Maior Risco de Churn</div><div class="chart-subtitle">Detalhamento dos motivos e acoes recomendadas</div></div></div>
+                <div style="max-height:500px;overflow-y:auto;">
+                    <table class="churn-table"><thead><tr><th>Empresa</th><th>Score</th><th>Risco</th><th>Oraculo</th><th>Etapa Hub</th><th>GMV</th><th>Mensalidade</th><th>Motivos</th></tr></thead><tbody id="churnTableBody"></tbody></table>
                 </div>
             </div>
         </div>
@@ -515,12 +522,21 @@ function updateEmpresaPanel(){
         document.getElementById('eiInteg').textContent=match.temIntegracao?'Sim'+(match.tipoIntegracao?' - '+match.tipoIntegracao:''):'Nao';
         document.getElementById('eiMensal').textContent=match.mensalidade||'-';
         document.getElementById('eiHub').textContent=match.etapaHub||'-';
-        document.getElementById('eiOraculo').textContent=match.oraculoEtapa||'-';
+        // Oráculo: Tem ou não + coluna
+        const temOrac=document.getElementById('eiTemOraculo');
+        const colOrac=document.getElementById('eiOraculoColuna');
+        if(match.oraculoEtapa){
+            temOrac.innerHTML='<span style="color:var(--success);font-weight:700;">Sim</span>';
+            colOrac.innerHTML='<span style="color:var(--primary);font-weight:600;">'+match.oraculoEtapa+'</span>';
+        } else {
+            temOrac.innerHTML='<span style="color:var(--accent-red);font-weight:700;">Nao</span>';
+            colOrac.textContent='-';
+        }
         const cb=document.getElementById('eiChurn');
         cb.textContent=match.churnRisco||'-';
         cb.className='';
         if(match.churnRisco==='Alto')cb.style.cssText='color:var(--danger);font-weight:700;';
-        else if(match.churnRisco==='Medio')cb.style.cssText='color:var(--warning);font-weight:700;';
+        else if(match.churnRisco==='Medio'||match.churnRisco==='Médio')cb.style.cssText='color:var(--warning);font-weight:700;';
         else if(match.churnRisco==='Baixo')cb.style.cssText='color:var(--success);font-weight:700;';
         else cb.style.cssText='';
     } else {
@@ -666,48 +682,90 @@ function renderTab1(){
     getOrCreate('chartAnjo',{type:'pie',data:{labels:anjoLabels,datasets:[{data:anjoLabels.map(l=>anjoMap[l]),backgroundColor:anjoColors.slice(0,anjoLabels.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip}}});
 }
 
-/* ========== TAB 2: ORACULO & CHURN ========== */
+/* ========== TAB 2: ANALISE DE CHURN ========== */
 function renderTab2(){
-    const os=DADOS.oraculoSummary||{};
-    const ot=DADOS.oraculoTickets||[];
-    const cs=DADOS.churnStats||{};
-    const totalTickets=ot.length;
-    const concluidos=os['Concluido']||os['Concluído']||0;
-    const churnCount=os['Churn']||0;
-    const parados=os['Parado']||0;
-    const emAndamento=totalTickets-concluidos-churnCount-parados;
-    const riscoAlto=cs.alto||0;
-    const riscoMedio=cs.medio||0;
+    const es=filtered;
+    const alto=es.filter(e=>e.churnRisco==='Alto').length;
+    const medio=es.filter(e=>e.churnRisco==='Medio'||e.churnRisco==='Médio').length;
+    const baixo=es.filter(e=>e.churnRisco==='Baixo').length;
+    const altoGMV=es.filter(e=>e.churnRisco==='Alto').reduce((s,e)=>s+(e._gmv||0),0);
+    const altoMensal=es.filter(e=>e.churnRisco==='Alto'&&e.mensalidade).length;
+
+    // Count motivos across all at-risk companies
+    const motivoCount={};
+    es.filter(e=>e.churnScore>0).forEach(e=>{
+        (e.churnMotivos||'').split('; ').filter(Boolean).forEach(m=>{motivoCount[m]=(motivoCount[m]||0)+1;});
+    });
 
     document.getElementById('kpiGrid2').innerHTML=kpiHTML([
-        {icon:'&#128203;',label:'Total Tickets Oraculo',value:fmtN(totalTickets)},
-        {icon:'&#9989;',label:'Concluidos',value:fmtN(concluidos)},
-        {icon:'&#9203;',label:'Em Andamento',value:fmtN(Math.max(0,emAndamento))},
-        {icon:'&#128308;',label:'Risco Alto',value:fmtN(riscoAlto),color:'var(--danger)'},
-        {icon:'&#128992;',label:'Risco Medio',value:fmtN(riscoMedio),color:'var(--warning)'},
+        {icon:'&#128308;',label:'Risco Alto',value:fmtN(alto),color:'var(--danger)'},
+        {icon:'&#128992;',label:'Risco Medio',value:fmtN(medio),color:'var(--warning)'},
+        {icon:'&#128994;',label:'Risco Baixo',value:fmtN(baixo),color:'var(--success)'},
+        {icon:'&#128176;',label:'GMV em Risco (Alto)',value:fmtC(altoGMV),color:'var(--danger)'},
+        {icon:'&#128181;',label:'C/ Mensalidade em Risco',value:fmtN(altoMensal),color:'var(--warning)'},
     ]);
 
-    // Oraculo por Etapa (horizontal bar)
-    const etapas=Object.keys(os);
-    const etapaVals=etapas.map(k=>os[k]);
-    const etapaColors=etapas.map((_,i)=>['#118DFF','#00c853','#E66C37','#E044A7','#744EC2','#D9B300','#D64550','#ffab00','#12239E'][i%9]);
-    getOrCreate('chartOracEtapa',{type:'bar',data:{labels:etapas,datasets:[{label:'Quantidade',data:etapaVals,backgroundColor:etapaColors,borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:darkTooltip},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:darkTick,grid:darkGrid}}}});
-
     // Distribuicao Risco de Churn (doughnut)
-    const alto=filtered.filter(e=>e.churnRisco==='Alto').length;
-    const medio=filtered.filter(e=>e.churnRisco==='Medio'||e.churnRisco==='Médio').length;
-    const baixo=filtered.filter(e=>e.churnRisco==='Baixo').length;
-    getOrCreate('chartChurnDist',{type:'doughnut',data:{labels:['Alto','Medio','Baixo'],datasets:[{data:[alto,medio,baixo],backgroundColor:['#ff5252','#ffab00','#00c853'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip}}});
+    getOrCreate('chartChurnDist',{type:'doughnut',data:{labels:['Alto','Medio','Baixo'],datasets:[{data:[alto,medio,baixo],backgroundColor:['#ff5252','#ffab00','#00c853'],borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:darkLegend,tooltip:darkTooltip}}});
 
-    // Etapa Hub Distribution (bar)
-    const hubMap={};filtered.forEach(e=>{if(e.etapaHub){hubMap[e.etapaHub]=(hubMap[e.etapaHub]||0)+1;}});
-    const hubLabels=Object.keys(hubMap).sort((a,b)=>hubMap[b]-hubMap[a]);
-    const hubColors=hubLabels.map((_,i)=>['#118DFF','#744EC2','#E66C37','#00c853','#E044A7','#D9B300','#D64550'][i%7]);
-    getOrCreate('chartHubDist',{type:'bar',data:{labels:hubLabels,datasets:[{label:'Empresas',data:hubLabels.map(l=>hubMap[l]),backgroundColor:hubColors,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:darkTooltip},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:darkTick,grid:darkGrid}}}});
+    // Principais Motivos de Churn (horizontal bar)
+    const mLabels=Object.keys(motivoCount).sort((a,b)=>motivoCount[b]-motivoCount[a]);
+    const mVals=mLabels.map(l=>motivoCount[l]);
+    const mColors=mLabels.map(m=>{
+        if(m.includes('Zero'))return'#ff5252';
+        if(m.includes('Queda >50'))return'#D64550';
+        if(m.includes('Queda >30'))return'#E66C37';
+        if(m.includes('cancelamento'))return'#E044A7';
+        if(m.includes('integra'))return'#744EC2';
+        if(m.includes('Churn'))return'#ff5252';
+        if(m.includes('Parado'))return'#ffab00';
+        return'#8b8fa3';
+    });
+    getOrCreate('chartChurnMotivos',{type:'bar',data:{labels:mLabels,datasets:[{label:'Empresas afetadas',data:mVals,backgroundColor:mColors,borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:darkTooltip},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:{...darkTick,font:{size:11}},grid:darkGrid}}}});
 
-    // Top 15 Risco Alto table
-    const riscoAltoList=[...filtered].filter(e=>e.churnRisco==='Alto').sort((a,b)=>(b.churnScore||0)-(a.churnScore||0)).slice(0,15);
-    document.getElementById('churnTableBody').innerHTML=riscoAltoList.map(e=>`<tr><td class="cell-company">${e.nome}</td><td class="cell-value">${e.churnScore||0}</td><td>${e.oraculoEtapa||'-'}</td><td class="churn-motivos">${e.churnMotivos||'-'}</td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:20px;">Nenhuma empresa com risco alto</td></tr>';
+    // Saude por Etapa Hub (stacked bar: alto/medio/baixo por etapa)
+    const hubRisco={};
+    es.forEach(e=>{
+        const hub=e.etapaHub||'Sem etapa';
+        if(!hubRisco[hub])hubRisco[hub]={alto:0,medio:0,baixo:0};
+        if(e.churnRisco==='Alto')hubRisco[hub].alto++;
+        else if(e.churnRisco==='Medio'||e.churnRisco==='Médio')hubRisco[hub].medio++;
+        else hubRisco[hub].baixo++;
+    });
+    const hubLabels=Object.keys(hubRisco).sort((a,b)=>(hubRisco[b].alto+hubRisco[b].medio)-(hubRisco[a].alto+hubRisco[a].medio));
+    getOrCreate('chartHubChurn',{type:'bar',data:{labels:hubLabels,datasets:[
+        {label:'Alto',data:hubLabels.map(l=>hubRisco[l].alto),backgroundColor:'rgba(255,82,82,0.8)',borderRadius:2},
+        {label:'Medio',data:hubLabels.map(l=>hubRisco[l].medio),backgroundColor:'rgba(255,171,0,0.7)',borderRadius:2},
+        {label:'Baixo',data:hubLabels.map(l=>hubRisco[l].baixo),backgroundColor:'rgba(0,200,83,0.5)',borderRadius:2},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip},scales:{x:{stacked:true,ticks:darkTick,grid:darkGrid},y:{stacked:true,ticks:darkTick,grid:darkGrid}}}});
+
+    // Churn Score vs GMV (scatter/bubble)
+    const riskData=es.filter(e=>e.churnScore>0&&e._gmv>0).map(e=>({x:e.churnScore,y:e._gmv,nome:e.nome,r:Math.max(4,Math.min(20,Math.sqrt(e._gmv/1000)))}));
+    const scatterAlto=riskData.filter(d=>d.x>=60);
+    const scatterMedio=riskData.filter(d=>d.x>=30&&d.x<60);
+    const scatterBaixo=riskData.filter(d=>d.x<30);
+    getOrCreate('chartChurnGMV',{type:'bubble',data:{datasets:[
+        {label:'Alto',data:scatterAlto,backgroundColor:'rgba(255,82,82,0.6)',borderColor:'#ff5252',borderWidth:1},
+        {label:'Medio',data:scatterMedio,backgroundColor:'rgba(255,171,0,0.5)',borderColor:'#ffab00',borderWidth:1},
+        {label:'Baixo',data:scatterBaixo,backgroundColor:'rgba(0,200,83,0.4)',borderColor:'#00c853',borderWidth:1},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:{...darkTooltip,callbacks:{label:ctx=>{const d=ctx.raw;return d.nome+' | Score: '+d.x+' | GMV: '+fmtC(d.y);}}}},scales:{x:{title:{display:true,text:'Churn Score',color:'#8b8fa3',font:{family:'Inter'}},ticks:darkTick,grid:darkGrid,min:0,max:100},y:{title:{display:true,text:'GMV (R$)',color:'#8b8fa3',font:{family:'Inter'}},ticks:{...darkTick,callback:v=>fmtC(v)},grid:darkGrid}}}});
+
+    // Tabela detalhada - Top empresas em risco (alto + medio)
+    const riscoList=[...es].filter(e=>e.churnRisco==='Alto'||e.churnRisco==='Medio'||e.churnRisco==='Médio').sort((a,b)=>(b.churnScore||0)-(a.churnScore||0)).slice(0,25);
+    document.getElementById('churnTableBody').innerHTML=riscoList.map(e=>{
+        const riscoBadge=e.churnRisco==='Alto'?'<span class="cell-badge badge-alto">Alto</span>':'<span class="cell-badge badge-medio">Medio</span>';
+        const oracInfo=e.oraculoEtapa||'<span style="color:var(--text-muted)">Sem oraculo</span>';
+        return `<tr>
+            <td class="cell-company">${e.nome}</td>
+            <td class="cell-value" style="color:${e.churnScore>=60?'var(--danger)':'var(--warning)'}">${e.churnScore||0}</td>
+            <td>${riscoBadge}</td>
+            <td>${oracInfo}</td>
+            <td>${e.etapaHub||'-'}</td>
+            <td class="cell-currency">${fmtC(e._gmv||0)}</td>
+            <td>${e.mensalidade||'-'}</td>
+            <td class="churn-motivos">${e.churnMotivos||'-'}</td>
+        </tr>`;
+    }).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">Nenhuma empresa com risco alto ou medio</td></tr>';
 }
 
 /* ========== TAB 3: TABLE ========== */
