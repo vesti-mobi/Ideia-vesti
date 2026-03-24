@@ -298,6 +298,7 @@ async function main() {
         const entry = {
             marca,
             companyId,
+            usuario: row['Usuário'] || row['Usuario'] || '',
             etapaHub: row['ETAPA HUB'] || '',
             mensalidade: row['MENSALIDADE'] || '',
             gmvControle: row['GMV'] || '',
@@ -534,6 +535,7 @@ async function main() {
                 churnRisco,
                 churnMotivos: churnMotivos.length > 0 ? churnMotivos.join('; ') : '',
                 // Controle Geral Luana fields
+                usuario: ctrl ? ctrl.usuario : '',
                 naoPagos: ctrl ? ctrl.naoPagos : 0,
                 filial: ctrl ? ctrl.filial : '',
                 pixOraculo: ctrl ? ctrl.pix : '',

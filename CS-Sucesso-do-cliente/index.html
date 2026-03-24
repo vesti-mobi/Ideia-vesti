@@ -223,6 +223,7 @@
 
 <div class="empresa-info-panel" id="empresaInfoPanel">
     <div class="empresa-info-item"><strong>CNPJ:</strong> <span id="eiCnpj">-</span></div>
+    <div class="empresa-info-item"><strong>Usuário (e-mail):</strong> <span id="eiUsuario">-</span></div>
     <div class="empresa-info-item"><strong>Integração:</strong> <span id="eiInteg">-</span></div>
     <div class="empresa-info-item"><strong>Mensalidade:</strong> <span id="eiMensal">-</span></div>
     <div class="empresa-info-item"><strong>Etapa Hub:</strong> <span id="eiHub">-</span></div>
@@ -531,6 +532,7 @@ function updateEmpresaPanel(){
     if(match){
         panel.classList.add('visible');
         document.getElementById('eiCnpj').textContent=match.cnpj||'-';
+        document.getElementById('eiUsuario').textContent=match.usuario||'-';
         document.getElementById('eiInteg').textContent=match.temIntegracao?'Sim'+(match.tipoIntegracao?' - '+match.tipoIntegracao:''):'Não';
         document.getElementById('eiMensal').textContent=match.mensalidade||'-';
         document.getElementById('eiHub').textContent=match.etapaHub||'-';
