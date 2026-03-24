@@ -316,16 +316,89 @@ async function main() {
     });
     console.log('  Controle Luana loaded: ' + Object.keys(controleMap).length + ' companies');
 
-    // 8. HubSpot Oráculo tickets
+    // 8. HubSpot Oráculo tickets - with fuzzy matching
     const oraculoTickets = await fetchOraculoTickets();
-    // Build map: lowercase company name -> most recent ticket
-    const oraculoByNome = {};
+
+    // Normalize a name for matching: lowercase, remove accents, remove common suffixes/noise
+    function normalize(s) {
+        return (s || '').toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove accents
+            .replace(/\s*(jeans|modas|moda|confeccoes|confecções|oficial|clothing|collection|acessorios|acessórios|tricot|ltda|me|eireli|s\.a\.|sa)\s*/gi, ' ')
+            .replace(/[^a-z0-9]/g, ' ') // remove special chars
+            .replace(/\s+/g, ' ').trim();
+    }
+
+    // Build empresa lookup structures for matching
+    const allEmpresas = Object.values(empresasMap).filter(e => e.nomeFantasia || e.nomeDominio);
+    const empLookup = {}; // normalized name -> empresa
+    const empWords = {};  // each word of 3+ chars -> [empresas]
+    allEmpresas.forEach(e => {
+        const nome = e.nomeFantasia || e.nomeDominio;
+        const n = normalize(nome);
+        empLookup[n] = e;
+        // Also index by each significant word
+        n.split(' ').filter(w => w.length >= 3).forEach(w => {
+            if (!empWords[w]) empWords[w] = [];
+            empWords[w].push({ emp: e, nome });
+        });
+    });
+
+    // Match ticket to empresa using multiple strategies
+    function matchTicketToEmpresa(ticket) {
+        const tn = normalize(ticket.companyName);
+        if (!tn || tn === 'oraculo' || tn === 'eventos') return null;
+
+        // 1. Exact normalized match
+        if (empLookup[tn]) return empLookup[tn];
+
+        // 2. Check if ticket name is contained in any empresa name or vice-versa
+        for (const [en, emp] of Object.entries(empLookup)) {
+            if (en.includes(tn) || tn.includes(en)) return emp;
+        }
+
+        // 3. Word-based scoring: how many words from ticket match empresa words
+        const ticketWords = tn.split(' ').filter(w => w.length >= 3);
+        if (ticketWords.length === 0) return null;
+
+        let bestMatch = null, bestScore = 0;
+        const candidates = new Map();
+        ticketWords.forEach(tw => {
+            // Check exact word match and prefix match (3+ chars)
+            for (const [word, emps] of Object.entries(empWords)) {
+                if (word === tw || word.startsWith(tw) || tw.startsWith(word)) {
+                    emps.forEach(({ emp, nome }) => {
+                        const key = emp.id;
+                        const prev = candidates.get(key) || { emp, nome, score: 0 };
+                        prev.score += (word === tw) ? 2 : 1;
+                        candidates.set(key, prev);
+                    });
+                }
+            }
+        });
+
+        for (const [, c] of candidates) {
+            if (c.score > bestScore) { bestScore = c.score; bestMatch = c.emp; }
+        }
+
+        // Only accept if score is decent (at least one strong match)
+        return bestScore >= 2 ? bestMatch : null;
+    }
+
+    // Build map: empresa id -> most recent oraculo ticket
+    const oraculoByEmpId = {};
+    let oraculoMatched = 0, oraculoUnmatched = 0;
     for (const t of oraculoTickets) {
-        const key = t.companyName.toLowerCase().trim();
-        if (!oraculoByNome[key] || t.modified > oraculoByNome[key].modified) {
-            oraculoByNome[key] = t;
+        const emp = matchTicketToEmpresa(t);
+        if (emp) {
+            oraculoMatched++;
+            if (!oraculoByEmpId[emp.id] || t.modified > oraculoByEmpId[emp.id].modified) {
+                oraculoByEmpId[emp.id] = t;
+            }
+        } else {
+            oraculoUnmatched++;
         }
     }
+    console.log('  Oráculo matched: ' + oraculoMatched + '/' + oraculoTickets.length + ' (' + oraculoUnmatched + ' unmatched)');
 
     // Collect all months that appear across all data sources
     const allMonthsSet = new Set([
@@ -370,8 +443,8 @@ async function main() {
             const nome = e.nomeFantasia || e.nomeDominio;
             const ctrl = controleMap[e.id] || controleByNome[(nome || '').toLowerCase().trim()];
 
-            // Match with Oráculo HubSpot ticket
-            const oracTkt = oraculoByNome[(nome || '').toLowerCase().trim()];
+            // Match with Oráculo HubSpot ticket (by empresa id)
+            const oracTkt = oraculoByEmpId[e.id];
 
             // Mensalidade: from controle first, fallback to marcas e planos
             let mensalidade = '';
