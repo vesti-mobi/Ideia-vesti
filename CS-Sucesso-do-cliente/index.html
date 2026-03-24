@@ -755,6 +755,22 @@ function renderTab2(){
     document.getElementById('churnTableBody').innerHTML=riscoList.map(e=>{
         const riscoBadge=e.churnRisco==='Alto'?'<span class="cell-badge badge-alto">Alto</span>':'<span class="cell-badge badge-medio">Médio</span>';
         const oracInfo=e.oraculoEtapa||'<span style="color:var(--text-muted)">Sem Oráculo</span>';
+        // Frase explicativa clara sobre o risco
+        let explicacao='';
+        if(e.churnMotivos){
+            const motivos=(e.churnMotivos||'').split('; ').filter(Boolean);
+            const frases=motivos.map(m=>{
+                if(m.includes('Queda >50%'))return'teve uma queda de mais de 50% nos pedidos';
+                if(m.includes('Queda >30%'))return'teve uma queda de mais de 30% nos pedidos';
+                if(m.includes('Zero pedidos'))return'não fez nenhum pedido no último mês';
+                if(m.includes('Alto cancelamento'))return'tem uma taxa alta de cancelamentos';
+                if(m.includes('Sem integração'))return'não possui integração ativa';
+                if(m.includes('Oráculo: Churn'))return'está marcado como Churn no Oráculo';
+                if(m.includes('Oráculo: Parado'))return'está parado no Oráculo';
+                return m.toLowerCase();
+            });
+            explicacao='<span style="color:var(--danger);font-weight:600;">Esse cliente tem chance de churn porque</span> '+frases.join(', ')+'.';
+        }
         return `<tr>
             <td class="cell-company">${e.nome}</td>
             <td class="cell-value" style="color:${e.churnScore>=60?'var(--danger)':'var(--warning)'}">${e.churnScore||0}</td>
@@ -763,9 +779,9 @@ function renderTab2(){
             <td>${e.etapaHub||'-'}</td>
             <td class="cell-currency">${fmtC(e._gmv||0)}</td>
             <td>${e.mensalidade||'-'}</td>
-            <td class="churn-motivos">${e.churnMotivos||'-'}</td>
+            <td class="churn-motivos">${explicacao||'-'}</td>
         </tr>`;
-    }).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">Nenhuma empresa com risco alto ou medio</td></tr>';
+    }).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--success);padding:20px;font-weight:600;">Sem risco de churn — todas as empresas filtradas estão saudáveis</td></tr>';
 }
 
 /* ========== TAB 3: TABLE ========== */
