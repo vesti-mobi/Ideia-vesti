@@ -407,7 +407,7 @@ function populateFilters(){
         if(e.anjo)anjos.add(e.anjo);
         if(e.canal)canais.add(e.canal);
         if(e.modulo)modulos.add(e.modulo);
-        if(e.oraculoEtapa)hubs.add(e.oraculoEtapa);
+        if(e.etapaHub)hubs.add(e.etapaHub);
     });
     const addOpts=(sel,vals)=>{[...vals].sort().forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);});};
     addOpts(document.getElementById('fAnjo'),anjos);
@@ -484,7 +484,7 @@ function applyFilters(){
         if(fIn==='Nao'&&e.temIntegracao)return false;
         if(fMo&&e.modulo!==fMo)return false;
         if(fAt==='1'&&(e.pedidos||0)===0)return false;
-        if(fEH&&e.oraculoEtapa!==fEH)return false;
+        if(fEH&&e.etapaHub!==fEH)return false;
         if(fCh&&e.churnRisco!==fCh)return false;
         if(fCriaDe&&(!e.criacao||e.criacao<fCriaDe))return false;
         if(fCriaAte&&(!e.criacao||e.criacao>fCriaAte))return false;
@@ -532,10 +532,10 @@ function updateEmpresaPanel(){
     if(match){
         panel.classList.add('visible');
         document.getElementById('eiCnpj').textContent=match.cnpj||'-';
-        document.getElementById('eiUsuario').textContent=match.anjo||'-';
+        document.getElementById('eiUsuario').textContent=match.usuario||'-';
         document.getElementById('eiInteg').textContent=match.temIntegracao?'Sim'+(match.tipoIntegracao?' - '+match.tipoIntegracao:''):'Não';
         document.getElementById('eiMensal').textContent=match.mensalidade||'-';
-        document.getElementById('eiHub').textContent=match.oraculoEtapa||'-';
+        document.getElementById('eiHub').textContent=match.etapaHub||'-';
         // Oráculo: Tem ou não + coluna
         const temOrac=document.getElementById('eiTemOraculo');
         const colOrac=document.getElementById('eiOraculoColuna');
@@ -766,7 +766,7 @@ function renderTab2(){
     // Saude por Etapa Hub (stacked bar: alto/medio/baixo por etapa)
     const hubRisco={};
     es.forEach(e=>{
-        const hub=e.oraculoEtapa||'Sem etapa';
+        const hub=e.etapaHub||'Sem etapa';
         if(!hubRisco[hub])hubRisco[hub]={alto:0,medio:0,baixo:0};
         if(e.churnRisco==='Alto')hubRisco[hub].alto++;
         else if(e.churnRisco==='Medio'||e.churnRisco==='Médio')hubRisco[hub].medio++;
@@ -816,7 +816,7 @@ function renderTab2(){
             <td class="cell-value" style="color:${e.churnScore>=60?'var(--danger)':'var(--warning)'}">${e.churnScore||0}</td>
             <td>${riscoBadge}</td>
             <td>${oracInfo}</td>
-            <td>${e.oraculoEtapa||'-'}</td>
+            <td>${e.etapaHub||'-'}</td>
             <td class="cell-currency">${fmtC(e._gmv||0)}</td>
             <td>${e.mensalidade||'-'}</td>
             <td class="churn-motivos">${explicacao||'-'}</td>
@@ -844,7 +844,7 @@ const TABLE_COLS=[
     {key:'_links',label:'Links Env.',fmt:v=>fmtN(v)},
     {key:'_cliques',label:'Cliques',fmt:v=>fmtN(v)},
     {key:'mensalidade',label:'Mensalidade',fmt:v=>v||'-'},
-    {key:'oraculoEtapa',label:'Oráculo',fmt:v=>v||'-'},
+    {key:'etapaHub',label:'Etapa Hub',fmt:v=>v||'-'},
     {key:'oraculoEtapa',label:'Fase Oráculo',fmt:v=>v||'-'},
     {key:'churnRisco',label:'Risco Churn',fmt:v=>{if(v==='Alto')return'<span class="cell-badge badge-alto">Alto</span>';if(v==='Medio'||v==='Médio')return'<span class="cell-badge badge-medio">Médio</span>';if(v==='Baixo')return'<span class="cell-badge badge-baixo">Baixo</span>';return'-';}},
     {key:'modulo',label:'Módulo',fmt:v=>v||'-'},

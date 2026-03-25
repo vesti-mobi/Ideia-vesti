@@ -355,7 +355,23 @@ async function main() {
     console.log('\nFetching HubSpot...');
     const oraculoTickets = await fetchOraculoTickets();
 
-    // ---------- 4. (CSV Luana removido - dados vêm 100% do Fabric + HubSpot) ----------
+    // ---------- 4. Read Controle Geral Luana CSV (apenas mensalidade, email, senha, etapaHub) ----------
+    console.log('\nReading Controle Geral Luana (campos selecionados)...');
+    const controleMap = {};
+    const controleByNome = {};
+    await readCSV('controle_geral_luana_csv.csv', (row) => {
+        const companyId = row['Company*ID'] || row['CompanyID'] || '';
+        const marca = row['MARCAS'] || '';
+        const entry = {
+            usuario: row['Usuário'] || row['Usuario'] || '',
+            senha: row['Senha'] || '',
+            etapaHub: row['ETAPA HUB'] || '',
+            mensalidade: row['MENSALIDADE'] || '',
+        };
+        if (companyId) controleMap[companyId] = entry;
+        if (marca) controleByNome[marca.toLowerCase().trim()] = entry;
+    });
+    console.log('  Controle Luana loaded: ' + Object.keys(controleMap).length + ' companies (email, senha, etapaHub, mensalidade)');
 
     // ---------- 5. Process Power BI data ----------
     console.log('\nProcessing data...');
@@ -541,15 +557,21 @@ async function main() {
             const idx = empIndex++;
 
             const nome = e.nomeFantasia || e.nomeDominio;
+            const ctrl = controleMap[e.id] || controleByNome[(nome || '').toLowerCase().trim()];
             const oracTkt = oraculoByEmpId[e.id];
 
-            // Mensalidade (from Marcas e Planos)
+            // Mensalidade (CSV > Marcas e Planos > valorPlano)
             let mensalidade = '';
-            if (marca && marca.totalCobrado) {
+            if (ctrl && ctrl.mensalidade) {
+                mensalidade = ctrl.mensalidade;
+            } else if (marca && marca.totalCobrado) {
                 mensalidade = 'R$ ' + marca.totalCobrado.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
             } else if (e.valorPlano > 0) {
                 mensalidade = 'R$ ' + e.valorPlano.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
             }
+
+            // Etapa Hub (do CSV)
+            const etapaHub = ctrl ? ctrl.etapaHub : '';
 
             // Oráculo etapa (only from HubSpot)
             const oraculoEtapa = oracTkt ? oracTkt.stageName : '';
@@ -658,7 +680,10 @@ async function main() {
                 plano: marca ? marca.plano : '',
                 marcaAtiva: e.transCartao >= 250 ? 'Sim' : 'Não',
                 mensalidade,
+                etapaHub,
                 oraculoEtapa,
+                usuario: ctrl ? ctrl.usuario : '',
+                senha: ctrl ? ctrl.senha : '',
                 churnScore,
                 churnRisco,
                 churnMotivos: churnMotivos.length > 0 ? churnMotivos.join('; ') : '',
