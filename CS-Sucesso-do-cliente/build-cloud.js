@@ -214,30 +214,43 @@ async function fetchOraculoTickets() {
         return [];
     }
     try {
-        const data = await hubspotRequest('/crm/v3/objects/tickets/search', 'POST', {
-            filterGroups: [{ filters: [{ propertyName: 'hs_pipeline', operator: 'EQ', value: ORACULO_PIPELINE_ID }] }],
-            properties: ['subject', 'hs_pipeline_stage', 'createdate', 'hs_lastmodifieddate'],
-            limit: 100,
-        });
-        const tickets = (data.results || []).map(t => {
-            const stageId = t.properties.hs_pipeline_stage;
-            let companyName = (t.properties.subject || '')
-                .replace(/^[ÓO]R[ÁA]CULO\s*-\s*/i, '').replace(/\s*-\s*[ÓO]r[áa]culo.*/i, '')
-                .replace(/\s*-\s*Agente.*/i, '').replace(/\s*\|.*/, '').replace(/\s*\(.*\)/, '').trim();
-            if (companyName.startsWith('Oráculo ')) companyName = companyName.replace('Oráculo ', '').trim();
-            if (companyName.startsWith('Óraculo ')) companyName = companyName.replace('Óraculo ', '').trim();
-            return {
-                id: t.id,
-                subject: t.properties.subject,
-                companyName,
-                stageId,
-                stageName: ORACULO_STAGES[stageId] || stageId,
-                created: t.properties.createdate,
-                modified: t.properties.hs_lastmodifieddate,
+        const allTickets = [];
+        let after = 0;
+        let hasMore = true;
+        while (hasMore) {
+            const body = {
+                filterGroups: [{ filters: [{ propertyName: 'hs_pipeline', operator: 'EQ', value: ORACULO_PIPELINE_ID }] }],
+                properties: ['subject', 'hs_pipeline_stage', 'createdate', 'hs_lastmodifieddate'],
+                limit: 100,
             };
-        });
-        console.log('  HubSpot Oráculo: ' + tickets.length + ' tickets');
-        return tickets;
+            if (after) body.after = after;
+            const data = await hubspotRequest('/crm/v3/objects/tickets/search', 'POST', body);
+            const results = data.results || [];
+            for (const t of results) {
+                const stageId = t.properties.hs_pipeline_stage;
+                let companyName = (t.properties.subject || '')
+                    .replace(/^[ÓO]R[ÁA]CULO\s*-\s*/i, '').replace(/\s*-\s*[ÓO]r[áa]culo.*/i, '')
+                    .replace(/\s*-\s*Agente.*/i, '').replace(/\s*\|.*/, '').replace(/\s*\(.*\)/, '').trim();
+                if (companyName.startsWith('Oráculo ')) companyName = companyName.replace('Oráculo ', '').trim();
+                if (companyName.startsWith('Óraculo ')) companyName = companyName.replace('Óraculo ', '').trim();
+                allTickets.push({
+                    id: t.id,
+                    subject: t.properties.subject,
+                    companyName,
+                    stageId,
+                    stageName: ORACULO_STAGES[stageId] || stageId,
+                    created: t.properties.createdate,
+                    modified: t.properties.hs_lastmodifieddate,
+                });
+            }
+            if (data.paging && data.paging.next && data.paging.next.after) {
+                after = data.paging.next.after;
+            } else {
+                hasMore = false;
+            }
+        }
+        console.log('  HubSpot Oráculo: ' + allTickets.length + ' tickets');
+        return allTickets;
     } catch (e) {
         console.log('  WARN: HubSpot fetch failed: ' + e.message);
         return [];
@@ -319,12 +332,15 @@ async function main() {
     const daxProduct = "EVALUATE SUMMARIZECOLUMNS('Product'[Cadastros Users ( Vendedores ).CompanyId], \"LinksEnviados\", COUNTROWS('Product'))";
     const daxRankings = "EVALUATE SUMMARIZECOLUMNS('Rankings'[Cadastros Users ( Vendedores ).CompanyId], \"Cliques\", SUM('Rankings'[rankings.shared_links]))";
 
-    const daxPedidosPerCompany = `EVALUATE SUMMARIZECOLUMNS('Merged Pedidos'[ID Empresa], "TotalPedidos", COUNTROWS('Merged Pedidos'), "TotalPagos", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pago]=TRUE()), "TotalCancelados", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Cancelado]=TRUE()), "TotalPendentes", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pendente]=TRUE()), "ValTotal", SUM('Merged Pedidos'[Total]), "ValPagos", CALCULATE(SUM('Merged Pedidos'[Total]), 'Merged Pedidos'[Pago]=TRUE()), "ValCancelados", CALCULATE(SUM('Merged Pedidos'[Total]), 'Merged Pedidos'[Cancelado]=TRUE()), "TransCartao", CALCULATE(COUNTROWS('Merged Pedidos'), CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "credit")), "TransPix", CALCULATE(COUNTROWS('Merged Pedidos'), CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "pix")), "ValCartao", CALCULATE(SUM('Merged Pedidos'[Total]), CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "credit")), "ValPix", CALCULATE(SUM('Merged Pedidos'[Total]), CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "pix")))`;
+    const daxPedidosPerCompany = `EVALUATE SUMMARIZECOLUMNS('Merged Pedidos'[ID Empresa], "TotalPedidos", COUNTROWS('Merged Pedidos'), "TotalPagos", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pago]=TRUE()), "TotalCancelados", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Cancelado]=TRUE()), "TotalPendentes", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pendente]=TRUE()), "ValTotal", SUM('Merged Pedidos'[Total]), "ValPagos", CALCULATE(SUM('Merged Pedidos'[Total]), 'Merged Pedidos'[Pago]=TRUE()), "ValCancelados", CALCULATE(SUM('Merged Pedidos'[Total]), 'Merged Pedidos'[Cancelado]=TRUE()), "TransCartao", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "credit")), "TransPix", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "pix")), "ValCartao", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "credit")), "ValPix", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "pix")))`;
 
-    const daxPedidosMonthly = `EVALUATE SUMMARIZECOLUMNS('Merged Pedidos'[Data Criacao].[Year], 'Merged Pedidos'[Data Criacao].[MonthNo], "TotalPedidos", COUNTROWS('Merged Pedidos'), "Pagos", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pago]=TRUE()), "Cancelados", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Cancelado]=TRUE()), "Pendentes", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pendente]=TRUE()), "ValTotal", SUM('Merged Pedidos'[Total]), "ValPagos", CALCULATE(SUM('Merged Pedidos'[Total]), 'Merged Pedidos'[Pago]=TRUE()), "Cartao", CALCULATE(COUNTROWS('Merged Pedidos'), CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "credit")), "Pix", CALCULATE(COUNTROWS('Merged Pedidos'), CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "pix")), "ValCartao", CALCULATE(SUM('Merged Pedidos'[Total]), CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "credit")), "ValPix", CALCULATE(SUM('Merged Pedidos'[Total]), CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "pix")))`;
+    const daxPedidosMonthly = `EVALUATE SUMMARIZECOLUMNS('Merged Pedidos'[Data Criacao].[Year], 'Merged Pedidos'[Data Criacao].[MonthNo], "TotalPedidos", COUNTROWS('Merged Pedidos'), "Pagos", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pago]=TRUE()), "Cancelados", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Cancelado]=TRUE()), "Pendentes", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pendente]=TRUE()), "ValTotal", SUM('Merged Pedidos'[Total]), "ValPagos", CALCULATE(SUM('Merged Pedidos'[Total]), 'Merged Pedidos'[Pago]=TRUE()), "Cartao", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "credit")), "Pix", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "pix")), "ValCartao", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "credit")), "ValPix", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && CONTAINSSTRING('Merged Pedidos'[docs.payment.method], "pix")))`;
+
+    // Pedidos per company per month (for churn calculation)
+    const daxPedidosCompanyMonthly = `EVALUATE SUMMARIZECOLUMNS('Merged Pedidos'[ID Empresa], 'Merged Pedidos'[Data Criacao].[Year], 'Merged Pedidos'[Data Criacao].[MonthNo], "Qtd", COUNTROWS('Merged Pedidos'), "Pagos", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pago]=TRUE()), "Cancelados", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Cancelado]=TRUE()), "Pendentes", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pendente]=TRUE()), "Val", SUM('Merged Pedidos'[Total]), "ValPagos", CALCULATE(SUM('Merged Pedidos'[Total]), 'Merged Pedidos'[Pago]=TRUE()))`;
 
     // Run all queries in parallel
-    const [cadastrosRows, configRows, marcasRows, productRows, rankingsRows, pedidosCompanyRows, pedidosMonthlyRows] = await Promise.all([
+    const [cadastrosRows, configRows, marcasRows, productRows, rankingsRows, pedidosCompanyRows, pedidosMonthlyRows, pedidosCompanyMonthlyRows] = await Promise.all([
         executeDaxQuery(accessToken, daxCadastros, 'Cadastros Empresas'),
         executeDaxQuery(accessToken, daxConfig, 'Config Empresas'),
         executeDaxQuery(accessToken, daxMarcas, 'Marcas e Planos'),
@@ -332,40 +348,14 @@ async function main() {
         executeDaxQuery(accessToken, daxRankings, 'Rankings (cliques)'),
         executeDaxQuery(accessToken, daxPedidosPerCompany, 'Pedidos per Company'),
         executeDaxQuery(accessToken, daxPedidosMonthly, 'Pedidos Monthly'),
+        executeDaxQuery(accessToken, daxPedidosCompanyMonthly, 'Pedidos Company Monthly'),
     ]);
 
     // ---------- 3. Fetch HubSpot Oráculo tickets ----------
     console.log('\nFetching HubSpot...');
     const oraculoTickets = await fetchOraculoTickets();
 
-    // ---------- 4. Read Controle Geral Luana CSV ----------
-    console.log('\nReading Controle Geral Luana...');
-    const controleMap = {};
-    const controleByNome = {};
-    await readCSV('controle_geral_luana_csv.csv', (row) => {
-        const companyId = row['Company*ID'] || row['CompanyID'] || '';
-        const marca = row['MARCAS'] || '';
-        const entry = {
-            marca,
-            companyId,
-            usuario: row['Usuário'] || row['Usuario'] || '',
-            etapaHub: row['ETAPA HUB'] || '',
-            mensalidade: row['MENSALIDADE'] || '',
-            gmvControle: row['GMV'] || '',
-            filial: row['FILIAL'] || '',
-            oraculo: row['ORÁCULO'] || row['ORACULO'] || '',
-            pix: row['PIX'] || '',
-            cc: row['CC'] || '',
-            frete: row['FRETE'] || '',
-            jan: parseInt(row['JAN']) || 0,
-            fev: parseInt(row['FEV']) || 0,
-            mar: parseInt(row['MAR']) || 0,
-            naoPagos: parseInt(row['NÃO PAGOS'] || row['NAO PAGOS']) || 0,
-        };
-        if (companyId) controleMap[companyId] = entry;
-        if (marca) controleByNome[marca.toLowerCase().trim()] = entry;
-    });
-    console.log('  Controle Luana loaded: ' + Object.keys(controleMap).length + ' companies');
+    // ---------- 4. (CSV Luana removido - dados vêm 100% do Fabric + HubSpot) ----------
 
     // ---------- 5. Process Power BI data ----------
     console.log('\nProcessing data...');
@@ -467,6 +457,26 @@ async function main() {
         }
     }
 
+    // 5g. Pedidos per company per month
+    const pedidosCompanyMonth = {};
+    for (const row of pedidosCompanyMonthlyRows) {
+        const empId = row['ID Empresa'];
+        const year = row['Year'];
+        const month = row['MonthNo'];
+        if (!empId || !year || !month) continue;
+        const mesKey = String(year) + '-' + String(month).padStart(2, '0');
+        if (!pedidosCompanyMonth[empId]) pedidosCompanyMonth[empId] = {};
+        pedidosCompanyMonth[empId][mesKey] = {
+            qtd: parseInt(row['Qtd']) || 0,
+            pagos: parseInt(row['Pagos']) || 0,
+            cancelados: parseInt(row['Cancelados']) || 0,
+            pendentes: parseInt(row['Pendentes']) || 0,
+            val: parseFloat(row['Val']) || 0,
+            valPagos: parseFloat(row['ValPagos']) || 0,
+        };
+    }
+    console.log('  Company monthly data: ' + Object.keys(pedidosCompanyMonth).length + ' companies');
+
     // ---------- 6. HubSpot fuzzy matching ----------
     console.log('\nMatching Oráculo tickets...');
     const allEmpresas = Object.values(empresasMap).filter(e => e.nomeFantasia || e.nomeDominio);
@@ -531,60 +541,85 @@ async function main() {
             const idx = empIndex++;
 
             const nome = e.nomeFantasia || e.nomeDominio;
-            const ctrl = controleMap[e.id] || controleByNome[(nome || '').toLowerCase().trim()];
             const oracTkt = oraculoByEmpId[e.id];
 
-            // Mensalidade
+            // Mensalidade (from Marcas e Planos)
             let mensalidade = '';
-            if (ctrl && ctrl.mensalidade) {
-                mensalidade = ctrl.mensalidade;
-            } else if (marca && marca.totalCobrado) {
+            if (marca && marca.totalCobrado) {
                 mensalidade = 'R$ ' + marca.totalCobrado.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            } else if (e.valorPlano > 0) {
+                mensalidade = 'R$ ' + e.valorPlano.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
             }
 
-            // Etapa HubSpot
-            const etapaHub = ctrl ? ctrl.etapaHub : '';
+            // Oráculo etapa (only from HubSpot)
+            const oraculoEtapa = oracTkt ? oracTkt.stageName : '';
 
-            // Oráculo etapa
-            let oraculoEtapa = '';
-            if (oracTkt) {
-                oraculoEtapa = oracTkt.stageName;
-            } else if (ctrl && ctrl.oraculo) {
-                oraculoEtapa = ctrl.oraculo;
+            // Per-company monthly data
+            const empMonthly = pedidosCompanyMonth[e.id] || {};
+            const empMonthKeys = Object.keys(empMonthly).sort();
+
+            // Build m (sparse monthly data per company)
+            const m = {};
+            for (const mk of empMonthKeys) {
+                const md = empMonthly[mk];
+                m[mk] = [
+                    md.qtd, md.pagos, md.cancelados, md.pendentes,
+                    Math.round(md.val * 100) / 100,
+                    Math.round(md.valPagos * 100) / 100,
+                    Math.round((md.val - md.valPagos) * 100) / 100,
+                    0, 0, 0, 0, // transCard, transPix, valCard, valPix (not available per company/month)
+                    0, 0, // links, cliques
+                ];
             }
 
-            // Churn prediction
+            // Churn prediction using real monthly data
             let churnScore = 0;
             let churnMotivos = [];
 
-            // Without per-company monthly data from DAX, use aggregate signals
-            // 1. Zero pedidos overall
-            if (e.pedidos === 0 && e.criacao) {
-                churnScore += 25;
-                churnMotivos.push('Zero pedidos');
+            // Get last 6 months of data for trend analysis
+            const now = new Date();
+            const recentMonthKeys = [];
+            for (let i = 0; i < 6; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                recentMonthKeys.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'));
             }
-            // 2. High cancellation rate
+
+            const last3 = recentMonthKeys.slice(0, 3).reduce((s, k) => s + (empMonthly[k] ? empMonthly[k].qtd : 0), 0);
+            const prev3 = recentMonthKeys.slice(3, 6).reduce((s, k) => s + (empMonthly[k] ? empMonthly[k].qtd : 0), 0);
+
+            // 1. Order drop >50% (last 3 months vs prior 3 months)
+            if (prev3 > 5 && last3 < prev3 * 0.5) {
+                churnScore += 30;
+                churnMotivos.push('Queda >50% nos pedidos');
+            }
+            // 2. Order drop >30%
+            else if (prev3 > 5 && last3 < prev3 * 0.7) {
+                churnScore += 15;
+                churnMotivos.push('Queda >30% nos pedidos');
+            }
+            // 3. Zero orders in current month
+            const currentMonth = recentMonthKeys[0];
+            if (e.pedidos > 0 && (!empMonthly[currentMonth] || empMonthly[currentMonth].qtd === 0)) {
+                churnScore += 25;
+                churnMotivos.push('Zero pedidos no mês atual');
+            }
+            // 4. High cancellation rate
             if (e.pedidos > 10 && e.pedidosCancelados > e.pedidosPagos * 0.3) {
                 churnScore += 15;
                 churnMotivos.push('Alto cancelamento');
             }
-            // 3. No integration
+            // 5. No integration
             if (e.temIntegracao !== 'Sim') {
                 churnScore += 10;
                 churnMotivos.push('Sem integração');
             }
-            // 4. Oráculo status
+            // 6. Oráculo status
             if (oraculoEtapa === 'Churn') {
                 churnScore += 30;
                 churnMotivos.push('Oráculo: Churn');
             } else if (oraculoEtapa === 'Parado') {
                 churnScore += 20;
                 churnMotivos.push('Oráculo: Parado');
-            }
-            // 5. Low GMV per order
-            if (e.pedidos > 5 && e.valTotal / e.pedidos < 50) {
-                churnScore += 10;
-                churnMotivos.push('Ticket médio muito baixo');
             }
 
             churnScore = Math.min(churnScore, 100);
@@ -623,20 +658,12 @@ async function main() {
                 plano: marca ? marca.plano : '',
                 marcaAtiva: e.transCartao >= 250 ? 'Sim' : 'Não',
                 mensalidade,
-                etapaHub,
                 oraculoEtapa,
                 churnScore,
                 churnRisco,
                 churnMotivos: churnMotivos.length > 0 ? churnMotivos.join('; ') : '',
-                usuario: ctrl ? ctrl.usuario : '',
-                naoPagos: ctrl ? ctrl.naoPagos : 0,
-                filial: ctrl ? ctrl.filial : '',
-                pixOraculo: ctrl ? ctrl.pix : '',
-                ccOraculo: ctrl ? ctrl.cc : '',
-                freteOraculo: ctrl ? ctrl.frete : '',
-                pedJan: ctrl ? ctrl.jan : 0,
-                pedFev: ctrl ? ctrl.fev : 0,
-                pedMar: ctrl ? ctrl.mar : 0,
+                naoPagos: e.pedidosPendentes,
+                m,
             };
         });
 
