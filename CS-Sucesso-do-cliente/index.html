@@ -506,8 +506,8 @@ function applyFilters(){
             e._transPix=sumMonthly(e,9,fPedDe,fPedAte);
             e._valCartao=sumMonthly(e,10,fPedDe,fPedAte);
             e._valPix=sumMonthly(e,11,fPedDe,fPedAte);
-            e._links=sumMonthly(e,12,fLinkDe,fLinkAte);
-            e._cliques=sumMonthly(e,13,fCliqDe,fCliqAte);
+            e._links=e.linksEnviados||0; // total acumulado (não disponível por mês)
+            e._cliques=e.cliques||0;   // total acumulado (não disponível por mês)
         } else {
             e._pedidos=e.pedidos||0;e._pedidosPagos=e.pedidosPagos||0;
             e._pedidosCancelados=e.pedidosCancelados||0;e._pedidosPendentes=e.pedidosPendentes||0;
