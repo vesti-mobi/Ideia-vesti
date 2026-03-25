@@ -206,14 +206,8 @@
         <span class="filter-label">Período Pedidos</span>
         <div class="filter-date-row"><input type="date" id="fPedDe" class="filter-date"><span>a</span><input type="date" id="fPedAte" class="filter-date"></div>
     </div>
-    <div class="filter-group">
-        <span class="filter-label">Período Links</span>
-        <div class="filter-date-row"><input type="date" id="fLinkDe" class="filter-date"><span>a</span><input type="date" id="fLinkAte" class="filter-date"></div>
-    </div>
-    <div class="filter-group">
-        <span class="filter-label">Período Cliques</span>
-        <div class="filter-date-row"><input type="date" id="fCliqDe" class="filter-date"><span>a</span><input type="date" id="fCliqAte" class="filter-date"></div>
-    </div>
+    <input type="hidden" id="fLinkDe"><input type="hidden" id="fLinkAte">
+    <input type="hidden" id="fCliqDe"><input type="hidden" id="fCliqAte">
     <div class="filter-group">
         <span class="filter-label">Criação Domínio</span>
         <div class="filter-date-row"><input type="date" id="fCriaDe" class="filter-date"><span>a</span><input type="date" id="fCriaAte" class="filter-date"></div>
@@ -470,7 +464,7 @@ function applyFilters(){
     const fCliqAte=document.getElementById('fCliqAte').value;
     const fCriaDe=document.getElementById('fCriaDe').value;
     const fCriaAte=document.getElementById('fCriaAte').value;
-    const hasPeriod=fPedDe||fPedAte||fLinkDe||fLinkAte||fCliqDe||fCliqAte;
+    const hasPeriod=fPedDe||fPedAte;
 
     filtered=DADOS.empresas.filter(e=>{
         if(fE&&!e.nome.toLowerCase().includes(fE))return false;
