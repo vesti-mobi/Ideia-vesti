@@ -500,12 +500,12 @@ function applyFilters(){
             e._pedidosPendentes=sumMonthly(e,3,fPedDe,fPedAte);
             e._valTotal=sumMonthly(e,4,fPedDe,fPedAte);
             e._valPedidosPagos=sumMonthly(e,5,fPedDe,fPedAte);
-            e._valPedidosCancelados=sumMonthly(e,6,fPedDe,fPedAte);
-            e._valPedidosPendentes=sumMonthly(e,7,fPedDe,fPedAte);
-            e._transCartao=sumMonthly(e,8,fPedDe,fPedAte);
-            e._transPix=sumMonthly(e,9,fPedDe,fPedAte);
-            e._valCartao=sumMonthly(e,10,fPedDe,fPedAte);
-            e._valPix=sumMonthly(e,11,fPedDe,fPedAte);
+            e._valPedidosCancelados=0; // não disponível por mês separado
+            e._valPedidosPendentes=sumMonthly(e,6,fPedDe,fPedAte); // pos 6 = val - valPagos
+            e._transCartao=sumMonthly(e,7,fPedDe,fPedAte);
+            e._transPix=sumMonthly(e,8,fPedDe,fPedAte);
+            e._valCartao=sumMonthly(e,9,fPedDe,fPedAte);
+            e._valPix=sumMonthly(e,10,fPedDe,fPedAte);
             e._links=e.linksEnviados||0; // total acumulado (não disponível por mês)
             e._cliques=e.cliques||0;   // total acumulado (não disponível por mês)
         } else {
