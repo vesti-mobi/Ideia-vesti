@@ -517,7 +517,7 @@ function applyFilters(){
             e._valCartao=e.valCartao||0;e._valPix=e.valPix||0;
             e._links=e.linksEnviados||0;e._cliques=e.cliques||0;
         }
-        e._gmv=e.gmv||e._valTotal||0;
+        e._gmv=hasPeriod?e._valTotal:(e.gmv||e._valTotal||0);
     });
 
     updateEmpresaPanel();
@@ -623,9 +623,13 @@ function renderTab0(){
     const vP=es.reduce((s,e)=>s+e._valPix,0);
     getOrCreate('chartMetodo',{type:'doughnut',data:{labels:['Cartão','PIX'],datasets:[{data:[vC,vP],backgroundColor:['#7C3AED','#06B6D4'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:{...darkTooltip,callbacks:{label:ctx=>ctx.label+': '+fmtC(ctx.raw)}}}}});
 
-    // Chart: Evolucao GMV Mensal
+    // Chart: Evolucao GMV Mensal (responde aos filtros)
     const meses=DADOS.meses||[];
-    const gmvMensal=meses.map(m=>{const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.valTotal||0:0;});
+    const isFiltered=es.length<DADOS.empresas.length;
+    const gmvMensal=meses.map(m=>{
+        if(isFiltered){return es.reduce((s,e)=>{const md=e.m&&e.m[m];return s+(md?md[4]:0);},0);}
+        const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.valTotal||0:0;
+    });
     getOrCreate('chartGMV',{type:'line',data:{labels:meses.map(m=>m.substring(5)+'/'+m.substring(2,4)),datasets:[{label:'GMV',data:gmvMensal,borderColor:'#7C3AED',backgroundColor:'rgba(124,58,237,0.1)',fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#7C3AED'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:{...darkTick,callback:v=>fmtC(v)},grid:darkGrid}}}});
 
     // Chart: Distribuicao por Canal
@@ -645,19 +649,27 @@ function renderTab0(){
     const maxG=top10.length?top10[0]._gmv:1;
     document.getElementById('topGMV').innerHTML=top10.map((e,i)=>`<li class="top-item"><span class="top-rank">${i+1}</span><span class="top-name" title="${e.nome}">${e.nome}</span><div class="top-bar-wrap"><div class="top-bar" style="width:${(e._gmv/maxG*100).toFixed(1)}%"></div></div><span class="top-val">${fmtC(e._gmv)}</span></li>`).join('');
 
-    // Chart: Transações Mensais Cartão vs PIX
-    const tcM=meses.map(m=>{const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.cartao||0:0;});
-    const tpM=meses.map(m=>{const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.pix||0:0;});
+    // Chart: Transações Mensais Cartão vs PIX (responde aos filtros)
+    const tcM=meses.map(m=>{
+        if(isFiltered){return es.reduce((s,e)=>{const md=e.m&&e.m[m];return s+(md?md[7]:0);},0);}
+        const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.cartao||0:0;
+    });
+    const tpM=meses.map(m=>{
+        if(isFiltered){return es.reduce((s,e)=>{const md=e.m&&e.m[m];return s+(md?md[8]:0);},0);}
+        const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.pix||0:0;
+    });
     getOrCreate('chartTransMensal',{type:'bar',data:{labels:meses.map(m=>m.substring(5)+'/'+m.substring(2,4)),datasets:[{label:'Cartão',data:tcM,backgroundColor:'rgba(124,58,237,0.7)'},{label:'PIX',data:tpM,backgroundColor:'rgba(6,182,212,0.7)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:darkTick,grid:darkGrid}}}});
 
     // Chart: Pedidos por Status
     const pend=es.reduce((s,e)=>s+e._pedidosPendentes,0);
     getOrCreate('chartPedStatus',{type:'doughnut',data:{labels:['Pagos','Pendentes','Cancelados'],datasets:[{data:[pagos,pend,canc],backgroundColor:['#10B981','#F59E0B','#EF4444'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip}}});
 
-    // Chart: Links vs Cliques
-    const lM=meses.map(m=>{const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.links||0:0;});
-    const cM=meses.map(m=>{const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.cliques||0:0;});
-    getOrCreate('chartLinksCliques',{type:'line',data:{labels:meses.map(m=>m.substring(5)+'/'+m.substring(2,4)),datasets:[{label:'Links Enviados',data:lM,borderColor:'#8B5CF6',backgroundColor:'rgba(116,78,194,0.1)',fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#8B5CF6'},{label:'Cliques',data:cM,borderColor:'#EAB308',backgroundColor:'rgba(217,179,0,0.1)',fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#EAB308'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:darkTick,grid:darkGrid}}}});
+    // Chart: Pedidos Mensais (responde aos filtros)
+    const pedMensal=meses.map(m=>{
+        if(isFiltered){return es.reduce((s,e)=>{const md=e.m&&e.m[m];return s+(md?md[0]:0);},0);}
+        const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.total||0:0;
+    });
+    getOrCreate('chartLinksCliques',{type:'line',data:{labels:meses.map(m=>m.substring(5)+'/'+m.substring(2,4)),datasets:[{label:'Pedidos',data:pedMensal,borderColor:'#8B5CF6',backgroundColor:'rgba(116,78,194,0.1)',fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#8B5CF6'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:darkTick,grid:darkGrid}}}});
 }
 
 /* ========== TAB 1: TRANSACOES ========== */
