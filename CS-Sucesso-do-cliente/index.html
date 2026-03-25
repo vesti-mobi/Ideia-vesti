@@ -698,11 +698,18 @@ function renderTab1(){
     const inativas=es.length-ativas;
     getOrCreate('chartMarcas',{type:'doughnut',data:{labels:['Ativas','Inativas'],datasets:[{data:[ativas,inativas],backgroundColor:['#10B981','#5a5e72'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip}}});
 
-    // Evolucao valor mensal
+    // Evolucao valor mensal (GMV por mês - responde aos filtros)
     const meses=DADOS.meses||[];
-    const vcM=meses.map(m=>{const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.valCartao||0:0;});
-    const vpM=meses.map(m=>{const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.valPix||0:0;});
-    getOrCreate('chartEvolVal',{type:'line',data:{labels:meses.map(m=>m.substring(5)+'/'+m.substring(2,4)),datasets:[{label:'Cartão',data:vcM,borderColor:'#7C3AED',tension:0.4,pointRadius:3,pointBackgroundColor:'#7C3AED'},{label:'PIX',data:vpM,borderColor:'#06B6D4',tension:0.4,pointRadius:3,pointBackgroundColor:'#06B6D4'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:{...darkTooltip,callbacks:{label:ctx=>ctx.dataset.label+': '+fmtC(ctx.raw)}}},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:{...darkTick,callback:v=>fmtC(v)},grid:darkGrid}}}});
+    const isFiltered1=es.length<DADOS.empresas.length;
+    const valMensalPagos=meses.map(m=>{
+        if(isFiltered1){return es.reduce((s,e)=>{const md=e.m&&e.m[m];return s+(md?md[5]:0);},0);}
+        const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.valPagos||0:0;
+    });
+    const valMensalTotal=meses.map(m=>{
+        if(isFiltered1){return es.reduce((s,e)=>{const md=e.m&&e.m[m];return s+(md?md[4]:0);},0);}
+        const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.valTotal||0:0;
+    });
+    getOrCreate('chartEvolVal',{type:'line',data:{labels:meses.map(m=>m.substring(5)+'/'+m.substring(2,4)),datasets:[{label:'Valor Total',data:valMensalTotal,borderColor:'#7C3AED',tension:0.4,pointRadius:3,pointBackgroundColor:'#7C3AED'},{label:'Valor Pagos',data:valMensalPagos,borderColor:'#10B981',tension:0.4,pointRadius:3,pointBackgroundColor:'#10B981'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:{...darkTooltip,callbacks:{label:ctx=>ctx.dataset.label+': '+fmtC(ctx.raw)}}},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:{...darkTick,callback:v=>fmtC(v)},grid:darkGrid}}}});
 
     // Top 10 por Pedidos Pagos (horizontal bar)
     const top10P=[...es].sort((a,b)=>b._pedidosPagos-a._pedidosPagos).slice(0,10).reverse();
