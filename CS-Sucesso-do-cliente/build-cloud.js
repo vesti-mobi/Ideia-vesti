@@ -340,8 +340,8 @@ async function main() {
 
     const daxPedidosMonthly = `EVALUATE SUMMARIZECOLUMNS('Merged Pedidos'[Data Criacao].[Year], 'Merged Pedidos'[Data Criacao].[MonthNo], "TotalPedidos", COUNTROWS('Merged Pedidos'), "Pagos", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pago]=TRUE()), "Cancelados", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Cancelado]=TRUE()), "Pendentes", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pendente]=TRUE()), "ValTotal", SUM('Merged Pedidos'[Total]), "ValPagos", CALCULATE(SUM('Merged Pedidos'[Total]), 'Merged Pedidos'[Pago]=TRUE()), "Cartao", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroCartao}), "Pix", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroPix}), "ValCartao", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroCartao}), "ValPix", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroPix}))`;
 
-    // Pedidos per company per month (for churn calculation)
-    const daxPedidosCompanyMonthly = `EVALUATE SUMMARIZECOLUMNS('Merged Pedidos'[ID Empresa], 'Merged Pedidos'[Data Criacao].[Year], 'Merged Pedidos'[Data Criacao].[MonthNo], "Qtd", COUNTROWS('Merged Pedidos'), "Pagos", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pago]=TRUE()), "Cancelados", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Cancelado]=TRUE()), "Pendentes", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pendente]=TRUE()), "Val", SUM('Merged Pedidos'[Total]), "ValPagos", CALCULATE(SUM('Merged Pedidos'[Total]), 'Merged Pedidos'[Pago]=TRUE()))`;
+    // Pedidos per company per month (churn + period filters + payment)
+    const daxPedidosCompanyMonthly = `EVALUATE SUMMARIZECOLUMNS('Merged Pedidos'[ID Empresa], 'Merged Pedidos'[Data Criacao].[Year], 'Merged Pedidos'[Data Criacao].[MonthNo], "Qtd", COUNTROWS('Merged Pedidos'), "Pagos", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pago]=TRUE()), "Cancelados", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Cancelado]=TRUE()), "Pendentes", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pendente]=TRUE()), "Val", SUM('Merged Pedidos'[Total]), "ValPagos", CALCULATE(SUM('Merged Pedidos'[Total]), 'Merged Pedidos'[Pago]=TRUE()), "TC", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroCartao}), "TP", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroPix}), "VC", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroCartao}), "VP", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroPix}))`;
 
     // Run all queries in parallel
     const [cadastrosRows, configRows, marcasRows, productRows, rankingsRows, pedidosCompanyRows, pedidosMonthlyRows, pedidosCompanyMonthlyRows] = await Promise.all([
@@ -493,6 +493,10 @@ async function main() {
             pendentes: parseInt(row['Pendentes']) || 0,
             val: parseFloat(row['Val']) || 0,
             valPagos: parseFloat(row['ValPagos']) || 0,
+            tc: parseInt(row['TC']) || 0,
+            tp: parseInt(row['TP']) || 0,
+            vc: parseFloat(row['VC']) || 0,
+            vp: parseFloat(row['VP']) || 0,
         };
     }
     console.log('  Company monthly data: ' + Object.keys(pedidosCompanyMonth).length + ' companies');
@@ -593,8 +597,10 @@ async function main() {
                     Math.round(md.val * 100) / 100,
                     Math.round(md.valPagos * 100) / 100,
                     Math.round((md.val - md.valPagos) * 100) / 100,
-                    0, 0, 0, 0, // transCard, transPix, valCard, valPix (not available per company/month)
-                    0, 0, // links, cliques
+                    md.tc, md.tp,
+                    Math.round(md.vc * 100) / 100,
+                    Math.round(md.vp * 100) / 100,
+                    0, 0, // links, cliques (not available per month)
                 ];
             }
 
