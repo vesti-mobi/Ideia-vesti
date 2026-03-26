@@ -140,8 +140,8 @@ async function main() {
             "SELECT id, company_id, domain_id, customer_id, total_price, created_at FROM dbo.OBDC_Quotes_Anterior2023",
             'OBDC_Quotes_Anterior2023'),
         runSQL(sqlToken,
-            "SELECT TOP 1 * FROM dbo.ODBC_Costumers",
-            'ODBC_Costumers cols'),
+            "SELECT TOP 1 * FROM dbo.ODBC_Users",
+            'ODBC_Users cols'),
     ]);
 
     // --- 3. Build empresas ---
@@ -150,17 +150,15 @@ async function main() {
     const customerNames = {};
     if (customersRows.length > 0) {
         const cols = Object.keys(customersRows[0]);
-        console.log('  ODBC_Customers columns: ' + cols.join(', '));
-        // Find name column
+        console.log('  ODBC_Users columns: ' + cols.join(', '));
         const nameCol = cols.find(c => c.toLowerCase().includes('name') || c.toLowerCase().includes('nome'));
         const idCol = cols.find(c => c.toLowerCase() === 'id');
         console.log('  Using: id=' + idCol + ' name=' + nameCol);
-        // Now fetch all customers with correct column names
         if (nameCol && idCol) {
-            const allCustomers = await runSQL(sqlToken,
-                'SELECT [' + idCol + '], [' + nameCol + '] FROM dbo.ODBC_Costumers',
-                'ODBC_Costumers full');
-            for (const r of allCustomers) {
+            const allUsers = await runSQL(sqlToken,
+                'SELECT [' + idCol + '], [' + nameCol + '] FROM dbo.ODBC_Users',
+                'ODBC_Users full');
+            for (const r of allUsers) {
                 if (r[idCol] && r[nameCol]) customerNames[r[idCol]] = r[nameCol];
             }
         }
