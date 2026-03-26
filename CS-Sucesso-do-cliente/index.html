@@ -704,12 +704,19 @@ function renderTab0(){
     const pend=es.reduce((s,e)=>s+e._pedidosPendentes,0);
     getOrCreate('chartPedStatus',{type:'doughnut',data:{labels:['Pagos','Pendentes','Cancelados'],datasets:[{data:[pagos,pend,canc],backgroundColor:['#10B981','#F59E0B','#EF4444'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip}}});
 
-    // Chart: Pedidos Mensais (responde aos filtros)
-    const pedMensal=meses.map(m=>{
-        if(isFiltered){return es.reduce((s,e)=>{const md=e.m&&e.m[m];return s+(md?md[0]:0);},0);}
-        const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.total||0:0;
+    // Chart: Links Enviados vs Cliques (responde aos filtros)
+    const linksMensal=meses.map(m=>{
+        if(isFiltered){return es.reduce((s,e)=>{const md=e.m&&e.m[m];return s+(md?md[12]:0);},0);}
+        const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.links||0:0;
     });
-    getOrCreate('chartLinksCliques',{type:'line',data:{labels:meses.map(m=>m.substring(5)+'/'+m.substring(2,4)),datasets:[{label:'Pedidos',data:pedMensal,borderColor:'#8B5CF6',backgroundColor:'rgba(116,78,194,0.1)',fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#8B5CF6'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:darkTick,grid:darkGrid}}}});
+    const cliquesMensal=meses.map(m=>{
+        if(isFiltered){return es.reduce((s,e)=>{const md=e.m&&e.m[m];return s+(md?md[13]:0);},0);}
+        const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.cliques||0:0;
+    });
+    getOrCreate('chartLinksCliques',{type:'line',data:{labels:meses.map(m=>m.substring(5)+'/'+m.substring(2,4)),datasets:[
+        {label:'Links Enviados',data:linksMensal,borderColor:'#7C3AED',backgroundColor:'rgba(124,58,237,0.1)',fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#7C3AED'},
+        {label:'Cliques',data:cliquesMensal,borderColor:'#06B6D4',backgroundColor:'rgba(6,182,212,0.1)',fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#06B6D4'},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:darkTick,grid:darkGrid}}}});
 }
 
 /* ========== TAB 1: TRANSACOES ========== */
