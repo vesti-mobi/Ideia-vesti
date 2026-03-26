@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedidos por Marca | Vesti</title>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
         body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f1117;color:#e1e4eb;min-height:100vh;}
@@ -239,7 +239,7 @@ function exportXLSX(){
     ws['!cols']=[{wch:12},{wch:30},{wch:26},{wch:12},{wch:12},{wch:16}];
     const wb=XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb,ws,'Pedidos');
-    XLSX.writeFile(wb,getExportFileName()+'.xlsx');
+    XLSX.writeFile(wb,getExportFileName()+'.xlsx',{bookType:'xlsx'});
 }
 
 function initApp(){

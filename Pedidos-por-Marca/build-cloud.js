@@ -124,10 +124,9 @@ async function main() {
 
     // --- 1. DAX queries (Cadastros, Marcas, Merged Pedidos) ---
     console.log('Fetching from Power BI DAX...');
-    const [cadastros, marcas, pedidos] = await Promise.all([
+    const [cadastros, marcas] = await Promise.all([
         daxQuery(pbiToken, "EVALUATE 'Cadastros Empresas'", 'Cadastros'),
         daxQuery(pbiToken, "EVALUATE 'Marcas e Planos'", 'Marcas e Planos'),
-        daxQuery(pbiToken, `EVALUATE SELECTCOLUMNS('Merged Pedidos', "EmpId", 'Merged Pedidos'[ID Empresa], "DomId", 'Merged Pedidos'[ID Dominio], "Dt", 'Merged Pedidos'[Data Criacao], "V", 'Merged Pedidos'[Total], "Pg", 'Merged Pedidos'[Pago], "Cn", 'Merged Pedidos'[Cancelado], "Pn", 'Merged Pedidos'[Pendente], "Mt", 'Merged Pedidos'[docs.payment.method], "Pid", 'Merged Pedidos'[ID Pedido], "Dom", 'Merged Pedidos'[Nome do Dominio])`, 'Merged Pedidos'),
     ]);
 
     // --- 2. SQL queries (Lakehouse historical) ---
@@ -143,8 +142,8 @@ async function main() {
             "SELECT c.id as customer_id, u.name, u.lastname FROM dbo.ODBC_Costumers c INNER JOIN dbo.ODBC_Users u ON c.user_id = u.id",
             'Customer names (join)'),
         runSQL(sqlToken,
-            "SELECT _id, customer_name FROM dbo.MongoDB_Pedidos_Geral WHERE customer_name IS NOT NULL",
-            'MongoDB customer names'),
+            "SELECT _id, companyId, customer_name, total, status, statusPayment, payment_method, settings_source, created_at FROM dbo.MongoDB_Pedidos_Geral",
+            'MongoDB_Pedidos_Geral'),
     ]);
 
     // --- 3. Build empresas ---
@@ -159,12 +158,7 @@ async function main() {
     }
     console.log('  Customer names (ODBC): ' + Object.keys(customerNames).length);
 
-    // MongoDB pedidos → customer_name (para Merged Pedidos 2025+)
-    const mongoNames = {};
-    for (const r of mongoPedidosNames) {
-        if (r._id && r.customer_name) mongoNames[r._id] = r.customer_name;
-    }
-    console.log('  Customer names (MongoDB): ' + Object.keys(mongoNames).length);
+    console.log('  MongoDB_Pedidos_Geral: ' + mongoPedidosNames.length + ' rows');
 
     const empresas = {};
     const empresasByDom = {}; // domain_id -> empresa id
@@ -190,22 +184,33 @@ async function main() {
     // --- 4. Build pedidos por empresa ---
     const pedidosPorEmp = {};
 
-    // 4a. Merged Pedidos (current - 2025+)
+    // 4a. MongoDB_Pedidos_Geral (pedidos recentes com customer_name - preenche gap 2023-2026)
     // Format: [dt, val, status, metodo, pedidoId, nomeCliente]
-    let countMerged = 0;
-    for (const r of pedidos) {
-        const empId = resolveEmpId(r['EmpId'], r['DomId']);
+    const seenIds = new Set(); // track _id to avoid duplicates with ODBC_Quotes
+    let countMongo = 0;
+    for (const r of mongoPedidosNames) {
+        const empId = r.companyId && empresas[r.companyId] ? r.companyId : null;
         if (!empId) continue;
         if (!pedidosPorEmp[empId]) pedidosPorEmp[empId] = [];
-        const status = r['Pg'] === true || r['Pg'] === 'True' ? 'P' : r['Cn'] === true || r['Cn'] === 'True' ? 'C' : r['Pn'] === true || r['Pn'] === 'True' ? 'E' : 'O';
-        const dt = (r['Dt'] || '').toString().substring(0, 10);
-        const met = (r['Mt'] || '').toString().substring(0, 15);
-        const pid = (r['Pid'] || '').toString().substring(0, 24);
-        const custName = pid ? (mongoNames[pid] || '') : '';
-        pedidosPorEmp[empId].push([dt, Math.round((parseFloat(r['V']) || 0) * 100) / 100, status, met, pid, custName]);
-        countMerged++;
+        const st = (r.status || '').toString().toLowerCase();
+        const sp = (r.statusPayment || '').toString().toUpperCase();
+        let status;
+        if (sp.includes('PAGO') || sp === 'AUTORIZADO') status = 'P';
+        else if (sp.includes('CANCEL') || sp === 'REJEITADO') status = 'C';
+        else if (sp.includes('ANALISE') || sp.includes('ANÁLISE') || sp.includes('PEND')) status = 'E';
+        else if (st === 'paid' || st === 'approved') status = 'P';
+        else if (st === 'canceled' || st === 'cancelled' || st === 'rejected') status = 'C';
+        else if (st === 'pending' || st === 'waiting') status = 'E';
+        else status = 'O';
+        const dt = r.created_at ? new Date(r.created_at).toISOString().substring(0, 10) : '';
+        const met = (r.payment_method || r.settings_source || '').toString().substring(0, 15);
+        const pid = (r._id || '').toString();
+        const custName = (r.customer_name || '').toString();
+        pedidosPorEmp[empId].push([dt, Math.round((parseFloat(r.total) || 0) * 100) / 100, status, met, pid, custName]);
+        if (pid) seenIds.add(pid);
+        countMongo++;
     }
-    console.log('  Merged Pedidos processed: ' + countMerged);
+    console.log('  MongoDB_Pedidos_Geral processed: ' + countMongo);
 
     // Helper: resolve company_id or fallback to domain_id
     function resolveEmpId(companyId, domainId) {
@@ -214,9 +219,10 @@ async function main() {
         return null;
     }
 
-    // 4b. ODBC_Quotes (historical - up to 2024)
-    let countQuotes = 0, countQuotesDom = 0;
+    // 4b. ODBC_Quotes (historical - up to 2024, skip duplicates already in MongoDB)
+    let countQuotes = 0, countQuotesDom = 0, countSkipped = 0;
     for (const r of quotesRows) {
+        if (r.id && seenIds.has(r.id)) { countSkipped++; continue; }
         const empId = resolveEmpId(r.company_id, r.domain_id);
         if (!empId) continue;
         if (!pedidosPorEmp[empId]) pedidosPorEmp[empId] = [];
@@ -239,11 +245,12 @@ async function main() {
         if (!(r.company_id && empresas[r.company_id])) countQuotesDom++;
         countQuotes++;
     }
-    console.log('  ODBC_Quotes processed: ' + countQuotes + ' (via domain_id: ' + countQuotesDom + ')');
+    console.log('  ODBC_Quotes processed: ' + countQuotes + ' (via domain_id: ' + countQuotesDom + ', skipped dupes: ' + countSkipped + ')');
 
-    // 4c. OBDC_Quotes_Anterior2023 (oldest)
-    let countAnterior = 0, countAnteriorDom = 0;
+    // 4c. OBDC_Quotes_Anterior2023 (oldest, skip duplicates)
+    let countAnterior = 0, countAnteriorDom = 0, countSkipped2 = 0;
     for (const r of anteriorRows) {
+        if (r.id && seenIds.has(r.id)) { countSkipped2++; continue; }
         const empId = resolveEmpId(r.company_id, r.domain_id);
         if (!empId) continue;
         if (!pedidosPorEmp[empId]) pedidosPorEmp[empId] = [];
