@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS - Sucesso do Cliente 2025 | Vesti</title>
+    <title>CS - Sucesso do Cliente 2025-2026 | Vesti</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="dados.js"></script>
     <style>
@@ -149,7 +149,7 @@
     <div class="header-left">
         <img src="logo-vesti.png" alt="Vesti" class="logo" onerror="this.style.display='none'">
         <div class="header-title">
-            <h1>Sucesso do Cliente 2025</h1>
+            <h1>Sucesso do Cliente 2025-2026</h1>
             <span>Customer Success Dashboard - VestiPago</span>
         </div>
     </div>
@@ -334,7 +334,7 @@
         </div>
         <div class="charts-grid">
             <div class="chart-card">
-                <div class="chart-header"><div><div class="chart-title">Saúde por Etapa Hub</div><div class="chart-subtitle">Risco de churn por etapa do cliente</div></div></div>
+                <div class="chart-header"><div><div class="chart-title">Risco de Churn por Anjo</div><div class="chart-subtitle">Clientes em risco por responsável</div></div><span class="chart-badge badge-orange">Ação</span></div>
                 <div class="chart-wrapper tall"><canvas id="chartHubChurn"></canvas></div>
             </div>
             <div class="chart-card">
@@ -804,21 +804,21 @@ function renderTab2(){
     });
     getOrCreate('chartChurnMotivos',{type:'bar',data:{labels:mLabels,datasets:[{label:'Empresas afetadas',data:mVals,backgroundColor:mColors,borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:darkTooltip},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:{...darkTick,font:{size:11}},grid:darkGrid}}}});
 
-    // Saude por Etapa Hub (stacked bar: alto/medio/baixo por etapa)
-    const hubRisco={};
+    // Risco de Churn por Anjo (horizontal stacked bar)
+    const anjoRisco={};
     es.forEach(e=>{
-        const hub=e.etapaHub||'Sem etapa';
-        if(!hubRisco[hub])hubRisco[hub]={alto:0,medio:0,baixo:0};
-        if(e.churnRisco==='Alto')hubRisco[hub].alto++;
-        else if(e.churnRisco==='Medio'||e.churnRisco==='Médio')hubRisco[hub].medio++;
-        else hubRisco[hub].baixo++;
+        const anjo=e.anjo||'Sem anjo';
+        if(!anjoRisco[anjo])anjoRisco[anjo]={alto:0,medio:0,baixo:0,gmvRisco:0};
+        if(e.churnRisco==='Alto'){anjoRisco[anjo].alto++;anjoRisco[anjo].gmvRisco+=(e._gmv||0);}
+        else if(e.churnRisco==='Medio'||e.churnRisco==='Médio')anjoRisco[anjo].medio++;
+        else anjoRisco[anjo].baixo++;
     });
-    const hubLabels=Object.keys(hubRisco).sort((a,b)=>(hubRisco[b].alto+hubRisco[b].medio)-(hubRisco[a].alto+hubRisco[a].medio));
-    getOrCreate('chartHubChurn',{type:'bar',data:{labels:hubLabels,datasets:[
-        {label:'Alto',data:hubLabels.map(l=>hubRisco[l].alto),backgroundColor:'rgba(255,82,82,0.8)',borderRadius:2},
-        {label:'Médio',data:hubLabels.map(l=>hubRisco[l].medio),backgroundColor:'rgba(255,171,0,0.7)',borderRadius:2},
-        {label:'Baixo',data:hubLabels.map(l=>hubRisco[l].baixo),backgroundColor:'rgba(0,200,83,0.5)',borderRadius:2},
-    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip},scales:{x:{stacked:true,ticks:darkTick,grid:darkGrid},y:{stacked:true,ticks:darkTick,grid:darkGrid}}}});
+    const anjoRLabels=Object.keys(anjoRisco).sort((a,b)=>(anjoRisco[b].alto+anjoRisco[b].medio)-(anjoRisco[a].alto+anjoRisco[a].medio));
+    getOrCreate('chartHubChurn',{type:'bar',data:{labels:anjoRLabels,datasets:[
+        {label:'Alto',data:anjoRLabels.map(l=>anjoRisco[l].alto),backgroundColor:'rgba(239,68,68,0.85)',borderRadius:2},
+        {label:'Médio',data:anjoRLabels.map(l=>anjoRisco[l].medio),backgroundColor:'rgba(245,158,11,0.75)',borderRadius:2},
+        {label:'Baixo',data:anjoRLabels.map(l=>anjoRisco[l].baixo),backgroundColor:'rgba(16,185,129,0.55)',borderRadius:2},
+    ]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:{...darkTooltip,callbacks:{footer:items=>{const anjo=items[0].label;const info=anjoRisco[anjo];return info.gmvRisco>0?'GMV em risco alto: '+fmtC(info.gmvRisco):'';}}}},scales:{x:{stacked:true,ticks:darkTick,grid:darkGrid},y:{stacked:true,ticks:{...darkTick,font:{size:11}},grid:darkGrid}}}});
 
     // Churn Score vs GMV (scatter/bubble)
     const riskData=es.filter(e=>e.churnScore>0&&e._gmv>0).map(e=>({x:e.churnScore,y:e._gmv,nome:e.nome,r:Math.max(4,Math.min(20,Math.sqrt(e._gmv/1000)))}));
