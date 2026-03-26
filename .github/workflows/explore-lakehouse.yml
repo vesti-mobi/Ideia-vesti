@@ -1,0 +1,17 @@
+name: Explorar VestiLake
+on:
+  workflow_dispatch:
+jobs:
+  explore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install tedious
+      - name: Explorar
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+        run: node explore-lakehouse.js
