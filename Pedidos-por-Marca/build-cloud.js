@@ -186,8 +186,8 @@ async function main() {
 
     // 4a. MongoDB_Pedidos_Geral (pedidos recentes com customer_name - preenche gap 2023-2026)
     // Format: [dt, val, status, metodo, pedidoId, nomeCliente]
-    const seenIds = new Set(); // track _id to avoid duplicates with ODBC_Quotes
-    const orderNumberMap = {}; // _id -> orderNumber (to use in ODBC_Quotes fallback)
+    const seenKeys = new Set(); // track composite key to avoid duplicates
+    const orderLookup = {}; // companyId+date+val -> {orderNum, custName} (for ODBC_Quotes)
     let countMongo = 0;
     for (const r of mongoPedidosNames) {
         const empId = r.companyId && empresas[r.companyId] ? r.companyId : null;
@@ -209,9 +209,12 @@ async function main() {
         const orderNum = (r.orderNumber || '').toString();
         const custName = (r.customer_name || '').toString();
         const pid = (r._id || '').toString();
-        pedidosPorEmp[empId].push([dt, Math.round((parseFloat(r.summary_total) || 0) * 100) / 100, status, met, orderNum, custName]);
-        if (pid) { seenIds.add(pid); if (orderNum) orderNumberMap[pid] = orderNum; }
-        if (orderNum) seenIds.add(orderNum);
+        const val = Math.round((parseFloat(r.summary_total) || 0) * 100) / 100;
+        pedidosPorEmp[empId].push([dt, val, status, met, orderNum, custName]);
+        // Build composite key for dedup and lookup
+        const key = empId + '|' + dt + '|' + val;
+        seenKeys.add(key);
+        if (orderNum || custName) orderLookup[key] = { orderNum, custName };
         countMongo++;
     }
     console.log('  MongoDB_Pedidos_Geral processed: ' + countMongo);
@@ -226,7 +229,6 @@ async function main() {
     // 4b. ODBC_Quotes (historical - up to 2024, skip duplicates already in MongoDB)
     let countQuotes = 0, countQuotesDom = 0, countSkipped = 0;
     for (const r of quotesRows) {
-        if (r.id && seenIds.has(r.id)) { countSkipped++; continue; }
         const empId = resolveEmpId(r.company_id, r.domain_id);
         if (!empId) continue;
         if (!pedidosPorEmp[empId]) pedidosPorEmp[empId] = [];
@@ -242,11 +244,15 @@ async function main() {
         else if (stNum === 1) status = 'P';
         else status = 'O';
         const dt = r.created_at ? new Date(r.created_at).toISOString().substring(0, 10) : '';
+        const val = Math.round((parseFloat(r.total_price) || 0) * 100) / 100;
+        const key = empId + '|' + dt + '|' + val;
+        if (seenKeys.has(key)) { countSkipped++; continue; }
+        seenKeys.add(key);
         const met = (r.app || '').toString().substring(0, 15);
-        const rawId = (r.id || '').toString();
-        const orderNum = orderNumberMap[rawId] || '';
-        const custName = r.customer_id ? (customerNames[r.customer_id] || '') : '';
-        pedidosPorEmp[empId].push([dt, Math.round((parseFloat(r.total_price) || 0) * 100) / 100, status, met, orderNum, custName]);
+        const lookup = orderLookup[key];
+        const orderNum = lookup ? lookup.orderNum : '';
+        const custName = lookup ? lookup.custName : (r.customer_id ? (customerNames[r.customer_id] || '') : '');
+        pedidosPorEmp[empId].push([dt, val, status, met, orderNum, custName]);
         if (!(r.company_id && empresas[r.company_id])) countQuotesDom++;
         countQuotes++;
     }
@@ -255,15 +261,18 @@ async function main() {
     // 4c. OBDC_Quotes_Anterior2023 (oldest, skip duplicates)
     let countAnterior = 0, countAnteriorDom = 0, countSkipped2 = 0;
     for (const r of anteriorRows) {
-        if (r.id && seenIds.has(r.id)) { countSkipped2++; continue; }
         const empId = resolveEmpId(r.company_id, r.domain_id);
         if (!empId) continue;
         if (!pedidosPorEmp[empId]) pedidosPorEmp[empId] = [];
         const dt = r.created_at ? new Date(r.created_at).toISOString().substring(0, 10) : '';
-        const rawId = (r.id || '').toString();
-        const orderNum = orderNumberMap[rawId] || '';
-        const custName = r.customer_id ? (customerNames[r.customer_id] || '') : '';
-        pedidosPorEmp[empId].push([dt, Math.round((parseFloat(r.total_price) || 0) * 100) / 100, 'O', '', orderNum, custName]);
+        const val = Math.round((parseFloat(r.total_price) || 0) * 100) / 100;
+        const key = empId + '|' + dt + '|' + val;
+        if (seenKeys.has(key)) { countSkipped2++; continue; }
+        seenKeys.add(key);
+        const lookup = orderLookup[key];
+        const orderNum = lookup ? lookup.orderNum : '';
+        const custName = lookup ? lookup.custName : (r.customer_id ? (customerNames[r.customer_id] || '') : '');
+        pedidosPorEmp[empId].push([dt, val, 'O', '', orderNum, custName]);
         if (!(r.company_id && empresas[r.company_id])) countAnteriorDom++;
         countAnterior++;
     }
