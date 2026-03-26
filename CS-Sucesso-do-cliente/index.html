@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CS - Sucesso do Cliente 2025-2026 | Vesti</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="dados.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         :root {
@@ -141,10 +140,29 @@
             .tab-nav{width:100%;overflow-x:auto;}
             .header-right{display:none;}
         }
+        .login-screen{display:flex;align-items:center;justify-content:center;height:100vh;}
+        .login-box{background:#1a1d2e;border:1px solid #2a2d3e;border-radius:12px;padding:40px;text-align:center;width:340px;}
+        .login-box h2{font-size:18px;margin-bottom:8px;background:linear-gradient(135deg,#7C3AED,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+        .login-box p{color:#8b8fa3;font-size:12px;margin-bottom:20px;}
+        .login-box input{width:100%;background:#161825;border:1px solid #2a2d3e;color:#e1e4eb;padding:10px 14px;border-radius:8px;font-size:14px;text-align:center;margin-bottom:12px;}
+        .login-box input:focus{outline:none;border-color:#7C3AED;}
+        .login-box .btn-login{width:100%;background:linear-gradient(135deg,#7C3AED,#06B6D4);color:#fff;border:none;padding:10px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;}
+        .login-box .btn-login:hover{opacity:0.9;}
+        .login-error{color:#EF4444;font-size:12px;margin-top:8px;display:none;}
+        .app-content{display:none;}
     </style>
 </head>
 <body>
-
+<div class="login-screen" id="loginScreen">
+    <div class="login-box">
+        <h2>Sucesso do Cliente 2025-2026</h2>
+        <p>Digite a senha para acessar</p>
+        <input type="password" id="loginPass" placeholder="Senha" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="btn-login" onclick="doLogin()">Entrar</button>
+        <div class="login-error" id="loginError">Senha incorreta</div>
+    </div>
+</div>
+<div class="app-content" id="appContent">
 <div class="header">
     <div class="header-left">
         <img src="logo-vesti.png" alt="Vesti" class="logo" onerror="this.style.display='none'">
@@ -388,26 +406,7 @@ let tablePage=1;
 const PER_PAGE=15;
 let sortCol=-1,sortDir=1;
 
-/* ========== INIT ========== */
-document.addEventListener('DOMContentLoaded',()=>{
-    if(typeof DADOS==='undefined')return;
-    document.getElementById('badgeTotal').textContent=DADOS.totalEmpresas+' empresas';
-    document.getElementById('badgeDate').textContent=DADOS.geradoEm?new Date(DADOS.geradoEm).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
-    populateFilters();
-    applyFilters();
-    document.querySelectorAll('.filter-select,.filter-date,.filter-input').forEach(el=>el.addEventListener('change',()=>{tablePage=1;applyFilters();}));
-    document.getElementById('fAnjo').addEventListener('change',()=>{updateEmpresaDatalist();});
-    document.getElementById('fEmpresa').addEventListener('input',function(){
-        const v=this.value.trim();
-        // Se colou um Company ID, resolve para o nome
-        if(v.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)){
-            const emp=DADOS.empresas.find(e=>e.id&&e.id.toLowerCase()===v.toLowerCase());
-            if(emp){this.value=emp.nome;}
-        }
-        tablePage=1;applyFilters();
-    });
-    document.getElementById('tableSearch').addEventListener('input',()=>{tablePage=1;renderTable();});
-});
+/* ========== INIT (called from login script) ========== */
 
 function populateFilters(){
     const es=DADOS.empresas;
@@ -972,6 +971,46 @@ function exportCSV(){
     const a=document.createElement('a');a.href=url;a.download='cs_dashboard_export.csv';a.click();
     URL.revokeObjectURL(url);
 }
+</script>
+</div>
+<script>
+function doLogin(){
+    const pass=document.getElementById('loginPass').value;
+    crypto.subtle.digest('SHA-256',new TextEncoder().encode(pass)).then(buf=>{
+        const hex=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+        if(hex==='bc2e1f676370b8131e3a1f84fc6c1cd6c9266f279030c92604fde8cfa8a1e0d3'){
+            sessionStorage.setItem('auth_cs','ok');
+            loadApp();
+        } else {
+            document.getElementById('loginError').style.display='block';
+            document.getElementById('loginPass').value='';
+        }
+    });
+}
+function loadApp(){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('appContent').style.display='block';
+    const s=document.createElement('script');s.src='dados.js';
+    s.onload=function(){
+        document.getElementById('badgeTotal').textContent=DADOS.totalEmpresas+' empresas';
+        document.getElementById('badgeDate').textContent=DADOS.geradoEm?new Date(DADOS.geradoEm).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+        populateFilters();
+        applyFilters();
+        document.querySelectorAll('.filter-select,.filter-date,.filter-input').forEach(el=>el.addEventListener('change',()=>{tablePage=1;applyFilters();}));
+        document.getElementById('fAnjo').addEventListener('change',()=>{updateEmpresaDatalist();});
+        document.getElementById('fEmpresa').addEventListener('input',function(){
+            const v=this.value.trim();
+            if(v.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)){
+                const emp=DADOS.empresas.find(e=>e.id&&e.id.toLowerCase()===v.toLowerCase());
+                if(emp){this.value=emp.nome;}
+            }
+            tablePage=1;applyFilters();
+        });
+        document.getElementById('tableSearch').addEventListener('input',()=>{tablePage=1;renderTable();});
+    };
+    document.head.appendChild(s);
+}
+if(sessionStorage.getItem('auth_cs')==='ok'){loadApp();}
 </script>
 </body>
 </html>
