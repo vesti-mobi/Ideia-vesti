@@ -302,7 +302,7 @@ async function main() {
 
     console.log('\n=== RESULTADO ===');
     console.log('Empresas: ' + empList.length);
-    console.log('Pedidos Merged: ' + countMerged);
+    console.log('Pedidos MongoDB: ' + countMongo);
     console.log('Pedidos ODBC_Quotes: ' + countQuotes);
     console.log('Pedidos Anterior2023: ' + countAnterior);
     console.log('Total pedidos: ' + totalPed);
