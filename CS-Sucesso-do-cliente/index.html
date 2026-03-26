@@ -233,6 +233,8 @@
 
 <div class="empresa-info-panel" id="empresaInfoPanel">
     <div class="empresa-info-item"><strong>Anjo:</strong> <span id="eiAnjo">-</span></div>
+    <div class="empresa-info-item"><strong>Company ID:</strong> <span id="eiCompanyId" style="font-size:11px;user-select:all">-</span></div>
+    <div class="empresa-info-item"><strong>Domínio:</strong> <span id="eiDominio">-</span></div>
     <div class="empresa-info-item"><strong>CNPJ:</strong> <span id="eiCnpj">-</span></div>
     <div class="empresa-info-item"><strong>Usuário (e-mail):</strong> <span id="eiUsuario">-</span></div>
     <div class="empresa-info-item"><strong>Integração:</strong> <span id="eiInteg">-</span></div>
@@ -537,6 +539,8 @@ function updateEmpresaPanel(){
     if(match){
         panel.classList.add('visible');
         document.getElementById('eiAnjo').textContent=match.anjo||'-';
+        document.getElementById('eiCompanyId').textContent=match.id||'-';
+        document.getElementById('eiDominio').textContent=match.nome||'-';
         document.getElementById('eiCnpj').textContent=match.cnpj||'-';
         document.getElementById('eiUsuario').textContent=match.usuario||'-';
         document.getElementById('eiInteg').textContent=match.temIntegracao?'Sim'+(match.tipoIntegracao?' - '+match.tipoIntegracao:''):'Não';
