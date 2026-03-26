@@ -23,6 +23,10 @@ function loadEnv() {
 }
 const ENV = loadEnv();
 const HUBSPOT_TOKEN = ENV.HUBSPOT_TOKEN || process.env.HUBSPOT_TOKEN || '';
+const FABRIC_REFRESH_TOKEN = ENV.FABRIC_REFRESH_TOKEN || process.env.FABRIC_REFRESH_TOKEN || '';
+const FABRIC_TENANT_ID = ENV.FABRIC_TENANT_ID || process.env.FABRIC_TENANT_ID || '';
+const VP_WORKSPACE_ID = 'f80301c2-8735-40d2-8662-1f8a627d3f61';
+const VP_DATASET_ID = '606be0ee-2c8c-4f43-8ad6-0be04f95d616';
 const ORACULO_PIPELINE_ID = '794686264';
 const ORACULO_STAGES = {
     '1165541427':'Fila','1165361278':'Grupo de Implementação','1165350737':'Reunião 1',
@@ -129,6 +133,75 @@ async function fetchOraculoTickets() {
     } catch(e) {
         console.log('  WARN: HubSpot fetch failed: ' + e.message);
         return [];
+    }
+}
+
+// ===================== FABRIC API (VestiPago) =====================
+function httpsRequest(options, body) {
+    return new Promise((resolve, reject) => {
+        const req = https.request(options, (res) => {
+            const chunks = [];
+            res.on('data', c => chunks.push(c));
+            res.on('end', () => resolve({ statusCode: res.statusCode, body: Buffer.concat(chunks).toString() }));
+        });
+        req.on('error', reject);
+        if (body) req.write(body);
+        req.end();
+    });
+}
+
+async function fetchVestiPagoCompanies() {
+    if (!FABRIC_REFRESH_TOKEN || !FABRIC_TENANT_ID) {
+        console.log('  SKIP: FABRIC_REFRESH_TOKEN/FABRIC_TENANT_ID not set, skipping VestiPago');
+        return new Set();
+    }
+    try {
+        // Get access token
+        const querystring = require('querystring');
+        const postBody = querystring.stringify({
+            client_id: '1950a258-227b-4e31-a9cf-717495945fc2',
+            grant_type: 'refresh_token',
+            refresh_token: FABRIC_REFRESH_TOKEN,
+            scope: 'https://analysis.windows.net/powerbi/api/.default offline_access',
+        });
+        const tokenRes = await httpsRequest({
+            hostname: 'login.microsoftonline.com',
+            path: '/' + FABRIC_TENANT_ID + '/oauth2/v2.0/token',
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(postBody) },
+        }, postBody);
+        const tokenData = JSON.parse(tokenRes.body);
+        if (!tokenData.access_token) { console.log('  WARN: Failed to get Fabric token'); return new Set(); }
+
+        // Save new refresh token if returned
+        if (tokenData.refresh_token) {
+            fs.writeFileSync(path.join(DIR, '.new_refresh_token'), tokenData.refresh_token, 'utf-8');
+        }
+
+        // Query VestiPago dataset
+        const daxBody = JSON.stringify({
+            queries: [{ query: 'EVALUATE SELECTCOLUMNS(Companies, "companyId", Companies[data.companyId])' }],
+            serializerSettings: { includeNulls: true },
+        });
+        const daxRes = await httpsRequest({
+            hostname: 'api.powerbi.com',
+            path: '/v1.0/myorg/groups/' + VP_WORKSPACE_ID + '/datasets/' + VP_DATASET_ID + '/executeQueries',
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + tokenData.access_token, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(daxBody) },
+        }, daxBody);
+        if (daxRes.statusCode !== 200) { console.log('  WARN: VestiPago query failed: HTTP ' + daxRes.statusCode); return new Set(); }
+        const data = JSON.parse(daxRes.body);
+        const rows = (data.results && data.results[0] && data.results[0].tables && data.results[0].tables[0] && data.results[0].tables[0].rows) || [];
+        const set = new Set();
+        rows.forEach(r => {
+            const key = Object.keys(r).find(k => k.includes('companyId'));
+            if (key && r[key]) set.add(r[key]);
+        });
+        console.log('  VestiPago companies from Fabric: ' + set.size);
+        return set;
+    } catch (e) {
+        console.log('  WARN: VestiPago fetch failed: ' + e.message);
+        return new Set();
     }
 }
 
@@ -339,6 +412,9 @@ async function main() {
     // 8. HubSpot Oráculo tickets - with fuzzy matching
     const oraculoTickets = await fetchOraculoTickets();
 
+    // 9. VestiPago companies from Fabric
+    const vestiPagoSet = await fetchVestiPagoCompanies();
+
     // Normalize a name for matching: lowercase, remove accents, remove common suffixes/noise
     function normalize(s) {
         return (s || '').toLowerCase()
@@ -514,8 +590,8 @@ async function main() {
             churnScore = Math.min(churnScore, 100);
             const churnRisco = churnScore >= 60 ? 'Alto' : churnScore >= 30 ? 'Médio' : 'Baixo';
 
-            // VestiPago: empresa tem transações de cartão ou pix
-            const temVestiPago = (e.valCartao + e.valPix) > 0;
+            // VestiPago: vem do dataset Fabric "VestiPago - Vendas por empresa"
+            const temVestiPago = vestiPagoSet.has(e.id);
 
             return {
                 i: idx,
