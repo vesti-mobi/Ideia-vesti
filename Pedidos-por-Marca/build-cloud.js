@@ -127,24 +127,27 @@ async function main() {
     const [cadastros, marcas, pedidos] = await Promise.all([
         daxQuery(pbiToken, "EVALUATE 'Cadastros Empresas'", 'Cadastros'),
         daxQuery(pbiToken, "EVALUATE 'Marcas e Planos'", 'Marcas e Planos'),
-        daxQuery(pbiToken, `EVALUATE SELECTCOLUMNS('Merged Pedidos', "EmpId", 'Merged Pedidos'[ID Empresa], "Dt", 'Merged Pedidos'[Data Criacao], "V", 'Merged Pedidos'[Total], "Pg", 'Merged Pedidos'[Pago], "Cn", 'Merged Pedidos'[Cancelado], "Pn", 'Merged Pedidos'[Pendente], "Mt", 'Merged Pedidos'[docs.payment.method])`, 'Merged Pedidos'),
+        daxQuery(pbiToken, `EVALUATE SELECTCOLUMNS('Merged Pedidos', "EmpId", 'Merged Pedidos'[ID Empresa], "DomId", 'Merged Pedidos'[ID Dominio], "Dt", 'Merged Pedidos'[Data Criacao], "V", 'Merged Pedidos'[Total], "Pg", 'Merged Pedidos'[Pago], "Cn", 'Merged Pedidos'[Cancelado], "Pn", 'Merged Pedidos'[Pendente], "Mt", 'Merged Pedidos'[docs.payment.method])`, 'Merged Pedidos'),
     ]);
 
     // --- 2. SQL queries (Lakehouse historical) ---
     console.log('\nFetching from VestiLake SQL...');
     const quotesRows = await runSQL(sqlToken,
-        "SELECT company_id, total_price, created_at, status_payment, app FROM dbo.ODBC_Quotes",
+        "SELECT company_id, domain_id, total_price, created_at, status_payment, app FROM dbo.ODBC_Quotes",
         'ODBC_Quotes');
     const anteriorRows = await runSQL(sqlToken,
-        "SELECT company_id, total_price, created_at FROM dbo.OBDC_Quotes_Anterior2023",
+        "SELECT company_id, domain_id, total_price, created_at FROM dbo.OBDC_Quotes_Anterior2023",
         'OBDC_Quotes_Anterior2023');
 
     // --- 3. Build empresas ---
     console.log('\nProcessing...');
     const empresas = {};
+    const empresasByDom = {}; // domain_id -> empresa id
     for (const r of cadastros) {
         const id = r['Id Empresa']; if (!id) continue;
         empresas[id] = { id, nome: r['Nome Fantasia'] || r['Nome do Dominio'] || '', cnpj: r['CNPJ'] || '', anjo: r['Anjo'] || '', canal: r['Canal de Vendas'] || '' };
+        const domId = r['Id Dominio'];
+        if (domId) empresasByDom[String(domId)] = id;
     }
 
     const marcasByCnpj = {};
@@ -165,7 +168,8 @@ async function main() {
     // 4a. Merged Pedidos (current - 2025+)
     let countMerged = 0;
     for (const r of pedidos) {
-        const empId = r['EmpId']; if (!empId || !empresas[empId]) continue;
+        const empId = resolveEmpId(r['EmpId'], r['DomId']);
+        if (!empId) continue;
         if (!pedidosPorEmp[empId]) pedidosPorEmp[empId] = [];
         const status = r['Pg'] === true || r['Pg'] === 'True' ? 'P' : r['Cn'] === true || r['Cn'] === 'True' ? 'C' : r['Pn'] === true || r['Pn'] === 'True' ? 'E' : 'O';
         const dt = (r['Dt'] || '').toString().substring(0, 10);
@@ -175,30 +179,41 @@ async function main() {
     }
     console.log('  Merged Pedidos processed: ' + countMerged);
 
+    // Helper: resolve company_id or fallback to domain_id
+    function resolveEmpId(companyId, domainId) {
+        if (companyId && empresas[companyId]) return companyId;
+        if (domainId && empresasByDom[String(domainId)]) return empresasByDom[String(domainId)];
+        return null;
+    }
+
     // 4b. ODBC_Quotes (historical - up to 2024)
-    let countQuotes = 0;
+    let countQuotes = 0, countQuotesDom = 0;
     for (const r of quotesRows) {
-        const empId = r.company_id; if (!empId || !empresas[empId]) continue;
+        const empId = resolveEmpId(r.company_id, r.domain_id);
+        if (!empId) continue;
         if (!pedidosPorEmp[empId]) pedidosPorEmp[empId] = [];
         const sp = (r.status_payment || '').toString();
         const status = sp.includes('PAGO') ? 'P' : sp.includes('CANCEL') ? 'C' : sp.includes('PEND') ? 'E' : 'O';
         const dt = r.created_at ? new Date(r.created_at).toISOString().substring(0, 10) : '';
         const met = (r.app || '').toString().substring(0, 15);
         pedidosPorEmp[empId].push([dt, Math.round((parseFloat(r.total_price) || 0) * 100) / 100, status, met]);
+        if (!(r.company_id && empresas[r.company_id])) countQuotesDom++;
         countQuotes++;
     }
-    console.log('  ODBC_Quotes processed: ' + countQuotes);
+    console.log('  ODBC_Quotes processed: ' + countQuotes + ' (via domain_id: ' + countQuotesDom + ')');
 
     // 4c. OBDC_Quotes_Anterior2023 (oldest)
-    let countAnterior = 0;
+    let countAnterior = 0, countAnteriorDom = 0;
     for (const r of anteriorRows) {
-        const empId = r.company_id; if (!empId || !empresas[empId]) continue;
+        const empId = resolveEmpId(r.company_id, r.domain_id);
+        if (!empId) continue;
         if (!pedidosPorEmp[empId]) pedidosPorEmp[empId] = [];
         const dt = r.created_at ? new Date(r.created_at).toISOString().substring(0, 10) : '';
         pedidosPorEmp[empId].push([dt, Math.round((parseFloat(r.total_price) || 0) * 100) / 100, 'O', '']);
+        if (!(r.company_id && empresas[r.company_id])) countAnteriorDom++;
         countAnterior++;
     }
-    console.log('  OBDC_Quotes_Anterior2023 processed: ' + countAnterior);
+    console.log('  OBDC_Quotes_Anterior2023 processed: ' + countAnterior + ' (via domain_id: ' + countAnteriorDom + ')');
 
     // Sort by date desc
     for (const id of Object.keys(pedidosPorEmp)) {
