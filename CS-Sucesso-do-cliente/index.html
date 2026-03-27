@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CS - Sucesso do Cliente 2025-2026 | Vesti</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         :root {
@@ -228,6 +229,10 @@
         <span class="filter-label">Criação Domínio</span>
         <div class="filter-date-row"><input type="date" id="fCriaDe" class="filter-date"><span>a</span><input type="date" id="fCriaAte" class="filter-date"></div>
     </div>
+    <div class="filter-group" id="filialFilterGroup" style="display:none;">
+        <span class="filter-label">Filial</span>
+        <select id="fFilial" class="filter-select"><option value="">Todas (consolidado)</option></select>
+    </div>
     <button class="btn-clear" onclick="clearFilters()">Limpar Filtros</button>
 </div>
 
@@ -239,7 +244,16 @@
     <div class="empresa-info-item"><strong>CNPJ:</strong> <span id="eiCnpj">-</span></div>
     <div class="empresa-info-item"><strong>Usuário (e-mail):</strong> <span id="eiUsuario">-</span></div>
     <div class="empresa-info-item"><strong>Integração:</strong> <span id="eiInteg">-</span></div>
+    <div class="empresa-info-item"><strong>Integração (detalhe):</strong> <span id="eiIntegDetalhe">-</span></div>
+    <div class="empresa-info-item"><strong>Tipo Integração:</strong> <span id="eiTipoInteg">-</span></div>
+    <div class="empresa-info-item"><strong>Canal de Vendas:</strong> <span id="eiCanal">-</span></div>
+    <div class="empresa-info-item"><strong>Plano:</strong> <span id="eiPlano">-</span></div>
     <div class="empresa-info-item"><strong>Mensalidade:</strong> <span id="eiMensal">-</span></div>
+    <div class="empresa-info-item"><strong>Integração (Plano):</strong> <span id="eiPlanoInteg">-</span></div>
+    <div class="empresa-info-item"><strong>Assistente:</strong> <span id="eiAssistente">-</span></div>
+    <div class="empresa-info-item"><strong>Filial (Plano):</strong> <span id="eiPlanoFilial">-</span></div>
+    <div class="empresa-info-item"><strong>Descontos:</strong> <span id="eiDescontos">-</span></div>
+    <div class="empresa-info-item"><strong>Total Cobrado:</strong> <span id="eiTotalCobrado">-</span></div>
     <div class="empresa-info-item"><strong>Etapa Hub:</strong> <span id="eiHub">-</span></div>
     <div class="empresa-info-item"><strong>Tem Oráculo:</strong> <span id="eiTemOraculo">-</span></div>
     <div class="empresa-info-item"><strong>Fase Oráculo:</strong> <span id="eiOraculoColuna">-</span></div>
@@ -248,13 +262,24 @@
     <div class="empresa-info-item"><strong>Filial:</strong> <span id="eiFilial">-</span></div>
     <div class="empresa-info-item"><strong>Ped. Jan/Fev/Mar:</strong> <span id="eiPedMes">-</span></div>
 </div>
+<div id="oraculoDetailPanel" style="display:none;padding:14px 32px;background:rgba(168,85,247,0.06);border-bottom:1px solid var(--border);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:700;color:var(--accent-purple);">Oráculo</div>
+        <div style="display:flex;gap:6px;">
+            <button onclick="oraculoSlide(-1)" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;">&#9664;</button>
+            <button onclick="oraculoSlide(1)" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;">&#9654;</button>
+        </div>
+    </div>
+    <div id="oraculoDetailContent"></div>
+</div>
 
 <div class="main">
     <div class="tab-nav">
         <button class="tab-btn active" onclick="switchTab(0)">Visão Geral</button>
         <button class="tab-btn" onclick="switchTab(1)">Transações</button>
-        <button class="tab-btn" onclick="switchTab(2)">Análise de Churn</button>
-        <button class="tab-btn" onclick="switchTab(3)">Dados para Exportação</button>
+        <button class="tab-btn" onclick="switchTab(2)">Financeiro</button>
+        <button class="tab-btn" onclick="switchTab(3)">Análise de Churn</button>
+        <button class="tab-btn" onclick="switchTab(4)">Dados para Exportação</button>
     </div>
 
     <!-- TAB 0: Visão Geral -->
@@ -337,10 +362,51 @@
                 <div class="chart-wrapper"><canvas id="chartAnjo"></canvas></div>
             </div>
         </div>
+        <div id="filiaisSection" style="display:none;">
+            <div class="chart-card full-width" style="margin-bottom:24px;">
+                <div class="chart-header"><div><div class="chart-title">Filiais da Empresa</div><div class="chart-subtitle">Filiais encontradas por Domínio ID</div></div><span class="chart-badge badge-blue">Filiais</span></div>
+                <div style="overflow-x:auto;">
+                    <table style="width:100%;font-size:12px;"><thead><tr><th>Nome</th><th>Tipo</th><th>Domínio ID</th><th>Company ID</th><th>VestiPago</th></tr></thead><tbody id="filiaisTableBody"></tbody></table>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- TAB 2: Analise de Churn -->
+    <!-- TAB 2: Financeiro -->
     <div class="tab-content" id="tab2">
+        <div class="kpi-grid" id="kpiGridFin"></div>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header"><div><div class="chart-title">Distribuição por Plano</div></div><span class="chart-badge badge-blue">Planos</span></div>
+                <div class="chart-wrapper"><canvas id="chartPlanos"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header"><div><div class="chart-title">Receita por Plano</div></div><span class="chart-badge badge-green">Receita</span></div>
+                <div class="chart-wrapper"><canvas id="chartReceitaPlano"></canvas></div>
+            </div>
+        </div>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header"><div><div class="chart-title">Top 10 por Total Cobrado</div></div></div>
+                <div class="chart-wrapper tall"><canvas id="chartTopCobrado"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header"><div><div class="chart-title">Composição de Valores</div><div class="chart-subtitle">Mensalidade, Integração, Assistente, Filial, Descontos</div></div></div>
+                <div class="chart-wrapper"><canvas id="chartComposicao"></canvas></div>
+            </div>
+        </div>
+        <div id="finEmpresaDetail" style="display:none;">
+            <div class="chart-card full-width" style="margin-bottom:24px;">
+                <div class="chart-header"><div><div class="chart-title">Detalhes Financeiros da Empresa</div></div><span class="chart-badge badge-green">Individual</span></div>
+                <div style="overflow-x:auto;">
+                    <table style="width:100%;font-size:12px;"><thead><tr><th>Campo</th><th>Valor</th></tr></thead><tbody id="finEmpresaBody"></tbody></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: Analise de Churn -->
+    <div class="tab-content" id="tab3">
         <div class="kpi-grid" id="kpiGrid2"></div>
         <div class="charts-grid">
             <div class="chart-card">
@@ -372,15 +438,17 @@
         </div>
     </div>
 
-    <!-- TAB 3: Dados para Exportação -->
-    <div class="tab-content" id="tab3">
+    <!-- TAB 4: Dados para Exportação -->
+    <div class="tab-content" id="tab4">
         <div class="table-card">
             <div class="table-header">
                 <div class="table-title">Dados para Exportação</div>
                 <div style="display:flex;gap:8px;align-items:center;">
                     <input type="text" class="table-search" id="tableSearch" placeholder="Buscar na tabela...">
                     <button class="btn-export" onclick="exportCSV()">Exportar CSV</button>
+                    <button class="btn-export" onclick="exportExcel()" style="background:rgba(124,58,237,0.15);color:var(--primary);border-color:rgba(124,58,237,0.3);">Exportar Excel</button>
                 </div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Preview: 10 primeiras empresas. A exportação inclui todos os dados filtrados.</div>
             </div>
             <div class="table-wrapper"><table><thead><tr id="tableHead"></tr></thead><tbody id="tableBody"></tbody></table></div>
             <div class="table-footer"><span id="tableInfo"></span><div class="pagination" id="tablePag"></div></div>
@@ -404,7 +472,7 @@ const darkTooltip={backgroundColor:'#1a1d27',titleColor:'#f0f2f5',bodyColor:'#8b
 /* ========== STATE ========== */
 let filtered=[];
 let tablePage=1;
-const PER_PAGE=15;
+const PER_PAGE=10;
 let sortCol=-1,sortDir=1;
 
 /* ========== INIT (called from login script) ========== */
@@ -430,7 +498,9 @@ function updateEmpresaDatalist(){
     const dl=document.getElementById('dlEmpresas');
     dl.innerHTML='';
     const fA=document.getElementById('fAnjo').value;
-    const empresas=fA?DADOS.empresas.filter(e=>e.anjo===fA):DADOS.empresas;
+    let empresas=fA?DADOS.empresas.filter(e=>e.anjo===fA):DADOS.empresas;
+    // Show only matrizes and companies without filiais (hide filiais from main dropdown)
+    empresas=empresas.filter(e=>e.isMatriz||!e.matrizId);
     empresas.forEach(e=>{const o=document.createElement('option');o.value=e.nome;dl.appendChild(o);});
 }
 
@@ -439,6 +509,7 @@ function clearFilters(){
     document.querySelectorAll('.filter-date').forEach(d=>d.value='');
     document.getElementById('fEmpresa').value='';
     document.getElementById('tableSearch').value='';
+    document.getElementById('filialFilterGroup').style.display='none';
     tablePage=1;sortCol=-1;
     applyFilters();
 }
@@ -480,6 +551,8 @@ function applyFilters(){
     const fCriaAte=document.getElementById('fCriaAte').value;
     const hasPeriod=fPedDe||fPedAte;
 
+    const fFilial=document.getElementById('fFilial').value;
+
     filtered=DADOS.empresas.filter(e=>{
         if(fE&&!e.nome.toLowerCase().includes(fE)&&!(e.id&&e.id.toLowerCase().includes(fE)))return false;
         if(fA&&e.anjo!==fA)return false;
@@ -498,6 +571,22 @@ function applyFilters(){
         if(fCriaAte&&(!e.criacao||e.criacao>fCriaAte))return false;
         return true;
     });
+
+    // Apply filial filter after main filter
+    if(fE){
+        const mainMatch=DADOS.empresas.find(e=>e.nome.toLowerCase()===fE||(e.id&&e.id.toLowerCase()===fE));
+        if(mainMatch&&mainMatch.filiais&&mainMatch.filiais.length>0){
+            if(fFilial){
+                // Specific filial/matriz selected - show only that one
+                filtered=DADOS.empresas.filter(e=>e.id===fFilial);
+            } else {
+                // "Todas (consolidado)" - show main + all filiais
+                const allIds=new Set([mainMatch.id]);
+                mainMatch.filiais.forEach(f=>allIds.add(f.id));
+                filtered=DADOS.empresas.filter(e=>allIds.has(e.id));
+            }
+        }
+    }
 
     // Build aggregated data considering period filters
     filtered.forEach(e=>{
@@ -529,51 +618,213 @@ function applyFilters(){
     });
 
     updateEmpresaPanel();
-    renderTab0();renderTab1();renderTab2();renderTable();
+    renderTab0();renderTab1();renderTabFin();renderTab2();renderTable();
 }
 
 /* ========== EMPRESA PANEL ========== */
+function getDisplayEmpresa(){
+    const fE=document.getElementById('fEmpresa').value.trim().toLowerCase();
+    const mainMatch=fE?DADOS.empresas.find(e=>e.nome.toLowerCase()===fE||(e.id&&e.id.toLowerCase()===fE)):null;
+    if(!mainMatch) return {main:null,display:null};
+    const fFilial=document.getElementById('fFilial').value;
+    if(fFilial){
+        const filialMatch=DADOS.empresas.find(e=>e.id===fFilial);
+        return {main:mainMatch, display:filialMatch||mainMatch};
+    }
+    return {main:mainMatch, display:mainMatch};
+}
+
 function updateEmpresaPanel(){
     const panel=document.getElementById('empresaInfoPanel');
-    const fE=document.getElementById('fEmpresa').value.trim().toLowerCase();
-    const match=fE?DADOS.empresas.find(e=>e.nome.toLowerCase()===fE||(e.id&&e.id.toLowerCase()===fE)):null;
+    const oraculoPanel=document.getElementById('oraculoDetailPanel');
+    const {main:match, display}=getDisplayEmpresa();
     if(match){
+        // Show info for the selected filial (individual) or the main company
+        const show=display||match;
         panel.classList.add('visible');
-        document.getElementById('eiAnjo').textContent=match.anjo||'-';
-        document.getElementById('eiCompanyId').textContent=match.id||'-';
-        document.getElementById('eiDominio').textContent=match.nome||'-';
-        document.getElementById('eiDominioId').textContent=match.idDominio||'-';
-        document.getElementById('eiCnpj').textContent=match.cnpj||'-';
-        document.getElementById('eiUsuario').textContent=match.usuario||'-';
-        document.getElementById('eiInteg').textContent=match.temIntegracao?'Sim'+(match.tipoIntegracao?' - '+match.tipoIntegracao:''):'Não';
-        document.getElementById('eiMensal').textContent=match.mensalidade||'-';
-        document.getElementById('eiHub').textContent=match.etapaHub||'-';
+        document.getElementById('eiAnjo').textContent=show.anjo||'-';
+        document.getElementById('eiCompanyId').textContent=show.id||'-';
+        document.getElementById('eiDominio').textContent=show.nome||'-';
+        document.getElementById('eiDominioId').textContent=show.idDominio||'-';
+        document.getElementById('eiCnpj').textContent=show.cnpj||'-';
+        document.getElementById('eiUsuario').textContent=show.usuario||'-';
+        document.getElementById('eiInteg').textContent=show.temIntegracao?'Sim':'Não';
+        document.getElementById('eiIntegDetalhe').textContent=show.integracao||'-';
+        document.getElementById('eiTipoInteg').textContent=show.tipoIntegracao||'-';
+        document.getElementById('eiCanal').textContent=show.canal||'-';
+        // Plano / Financeiro
+        document.getElementById('eiPlano').textContent=show.plano||'-';
+        document.getElementById('eiMensal').textContent=show.planoMensalidade?fmtCFull(show.planoMensalidade):(show.mensalidade||'-');
+        document.getElementById('eiPlanoInteg').textContent=show.planoIntegracao?fmtCFull(show.planoIntegracao):'-';
+        document.getElementById('eiAssistente').textContent=show.planoAssistente?fmtCFull(show.planoAssistente):'-';
+        document.getElementById('eiPlanoFilial').textContent=show.planoFilial?fmtCFull(show.planoFilial):'-';
+        document.getElementById('eiDescontos').textContent=show.planoDescontos?fmtCFull(show.planoDescontos):'-';
+        document.getElementById('eiTotalCobrado').textContent=show.planoTotalCobrado?fmtCFull(show.planoTotalCobrado):'-';
+        document.getElementById('eiHub').textContent=show.etapaHub||'-';
         // Oráculo: Tem ou não + coluna
         const temOrac=document.getElementById('eiTemOraculo');
         const colOrac=document.getElementById('eiOraculoColuna');
-        if(match.oraculoEtapa){
+        const temOraculoReal=show.temOraculoFabric||!!show.oraculoEtapa;
+        if(temOraculoReal){
             temOrac.innerHTML='<span style="color:var(--success);font-weight:700;">Sim</span>';
-            colOrac.innerHTML='<span style="color:var(--primary);font-weight:600;">'+match.oraculoEtapa+'</span>';
+            colOrac.innerHTML='<span style="color:var(--primary);font-weight:600;">'+(show.oraculoEtapa||'Ativo')+'</span>';
         } else {
             temOrac.innerHTML='<span style="color:var(--accent-red);font-weight:700;">Não</span>';
             colOrac.textContent='-';
         }
+        // Oráculo detail panel (Fabric) - mini dashboard com slides
+        if(show.temOraculoFabric&&show.oraculoFabric){
+            oraculoPanel.style.display='block';
+            const oc=show.oraculoFabric;
+            window._oraculoSlides=[
+                // Slide 1: Atendimentos
+                {title:'Clientes Atendidos',kpi:fmtN(oc.atendimentosOraculo||0),label:'atendimentos totais',color:'var(--primary)',bg:'rgba(124,58,237,0.1)',sub:'Pedidos: '+fmtN(oc.pedidosOraculo||0)+' | Interações: '+fmtN(oc.interacoesOraculo||0)},
+                // Slide 2: % IA
+                {title:'% Atendimento por IA',kpi:(oc.pctIAOraculo||0).toFixed(1)+'%',label:'dos atendimentos feitos por IA',color:'var(--teal)',bg:'rgba(6,182,212,0.1)',sub:fmtN(Math.round((oc.atendimentosOraculo||0)*(oc.pctIAOraculo||0)/100))+' atendimentos por IA de '+fmtN(oc.atendimentosOraculo||0)+' totais'},
+                // Slide 3: Vendas
+                {title:'Vendas pelo Oráculo',kpi:oc.vendasOraculo>0?fmtCFull(oc.vendasOraculo):'Sem dados',label:'valor total em vendas',color:'var(--success)',bg:'rgba(16,185,129,0.1)',sub:'Pedidos pelo Oráculo: '+fmtN(oc.pedidosOraculo||0)},
+                // Slide 4: Config
+                {title:'Configuração',kpi:'',label:'',color:'var(--accent-purple)',bg:'rgba(168,85,247,0.1)',config:true,oc},
+            ];
+            window._oraculoSlideIdx=0;
+            renderOraculoSlide();
+        } else {
+            oraculoPanel.style.display='none';
+        }
         const cb=document.getElementById('eiChurn');
-        cb.textContent=match.churnRisco||'-';
+        cb.textContent=show.churnRisco||'-';
         cb.className='';
-        if(match.churnRisco==='Alto')cb.style.cssText='color:var(--danger);font-weight:700;';
-        else if(match.churnRisco==='Medio'||match.churnRisco==='Médio')cb.style.cssText='color:var(--warning);font-weight:700;';
-        else if(match.churnRisco==='Baixo')cb.style.cssText='color:var(--success);font-weight:700;';
+        if(show.churnRisco==='Alto')cb.style.cssText='color:var(--danger);font-weight:700;';
+        else if(show.churnRisco==='Medio'||show.churnRisco==='Médio')cb.style.cssText='color:var(--warning);font-weight:700;';
+        else if(show.churnRisco==='Baixo')cb.style.cssText='color:var(--success);font-weight:700;';
         else cb.style.cssText='';
-        document.getElementById('eiNaoPagos').textContent=match.naoPagos||'0';
-        document.getElementById('eiFilial').textContent=match.canal||'-';
-        // Pedidos por mês (últimos 3 meses do Fabric)
-        const mKeys=match.m?Object.keys(match.m).sort():[];
+        document.getElementById('eiNaoPagos').textContent=show.naoPagos||'0';
+        document.getElementById('eiFilial').textContent=show.filial||'-';
+        // Pedidos por mês (últimos 3 meses)
+        const mKeys=show.m?Object.keys(show.m).sort():[];
         const lastM=mKeys.slice(-3);
-        const pedMes=lastM.map(k=>{const d=match.m[k];return(d?d[0]:0);}).join('/');
+        const pedMes=lastM.map(k=>{const d=show.m[k];return(d?d[0]:0);}).join('/');
         document.getElementById('eiPedMes').textContent=pedMes||'0/0/0';
+        // Filiais filter (always uses main match)
+        updateFiliaisFilter(match);
+        // Filiais section in Transações tab
+        updateFiliaisSection(match);
+        // Financeiro detail (uses displayed empresa)
+        updateFinanceiroDetail(show);
     } else {
         panel.classList.remove('visible');
+        oraculoPanel.style.display='none';
+        document.getElementById('filiaisSection').style.display='none';
+        document.getElementById('filialFilterGroup').style.display='none';
+        document.getElementById('finEmpresaDetail').style.display='none';
+    }
+}
+
+function updateFiliaisFilter(match){
+    const group=document.getElementById('filialFilterGroup');
+    const select=document.getElementById('fFilial');
+    const currentVal=select.value;
+    select.innerHTML='<option value="">Todas (consolidado)</option>';
+    if(match&&match.filiais&&match.filiais.length>0){
+        group.style.display='';
+        // Add current empresa
+        const oSelf=document.createElement('option');
+        oSelf.value=match.id;
+        oSelf.textContent=match.nome+(match.isMatriz?' (matriz)':' (filial)');
+        select.appendChild(oSelf);
+        // Add filiais sorted: matriz first
+        match.filiais.forEach(f=>{
+            const o=document.createElement('option');
+            o.value=f.id;
+            o.textContent=f.nome+(f.isMatriz?' (matriz)':' (filial)');
+            select.appendChild(o);
+        });
+        if(currentVal){
+            const exists=[...select.options].some(o=>o.value===currentVal);
+            if(exists) select.value=currentVal;
+        }
+    } else {
+        group.style.display='none';
+    }
+}
+
+function onFilialFilterChange(){
+    tablePage=1;
+    applyFilters();
+}
+
+function updateFiliaisSection(match){
+    const section=document.getElementById('filiaisSection');
+    const tbody=document.getElementById('filiaisTableBody');
+    if(match&&match.filiais&&match.filiais.length>0){
+        section.style.display='block';
+        // Include the current empresa + filiais
+        const all=[{nome:match.nome,idDominio:match.idDominio,id:match.id,temVestiPago:match.temVestiPago,isMatriz:match.isMatriz},...match.filiais];
+        tbody.innerHTML=all.map(f=>{
+            const vpBadge=f.temVestiPago?'<span class="cell-badge badge-sim">Sim</span>':'<span class="cell-badge badge-nao">Não</span>';
+            const tipoBadge=f.isMatriz?'<span class="cell-badge badge-sim">Matriz</span>':'<span class="cell-badge" style="background:rgba(6,182,212,0.15);color:var(--teal);">Filial</span>';
+            return '<tr><td class="cell-company">'+f.nome+'</td><td>'+tipoBadge+'</td><td>'+f.idDominio+'</td><td style="font-size:11px;user-select:all;">'+f.id+'</td><td>'+vpBadge+'</td></tr>';
+        }).join('');
+    } else {
+        section.style.display='none';
+    }
+}
+
+function updateFinanceiroDetail(match){
+    const detail=document.getElementById('finEmpresaDetail');
+    const tbody=document.getElementById('finEmpresaBody');
+    if(match&&match.planoTotalCobrado>0){
+        detail.style.display='block';
+        const rows=[
+            {l:'Plano',v:match.plano||'-'},
+            {l:'Mensalidade',v:match.planoMensalidade?fmtCFull(match.planoMensalidade):'-'},
+            {l:'Integração',v:match.planoIntegracao?fmtCFull(match.planoIntegracao):'-'},
+            {l:'Assistente',v:match.planoAssistente?fmtCFull(match.planoAssistente):'-'},
+            {l:'Filial',v:match.planoFilial?fmtCFull(match.planoFilial):'-'},
+            {l:'Descontos',v:match.planoDescontos?fmtCFull(match.planoDescontos):'Nenhum'},
+            {l:'Total Cobrado',v:'<span style="font-weight:700;color:var(--success);font-size:14px;">'+fmtCFull(match.planoTotalCobrado)+'</span>'},
+            {l:'Setup',v:match.planoSetup?fmtCFull(match.planoSetup):'Isento'},
+            {l:'Subconta',v:match.planoSubconta||'-'},
+            {l:'Observações',v:match.planoObservacoes||'-'},
+        ];
+        tbody.innerHTML=rows.map(r=>'<tr><td style="font-weight:600;color:var(--text-secondary);">'+r.l+'</td><td>'+r.v+'</td></tr>').join('');
+    } else {
+        detail.style.display='none';
+    }
+}
+
+/* ========== ORÁCULO SLIDES ========== */
+function oraculoSlide(dir){
+    if(!window._oraculoSlides)return;
+    window._oraculoSlideIdx=(window._oraculoSlideIdx+dir+window._oraculoSlides.length)%window._oraculoSlides.length;
+    renderOraculoSlide();
+}
+function renderOraculoSlide(){
+    var slides=window._oraculoSlides;
+    if(!slides)return;
+    var idx=window._oraculoSlideIdx;
+    var s=slides[idx];
+    var el=document.getElementById('oraculoDetailContent');
+    var dotArr=[];
+    for(var di=0;di<slides.length;di++){dotArr.push('<span style="width:8px;height:8px;border-radius:50%;background:'+(di===idx?'var(--primary)':'var(--border)') +';display:inline-block;"></span>');}
+    var dots=dotArr.join('');
+    var dotsRow='<div style="display:flex;gap:4px;justify-content:center;margin-top:10px;">'+dots+'</div>';
+    if(s.config){
+        var oc=s.oc;
+        var sn=function(v){return v?'<span style="color:var(--success);font-weight:600">Sim</span>':'<span style="color:var(--text-muted)">Nao</span>';};
+        var h='<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">';
+        if(oc.n8n_url)h+='<div class="empresa-info-item"><strong>URL:</strong> <a href="'+oc.n8n_url+'" target="_blank" style="color:var(--teal);text-decoration:underline">'+oc.n8n_url+'</a></div>';
+        h+='<div class="empresa-info-item"><strong>Tel. Vesti:</strong> '+sn(oc.phone_by_vesti)+'</div>';
+        h+='<div class="empresa-info-item"><strong>Catalogo c/ Preco:</strong> '+sn(oc.catalogue_with_price)+'</div>';
+        h+='<div class="empresa-info-item"><strong>Agente Varejo:</strong> '+sn(oc.agent_retail)+'</div>';
+        h+='<div class="empresa-info-item"><strong>Praca Fechada:</strong> '+sn(oc.works_with_closed_square)+'</div>';
+        h+='<div class="empresa-info-item"><strong>Ativo desde:</strong> '+(oc.created_at?new Date(oc.created_at).toLocaleDateString('pt-BR'):'-')+'</div>';
+        h+='</div>';
+        if(oc.link_report)h+='<div style="margin-top:10px"><a href="'+oc.link_report+'" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;padding:7px 16px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600">Abrir Relatorio Completo</a></div>';
+        h+=dotsRow;
+        el.innerHTML=h;
+    } else {
+        el.innerHTML='<div style="text-align:center;padding:8px 0"><div style="background:'+s.bg+';border-radius:12px;padding:16px;display:inline-block;min-width:280px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);margin-bottom:6px">'+s.title+'</div><div style="font-size:32px;font-weight:800;color:'+s.color+';margin-bottom:4px">'+s.kpi+'</div><div style="font-size:11px;color:var(--text-muted)">'+s.label+'</div></div><div style="font-size:12px;color:var(--text-secondary);margin-top:8px">'+s.sub+'</div>'+dotsRow+'</div>';
     }
 }
 
@@ -621,7 +872,7 @@ function renderTab0(){
 
     document.getElementById('kpiGrid0').innerHTML=kpiHTML([
         {icon:'&#128176;',label:'GMV Total',value:fmtC(gmv)},
-        {icon:'&#127980;',label:'Marcas',value:fmtN(es.length)},
+        {icon:'&#127980;',label:'Marcas',value:'<div style="display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;margin-top:2px"><div style="display:flex;flex-direction:column;align-items:center;line-height:1.2"><span style="font-size:22px;font-weight:800">'+fmtN(es.filter(e=>e.isMatriz||!e.matrizId).length)+'</span><span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);font-weight:600">Empresas</span></div><div style="display:flex;flex-direction:column;align-items:center;line-height:1.2"><span style="font-size:22px;font-weight:800">'+fmtN(es.filter(e=>e.matrizId&&!e.isMatriz).length)+'</span><span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);font-weight:600">Filiais</span></div><div style="display:flex;flex-direction:column;align-items:center;line-height:1.2"><span style="font-size:22px;font-weight:800">'+fmtN(es.length)+'</span><span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);font-weight:600">Total</span></div></div>'},
         {icon:'&#128230;',label:'Total Pedidos',value:fmtN(ped)},
         {icon:'&#9989;',label:'Pedidos Pagos',value:fmtN(pagos)},
         {icon:'&#128178;',label:'Valor Pedidos Pagos',value:fmtC(valPag)},
@@ -773,7 +1024,49 @@ function renderTab1(){
     getOrCreate('chartAnjo',{type:'pie',data:{labels:anjoLabels,datasets:[{data:anjoLabels.map(l=>anjoMap[l]),backgroundColor:anjoColors.slice(0,anjoLabels.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip}}});
 }
 
-/* ========== TAB 2: ANALISE DE CHURN ========== */
+/* ========== TAB 2: FINANCEIRO ========== */
+function renderTabFin(){
+    const es=filtered;
+    const comPlano=es.filter(e=>e.planoTotalCobrado>0);
+    const totalMensal=comPlano.reduce((s,e)=>s+e.planoMensalidade,0);
+    const totalCobrado=comPlano.reduce((s,e)=>s+e.planoTotalCobrado,0);
+    const totalInteg=comPlano.reduce((s,e)=>s+(e.planoIntegracao||0),0);
+    const totalAssist=comPlano.reduce((s,e)=>s+(e.planoAssistente||0),0);
+    const totalFilial=comPlano.reduce((s,e)=>s+(e.planoFilial||0),0);
+    const totalDesc=comPlano.reduce((s,e)=>s+(e.planoDescontos||0),0);
+    const ticketMedio=comPlano.length>0?totalCobrado/comPlano.length:0;
+
+    document.getElementById('kpiGridFin').innerHTML=kpiHTML([
+        {icon:'&#128176;',label:'Total Cobrado',value:fmtCFull(totalCobrado)},
+        {icon:'&#128178;',label:'Mensalidade',value:fmtCFull(totalMensal)},
+        {icon:'&#127970;',label:'Valor Filial',value:totalFilial>0?fmtCFull(totalFilial):'Sem filial'},
+        {icon:'&#128279;',label:'Valor Integração',value:totalInteg>0?fmtCFull(totalInteg):'Sem integração'},
+        {icon:'&#129302;',label:'Valor Assistente',value:totalAssist>0?fmtCFull(totalAssist):'Sem assistente'},
+    ]);
+
+    // Distribuição por Plano (pie)
+    const planoMap={};comPlano.forEach(e=>{const p=e.plano||'Sem plano';planoMap[p]=(planoMap[p]||0)+1;});
+    const planoLabels=Object.keys(planoMap).sort((a,b)=>planoMap[b]-planoMap[a]);
+    const planoColors=['#7C3AED','#06B6D4','#A855F7','#EC4899','#8B5CF6','#EAB308','#10B981','#EF4444'];
+    getOrCreate('chartPlanos',{type:'pie',data:{labels:planoLabels,datasets:[{data:planoLabels.map(l=>planoMap[l]),backgroundColor:planoColors.slice(0,planoLabels.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip}}});
+
+    // Receita por Plano (bar)
+    const receitaPlano={};comPlano.forEach(e=>{const p=e.plano||'Sem plano';receitaPlano[p]=(receitaPlano[p]||0)+e.planoTotalCobrado;});
+    const rLabels=Object.keys(receitaPlano).sort((a,b)=>receitaPlano[b]-receitaPlano[a]);
+    getOrCreate('chartReceitaPlano',{type:'bar',data:{labels:rLabels,datasets:[{label:'Receita',data:rLabels.map(l=>receitaPlano[l]),backgroundColor:'rgba(16,185,129,0.7)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...darkTooltip,callbacks:{label:ctx=>fmtC(ctx.raw)}}},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:{...darkTick,callback:v=>fmtC(v)},grid:darkGrid}}}});
+
+    // Top 10 por Total Cobrado
+    const top10C=[...comPlano].sort((a,b)=>b.planoTotalCobrado-a.planoTotalCobrado).slice(0,10).reverse();
+    getOrCreate('chartTopCobrado',{type:'bar',data:{labels:top10C.map(e=>e.nome.length>20?e.nome.substring(0,20)+'...':e.nome),datasets:[{label:'Total Cobrado',data:top10C.map(e=>e.planoTotalCobrado),backgroundColor:'rgba(124,58,237,0.7)',borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...darkTooltip,callbacks:{label:ctx=>fmtC(ctx.raw)}}},scales:{x:{ticks:{...darkTick,callback:v=>fmtC(v)},grid:darkGrid},y:{ticks:darkTick,grid:darkGrid}}}});
+
+    // Composição de Valores (stacked bar)
+    const cats=['Mensalidade','Integração','Assistente','Filial'];
+    const catVals=[totalMensal,totalInteg,totalAssist,totalFilial];
+    const descVal=Math.abs(totalDesc);
+    getOrCreate('chartComposicao',{type:'doughnut',data:{labels:[...cats,'Descontos'],datasets:[{data:[...catVals,descVal],backgroundColor:['#7C3AED','#06B6D4','#A855F7','#EC4899','#EF4444'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:{...darkTooltip,callbacks:{label:ctx=>ctx.label+': '+fmtC(ctx.raw)}}}}});
+}
+
+/* ========== TAB 3: ANALISE DE CHURN ========== */
 function renderTab2(){
     const es=filtered;
     const alto=es.filter(e=>e.churnRisco==='Alto').length;
@@ -875,7 +1168,7 @@ function renderTab2(){
     }).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--success);padding:20px;font-weight:600;">Sem risco de churn — todas as empresas filtradas estão saudáveis</td></tr>';
 }
 
-/* ========== TAB 3: TABLE ========== */
+/* ========== TAB 4: TABLE ========== */
 const TABLE_COLS=[
     {key:'nome',label:'Nome Fantasia',fmt:v=>v},
     {key:'canal',label:'Canal',fmt:v=>v||'-'},
@@ -885,6 +1178,13 @@ const TABLE_COLS=[
     {key:'pix',label:'PIX',fmt:v=>v==='Sim'?'<span class="cell-badge badge-sim">Sim</span>':'<span class="cell-badge badge-nao">Não</span>'},
     {key:'temIntegracao',label:'Integração',fmt:v=>v?'<span class="cell-badge badge-sim">Sim</span>':'<span class="cell-badge badge-nao">Não</span>'},
     {key:'tipoIntegracao',label:'Tipo Integ.',fmt:v=>v||'-'},
+    {key:'plano',label:'Plano',fmt:v=>v||'-'},
+    {key:'planoMensalidade',label:'Mensalidade (Plano)',fmt:(v,e)=>e.plano?fmtCFull(v||0):'-',css:'cell-currency'},
+    {key:'planoIntegracao',label:'Integração (Plano)',fmt:(v,e)=>e.plano?fmtCFull(v||0):'-',css:'cell-currency'},
+    {key:'planoAssistente',label:'Assistente',fmt:(v,e)=>e.plano?fmtCFull(v||0):'-',css:'cell-currency'},
+    {key:'planoFilial',label:'Filial (Plano)',fmt:(v,e)=>e.plano?fmtCFull(v||0):'-',css:'cell-currency'},
+    {key:'planoDescontos',label:'Descontos',fmt:(v,e)=>e.plano?fmtCFull(v||0):'-',css:'cell-currency'},
+    {key:'planoTotalCobrado',label:'Total Cobrado',fmt:(v,e)=>e.plano?fmtCFull(v||0):'-',css:'cell-currency'},
     {key:'_pedidos',label:'Pedidos',fmt:v=>fmtN(v)},
     {key:'_pedidosPagos',label:'Ped. Pagos',fmt:v=>fmtN(v)},
     {key:'_valPedidosPagos',label:'Val. Pagos',fmt:v=>fmtC(v),css:'cell-currency'},
@@ -894,13 +1194,13 @@ const TABLE_COLS=[
     {key:'_transPix',label:'Trans. PIX',fmt:v=>fmtN(v)},
     {key:'_links',label:'Links Env.',fmt:v=>fmtN(v)},
     {key:'_cliques',label:'Cliques',fmt:v=>fmtN(v)},
-    {key:'mensalidade',label:'Mensalidade',fmt:v=>v||'-'},
+    {key:'mensalidade',label:'Mensalidade (Ctrl)',fmt:v=>v||'-'},
     {key:'etapaHub',label:'Etapa Hub',fmt:v=>v||'-'},
     {key:'oraculoEtapa',label:'Fase Oráculo',fmt:v=>v||'-'},
+    {key:'temOraculoFabric',label:'Oráculo (Fabric)',fmt:v=>v?'<span class="cell-badge badge-sim">Sim</span>':'<span class="cell-badge badge-nao">Não</span>'},
     {key:'churnRisco',label:'Risco Churn',fmt:v=>{if(v==='Alto')return'<span class="cell-badge badge-alto">Alto</span>';if(v==='Medio'||v==='Médio')return'<span class="cell-badge badge-medio">Médio</span>';if(v==='Baixo')return'<span class="cell-badge badge-baixo">Baixo</span>';return'-';}},
     {key:'modulo',label:'Módulo',fmt:v=>v||'-'},
     {key:'naoPagos',label:'Não Pagos',fmt:v=>v?fmtN(v):'-'},
-    {key:'canal',label:'Canal',fmt:v=>v||'-'},
     {key:'_pedMes1',label:'Ped. Mês -2',fmt:(v,e)=>{const k=e.m?Object.keys(e.m).sort():[];return k.length>=3&&e.m[k[k.length-3]]?fmtN(e.m[k[k.length-3]][0]):'-';}},
     {key:'_pedMes2',label:'Ped. Mês -1',fmt:(v,e)=>{const k=e.m?Object.keys(e.m).sort():[];return k.length>=2&&e.m[k[k.length-2]]?fmtN(e.m[k[k.length-2]][0]):'-';}},
     {key:'_pedMes3',label:'Ped. Mês Atual',fmt:(v,e)=>{const k=e.m?Object.keys(e.m).sort():[];return k.length>=1&&e.m[k[k.length-1]]?fmtN(e.m[k[k.length-1]][0]):'-';}},
@@ -941,7 +1241,7 @@ function renderTable(){
     ).join('');
 
     // Footer
-    document.getElementById('tableInfo').textContent=`Mostrando ${start+1}-${Math.min(start+PER_PAGE,total)} de ${total}`;
+    document.getElementById('tableInfo').textContent=`Preview: ${start+1}-${Math.min(start+PER_PAGE,total)} de ${total} empresas (exportação inclui todos)`;
     let pagHTML='';
     if(pages>1){
         if(tablePage>1)pagHTML+=`<button class="page-btn" onclick="goPage(${tablePage-1})">&laquo;</button>`;
@@ -956,10 +1256,15 @@ function sortTable(col){if(sortCol===col){sortDir*=-1;}else{sortCol=col;sortDir=
 function goPage(p){tablePage=p;renderTable();}
 
 /* ========== EXPORT CSV ========== */
-function exportCSV(){
+function getExportData(){
     const search=document.getElementById('tableSearch').value.trim().toLowerCase();
     let data=filtered;
     if(search){data=data.filter(e=>e.nome.toLowerCase().includes(search)||(e.cnpj||'').includes(search));}
+    return data;
+}
+
+function exportCSV(){
+    const data=getExportData();
     const headers=TABLE_COLS.map(c=>c.label);
     const rows=data.map(e=>TABLE_COLS.map(c=>{
         let v=e[c.key];
@@ -973,6 +1278,29 @@ function exportCSV(){
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');a.href=url;a.download='cs_dashboard_export.csv';a.click();
     URL.revokeObjectURL(url);
+}
+
+/* ========== EXPORT EXCEL ========== */
+function exportExcel(){
+    const data=getExportData();
+    const headers=TABLE_COLS.map(c=>c.label);
+    const rows=data.map(e=>TABLE_COLS.map(c=>{
+        let v=e[c.key];
+        if(typeof v==='boolean')v=v?'Sim':'Não';
+        return v!=null?v:'';
+    }));
+    const wsData=[headers,...rows];
+    const wb=XLSX.utils.book_new();
+    const ws=XLSX.utils.aoa_to_sheet(wsData);
+    // Auto-width columns
+    const colWidths=headers.map((h,i)=>{
+        let max=h.length;
+        rows.forEach(r=>{const v=String(r[i]||'');if(v.length>max)max=v.length;});
+        return{wch:Math.min(max+2,40)};
+    });
+    ws['!cols']=colWidths;
+    XLSX.utils.book_append_sheet(wb,ws,'Dados CS');
+    XLSX.writeFile(wb,'cs_dashboard_export.xlsx');
 }
 </script>
 </div>
@@ -1010,6 +1338,7 @@ function loadApp(){
             tablePage=1;applyFilters();
         });
         document.getElementById('tableSearch').addEventListener('input',()=>{tablePage=1;renderTable();});
+        document.getElementById('fFilial').addEventListener('change',onFilialFilterChange);
     };
     document.head.appendChild(s);
 }

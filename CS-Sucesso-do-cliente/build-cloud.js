@@ -530,15 +530,24 @@ async function main() {
         }
     }
 
-    // 5f. Marcas e Planos - by CNPJ
+    // 5f. Marcas e Planos - by CNPJ (all plan breakdown fields)
     const marcasMap = {};
     for (const row of marcasRows) {
         const cnpj = row['CPFCNPJ'] || '';
         if (cnpj) {
             marcasMap[cnpj] = {
                 marca: row['MARCA'],
-                plano: row['PLANO'],
-                totalCobrado: parseFloat(row['TOTAL_COBRADO']) || 0,
+                plano: row['PLANO'] || '',
+                setup: parseFloat(row['SETUP']) || 0,
+                mensalidade: parseFloat(row['MENSALIDADE']) || 0,
+                integracao: parseFloat(row['INTEGRAÇÃO'] || row['INTEGRACAO']) || 0,
+                assistente: parseFloat(row['ASSISTENTE']) || 0,
+                filial: parseFloat(row['FILIAL']) || 0,
+                descontos: parseFloat(row['DESCONTOS']) || 0,
+                totalCobrado: parseFloat(row['TOTAL COBRADO'] || row['TOTAL_COBRADO']) || 0,
+                observacoes: row['OBSERVAÇÕES'] || row['OBSERVACOES'] || '',
+                canal: row['CANAL'] || '',
+                subconta: row['Subconta'] || '',
             };
         }
     }
@@ -663,6 +672,77 @@ async function main() {
         cliques: cliquesMensais[m] || 0,
     }));
 
+    // ---------- 7b. Build filiais map (Union-Find by CNPJ root + Domain ID) ----------
+    const ufParent = {};
+    function ufFind(x) { if (ufParent[x] !== x) ufParent[x] = ufFind(ufParent[x]); return ufParent[x]; }
+    function ufUnion(a, b) { const pa = ufFind(a), pb = ufFind(b); if (pa !== pb) ufParent[pa] = pb; }
+
+    const allEmpIds = Object.values(empresasMap).filter(e => e.id).map(e => e.id);
+    allEmpIds.forEach(id => { ufParent[id] = id; });
+
+    // Strategy A: group by CNPJ root (first 8 digits of 14-digit CNPJ)
+    const cnpjRootMap = {};
+    Object.values(empresasMap).forEach(e => {
+        const clean = (e.cnpj || '').replace(/[.\-\/]/g, '');
+        if (clean.length >= 14 && e.id) {
+            const root = clean.substring(0, 8);
+            if (!cnpjRootMap[root]) cnpjRootMap[root] = [];
+            cnpjRootMap[root].push(e.id);
+        }
+    });
+    Object.values(cnpjRootMap).forEach(ids => {
+        if (ids.length > 1 && ids.length <= 20) {
+            for (let i = 1; i < ids.length; i++) ufUnion(ids[0], ids[i]);
+        }
+    });
+
+    // Strategy B: group by Domínio ID
+    const domIdMap = {};
+    Object.values(empresasMap).forEach(e => {
+        if (e.idDominio && e.id) {
+            if (!domIdMap[e.idDominio]) domIdMap[e.idDominio] = [];
+            domIdMap[e.idDominio].push(e.id);
+        }
+    });
+    Object.values(domIdMap).forEach(ids => {
+        if (ids.length > 1 && ids.length <= 15) {
+            for (let i = 1; i < ids.length; i++) ufUnion(ids[0], ids[i]);
+        }
+    });
+
+    // Build final groups
+    const filialGroups = {};
+    Object.values(empresasMap).forEach(e => {
+        if (!e.id) return;
+        const root = ufFind(e.id);
+        if (!filialGroups[root]) filialGroups[root] = [];
+        filialGroups[root].push(e);
+    });
+    const groupsWithFiliais = Object.values(filialGroups).filter(g => g.length > 1);
+    console.log('  Filial groups detected: ' + groupsWithFiliais.length + ' (total companies in groups: ' + groupsWithFiliais.reduce((s, g) => s + g.length, 0) + ')');
+
+    // Identify matriz in each group
+    const matrizIds = new Set();
+    for (const group of groupsWithFiliais) {
+        const withInfo = group.map(e => {
+            const clean = (e.cnpj || '').replace(/[.\-\/]/g, '');
+            const branchNum = clean.length >= 12 ? clean.substring(8, 12) : '9999';
+            const cnpjRoot = clean.length >= 8 ? clean.substring(0, 8) : '';
+            const nome = e.nomeFantasia || e.nomeDominio || '';
+            return { emp: e, branchNum, cnpjRoot, orders: e.pedidos || 0, nameLen: nome.length };
+        });
+        const roots0001 = new Set(withInfo.filter(x => x.branchNum === '0001').map(x => x.cnpjRoot));
+        withInfo.sort((a, b) => {
+            const aIs0001 = a.branchNum === '0001';
+            const bIs0001 = b.branchNum === '0001';
+            if (aIs0001 && !bIs0001 && roots0001.size === 1) return -1;
+            if (bIs0001 && !aIs0001 && roots0001.size === 1) return 1;
+            if (b.orders !== a.orders) return b.orders - a.orders;
+            return a.nameLen - b.nameLen;
+        });
+        matrizIds.add(withInfo[0].emp.id);
+    }
+
     // ---------- 8. Build final empresas list ----------
     console.log('\nBuilding empresas list...');
     let empIndex = 0;
@@ -777,6 +857,27 @@ async function main() {
 
             const temVestiPago = vestiPagoSet.has(e.id);
 
+            // Filiais
+            const groupRoot = ufFind(e.id);
+            const filiaisGroup = filialGroups[groupRoot] || [];
+            const isMatriz = matrizIds.has(e.id);
+            const matrizEmp = filiaisGroup.find(f => matrizIds.has(f.id));
+            const matrizId = matrizEmp ? matrizEmp.id : e.id;
+            const filiais = filiaisGroup
+                .filter(f => f.id !== e.id)
+                .map(f => ({
+                    nome: f.nomeFantasia || f.nomeDominio,
+                    idDominio: f.idDominio,
+                    id: f.id,
+                    temVestiPago: vestiPagoSet.has(f.id),
+                    isMatriz: matrizIds.has(f.id),
+                }))
+                .sort((a, b) => {
+                    if (a.isMatriz && !b.isMatriz) return -1;
+                    if (!a.isMatriz && b.isMatriz) return 1;
+                    return a.nome.localeCompare(b.nome);
+                });
+
             return {
                 i: idx,
                 id: e.id,
@@ -811,6 +912,15 @@ async function main() {
                 criacao: e.criacao,
                 valorPlano: e.valorPlano,
                 plano: marca ? marca.plano : '',
+                planoMensalidade: marca ? marca.mensalidade : 0,
+                planoIntegracao: marca ? marca.integracao : 0,
+                planoAssistente: marca ? marca.assistente : 0,
+                planoFilial: marca ? marca.filial : 0,
+                planoDescontos: marca ? marca.descontos : 0,
+                planoTotalCobrado: marca ? marca.totalCobrado : 0,
+                planoSetup: marca ? marca.setup : 0,
+                planoObservacoes: marca ? marca.observacoes : '',
+                planoSubconta: marca ? marca.subconta : '',
                 marcaAtiva: e.transCartao >= 250 ? 'Sim' : 'Não',
                 mensalidade,
                 etapaHub,
@@ -821,6 +931,9 @@ async function main() {
                 churnRisco,
                 churnMotivos: churnMotivos.length > 0 ? churnMotivos.join('; ') : '',
                 naoPagos: e.pedidosPendentes,
+                isMatriz: filiaisGroup.length > 1 ? isMatriz : undefined,
+                matrizId: filiaisGroup.length > 1 && !isMatriz ? matrizId : undefined,
+                filiais: filiais.length > 0 ? filiais : undefined,
                 m,
             };
         });
