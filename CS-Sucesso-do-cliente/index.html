@@ -1024,32 +1024,55 @@ function renderTab1(){
 /* ========== TAB 2: FINANCEIRO ========== */
 function renderTabFin(){
     const es=filtered;
-    const comPlano=es.filter(e=>e.planoTotalCobrado>0);
-    // Separate main plan vs Oráculo/extras from planos array
-    let totalPlano=0,totalOraculo=0,totalMensal=0,totalInteg=0,totalAssist=0,totalFilial=0,totalDesc=0;
-    comPlano.forEach(e=>{
-        if(e.planos&&e.planos.length>1){
-            e.planos.forEach(p=>{
-                const isOrac=/oraculo|oráculo|integração|integracao|pacote/i.test(p.plano);
-                if(isOrac){totalOraculo+=p.totalCobrado;}
-                else{totalPlano+=p.totalCobrado;totalMensal+=p.mensalidade;totalInteg+=p.integracao;totalFilial+=p.filial;totalDesc+=p.descontos;totalAssist+=p.assistente;}
-            });
-        } else {
-            totalPlano+=e.planoTotalCobrado;totalMensal+=e.planoMensalidade;
-            totalInteg+=(e.planoIntegracao||0);totalAssist+=(e.planoAssistente||0);
-            totalFilial+=(e.planoFilial||0);totalDesc+=(e.planoDescontos||0);
-        }
-    });
+    const comPlano=es.filter(e=>e.planoTotalCobrado>0||e.planos);
+    const {display:selEmp}=getDisplayEmpresa();
+    const isSingle=!!selEmp;
 
-    const kpis=[
-        {icon:'&#128176;',label:'Total Planos',value:fmtCFull(totalPlano)},
-        {icon:'&#128178;',label:'Mensalidade',value:fmtCFull(totalMensal)},
-        {icon:'&#127970;',label:'Valor Filial',value:totalFilial>0?fmtCFull(totalFilial):'Sem filial'},
-        {icon:'&#128279;',label:'Valor Integração',value:totalInteg>0?fmtCFull(totalInteg):'Sem integração'},
-        {icon:'&#129302;',label:'Assistente (Plano)',value:totalAssist>0?fmtCFull(totalAssist):'Sem assistente'},
-    ];
-    if(totalOraculo>0) kpis.push({icon:'&#128302;',label:'Total Oráculo',value:fmtCFull(totalOraculo),color:'var(--accent-purple)'});
-    document.getElementById('kpiGridFin').innerHTML=kpiHTML(kpis);
+    // Single company: show each plan line as a separate KPI card
+    if(isSingle&&selEmp.planos&&selEmp.planos.length>1){
+        const kpis=selEmp.planos.map(p=>{
+            const isOrac=/oraculo|oráculo|integração|integracao|pacote/i.test(p.plano);
+            const parts=[];
+            if(p.mensalidade)parts.push('Mensal: '+fmtCFull(p.mensalidade));
+            if(p.integracao)parts.push('Integ: '+fmtCFull(p.integracao));
+            if(p.assistente)parts.push('Assist: '+fmtCFull(p.assistente));
+            if(p.filial)parts.push('Filial: '+fmtCFull(p.filial));
+            if(p.descontos)parts.push('Desc: '+fmtCFull(p.descontos));
+            if(p.setup)parts.push('Setup: '+fmtCFull(p.setup));
+            return {icon:isOrac?'&#128302;':'&#128176;',label:p.plano||'Plano',value:fmtCFull(p.totalCobrado),color:isOrac?'var(--accent-purple)':undefined};
+        });
+        document.getElementById('kpiGridFin').innerHTML=kpiHTML(kpis);
+    } else if(isSingle&&selEmp.planoTotalCobrado>0){
+        // Single company, single plan
+        document.getElementById('kpiGridFin').innerHTML=kpiHTML([
+            {icon:'&#128176;',label:selEmp.plano||'Plano',value:fmtCFull(selEmp.planoTotalCobrado)},
+        ]);
+    } else {
+        // Multiple companies: aggregate KPIs
+        let totalPlano=0,totalOraculo=0,totalMensal=0,totalInteg=0,totalAssist=0,totalFilial=0,totalDesc=0;
+        comPlano.forEach(e=>{
+            if(e.planos&&e.planos.length>1){
+                e.planos.forEach(p=>{
+                    const isOrac=/oraculo|oráculo|integração|integracao|pacote/i.test(p.plano);
+                    if(isOrac){totalOraculo+=p.totalCobrado;}
+                    else{totalPlano+=p.totalCobrado;totalMensal+=p.mensalidade;totalInteg+=p.integracao;totalFilial+=p.filial;totalDesc+=p.descontos;totalAssist+=p.assistente;}
+                });
+            } else {
+                totalPlano+=e.planoTotalCobrado;totalMensal+=e.planoMensalidade;
+                totalInteg+=(e.planoIntegracao||0);totalAssist+=(e.planoAssistente||0);
+                totalFilial+=(e.planoFilial||0);totalDesc+=(e.planoDescontos||0);
+            }
+        });
+        const kpis=[
+            {icon:'&#128176;',label:'Total Planos',value:fmtCFull(totalPlano)},
+            {icon:'&#128178;',label:'Mensalidade',value:fmtCFull(totalMensal)},
+            {icon:'&#127970;',label:'Valor Filial',value:totalFilial>0?fmtCFull(totalFilial):'Sem filial'},
+            {icon:'&#128279;',label:'Valor Integração',value:totalInteg>0?fmtCFull(totalInteg):'Sem integração'},
+            {icon:'&#129302;',label:'Assistente (Plano)',value:totalAssist>0?fmtCFull(totalAssist):'Sem assistente'},
+        ];
+        if(totalOraculo>0) kpis.push({icon:'&#128302;',label:'Total Oráculo',value:fmtCFull(totalOraculo),color:'var(--accent-purple)'});
+        document.getElementById('kpiGridFin').innerHTML=kpiHTML(kpis);
+    }
 
     // Distribuição por Plano (pie)
     const planoMap={};comPlano.forEach(e=>{const p=e.plano||'Sem plano';planoMap[p]=(planoMap[p]||0)+1;});
