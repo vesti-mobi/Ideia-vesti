@@ -551,9 +551,10 @@ async function main() {
             const starterSheets = wb.SheetNames.filter(s => s.toLowerCase().includes('starter'));
             vestiSheets.sort((a, b) => extractSheetDate(b).localeCompare(extractSheetDate(a)));
             starterSheets.sort((a, b) => extractSheetDate(b).localeCompare(extractSheetDate(a)));
+            // Process Starter first (lower priority), then Vesti (overwrites)
             const sheetsToRead = [];
-            if (vestiSheets.length > 0) sheetsToRead.push(vestiSheets[0]);
             if (starterSheets.length > 0) sheetsToRead.push(starterSheets[0]);
+            if (vestiSheets.length > 0) sheetsToRead.push(vestiSheets[0]);
             if (sheetsToRead.length === 0) sheetsToRead.push(wb.SheetNames[0]);
             for (const sheetName of sheetsToRead) {
                 const ws = wb.Sheets[sheetName];
@@ -561,9 +562,11 @@ async function main() {
                 for (const row of rows) {
                     const cnpj = String(row['CPFCNPJ'] || row['CPF e CNPJ'] || '').replace(/[.\-\/\s]/g, '');
                     if (!cnpj || cnpj.length < 11) continue;
-                    marcasMap[cnpj] = {
+                    const plano = (row['PLANO'] || '').trim();
+                    const isOraculo = plano.toLowerCase().includes('oraculo') || plano.toLowerCase().includes('oráculo');
+                    const marca = {
                         marca: row['MARCA'] || '',
-                        plano: row['PLANO'] || '',
+                        plano,
                         setup: parseFloat(row['SETUP']) || 0,
                         mensalidade: parseFloat(row['MENSALIDADE']) || 0,
                         integracao: parseFloat(row['INTEGRAÇÃO'] || row['INTEGRACAO']) || 0,
@@ -575,6 +578,12 @@ async function main() {
                         canal: row['CANAL'] || row['CANAL/Agência'] || '',
                         subconta: row['Subconta'] || '',
                     };
+                    // Non-Oráculo entries always win over Oráculo entries
+                    if (!isOraculo) {
+                        marcasMap[cnpj] = marca;
+                    } else if (!marcasMap[cnpj]) {
+                        marcasMap[cnpj] = marca;
+                    }
                 }
                 console.log('  Excel sheet "' + sheetName + '": ' + rows.length + ' rows');
             }
@@ -806,7 +815,27 @@ async function main() {
         .filter(e => e.nomeFantasia || e.nomeDominio)
         .map(e => {
             const cnpjNum = (e.cnpj || '').replace(/[.\-\/]/g, '');
-            const marca = marcasMap[cnpjNum];
+            let marca = marcasMap[cnpjNum];
+            // Fallback: match by CNPJ root (first 8 digits)
+            if (!marca && cnpjNum.length >= 8) {
+                for (const [mcnpj, mdata] of Object.entries(marcasMap)) {
+                    if (mcnpj.substring(0, 8) === cnpjNum.substring(0, 8)) { marca = mdata; break; }
+                }
+            }
+            // Fallback: match by name
+            if (!marca) {
+                const nomeEmp = (e.nomeFantasia || e.nomeDominio || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+                for (const [, mdata] of Object.entries(marcasMap)) {
+                    const nMarca = (mdata.marca || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+                    if (nMarca && nomeEmp && nMarca === nomeEmp) { marca = mdata; break; }
+                }
+                if (!marca && nomeEmp.length >= 5) {
+                    for (const [, mdata] of Object.entries(marcasMap)) {
+                        const nMarca = (mdata.marca || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+                        if (nMarca.length >= 5 && (nomeEmp.includes(nMarca) || nMarca.includes(nomeEmp))) { marca = mdata; break; }
+                    }
+                }
+            }
             const idx = empIndex++;
 
             const nome = e.nomeFantasia || e.nomeDominio;
