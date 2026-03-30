@@ -1035,13 +1035,28 @@ function renderTabFin(){
         uniquePlano.push(e);
     });
 
-    // Check if all filtered are same CNPJ (single brand)
+    // Aggregate totals (used by KPIs and charts) - deduplicated
+    let totalPlano=0,totalOraculo=0,totalMensal=0,totalInteg=0,totalAssist=0,totalFilial=0,totalDesc=0;
+    uniquePlano.forEach(e=>{
+        if(e.planos&&e.planos.length>1){
+            e.planos.forEach(p=>{
+                const isOrac=/oraculo|oráculo|integração|integracao|pacote/i.test(p.plano);
+                if(isOrac){totalOraculo+=p.totalCobrado;}
+                else{totalPlano+=p.totalCobrado;totalMensal+=p.mensalidade;totalInteg+=p.integracao;totalFilial+=p.filial;totalDesc+=p.descontos;totalAssist+=p.assistente;}
+            });
+        } else {
+            totalPlano+=e.planoTotalCobrado;totalMensal+=e.planoMensalidade;
+            totalInteg+=(e.planoIntegracao||0);totalAssist+=(e.planoAssistente||0);
+            totalFilial+=(e.planoFilial||0);totalDesc+=(e.planoDescontos||0);
+        }
+    });
+
+    // KPIs: single brand shows each plan as card, multiple brands show aggregates
     const allCnpjs=new Set(comPlano.map(e=>(e.cnpj||'').replace(/[.\-\/]/g,'')).filter(Boolean));
     const isSingleBrand=allCnpjs.size===1&&uniquePlano.length===1;
     const ref=isSingleBrand?uniquePlano[0]:null;
 
     if(isSingleBrand&&ref&&ref.planos&&ref.planos.length>1){
-        // Single brand with multiple plans: show each as card
         const kpis=ref.planos.map(p=>{
             const isOrac=/oraculo|oráculo|integração|integracao|pacote/i.test(p.plano);
             return {icon:isOrac?'&#128302;':'&#128176;',label:p.plano||'Plano',value:fmtCFull(p.totalCobrado),color:isOrac?'var(--accent-purple)':undefined};
@@ -1052,21 +1067,6 @@ function renderTabFin(){
             {icon:'&#128176;',label:ref.plano||'Plano',value:fmtCFull(ref.planoTotalCobrado)},
         ]);
     } else {
-        // Multiple brands: aggregate using deduplicated list
-        let totalPlano=0,totalOraculo=0,totalMensal=0,totalInteg=0,totalAssist=0,totalFilial=0,totalDesc=0;
-        uniquePlano.forEach(e=>{
-            if(e.planos&&e.planos.length>1){
-                e.planos.forEach(p=>{
-                    const isOrac=/oraculo|oráculo|integração|integracao|pacote/i.test(p.plano);
-                    if(isOrac){totalOraculo+=p.totalCobrado;}
-                    else{totalPlano+=p.totalCobrado;totalMensal+=p.mensalidade;totalInteg+=p.integracao;totalFilial+=p.filial;totalDesc+=p.descontos;totalAssist+=p.assistente;}
-                });
-            } else {
-                totalPlano+=e.planoTotalCobrado;totalMensal+=e.planoMensalidade;
-                totalInteg+=(e.planoIntegracao||0);totalAssist+=(e.planoAssistente||0);
-                totalFilial+=(e.planoFilial||0);totalDesc+=(e.planoDescontos||0);
-            }
-        });
         const kpis=[
             {icon:'&#128176;',label:'Total Planos',value:fmtCFull(totalPlano)},
             {icon:'&#128178;',label:'Mensalidade',value:fmtCFull(totalMensal)},
