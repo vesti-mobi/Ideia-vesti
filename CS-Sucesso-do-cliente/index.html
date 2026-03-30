@@ -257,6 +257,10 @@
     <div class="empresa-info-item"><strong>Risco Churn:</strong> <span id="eiChurn">-</span></div>
     <div class="empresa-info-item"><strong>Filial:</strong> <span id="eiFilial">-</span></div>
 </div>
+<div id="csatPanel" style="display:none;padding:10px 32px;background:rgba(234,179,8,0.06);border-bottom:1px solid var(--border);">
+    <div style="font-size:13px;font-weight:700;color:var(--accent-gold);margin-bottom:8px;">CSAT - Satisfação do Cliente</div>
+    <div id="csatContent" style="display:flex;gap:16px;flex-wrap:wrap;"></div>
+</div>
 <div id="oraculoDetailPanel" style="display:none;padding:14px 32px;background:rgba(168,85,247,0.06);border-bottom:1px solid var(--border);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
         <div style="font-size:13px;font-weight:700;color:var(--accent-purple);">Oráculo</div>
@@ -701,6 +705,25 @@ function updateEmpresaPanel(){
         if(show.controleEstoque==='Sim')ceEl.style.cssText='color:var(--success);font-weight:700;';
         else if(show.controleEstoque==='Não')ceEl.style.cssText='color:var(--text-muted);';
         else ceEl.style.cssText='';
+        // CSAT panel
+        const csatPanel=document.getElementById('csatPanel');
+        const csatContent=document.getElementById('csatContent');
+        if(show.csat&&show.csat.length>0){
+            csatPanel.style.display='block';
+            const mesesNome={'-01':'Jan','-02':'Fev','-03':'Mar','-04':'Abr','-05':'Mai','-06':'Jun','-07':'Jul','-08':'Ago','-09':'Set','-10':'Out','-11':'Nov','-12':'Dez'};
+            csatContent.innerHTML=show.csat.map(c=>{
+                const mesLabel=mesesNome[c.mes.substring(4)]||c.mes;
+                const cor=c.nota>=5?'var(--success)':c.nota>=4?'var(--accent-gold)':c.nota>=3?'var(--warning)':'var(--danger)';
+                let html='<div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:100px;">';
+                html+='<div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);margin-bottom:4px;">'+mesLabel+' '+c.mes.substring(0,4)+'</div>';
+                html+='<div style="font-size:28px;font-weight:800;color:'+cor+';">'+c.nota+'</div>';
+                if(c.obs)html+='<div style="font-size:10px;color:var(--text-muted);margin-top:4px;max-width:150px;" title="'+c.obs+'">'+c.obs.substring(0,40)+(c.obs.length>40?'...':'')+'</div>';
+                html+='</div>';
+                return html;
+            }).join('');
+        } else {
+            csatPanel.style.display='none';
+        }
         // Filiais filter (always uses main match)
         updateFiliaisFilter(match);
         // Filiais section in Transações tab
@@ -710,6 +733,7 @@ function updateEmpresaPanel(){
     } else {
         panel.classList.remove('visible');
         oraculoPanel.style.display='none';
+        document.getElementById('csatPanel').style.display='none';
         document.getElementById('filiaisSection').style.display='none';
         document.getElementById('filialFilterGroup').style.display='none';
         document.getElementById('finEmpresaDetail').style.display='none';
