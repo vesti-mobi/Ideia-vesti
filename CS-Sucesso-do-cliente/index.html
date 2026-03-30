@@ -252,6 +252,8 @@
     <div class="empresa-info-item"><strong>Total Cobrado:</strong> <span id="eiTotalCobrado">-</span></div>
     <div class="empresa-info-item"><strong>Tem Oráculo:</strong> <span id="eiTemOraculo">-</span></div>
     <div class="empresa-info-item"><strong>Fase Oráculo:</strong> <span id="eiOraculoColuna">-</span></div>
+    <div class="empresa-info-item"><strong>Status Empresa:</strong> <span id="eiStatusEmpresa">-</span></div>
+    <div class="empresa-info-item"><strong>Controle de Estoque:</strong> <span id="eiControleEstoque">-</span></div>
     <div class="empresa-info-item"><strong>Risco Churn:</strong> <span id="eiChurn">-</span></div>
     <div class="empresa-info-item"><strong>Filial:</strong> <span id="eiFilial">-</span></div>
 </div>
@@ -689,6 +691,16 @@ function updateEmpresaPanel(){
         else if(show.churnRisco==='Baixo')cb.style.cssText='color:var(--success);font-weight:700;';
         else cb.style.cssText='';
         document.getElementById('eiFilial').textContent=show.filial||'-';
+        const seEl=document.getElementById('eiStatusEmpresa');
+        seEl.textContent=show.statusEmpresa||'-';
+        if(show.statusEmpresa==='Ativa')seEl.style.cssText='color:var(--success);font-weight:700;';
+        else if(show.statusEmpresa==='Desativada')seEl.style.cssText='color:var(--danger);font-weight:700;';
+        else seEl.style.cssText='';
+        const ceEl=document.getElementById('eiControleEstoque');
+        ceEl.textContent=show.controleEstoque||'-';
+        if(show.controleEstoque==='Sim')ceEl.style.cssText='color:var(--success);font-weight:700;';
+        else if(show.controleEstoque==='Não')ceEl.style.cssText='color:var(--text-muted);';
+        else ceEl.style.cssText='';
         // Filiais filter (always uses main match)
         updateFiliaisFilter(match);
         // Filiais section in Transações tab
