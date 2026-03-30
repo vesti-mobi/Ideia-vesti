@@ -582,16 +582,15 @@ async function main() {
                 }
                 console.log('  Excel sheet "' + sheetName + '": ' + rows.length + ' rows');
             }
-            // Merge: main plan name from non-extra line, sum all numeric fields
+            // Keep main plan fields + planos array with all lines
             const isExtra = (p) => /oraculo|oráculo|integração|integracao|pacote/i.test(p);
             for (const [cnpj, lines] of Object.entries(allLinesByCnpj)) {
                 const main = lines.find(l => !isExtra(l.plano)) || lines[0];
-                const merged = { marca: main.marca, plano: main.plano, setup: 0, mensalidade: 0, integracao: 0, assistente: 0, filial: 0, descontos: 0, totalCobrado: 0, observacoes: main.observacoes, canal: main.canal, subconta: main.subconta };
-                for (const line of lines) {
-                    for (const k of ['setup', 'mensalidade', 'integracao', 'assistente', 'filial', 'descontos', 'totalCobrado']) merged[k] += line[k];
+                const entry = { marca: main.marca, plano: main.plano, setup: main.setup, mensalidade: main.mensalidade, integracao: main.integracao, assistente: main.assistente, filial: main.filial, descontos: main.descontos, totalCobrado: main.totalCobrado, observacoes: main.observacoes, canal: main.canal, subconta: main.subconta };
+                if (lines.length > 1) {
+                    entry.planos = lines.map(l => ({ plano: l.plano, mensalidade: l.mensalidade, integracao: l.integracao, assistente: l.assistente, filial: l.filial, descontos: l.descontos, totalCobrado: l.totalCobrado, setup: l.setup }));
                 }
-                for (const k of ['setup', 'mensalidade', 'integracao', 'assistente', 'filial', 'descontos', 'totalCobrado']) merged[k] = Math.round(merged[k] * 100) / 100;
-                marcasMap[cnpj] = merged;
+                marcasMap[cnpj] = entry;
             }
             marcasSource = 'Excel';
             console.log('  Marcas e Planos (Excel merged): ' + Object.keys(marcasMap).length + ' CNPJs');
@@ -1012,6 +1011,7 @@ async function main() {
                 planoSetup: marca ? marca.setup : 0,
                 planoObservacoes: marca ? marca.observacoes : '',
                 planoSubconta: marca ? marca.subconta : '',
+                planos: marca && marca.planos ? marca.planos : undefined,
                 marcaAtiva: e.transCartao >= 250 ? 'Sim' : 'Não',
                 mensalidade,
                 etapaHub,

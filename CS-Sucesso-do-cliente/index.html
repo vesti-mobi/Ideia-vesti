@@ -396,7 +396,7 @@
             <div class="chart-card full-width" style="margin-bottom:24px;">
                 <div class="chart-header"><div><div class="chart-title">Detalhes Financeiros da Empresa</div></div><span class="chart-badge badge-green">Individual</span></div>
                 <div style="overflow-x:auto;">
-                    <table style="width:100%;font-size:12px;"><thead><tr><th>Campo</th><th>Valor</th></tr></thead><tbody id="finEmpresaBody"></tbody></table>
+                    <table style="width:100%;font-size:12px;border-collapse:collapse;"><tbody id="finEmpresaBody"></tbody></table>
                 </div>
             </div>
         </div>
@@ -766,19 +766,38 @@ function updateFinanceiroDetail(match){
     const tbody=document.getElementById('finEmpresaBody');
     if(match&&match.planoTotalCobrado>0){
         detail.style.display='block';
-        const rows=[
-            {l:'Plano',v:match.plano||'-'},
-            {l:'Mensalidade',v:match.planoMensalidade?fmtCFull(match.planoMensalidade):'-'},
-            {l:'Integração',v:match.planoIntegracao?fmtCFull(match.planoIntegracao):'-'},
-            {l:'Assistente',v:match.planoAssistente?fmtCFull(match.planoAssistente):'-'},
-            {l:'Filial',v:match.planoFilial?fmtCFull(match.planoFilial):'-'},
-            {l:'Descontos',v:match.planoDescontos?fmtCFull(match.planoDescontos):'Nenhum'},
-            {l:'Total Cobrado',v:'<span style="font-weight:700;color:var(--success);font-size:14px;">'+fmtCFull(match.planoTotalCobrado)+'</span>'},
-            {l:'Setup',v:match.planoSetup?fmtCFull(match.planoSetup):'Isento'},
-            {l:'Subconta',v:match.planoSubconta||'-'},
-            {l:'Observações',v:match.planoObservacoes||'-'},
-        ];
-        tbody.innerHTML=rows.map(r=>'<tr><td style="font-weight:600;color:var(--text-secondary);">'+r.l+'</td><td>'+r.v+'</td></tr>').join('');
+        const planos=match.planos||[{plano:match.plano,mensalidade:match.planoMensalidade,integracao:match.planoIntegracao,assistente:match.planoAssistente,filial:match.planoFilial,descontos:match.planoDescontos,totalCobrado:match.planoTotalCobrado,setup:match.planoSetup}];
+        const cols=['Plano','Mensalidade','Integração','Assistente','Filial','Descontos','Total Cobrado','Setup'];
+        let html='<tr>'+cols.map(c=>'<th style="padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);border-bottom:1px solid var(--border);">'+c+'</th>').join('')+'</tr>';
+        planos.forEach(p=>{
+            html+='<tr>';
+            html+='<td style="padding:8px 12px;font-weight:600;color:var(--primary);">'+( p.plano||'-')+'</td>';
+            html+='<td style="padding:8px 12px;">'+(p.mensalidade?fmtCFull(p.mensalidade):'-')+'</td>';
+            html+='<td style="padding:8px 12px;">'+(p.integracao?fmtCFull(p.integracao):'-')+'</td>';
+            html+='<td style="padding:8px 12px;">'+(p.assistente?fmtCFull(p.assistente):'-')+'</td>';
+            html+='<td style="padding:8px 12px;">'+(p.filial?fmtCFull(p.filial):'-')+'</td>';
+            html+='<td style="padding:8px 12px;">'+(p.descontos?fmtCFull(p.descontos):'-')+'</td>';
+            html+='<td style="padding:8px 12px;font-weight:700;color:var(--success);">'+fmtCFull(p.totalCobrado)+'</td>';
+            html+='<td style="padding:8px 12px;">'+(p.setup?fmtCFull(p.setup):'Isento')+'</td>';
+            html+='</tr>';
+        });
+        // Total row if multiple plans
+        if(planos.length>1){
+            const sum=(k)=>planos.reduce((s,p)=>s+(p[k]||0),0);
+            html+='<tr style="border-top:2px solid var(--border);background:rgba(124,58,237,0.05);">';
+            html+='<td style="padding:8px 12px;font-weight:700;">TOTAL</td>';
+            html+='<td style="padding:8px 12px;font-weight:600;">'+(sum('mensalidade')?fmtCFull(sum('mensalidade')):'-')+'</td>';
+            html+='<td style="padding:8px 12px;font-weight:600;">'+(sum('integracao')?fmtCFull(sum('integracao')):'-')+'</td>';
+            html+='<td style="padding:8px 12px;font-weight:600;">'+(sum('assistente')?fmtCFull(sum('assistente')):'-')+'</td>';
+            html+='<td style="padding:8px 12px;font-weight:600;">'+(sum('filial')?fmtCFull(sum('filial')):'-')+'</td>';
+            html+='<td style="padding:8px 12px;font-weight:600;">'+(sum('descontos')?fmtCFull(sum('descontos')):'-')+'</td>';
+            html+='<td style="padding:8px 12px;font-weight:800;color:var(--success);font-size:14px;">'+fmtCFull(sum('totalCobrado'))+'</td>';
+            html+='<td style="padding:8px 12px;font-weight:600;">'+(sum('setup')?fmtCFull(sum('setup')):'Isento')+'</td>';
+            html+='</tr>';
+        }
+        // Subconta + Observações
+        html+='<tr><td colspan="8" style="padding:8px 12px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border);"><strong>Subconta:</strong> '+(match.planoSubconta||'-')+' &nbsp;|&nbsp; <strong>Obs:</strong> '+(match.planoObservacoes||'-')+'</td></tr>';
+        tbody.innerHTML=html;
     } else {
         detail.style.display='none';
     }
