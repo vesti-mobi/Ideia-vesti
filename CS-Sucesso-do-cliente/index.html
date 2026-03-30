@@ -245,6 +245,7 @@
     <div class="empresa-info-item"><strong>Canal de Vendas:</strong> <span id="eiCanal">-</span></div>
     <div class="empresa-info-item"><strong>Plano:</strong> <span id="eiPlano">-</span></div>
     <div class="empresa-info-item"><strong>Mensalidade:</strong> <span id="eiMensal">-</span></div>
+    <div class="empresa-info-item"><strong>Última Fatura:</strong> <span id="eiUltimaFatura">-</span></div>
     <div class="empresa-info-item"><strong>Integração (Plano):</strong> <span id="eiPlanoInteg">-</span></div>
     <div class="empresa-info-item"><strong>Assistente:</strong> <span id="eiAssistente">-</span></div>
     <div class="empresa-info-item"><strong>Filial (Plano):</strong> <span id="eiPlanoFilial">-</span></div>
@@ -652,6 +653,16 @@ function updateEmpresaPanel(){
         // Plano / Financeiro
         document.getElementById('eiPlano').textContent=show.plano||'-';
         document.getElementById('eiMensal').textContent=show.planoMensalidade?fmtCFull(show.planoMensalidade):(show.mensalidade||'-');
+        // Última fatura Iugu - status + valor + mês
+        const ufEl=document.getElementById('eiUltimaFatura');
+        if(show.faturamento&&show.faturamento.faturas&&show.faturamento.faturas.length>0){
+            const uf=show.faturamento.faturas[0]; // já ordenado por data desc
+            const statusMap={paid:'Pago',pending:'Pendente',expired:'Vencido',canceled:'Cancelado',externally_paid:'Pago ext.'};
+            const colorMap={paid:'var(--success)',pending:'var(--warning)',expired:'var(--danger)',canceled:'var(--text-muted)',externally_paid:'var(--success)'};
+            ufEl.innerHTML='<span style="color:'+( colorMap[uf.status]||'var(--text-primary)')+';font-weight:700;">'+(statusMap[uf.status]||uf.status)+'</span> — '+fmtCFull(uf.total)+' <span style="color:var(--text-muted);font-size:11px;">('+uf.mes+')</span>';
+        } else {
+            ufEl.textContent='-';
+        }
         document.getElementById('eiPlanoInteg').textContent=show.planoIntegracao?fmtCFull(show.planoIntegracao):'-';
         document.getElementById('eiAssistente').textContent=show.planoAssistente?fmtCFull(show.planoAssistente):'-';
         document.getElementById('eiPlanoFilial').textContent=show.planoFilial?fmtCFull(show.planoFilial):'-';
