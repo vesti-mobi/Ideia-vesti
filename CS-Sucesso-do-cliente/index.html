@@ -167,10 +167,10 @@
 <div class="header">
     <div class="header-left">
         <img src="logo-vesti.png" alt="Vesti" class="logo" onerror="this.style.display='none'">
-        <div class="header-title">
-            <h1>Sucesso do Cliente 2025-2026</h1>
-            <span>Customer Success Dashboard - VestiPago</span>
-        </div>
+    </div>
+    <div class="header-title" style="text-align:center;flex:1;">
+        <h1>Sucesso do Cliente 2025-2026</h1>
+        <span>Customer Success Dashboard - VestiPago</span>
     </div>
     <div class="header-right">
         <span class="header-badge" id="badgeTotal"></span>
@@ -211,24 +211,20 @@
         <select id="fAtivas" class="filter-select"><option value="">Todas</option><option value="1">Com pedidos</option></select>
     </div>
     <div class="filter-group">
-        <span class="filter-label">Etapa Hub</span>
-        <select id="fEtapaHub" class="filter-select"><option value="">Todos</option></select>
-    </div>
-    <div class="filter-group">
         <span class="filter-label">Risco Churn</span>
         <select id="fChurn" class="filter-select"><option value="">Todos</option><option value="Alto">Alto</option><option value="Medio">Médio</option><option value="Baixo">Baixo</option></select>
     </div>
     <div class="filter-divider"></div>
+    <div class="filter-group">
+        <span class="filter-label">Criação Domínio</span>
+        <div class="filter-date-row"><input type="date" id="fCriaDe" class="filter-date"><span>a</span><input type="date" id="fCriaAte" class="filter-date"></div>
+    </div>
     <div class="filter-group">
         <span class="filter-label">Período Pedidos</span>
         <div class="filter-date-row"><input type="month" id="fPedDe" class="filter-date"><span>a</span><input type="month" id="fPedAte" class="filter-date"></div>
     </div>
     <input type="hidden" id="fLinkDe"><input type="hidden" id="fLinkAte">
     <input type="hidden" id="fCliqDe"><input type="hidden" id="fCliqAte">
-    <div class="filter-group">
-        <span class="filter-label">Criação Domínio</span>
-        <div class="filter-date-row"><input type="date" id="fCriaDe" class="filter-date"><span>a</span><input type="date" id="fCriaAte" class="filter-date"></div>
-    </div>
     <div class="filter-group" id="filialFilterGroup" style="display:none;">
         <span class="filter-label">Filial</span>
         <select id="fFilial" class="filter-select"><option value="">Todas (consolidado)</option></select>
@@ -477,18 +473,15 @@ let sortCol=19,sortDir=-1; // default: GMV desc
 
 function populateFilters(){
     const es=DADOS.empresas;
-    const anjos=new Set(),canais=new Set(),modulos=new Set(),hubs=new Set();
+    const anjos=new Set(),canais=new Set(),modulos=new Set();
     es.forEach(e=>{
         if(e.anjo)anjos.add(e.anjo);
         if(e.canal)canais.add(e.canal);
         if(e.modulo)modulos.add(e.modulo);
-        if(e.etapaHub)hubs.add(e.etapaHub);
     });
     const addOpts=(sel,vals)=>{[...vals].sort().forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);});};
     addOpts(document.getElementById('fAnjo'),anjos);
     addOpts(document.getElementById('fCanal'),canais);
-    //addOpts(document.getElementById('fModulo'),modulos);
-    addOpts(document.getElementById('fEtapaHub'),hubs);
     updateEmpresaDatalist();
 }
 
@@ -537,7 +530,7 @@ function applyFilters(){
     const fIn=document.getElementById('fInteg').value;
     const fMo='';
     const fAt=document.getElementById('fAtivas').value;
-    const fEH=document.getElementById('fEtapaHub').value;
+    const fEH='';
     const fCh=document.getElementById('fChurn').value;
     const fPedDe=document.getElementById('fPedDe').value;
     const fPedAte=document.getElementById('fPedAte').value;
