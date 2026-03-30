@@ -12,3 +12,4 @@ node_modules/
 .env
 .new_refresh_token
 *.xlsx
+!Marcas e Planos.xlsx

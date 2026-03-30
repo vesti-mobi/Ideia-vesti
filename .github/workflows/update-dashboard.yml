@@ -21,15 +21,15 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install dependencies
+        run: npm install xlsx tedious
+
       - name: Rebuild CS Sucesso do Cliente via Fabric + HubSpot
         env:
           HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
           FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
           FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
         run: node CS-Sucesso-do-cliente/build-cloud.js
-
-      - name: Install tedious (SQL driver)
-        run: npm install tedious
 
       - name: Rebuild Pedidos por Marca via Fabric + Lakehouse
         env:

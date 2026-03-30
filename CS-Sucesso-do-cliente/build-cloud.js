@@ -531,25 +531,81 @@ async function main() {
     }
 
     // 5f. Marcas e Planos - by CNPJ (all plan breakdown fields)
+    // Power BI table only has MARCA, PLANO, CPFCNPJ, TOTAL_COBRADO.
+    // Full data (MENSALIDADE, INTEGRAÇÃO, ASSISTENTE, FILIAL, DESCONTOS, etc.) comes from local Excel.
     const marcasMap = {};
-    for (const row of marcasRows) {
-        const cnpj = row['CPFCNPJ'] || '';
-        if (cnpj) {
-            marcasMap[cnpj] = {
-                marca: row['MARCA'],
-                plano: row['PLANO'] || '',
-                setup: parseFloat(row['SETUP']) || 0,
-                mensalidade: parseFloat(row['MENSALIDADE']) || 0,
-                integracao: parseFloat(row['INTEGRAÇÃO'] || row['INTEGRACAO']) || 0,
-                assistente: parseFloat(row['ASSISTENTE']) || 0,
-                filial: parseFloat(row['FILIAL']) || 0,
-                descontos: parseFloat(row['DESCONTOS']) || 0,
-                totalCobrado: parseFloat(row['TOTAL COBRADO'] || row['TOTAL_COBRADO']) || 0,
-                observacoes: row['OBSERVAÇÕES'] || row['OBSERVACOES'] || '',
-                canal: row['CANAL'] || '',
-                subconta: row['Subconta'] || '',
-            };
+    const excelPath = path.join(DIR, 'Marcas e Planos.xlsx');
+    let marcasSource = 'PowerBI';
+    if (fs.existsSync(excelPath)) {
+        try {
+            const XLSX = require('xlsx');
+            const wb = XLSX.readFile(excelPath);
+            function extractSheetDate(name) {
+                let m = name.match(/(\d{2})-?(\d{4})/);
+                if (m) return m[2] + '-' + m[1];
+                m = name.match(/(\d{2})-?(\d{2})$/);
+                if (m) return '20' + m[2] + '-' + m[1];
+                return '0000-00';
+            }
+            const vestiSheets = wb.SheetNames.filter(s => s.toLowerCase().includes('vesti') && !s.toLowerCase().includes('starter'));
+            const starterSheets = wb.SheetNames.filter(s => s.toLowerCase().includes('starter'));
+            vestiSheets.sort((a, b) => extractSheetDate(b).localeCompare(extractSheetDate(a)));
+            starterSheets.sort((a, b) => extractSheetDate(b).localeCompare(extractSheetDate(a)));
+            const sheetsToRead = [];
+            if (vestiSheets.length > 0) sheetsToRead.push(vestiSheets[0]);
+            if (starterSheets.length > 0) sheetsToRead.push(starterSheets[0]);
+            if (sheetsToRead.length === 0) sheetsToRead.push(wb.SheetNames[0]);
+            for (const sheetName of sheetsToRead) {
+                const ws = wb.Sheets[sheetName];
+                const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+                for (const row of rows) {
+                    const cnpj = String(row['CPFCNPJ'] || row['CPF e CNPJ'] || '').replace(/[.\-\/\s]/g, '');
+                    if (!cnpj || cnpj.length < 11) continue;
+                    marcasMap[cnpj] = {
+                        marca: row['MARCA'] || '',
+                        plano: row['PLANO'] || '',
+                        setup: parseFloat(row['SETUP']) || 0,
+                        mensalidade: parseFloat(row['MENSALIDADE']) || 0,
+                        integracao: parseFloat(row['INTEGRAÇÃO'] || row['INTEGRACAO']) || 0,
+                        assistente: parseFloat(row['ASSISTENTE']) || 0,
+                        filial: parseFloat(row['FILIAL']) || 0,
+                        descontos: parseFloat(row['DESCONTOS']) || 0,
+                        totalCobrado: parseFloat(row['TOTAL COBRADO'] || row['TOTAL_COBRADO']) || 0,
+                        observacoes: row['OBSERVAÇÕES'] || row['OBSERVACOES'] || '',
+                        canal: row['CANAL'] || row['CANAL/Agência'] || '',
+                        subconta: row['Subconta'] || '',
+                    };
+                }
+                console.log('  Excel sheet "' + sheetName + '": ' + rows.length + ' rows');
+            }
+            marcasSource = 'Excel';
+            console.log('  Marcas e Planos (Excel): ' + Object.keys(marcasMap).length + ' CNPJs');
+        } catch (e) {
+            console.log('  WARN: Excel read failed: ' + e.message + ', falling back to PowerBI data');
         }
+    }
+    if (marcasSource === 'PowerBI') {
+        // Fallback: use PowerBI data (limited columns)
+        for (const row of marcasRows) {
+            const cnpj = row['CPFCNPJ'] || '';
+            if (cnpj) {
+                marcasMap[cnpj] = {
+                    marca: row['MARCA'] || '',
+                    plano: row['PLANO'] || '',
+                    setup: 0,
+                    mensalidade: parseFloat(row['MENSALIDADE']) || 0,
+                    integracao: parseFloat(row['INTEGRAÇÃO'] || row['INTEGRACAO']) || 0,
+                    assistente: parseFloat(row['ASSISTENTE']) || 0,
+                    filial: parseFloat(row['FILIAL']) || 0,
+                    descontos: parseFloat(row['DESCONTOS']) || 0,
+                    totalCobrado: parseFloat(row['TOTAL COBRADO'] || row['TOTAL_COBRADO']) || 0,
+                    observacoes: row['OBSERVAÇÕES'] || row['OBSERVACOES'] || '',
+                    canal: row['CANAL'] || '',
+                    subconta: row['Subconta'] || '',
+                };
+            }
+        }
+        console.log('  Marcas e Planos (PowerBI): ' + Object.keys(marcasMap).length + ' CNPJs');
     }
 
     // 5g. Pedidos per company per month
