@@ -27,6 +27,16 @@ const DAX_ENDPOINT = `/v1.0/myorg/groups/${WORKSPACE_ID}/datasets/${DATASET_ID}/
 const VP_WORKSPACE_ID = 'f80301c2-8735-40d2-8662-1f8a627d3f61';
 const VP_DATASET_ID = '606be0ee-2c8c-4f43-8ad6-0be04f95d616';
 
+// Invoices (Iugu) workspace + dataset (Confecção - Assinaturas)
+const INV_WORKSPACE_ID = '786bfd95-0733-4fcb-aa84-ef2c97518959';
+const INV_DATASET_ID = '66e1e1d7-0ea5-4a50-b9e1-5958892debde';
+
+// Oráculo Fabric workspace + datasets
+const FABRIC_CLIENT_ID = '14d82eec-204b-4c2f-b7e8-296a70dab67e';
+const ORACULO_WS_ID = '2929476c-7b92-4366-9236-ccd13ffbd917';
+const ORACULO_DS_ID = 'c6a480e9-2db4-45f7-ba67-b489407f59e6';
+const ORACULO_PAINEIS_WS_ID = '63a65f3e-d96b-446e-a01d-f219132e1144';
+
 const ORACULO_PIPELINE_ID = '794686264';
 const ORACULO_STAGES = {
     '1165541427':'Fila','1165361278':'Grupo de Implementação','1165350737':'Reunião 1',
@@ -37,9 +47,19 @@ const ORACULO_STAGES = {
     '1165361281':'Concluído','1238455699':'Parado','1249275660':'Churn'
 };
 
-const HUBSPOT_TOKEN = process.env.HUBSPOT_TOKEN || '';
-const FABRIC_REFRESH_TOKEN = process.env.FABRIC_REFRESH_TOKEN || '';
-const FABRIC_TENANT_ID = process.env.FABRIC_TENANT_ID || '';
+// Load .env file if present (for local execution)
+const _envPath = path.join(DIR, '.env');
+const _localEnv = {};
+if (fs.existsSync(_envPath)) {
+    fs.readFileSync(_envPath, 'utf-8').split('\n').forEach(l => {
+        const m = l.match(/^([^#=]+)=(.*)$/);
+        if (m) _localEnv[m[1].trim()] = m[2].trim();
+    });
+}
+
+const HUBSPOT_TOKEN = process.env.HUBSPOT_TOKEN || _localEnv.HUBSPOT_TOKEN || '';
+const FABRIC_REFRESH_TOKEN = process.env.FABRIC_REFRESH_TOKEN || _localEnv.FABRIC_REFRESH_TOKEN || '';
+const FABRIC_TENANT_ID = process.env.FABRIC_TENANT_ID || _localEnv.FABRIC_TENANT_ID || '';
 
 // ===================== HTTP HELPERS =====================
 function httpsRequest(options, body) {
@@ -95,6 +115,13 @@ async function getAccessToken() {
         const rtPath = path.join(DIR, '.new_refresh_token');
         fs.writeFileSync(rtPath, data.refresh_token, 'utf-8');
         console.log('  New refresh token saved to .new_refresh_token');
+        // Also update .env if it exists (for local execution)
+        if (fs.existsSync(_envPath)) {
+            let env = fs.readFileSync(_envPath, 'utf-8');
+            env = env.replace(/^FABRIC_REFRESH_TOKEN=.*$/m, 'FABRIC_REFRESH_TOKEN=' + data.refresh_token);
+            fs.writeFileSync(_envPath, env, 'utf-8');
+            console.log('  .env refresh token updated');
+        }
     }
 
     return data.access_token;
@@ -295,6 +322,112 @@ async function fetchOraculoTickets() {
     }
 }
 
+// ===================== ORÁCULO FABRIC: PAINEL STATS =====================
+async function fetchOraculoPainelStats(accessToken) {
+    try {
+        console.log('  Listing Oráculo painéis datasets...');
+        const dsRes = await httpsRequest({
+            hostname: 'api.powerbi.com',
+            path: '/v1.0/myorg/groups/' + ORACULO_PAINEIS_WS_ID + '/datasets',
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+        });
+        if (dsRes.statusCode !== 200) { console.log('  WARN: Oráculo painéis list failed HTTP ' + dsRes.statusCode); return new Map(); }
+        const datasets = JSON.parse(dsRes.body).value || [];
+
+        const dax = "EVALUATE ROW(\"pedidos\", COUNTROWS('f_Pedidos Oraculo'), \"interacoes\", COUNTROWS('f_Interacoes Oraculo Semanal'), \"atendimentos\", [KPI Atendimentos Oraculo], \"pctIA\", [KPI % Atendimento Oraculo], \"vendas\", [KPI Vendas Totais])";
+        const map = new Map();
+        let ok = 0, fail = 0;
+        for (const ds of datasets) {
+            if (ds.name === 'Report Usage Metrics Model') continue;
+            const name = ds.name.replace(' - Oráculo', '').trim();
+            const body = JSON.stringify({ queries: [{ query: dax }], serializerSettings: { includeNulls: true } });
+            try {
+                const res = await httpsRequest({
+                    hostname: 'api.powerbi.com',
+                    path: '/v1.0/myorg/groups/' + ORACULO_PAINEIS_WS_ID + '/datasets/' + ds.id + '/executeQueries',
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+                }, body);
+                if (res.statusCode === 200) {
+                    const val = JSON.parse(res.body).results?.[0]?.tables?.[0]?.rows?.[0] || {};
+                    map.set(name.toLowerCase(), {
+                        name,
+                        pedidosOraculo: val['[pedidos]'] || 0,
+                        interacoesOraculo: val['[interacoes]'] || 0,
+                        atendimentosOraculo: val['[atendimentos]'] || 0,
+                        pctIAOraculo: val['[pctIA]'] != null ? Math.round(val['[pctIA]'] * 1000) / 10 : 0,
+                        vendasOraculo: val['[vendas]'] != null ? Math.round(val['[vendas]'] * 100) / 100 : 0,
+                    });
+                    ok++;
+                } else { fail++; }
+            } catch (e) { fail++; }
+        }
+        console.log('  Oráculo painéis stats: ' + ok + ' OK, ' + fail + ' failed (of ' + datasets.length + ')');
+        return map;
+    } catch (e) {
+        console.log('  WARN: Oráculo painéis fetch failed: ' + e.message);
+        return new Map();
+    }
+}
+
+// ===================== ORÁCULO FABRIC: CONFIGURATIONS =====================
+async function fetchOraculoConfigurations(accessToken) {
+    try {
+        const query = `EVALUATE SELECTCOLUMNS(
+            FILTER(Oraculo_configurations, NOT ISBLANK(Oraculo_configurations[n8n_url])),
+            "company_id", Oraculo_configurations[company_id],
+            "domain_id", Oraculo_configurations[domain_id],
+            "name", Oraculo_configurations[name],
+            "n8n_url", Oraculo_configurations[n8n_url],
+            "phone_origin", Oraculo_configurations[phone_origin],
+            "created_at", Oraculo_configurations[created_at],
+            "updated_at", Oraculo_configurations[updated_at],
+            "link_report", Oraculo_configurations[link_report],
+            "phone_by_vesti", Oraculo_configurations[phone_by_vesti],
+            "catalogue_with_price", Oraculo_configurations[catalogue_with_price],
+            "agent_retail", Oraculo_configurations[agent_retail],
+            "works_with_closed_square", Oraculo_configurations[works_with_closed_square],
+            "keep_assigned_seller", Oraculo_configurations[keep_assigned_seller]
+        )`;
+        const rows = await executeDaxQueryOn(accessToken, ORACULO_WS_ID, ORACULO_DS_ID, query, 'Oráculo Configurations');
+        const map = new Map();
+        rows.forEach(r => {
+            const companyId = r.company_id || '';
+            if (companyId) {
+                map.set(companyId, {
+                    name: r.name || '',
+                    domain_id: r.domain_id || '',
+                    n8n_url: r.n8n_url || '',
+                    phone: r.phone_origin || '',
+                    created_at: r.created_at || '',
+                    updated_at: r.updated_at || '',
+                    link_report: r.link_report || '',
+                    phone_by_vesti: r.phone_by_vesti === '1' || r.phone_by_vesti === 1 || r.phone_by_vesti === true,
+                    catalogue_with_price: r.catalogue_with_price === '1' || r.catalogue_with_price === 1 || r.catalogue_with_price === true,
+                    agent_retail: r.agent_retail === '1' || r.agent_retail === 1 || r.agent_retail === true,
+                    works_with_closed_square: r.works_with_closed_square === '1' || r.works_with_closed_square === 1 || r.works_with_closed_square === true,
+                    keep_assigned_seller: r.keep_assigned_seller === '1' || r.keep_assigned_seller === 1 || r.keep_assigned_seller === true,
+                });
+            }
+        });
+        console.log('  Oráculo configurations: ' + map.size);
+        return map;
+    } catch (e) {
+        console.log('  WARN: Oráculo config fetch failed: ' + e.message);
+        return new Map();
+    }
+}
+
+// ===================== INVOICE TOTAL PARSER =====================
+function parseInvoiceTotal(s) {
+    if (!s || typeof s !== 'string') return 0;
+    s = s.trim();
+    if (s.includes('BRL')) return parseFloat(s.replace('BRL', '').trim()) || 0;
+    s = s.replace('R$', '').trim().replace(/\./g, '').replace(',', '.');
+    return parseFloat(s) || 0;
+}
+
 // ===================== FUZZY MATCHING (same as build-data.js) =====================
 function normalize(s) {
     return (s || '').toLowerCase()
@@ -389,8 +522,11 @@ async function main() {
     // Pedidos per company per month (churn + period filters + payment)
     const daxPedidosCompanyMonthly = `EVALUATE SUMMARIZECOLUMNS('Merged Pedidos'[ID Empresa], 'Merged Pedidos'[Data Criacao].[Year], 'Merged Pedidos'[Data Criacao].[MonthNo], "Qtd", COUNTROWS('Merged Pedidos'), "Pagos", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pago]=TRUE()), "Cancelados", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Cancelado]=TRUE()), "Pendentes", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pendente]=TRUE()), "Val", SUM('Merged Pedidos'[Total]), "ValPagos", CALCULATE(SUM('Merged Pedidos'[Total]), 'Merged Pedidos'[Pago]=TRUE()), "TC", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroCartao}), "TP", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroPix}), "VC", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroCartao}), "VP", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroPix}))`;
 
+    // Invoices (Iugu) - from Confecção - Assinaturas dataset
+    const daxInvoices = `EVALUATE SELECTCOLUMNS(Invoices, "subId", Invoices[items.id], "name", Invoices[items.customer_name], "invId", Invoices[items.recent_invoices.id], "due", Invoices[items.recent_invoices.due_date], "status", Invoices[items.recent_invoices.status], "total", Invoices[items.recent_invoices.total], "plan", Invoices[items.plan_name], "custId", Invoices[items.customer_id])`;
+
     // Run all queries in parallel (including VestiPago companies from separate dataset)
-    const [cadastrosRows, configRows, marcasRows, productRows, rankingsRows, pedidosCompanyRows, pedidosMonthlyRows, pedidosCompanyMonthlyRows, vestiPagoRows, linksMonthlyRows, cliquesMonthlyRows, linksCompanyMonthlyRows, cliquesCompanyMonthlyRows] = await Promise.all([
+    const [cadastrosRows, configRows, marcasRows, productRows, rankingsRows, pedidosCompanyRows, pedidosMonthlyRows, pedidosCompanyMonthlyRows, vestiPagoRows, linksMonthlyRows, cliquesMonthlyRows, linksCompanyMonthlyRows, cliquesCompanyMonthlyRows, invoiceRows] = await Promise.all([
         executeDaxQuery(accessToken, daxCadastros, 'Cadastros Empresas'),
         executeDaxQuery(accessToken, daxConfig, 'Config Empresas'),
         executeDaxQuery(accessToken, daxMarcas, 'Marcas e Planos'),
@@ -404,6 +540,7 @@ async function main() {
         executeDaxQuery(accessToken, daxCliquesMonthly, 'Cliques Monthly'),
         executeDaxQuery(accessToken, daxLinksCompanyMonthly, 'Links Company Monthly'),
         executeDaxQuery(accessToken, daxCliquesCompanyMonthly, 'Cliques Company Monthly'),
+        executeDaxQueryOn(accessToken, INV_WORKSPACE_ID, INV_DATASET_ID, daxInvoices, 'Invoices Iugu'),
     ]);
 
     // Build VestiPago set
@@ -411,9 +548,54 @@ async function main() {
     vestiPagoRows.forEach(r => { if (r.companyId) vestiPagoSet.add(r.companyId); });
     console.log('  VestiPago companies: ' + vestiPagoSet.size);
 
+    // ---------- 2b. Process Invoices (Iugu) ----------
+    const seenInvIds = new Set();
+    const invoices = [];
+    invoiceRows.forEach(r => {
+        const invId = r.invId;
+        if (invId && !seenInvIds.has(invId)) {
+            seenInvIds.add(invId);
+            const brandName = (r.name || '').split(' = ')[0].trim();
+            const due = r.due || '';
+            invoices.push({
+                brand: brandName,
+                invId,
+                due,
+                dueMonth: due.substring(0, 7),
+                status: r.status || '',
+                total: typeof r.total === 'number' ? r.total : parseInvoiceTotal(String(r.total || '')),
+                plan: r.plan || '',
+                custId: r.custId || '',
+            });
+        }
+    });
+    console.log('  Unique invoices: ' + invoices.length);
+
+    // Group invoices by brand name
+    const invoicesByBrand = {};
+    invoices.forEach(i => {
+        if (!invoicesByBrand[i.brand]) invoicesByBrand[i.brand] = { brand: i.brand, plan: '', invoices: [], paid: 0, pending: 0, expired: 0, canceled: 0, totalInvoices: 0 };
+        const b = invoicesByBrand[i.brand];
+        if (i.plan && !b.plan) b.plan = i.plan;
+        b.totalInvoices++;
+        b.invoices.push({ mes: i.dueMonth, status: i.status, total: i.total, due: i.due });
+        if (i.status === 'paid' || i.status === 'externally_paid') b.paid += i.total;
+        else if (i.status === 'pending') b.pending += i.total;
+        else if (i.status === 'expired') b.expired += i.total;
+        else if (i.status === 'canceled') b.canceled += i.total;
+    });
+    console.log('  Invoice brands: ' + Object.keys(invoicesByBrand).length);
+
     // ---------- 3. Fetch HubSpot Oráculo tickets ----------
     console.log('\nFetching HubSpot...');
     const oraculoTickets = await fetchOraculoTickets();
+
+    // ---------- 3b. Fetch Oráculo Fabric data (painel stats + configurations) ----------
+    console.log('\nFetching Oráculo Fabric data...');
+    const [oraculoPainelStats, oraculoConfigMap] = await Promise.all([
+        fetchOraculoPainelStats(accessToken),
+        fetchOraculoConfigurations(accessToken),
+    ]);
 
     // ---------- 4. Read Controle Geral Luana CSV (apenas mensalidade, email, senha, etapaHub) ----------
     console.log('\nReading Controle Geral Luana (campos selecionados)...');
@@ -432,6 +614,23 @@ async function main() {
         if (marca) controleByNome[marca.toLowerCase().trim()] = entry;
     });
     console.log('  Controle Luana loaded: ' + Object.keys(controleMap).length + ' companies (email, senha, etapaHub, mensalidade)');
+
+    // ---------- 4b. Load CSAT data from _csat.json ----------
+    const csatByEmpresa = {};
+    const csatPath = path.join(DIR, '_csat.json');
+    if (fs.existsSync(csatPath)) {
+        try {
+            const csatData = JSON.parse(fs.readFileSync(csatPath, 'utf-8'));
+            csatData.forEach(c => {
+                const key = (c.empresa || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+                if (!csatByEmpresa[key]) csatByEmpresa[key] = [];
+                csatByEmpresa[key].push({ mes: c.mes, nota: c.nota, obs: c.obs || '' });
+            });
+            console.log('  CSAT loaded: ' + csatData.length + ' entries for ' + Object.keys(csatByEmpresa).length + ' empresas');
+        } catch (e) { console.log('  WARN: Failed to read _csat.json: ' + e.message); }
+    } else {
+        console.log('  SKIP: _csat.json not found');
+    }
 
     // ---------- 5. Process Power BI data ----------
     console.log('\nProcessing data...');
@@ -948,6 +1147,23 @@ async function main() {
 
             const temVestiPago = vestiPagoSet.has(e.id);
 
+            // Oráculo Fabric (configurations + painel stats)
+            const oraculoConfig = oraculoConfigMap.get(e.id) || null;
+            let oraculoStats = oraculoPainelStats.get(nome.toLowerCase()) || null;
+            if (!oraculoStats && oraculoConfig) {
+                const ocName = (oraculoConfig.name || '').toLowerCase().replace(/^churn\s*-\s*/i, '').replace(/^chrun\s*-\s*/i, '').trim();
+                if (ocName) oraculoStats = oraculoPainelStats.get(ocName) || null;
+                if (!oraculoStats) {
+                    const nNorm = normalize(nome);
+                    for (const [pName, pStats] of oraculoPainelStats) {
+                        const pNorm = normalize(pName);
+                        if (pNorm && nNorm && (nNorm.includes(pNorm) || pNorm.includes(nNorm))) {
+                            oraculoStats = pStats; break;
+                        }
+                    }
+                }
+            }
+
             // Filiais
             const groupRoot = ufFind(e.id);
             const filiaisGroup = filialGroups[groupRoot] || [];
@@ -1017,18 +1233,67 @@ async function main() {
                 mensalidade,
                 etapaHub,
                 oraculoEtapa,
+                temOraculoFabric: !!(oraculoStats || oraculoConfig),
+                oraculoFabric: (oraculoStats || oraculoConfig) ? {
+                    ...(oraculoConfig || {}),
+                    pedidosOraculo: oraculoStats ? oraculoStats.pedidosOraculo : 0,
+                    interacoesOraculo: oraculoStats ? oraculoStats.interacoesOraculo : 0,
+                    atendimentosOraculo: oraculoStats ? oraculoStats.atendimentosOraculo : 0,
+                    pctIAOraculo: oraculoStats ? oraculoStats.pctIAOraculo : 0,
+                    vendasOraculo: oraculoStats ? oraculoStats.vendasOraculo : 0,
+                } : undefined,
                 usuario: ctrl ? ctrl.usuario : '',
                 senha: ctrl ? ctrl.senha : '',
                 churnScore,
                 churnRisco,
                 churnMotivos: churnMotivos.length > 0 ? churnMotivos.join('; ') : '',
                 naoPagos: e.pedidosPendentes,
+                csat: (() => {
+                    const nk = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+                    if (csatByEmpresa[nk]) return csatByEmpresa[nk];
+                    for (const [ck, cv] of Object.entries(csatByEmpresa)) {
+                        if (ck.length >= 4 && nk.startsWith(ck)) return cv;
+                    }
+                })(),
                 isMatriz: filiaisGroup.length > 1 ? isMatriz : undefined,
                 matrizId: filiaisGroup.length > 1 && !isMatriz ? matrizId : undefined,
                 filiais: filiais.length > 0 ? filiais : undefined,
                 m,
             };
         });
+
+    // ---------- 8b. Match Invoices (Iugu) to empresas ----------
+    let invoiceMatched = 0;
+    for (const emp of empresasList) {
+        const nomeNorm = normalize(emp.nome);
+        let brandData = null;
+        for (const [brand, data] of Object.entries(invoicesByBrand)) {
+            const brandNorm = normalize(brand);
+            if (brandNorm.length < 4) continue;
+            if (nomeNorm === brandNorm) { brandData = data; break; }
+            const shorter = Math.min(nomeNorm.length, brandNorm.length);
+            if (shorter >= 5 && (nomeNorm.startsWith(brandNorm) || brandNorm.startsWith(nomeNorm))) {
+                brandData = data; break;
+            }
+        }
+        if (brandData) {
+            emp.faturamento = {
+                planoIugu: brandData.plan,
+                totalPago: Math.round(brandData.paid * 100) / 100,
+                totalPendente: Math.round(brandData.pending * 100) / 100,
+                totalVencido: Math.round(brandData.expired * 100) / 100,
+                totalCancelado: Math.round(brandData.canceled * 100) / 100,
+                qtdFaturas: brandData.totalInvoices,
+                faturas: brandData.invoices.sort((a, b) => b.due.localeCompare(a.due)).slice(0, 12).map(f => ({
+                    mes: f.mes,
+                    status: f.status,
+                    total: f.total,
+                })),
+            };
+            invoiceMatched++;
+        }
+    }
+    console.log('  Invoices matched to empresas: ' + invoiceMatched + '/' + empresasList.length);
 
     // ---------- 9. Build output ----------
     const oraculoSummary = {};

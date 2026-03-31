@@ -1,0 +1,15 @@
+[
+  { "empresa": "Kelly Rodrigues", "mes": "2026-01", "nota": 5 },
+  { "empresa": "Amiska", "mes": "2026-01", "nota": 4 },
+  { "empresa": "Le Ricard", "mes": "2026-01", "nota": 3, "obs": "Segundo a cliente, no início a implementação pareceu um pouco solta, o que influenciou nessa nota" },
+  { "empresa": "Venoro", "mes": "2026-01", "nota": 4 },
+  { "empresa": "Ousadia Feminina", "mes": "2026-01", "nota": 5 },
+  { "empresa": "Aero Summer", "mes": "2026-01", "nota": 4 },
+  { "empresa": "Nono Modas", "mes": "2026-01", "nota": 5 },
+  { "empresa": "Villon Jeans", "mes": "2026-01", "nota": 5 },
+  { "empresa": "Lemier", "mes": "2026-02", "nota": 4 },
+  { "empresa": "Ópera Kids", "mes": "2026-03", "nota": 5 },
+  { "empresa": "Vout", "mes": "2026-03", "nota": 4, "obs": "Quer avaliar um pouco mais a ferramenta" },
+  { "empresa": "Le Ricard", "mes": "2026-03", "nota": 4 },
+  { "empresa": "Kaessi", "mes": "2026-03", "nota": 4 }
+]
