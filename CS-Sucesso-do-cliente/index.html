@@ -1139,8 +1139,16 @@ function renderTabFin(){
 
     // Build KPIs - Faturamento Iugu first, then Marcas e Planos
     const kpis=[];
+    // Status Mensalidade KPI - when a single company is selected, show last invoice status
+    if(isSingleBrand&&ref&&ref.faturamento&&ref.faturamento.faturas&&ref.faturamento.faturas.length>0){
+        const uf=ref.faturamento.faturas[0];
+        const stMap={paid:"Pago",pending:"Pendente",expired:"Vencido",canceled:"Cancelado",externally_paid:"Pago ext."};
+        const stColor={paid:"var(--success)",pending:"var(--warning)",expired:"var(--danger)",canceled:"var(--text-muted)",externally_paid:"var(--success)"};
+        const stIcon={paid:"&#9989;",pending:"&#9888;",expired:"&#10060;",canceled:"&#128683;",externally_paid:"&#9989;"};
+        kpis.push({icon:stIcon[uf.status]||"&#128176;",label:"Status Mensalidade",value:stMap[uf.status]||uf.status,color:stColor[uf.status]||"var(--text-primary)"});
+    }
     // Invoices KPIs
-    if(fatPago>0||fatPendente>0) {
+    if(fatPago>0||fatPendente>0||fatVencido>0) {
         kpis.push({icon:'&#128176;',label:'Faturado (Pago)',value:fmtCFull(fatPago)});
         if(fatPendente>0)kpis.push({icon:'&#9888;',label:'Pendente',value:fmtCFull(fatPendente),color:'var(--warning)'});
         if(fatVencido>0)kpis.push({icon:'&#10060;',label:'Vencido',value:fmtCFull(fatVencido),color:'var(--danger)'});
