@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "tedious": "^19.2.1"
+    "tedious": "^19.2.1",
+    "xlsx": "^0.18.5"
   }
 }
