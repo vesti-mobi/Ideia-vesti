@@ -655,12 +655,31 @@ function updateEmpresaPanel(){
         document.getElementById('eiCanal').textContent=show.canal||'-';
         // Plano / Financeiro
         document.getElementById('eiPlano').textContent=show.plano||'-';
-        document.getElementById('eiMensal').textContent=show.planoMensalidade?fmtCFull(show.planoMensalidade):(show.mensalidade||'-');
+        // Mensalidade: show value + status from latest invoice
+        const mensalVal=show.planoMensalidade||show.planoTotalCobrado;
+        const eiMensal=document.getElementById('eiMensal');
+        if(mensalVal&&show.faturamento&&show.faturamento.faturas&&show.faturamento.faturas.length>0){
+            const mesAtualM=new Date().toISOString().substring(0,7);
+            const faturaAtual=show.faturamento.faturas.find(f=>f.mes===mesAtualM&&f.status!=='canceled');
+            const faturaRecente=show.faturamento.faturas.find(f=>f.mes<=mesAtualM&&f.status!=='canceled');
+            const fat=faturaAtual||faturaRecente;
+            if(fat){
+                const sMap={paid:'Pago',pending:'Pendente',expired:'Vencido',externally_paid:'Pago ext.'};
+                const cMap={paid:'var(--success)',pending:'var(--warning)',expired:'var(--danger)',externally_paid:'var(--success)'};
+                eiMensal.innerHTML=fmtCFull(fat.total)+' <span style="color:'+(cMap[fat.status]||'var(--text-primary)')+';font-weight:700;font-size:11px;">'+(sMap[fat.status]||fat.status)+'</span> <span style="color:var(--text-muted);font-size:10px;">('+fat.mes+')</span>';
+            } else {
+                eiMensal.textContent=fmtCFull(mensalVal);
+            }
+        } else if(mensalVal){
+            eiMensal.textContent=fmtCFull(mensalVal);
+        } else {
+            eiMensal.textContent=show.mensalidade||'-';
+        }
         // Última fatura Iugu - status + valor + mês
         const ufEl=document.getElementById('eiUltimaFatura');
         if(show.faturamento&&show.faturamento.faturas&&show.faturamento.faturas.length>0){
             const mesAtual=new Date().toISOString().substring(0,7);
-            const uf=show.faturamento.faturas.find(f=>f.mes<=mesAtual)||show.faturamento.faturas[0]; // mais recente até mês atual
+            const uf=show.faturamento.faturas.find(f=>f.mes<=mesAtual&&f.status!=='canceled')||show.faturamento.faturas.find(f=>f.mes<=mesAtual)||show.faturamento.faturas[0];
             const statusMap={paid:'Pago',pending:'Pendente',expired:'Vencido',canceled:'Cancelado',externally_paid:'Pago ext.'};
             const colorMap={paid:'var(--success)',pending:'var(--warning)',expired:'var(--danger)',canceled:'var(--text-muted)',externally_paid:'var(--success)'};
             ufEl.innerHTML='<span style="color:'+( colorMap[uf.status]||'var(--text-primary)')+';font-weight:700;">'+(statusMap[uf.status]||uf.status)+'</span> — '+fmtCFull(uf.total)+' <span style="color:var(--text-muted);font-size:11px;">('+uf.mes+')</span>';
@@ -1154,7 +1173,7 @@ function renderTabFin(){
                 else{totalPlano+=p.totalCobrado;totalMensal+=p.mensalidade;totalInteg+=p.integracao;totalFilial+=p.filial;totalDesc+=p.descontos;totalAssist+=p.assistente;}
             });
         } else {
-            totalPlano+=e.planoTotalCobrado;totalMensal+=e.planoMensalidade;
+            totalPlano+=e.planoTotalCobrado;totalMensal+=(e.planoMensalidade||e.planoTotalCobrado);
             totalInteg+=(e.planoIntegracao||0);totalAssist+=(e.planoAssistente||0);
             totalFilial+=(e.planoFilial||0);totalDesc+=(e.planoDescontos||0);
         }
@@ -1309,7 +1328,7 @@ function renderTab2(){
             <td>${oracInfo}</td>
             <td>${e.etapaHub||'-'}</td>
             <td class="cell-currency">${fmtC(e._gmv||0)}</td>
-            <td>${e.mensalidade||'-'}</td>
+            <td>${e.mensalidade||(e.planoTotalCobrado?fmtC(e.planoTotalCobrado):'-')}</td>
             <td class="churn-motivos">${explicacao||'-'}</td>
         </tr>`;
     }).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--success);padding:20px;font-weight:600;">Sem risco de churn — todas as empresas filtradas estão saudáveis</td></tr>';
