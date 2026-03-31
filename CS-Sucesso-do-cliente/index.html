@@ -1115,7 +1115,7 @@ function renderTab1(){
 
     // Evolucao valor mensal (GMV por mês - responde aos filtros)
     const meses=DADOS.meses||[];
-    const isFiltered1=es.length<DADOS.empresas.length;
+    const isFiltered1=es.length<DADOS.empresas.length||document.getElementById('fPedDe').value||document.getElementById('fPedAte').value;
     const valMensalPagos=meses.map(m=>{
         if(isFiltered1){return es.reduce((s,e)=>{const md=e.m&&e.m[m];return s+(md?md[5]:0);},0);}
         const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.valPagos||0:0;
