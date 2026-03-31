@@ -254,7 +254,7 @@
     <div class="empresa-info-item"><strong>Frete Ativo:</strong> <span id="eiFreteAtivo">-</span></div>
     <div class="empresa-info-item" id="rowFreteTotal" style="display:none;"><strong>Frete Total:</strong> <span id="eiFreteTotal">-</span></div>
     <div class="empresa-info-item"><strong>Tem Oráculo:</strong> <span id="eiTemOraculo">-</span></div>
-    <div class="empresa-info-item"><strong>Fase Oráculo:</strong> <span id="eiOraculoColuna">-</span></div>
+    <div class="empresa-info-item" id="rowFaseOraculo" style="display:none;"><strong>Fase Oráculo:</strong> <span id="eiOraculoColuna">-</span></div>
     <div class="empresa-info-item"><strong>Status Empresa:</strong> <span id="eiStatusEmpresa">-</span></div>
     <div class="empresa-info-item"><strong>Controle de Estoque:</strong> <span id="eiControleEstoque">-</span></div>
     <div class="empresa-info-item"><strong>Risco Churn:</strong> <span id="eiChurn">-</span></div>
@@ -680,9 +680,10 @@ function updateEmpresaPanel(){
         if(temOraculoReal){
             temOrac.innerHTML='<span style="color:var(--success);font-weight:700;">Sim</span>';
             colOrac.innerHTML='<span style="color:var(--primary);font-weight:600;">'+(show.oraculoEtapa||'Ativo')+'</span>';
+            document.getElementById('rowFaseOraculo').style.display='';
         } else {
             temOrac.innerHTML='<span style="color:var(--accent-red);font-weight:700;">Não</span>';
-            colOrac.textContent='-';
+            document.getElementById('rowFaseOraculo').style.display='none';
         }
         // Oráculo detail panel (Fabric) - mini dashboard com slides
         if(show.temOraculoFabric&&show.oraculoFabric){
