@@ -251,6 +251,8 @@
     <div class="empresa-info-item" id="rowPlanoFilial" style="display:none;"><strong>Filial (Plano):</strong> <span id="eiPlanoFilial">-</span></div>
     <div class="empresa-info-item" id="rowDescontos" style="display:none;"><strong>Descontos:</strong> <span id="eiDescontos">-</span></div>
     <div class="empresa-info-item" id="rowTotalCobrado" style="display:none;"><strong>Total Cobrado:</strong> <span id="eiTotalCobrado">-</span></div>
+    <div class="empresa-info-item"><strong>Frete Ativo:</strong> <span id="eiFreteAtivo">-</span></div>
+    <div class="empresa-info-item" id="rowFreteTotal" style="display:none;"><strong>Frete Total:</strong> <span id="eiFreteTotal">-</span></div>
     <div class="empresa-info-item"><strong>Tem Oráculo:</strong> <span id="eiTemOraculo">-</span></div>
     <div class="empresa-info-item"><strong>Fase Oráculo:</strong> <span id="eiOraculoColuna">-</span></div>
     <div class="empresa-info-item"><strong>Status Empresa:</strong> <span id="eiStatusEmpresa">-</span></div>
@@ -668,6 +670,9 @@ function updateEmpresaPanel(){
         if(show.planoFilial){document.getElementById('eiPlanoFilial').textContent=fmtCFull(show.planoFilial);document.getElementById('rowPlanoFilial').style.display='';}else{document.getElementById('rowPlanoFilial').style.display='none';}
         if(show.planoDescontos){document.getElementById('eiDescontos').textContent=fmtCFull(show.planoDescontos);document.getElementById('rowDescontos').style.display='';}else{document.getElementById('rowDescontos').style.display='none';}
         if(show.planoTotalCobrado){document.getElementById('eiTotalCobrado').textContent=fmtCFull(show.planoTotalCobrado);document.getElementById('rowTotalCobrado').style.display='';}else{document.getElementById('rowTotalCobrado').style.display='none';}
+        // Frete
+        const freteEl=document.getElementById('eiFreteAtivo');
+        if(show.freteAtivo){freteEl.innerHTML='<span style="color:var(--success);font-weight:700;">Sim</span>';document.getElementById('eiFreteTotal').textContent=fmtCFull(show.freteTotal);document.getElementById('rowFreteTotal').style.display='';}else{freteEl.innerHTML='<span style="color:var(--text-muted);">Não</span>';document.getElementById('rowFreteTotal').style.display='none';}
         // Oráculo: Tem ou não + coluna
         const temOrac=document.getElementById('eiTemOraculo');
         const colOrac=document.getElementById('eiOraculoColuna');
