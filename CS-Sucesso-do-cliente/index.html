@@ -265,7 +265,7 @@
     <div style="font-size:13px;font-weight:700;color:var(--accent-gold);margin-bottom:8px;">CSAT - Satisfação do Cliente</div>
     <div id="csatContent" style="display:flex;gap:16px;flex-wrap:wrap;"></div>
 </div>
-<div id="oraculoDetailPanel" style="display:none;padding:10px 24px;background:rgba(168,85,247,0.06);border-bottom:1px solid var(--border);max-width:600px;">
+<div id="oraculoDetailPanel" style="display:none;padding:14px 32px;background:rgba(168,85,247,0.06);border-bottom:1px solid var(--border);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
         <div style="font-size:13px;font-weight:700;color:var(--accent-purple);">Oráculo</div>
         <div style="display:flex;gap:6px;">
@@ -659,7 +659,8 @@ function updateEmpresaPanel(){
         // Última fatura Iugu - status + valor + mês
         const ufEl=document.getElementById('eiUltimaFatura');
         if(show.faturamento&&show.faturamento.faturas&&show.faturamento.faturas.length>0){
-            const uf=show.faturamento.faturas[0]; // já ordenado por data desc
+            const mesAtual=new Date().toISOString().substring(0,7);
+            const uf=show.faturamento.faturas.find(f=>f.mes<=mesAtual)||show.faturamento.faturas[0]; // mais recente até mês atual
             const statusMap={paid:'Pago',pending:'Pendente',expired:'Vencido',canceled:'Cancelado',externally_paid:'Pago ext.'};
             const colorMap={paid:'var(--success)',pending:'var(--warning)',expired:'var(--danger)',canceled:'var(--text-muted)',externally_paid:'var(--success)'};
             ufEl.innerHTML='<span style="color:'+( colorMap[uf.status]||'var(--text-primary)')+';font-weight:700;">'+(statusMap[uf.status]||uf.status)+'</span> — '+fmtCFull(uf.total)+' <span style="color:var(--text-muted);font-size:11px;">('+uf.mes+')</span>';
@@ -845,10 +846,12 @@ function updateFinanceiroDetail(match){
             html+='<tr><td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Vencido</td><td style="padding:6px 12px;color:var(--danger);font-weight:700;">'+(f.totalVencido?fmtCFull(f.totalVencido):'-')+'</td>';
             html+='<td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Faturas</td><td style="padding:6px 12px;font-weight:600;">'+f.qtdFaturas+'</td></tr>';
             // Individual invoices table
-            if(f.faturas&&f.faturas.length>0){
+            const mesAtualFin=new Date().toISOString().substring(0,7);
+            const faturasVisiveis=f.faturas.filter(inv=>inv.mes<=mesAtualFin);
+            if(faturasVisiveis.length>0){
                 html+='<tr><td colspan="4" style="padding:10px 12px 4px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);border-top:1px solid var(--border);">Histórico de Faturas</td></tr>';
                 html+='<tr><th style="padding:6px 12px;font-size:10px;text-transform:uppercase;color:var(--text-secondary);">Mês</th><th style="padding:6px 12px;font-size:10px;text-transform:uppercase;color:var(--text-secondary);">Status</th><th style="padding:6px 12px;font-size:10px;text-transform:uppercase;color:var(--text-secondary);">Valor</th><th></th></tr>';
-                f.faturas.forEach(inv=>{
+                faturasVisiveis.forEach(inv=>{
                     html+='<tr><td style="padding:4px 12px;">'+inv.mes+'</td><td style="padding:4px 12px;">'+statusBadge(inv.status)+'</td><td style="padding:4px 12px;font-weight:600;">'+fmtCFull(inv.total)+'</td><td></td></tr>';
                 });
             }
@@ -964,7 +967,14 @@ function renderTab0(){
         {icon:'&#127915;',label:'Ticket Médio',value:fmtC(ticket)},
         {icon:'&#10060;',label:'Pedidos Cancelados',value:fmtN(canc)},
         {icon:'&#9888;',label:'Risco Alto Churn',value:fmtN(riscoAlto),color:'var(--danger)'},
-        {icon:'&#128666;',label:'Frete Total',value:fmtC(es.reduce((s,e)=>s+(e.freteTotal||0),0))},
+        {icon:'&#128666;',label:'Frete Total',value:fmtC(es.reduce((s,e)=>{
+            const fPDe=document.getElementById('fPedDe').value;
+            const fPAte=document.getElementById('fPedAte').value;
+            if((fPDe||fPAte)&&e.freteMensal&&e.freteMensal.length>0){
+                return s+e.freteMensal.filter(m=>(!fPDe||m.mes>=fPDe)&&(!fPAte||m.mes<=fPAte)).reduce((t,m)=>t+m.valor,0);
+            }
+            return s+(e.freteTotal||0);
+        },0))},
     ]);
 
     // Chart: Pedidos - Últimos 6 Meses (responde aos filtros)
@@ -1102,7 +1112,7 @@ function renderTab1(){
     getOrCreate('chartTopPed',{type:'bar',data:{labels:top10P.map(e=>e.nome.length>20?e.nome.substring(0,20)+'...':e.nome),datasets:[{label:'Pedidos Pagos',data:top10P.map(e=>e._pedidosPagos),backgroundColor:'rgba(16,185,129,0.7)',borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:darkTooltip},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:darkTick,grid:darkGrid}}}});
 
     // Distribuicao por Anjo (pie)
-    const anjoMap={};es.forEach(e=>{const a=e.anjo||'N/A';anjoMap[a]=(anjoMap[a]||0)+1;});
+    const anjoMap={};es.filter(e=>e.isMatriz||!e.matrizId).forEach(e=>{const a=e.anjo||'N/A';anjoMap[a]=(anjoMap[a]||0)+1;});
     const anjoLabels=Object.keys(anjoMap).sort((a,b)=>anjoMap[b]-anjoMap[a]);
     const anjoColors=['#7C3AED','#06B6D4','#A855F7','#EC4899','#8B5CF6','#EAB308','#EF4444','#10B981','#F59E0B','#5B21B6','#0891B2','#8b8fa3'];
     getOrCreate('chartAnjo',{type:'pie',data:{labels:anjoLabels,datasets:[{data:anjoLabels.map(l=>anjoMap[l]),backgroundColor:anjoColors.slice(0,anjoLabels.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip}}});
