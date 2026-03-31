@@ -587,7 +587,7 @@ async function main() {
     const daxInvoices = `EVALUATE SELECTCOLUMNS(Invoices, "invId", Invoices[id], "dominio", Invoices[Dominio], "marca", Invoices[Marca], "iugu_name", Invoices[Iugu_name], "due", Invoices[due_date_TIMESTAMP], "status", Invoices[status], "valor", Invoices[ValorFatura], "plan", Invoices[Plano])`;
 
     // Status Empresa + Controle de Estoque - from Confeccao Métricas 2025
-    const daxMetricas = `EVALUATE SELECTCOLUMNS(Query1, "id", Query1[Id Empresa], "status", Query1[Status Empresa 2], "estoque", Query1[Controle de Estoque])`;
+    const daxMetricas = `EVALUATE SELECTCOLUMNS(Query1, "id", Query1[Id Empresa], "status", Query1[Status Empresa 2], "estoque", Query1[Controle de Estoque], "cs", Query1[Anjo])`;
 
     // Frete por empresa/mês - from Relatorio Confeccoes
     const daxFrete = `EVALUATE FILTER(SUMMARIZECOLUMNS(Merged[Companies.company_name], Merged[Recebido].[Year], Merged[Recebido].[MonthNo], "TotalFrete", SUM(Merged[Valor Frete])), [TotalFrete] > 0)`;
@@ -621,7 +621,7 @@ async function main() {
     const metricasMap = {};
     metricasRows.forEach(r => {
         const id = r.id;
-        if (id) metricasMap[id] = { statusEmpresa: r.status || '', controleEstoque: r.estoque || '' };
+        if (id) metricasMap[id] = { statusEmpresa: r.status || '', controleEstoque: r.estoque || '', cs: r.cs || '' };
     });
     console.log('  Métricas (status/estoque): ' + Object.keys(metricasMap).length);
 
@@ -1329,7 +1329,7 @@ async function main() {
                 valPedidosPendentes: Math.round(e.valPedidosPendentes * 100) / 100,
                 linksEnviados: e.linksEnviados,
                 cliques: e.cliques,
-                anjo: e.anjo,
+                anjo: (metricasMap[e.id] && metricasMap[e.id].cs) || e.anjo,
                 modulo: e.modulo,
                 tags: e.tags,
                 temIntegracao: e.temIntegracao,
