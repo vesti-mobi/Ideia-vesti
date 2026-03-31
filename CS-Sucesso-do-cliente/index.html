@@ -246,11 +246,11 @@
     <div class="empresa-info-item"><strong>Plano:</strong> <span id="eiPlano">-</span></div>
     <div class="empresa-info-item"><strong>Mensalidade:</strong> <span id="eiMensal">-</span></div>
     <div class="empresa-info-item"><strong>Última Fatura:</strong> <span id="eiUltimaFatura">-</span></div>
-    <div class="empresa-info-item"><strong>Integração (Plano):</strong> <span id="eiPlanoInteg">-</span></div>
-    <div class="empresa-info-item"><strong>Assistente:</strong> <span id="eiAssistente">-</span></div>
-    <div class="empresa-info-item"><strong>Filial (Plano):</strong> <span id="eiPlanoFilial">-</span></div>
-    <div class="empresa-info-item"><strong>Descontos:</strong> <span id="eiDescontos">-</span></div>
-    <div class="empresa-info-item"><strong>Total Cobrado:</strong> <span id="eiTotalCobrado">-</span></div>
+    <div class="empresa-info-item" id="rowPlanoInteg" style="display:none;"><strong>Integração (Plano):</strong> <span id="eiPlanoInteg">-</span></div>
+    <div class="empresa-info-item" id="rowAssistente" style="display:none;"><strong>Assistente:</strong> <span id="eiAssistente">-</span></div>
+    <div class="empresa-info-item" id="rowPlanoFilial" style="display:none;"><strong>Filial (Plano):</strong> <span id="eiPlanoFilial">-</span></div>
+    <div class="empresa-info-item" id="rowDescontos" style="display:none;"><strong>Descontos:</strong> <span id="eiDescontos">-</span></div>
+    <div class="empresa-info-item" id="rowTotalCobrado" style="display:none;"><strong>Total Cobrado:</strong> <span id="eiTotalCobrado">-</span></div>
     <div class="empresa-info-item"><strong>Tem Oráculo:</strong> <span id="eiTemOraculo">-</span></div>
     <div class="empresa-info-item"><strong>Fase Oráculo:</strong> <span id="eiOraculoColuna">-</span></div>
     <div class="empresa-info-item"><strong>Status Empresa:</strong> <span id="eiStatusEmpresa">-</span></div>
@@ -653,29 +653,21 @@ function updateEmpresaPanel(){
         // Plano / Financeiro
         document.getElementById('eiPlano').textContent=show.plano||'-';
         document.getElementById('eiMensal').textContent=show.planoMensalidade?fmtCFull(show.planoMensalidade):(show.mensalidade||'-');
-        // Última fatura Iugu - status da mensalidade
+        // Última fatura Iugu - status + valor + mês
         const ufEl=document.getElementById('eiUltimaFatura');
-        const statusMap={paid:'Pago',pending:'Pendente',expired:'Vencido',canceled:'Cancelado',externally_paid:'Pago ext.'};
-        const colorMap={paid:'var(--success)',pending:'var(--warning)',expired:'var(--danger)',canceled:'var(--text-muted)',externally_paid:'var(--success)'};
-        if(show.faturaStatus){
-            const s=show.faturaStatus;
-            let detail=(statusMap[s]||s);
-            if(show.faturasPagas)detail+=' ('+show.faturasPagas+' pagas';
-            if(show.faturasPendentes)detail+=', '+show.faturasPendentes+' pendentes';
-            if(show.faturasVencidas)detail+=', '+show.faturasVencidas+' vencidas';
-            detail+=')';
-            ufEl.innerHTML='<span style="color:'+(colorMap[s]||'var(--text-primary)')+';font-weight:700;">'+detail+'</span>';
-        } else if(show.faturamento&&show.faturamento.faturas&&show.faturamento.faturas.length>0){
-            const uf=show.faturamento.faturas[0];
-            ufEl.innerHTML='<span style="color:'+(colorMap[uf.status]||'var(--text-primary)')+';font-weight:700;">'+(statusMap[uf.status]||uf.status)+'</span> — '+fmtCFull(uf.total)+' <span style="color:var(--text-muted);font-size:11px;">('+uf.mes+')</span>';
+        if(show.faturamento&&show.faturamento.faturas&&show.faturamento.faturas.length>0){
+            const uf=show.faturamento.faturas[0]; // já ordenado por data desc
+            const statusMap={paid:'Pago',pending:'Pendente',expired:'Vencido',canceled:'Cancelado',externally_paid:'Pago ext.'};
+            const colorMap={paid:'var(--success)',pending:'var(--warning)',expired:'var(--danger)',canceled:'var(--text-muted)',externally_paid:'var(--success)'};
+            ufEl.innerHTML='<span style="color:'+( colorMap[uf.status]||'var(--text-primary)')+';font-weight:700;">'+(statusMap[uf.status]||uf.status)+'</span> — '+fmtCFull(uf.total)+' <span style="color:var(--text-muted);font-size:11px;">('+uf.mes+')</span>';
         } else {
             ufEl.textContent='-';
         }
-        document.getElementById('eiPlanoInteg').textContent=show.planoIntegracao?fmtCFull(show.planoIntegracao):'-';
-        document.getElementById('eiAssistente').textContent=show.planoAssistente?fmtCFull(show.planoAssistente):'-';
-        document.getElementById('eiPlanoFilial').textContent=show.planoFilial?fmtCFull(show.planoFilial):'-';
-        document.getElementById('eiDescontos').textContent=show.planoDescontos?fmtCFull(show.planoDescontos):'-';
-        document.getElementById('eiTotalCobrado').textContent=show.planoTotalCobrado?fmtCFull(show.planoTotalCobrado):'-';
+        if(show.planoIntegracao){document.getElementById('eiPlanoInteg').textContent=fmtCFull(show.planoIntegracao);document.getElementById('rowPlanoInteg').style.display='';}else{document.getElementById('rowPlanoInteg').style.display='none';}
+        if(show.planoAssistente){document.getElementById('eiAssistente').textContent=fmtCFull(show.planoAssistente);document.getElementById('rowAssistente').style.display='';}else{document.getElementById('rowAssistente').style.display='none';}
+        if(show.planoFilial){document.getElementById('eiPlanoFilial').textContent=fmtCFull(show.planoFilial);document.getElementById('rowPlanoFilial').style.display='';}else{document.getElementById('rowPlanoFilial').style.display='none';}
+        if(show.planoDescontos){document.getElementById('eiDescontos').textContent=fmtCFull(show.planoDescontos);document.getElementById('rowDescontos').style.display='';}else{document.getElementById('rowDescontos').style.display='none';}
+        if(show.planoTotalCobrado){document.getElementById('eiTotalCobrado').textContent=fmtCFull(show.planoTotalCobrado);document.getElementById('rowTotalCobrado').style.display='';}else{document.getElementById('rowTotalCobrado').style.display='none';}
         // Oráculo: Tem ou não + coluna
         const temOrac=document.getElementById('eiTemOraculo');
         const colOrac=document.getElementById('eiOraculoColuna');
@@ -1139,16 +1131,8 @@ function renderTabFin(){
 
     // Build KPIs - Faturamento Iugu first, then Marcas e Planos
     const kpis=[];
-    // Status Mensalidade KPI - when a single company is selected, show last invoice status
-    if(isSingleBrand&&ref&&ref.faturamento&&ref.faturamento.faturas&&ref.faturamento.faturas.length>0){
-        const uf=ref.faturamento.faturas[0];
-        const stMap={paid:"Pago",pending:"Pendente",expired:"Vencido",canceled:"Cancelado",externally_paid:"Pago ext."};
-        const stColor={paid:"var(--success)",pending:"var(--warning)",expired:"var(--danger)",canceled:"var(--text-muted)",externally_paid:"var(--success)"};
-        const stIcon={paid:"&#9989;",pending:"&#9888;",expired:"&#10060;",canceled:"&#128683;",externally_paid:"&#9989;"};
-        kpis.push({icon:stIcon[uf.status]||"&#128176;",label:"Status Mensalidade",value:stMap[uf.status]||uf.status,color:stColor[uf.status]||"var(--text-primary)"});
-    }
     // Invoices KPIs
-    if(fatPago>0||fatPendente>0||fatVencido>0) {
+    if(fatPago>0||fatPendente>0) {
         kpis.push({icon:'&#128176;',label:'Faturado (Pago)',value:fmtCFull(fatPago)});
         if(fatPendente>0)kpis.push({icon:'&#9888;',label:'Pendente',value:fmtCFull(fatPendente),color:'var(--warning)'});
         if(fatVencido>0)kpis.push({icon:'&#10060;',label:'Vencido',value:fmtCFull(fatVencido),color:'var(--danger)'});
