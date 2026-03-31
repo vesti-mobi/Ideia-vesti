@@ -27,9 +27,9 @@ const DAX_ENDPOINT = `/v1.0/myorg/groups/${WORKSPACE_ID}/datasets/${DATASET_ID}/
 const VP_WORKSPACE_ID = 'f80301c2-8735-40d2-8662-1f8a627d3f61';
 const VP_DATASET_ID = '606be0ee-2c8c-4f43-8ad6-0be04f95d616';
 
-// Invoices (Iugu) workspace + dataset (Confecção - Assinaturas)
-const INV_WORKSPACE_ID = '786bfd95-0733-4fcb-aa84-ef2c97518959';
-const INV_DATASET_ID = '66e1e1d7-0ea5-4a50-b9e1-5958892debde';
+// Invoices - dataset "Painel CS" (mesmo workspace do Oráculo)
+const INV_WORKSPACE_ID = '2929476c-7b92-4366-9236-ccd13ffbd917';
+const INV_DATASET_ID = '583e34d7-6dd1-467b-86aa-3b74cfe1ca56';
 
 // Oráculo Fabric workspace + datasets
 const FABRIC_CLIENT_ID = '14d82eec-204b-4c2f-b7e8-296a70dab67e';
@@ -523,7 +523,7 @@ async function main() {
     const daxPedidosCompanyMonthly = `EVALUATE SUMMARIZECOLUMNS('Merged Pedidos'[ID Empresa], 'Merged Pedidos'[Data Criacao].[Year], 'Merged Pedidos'[Data Criacao].[MonthNo], "Qtd", COUNTROWS('Merged Pedidos'), "Pagos", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pago]=TRUE()), "Cancelados", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Cancelado]=TRUE()), "Pendentes", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pendente]=TRUE()), "Val", SUM('Merged Pedidos'[Total]), "ValPagos", CALCULATE(SUM('Merged Pedidos'[Total]), 'Merged Pedidos'[Pago]=TRUE()), "TC", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroCartao}), "TP", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroPix}), "VC", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroCartao}), "VP", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroPix}))`;
 
     // Invoices (Iugu) - from Confecção - Assinaturas dataset
-    const daxInvoices = `EVALUATE SELECTCOLUMNS(Invoices, "subId", Invoices[items.id], "name", Invoices[items.customer_name], "invId", Invoices[items.recent_invoices.id], "due", Invoices[items.recent_invoices.due_date], "status", Invoices[items.recent_invoices.status], "total", Invoices[items.recent_invoices.total], "plan", Invoices[items.plan_name], "custId", Invoices[items.customer_id])`;
+    const daxInvoices = `EVALUATE SELECTCOLUMNS(Invoices, "invId", Invoices[id], "dominio", Invoices[Dominio], "marca", Invoices[Marca], "iugu_name", Invoices[Iugu_name], "due", Invoices[due_date_TIMESTAMP], "status", Invoices[status], "valor", Invoices[ValorFatura], "plan", Invoices[Plano])`;
 
     // Run all queries in parallel (including VestiPago companies from separate dataset)
     const [cadastrosRows, configRows, marcasRows, productRows, rankingsRows, pedidosCompanyRows, pedidosMonthlyRows, pedidosCompanyMonthlyRows, vestiPagoRows, linksMonthlyRows, cliquesMonthlyRows, linksCompanyMonthlyRows, cliquesCompanyMonthlyRows, invoiceRows] = await Promise.all([
@@ -548,43 +548,48 @@ async function main() {
     vestiPagoRows.forEach(r => { if (r.companyId) vestiPagoSet.add(r.companyId); });
     console.log('  VestiPago companies: ' + vestiPagoSet.size);
 
-    // ---------- 2b. Process Invoices (Iugu) ----------
+    // ---------- 2b. Process Invoices (Painel CS) ----------
     const seenInvIds = new Set();
     const invoices = [];
     invoiceRows.forEach(r => {
         const invId = r.invId;
         if (invId && !seenInvIds.has(invId)) {
             seenInvIds.add(invId);
-            const brandName = (r.name || '').split(' = ')[0].trim();
-            const due = r.due || '';
+            const due = (r.due || '').substring(0, 10);
             invoices.push({
-                brand: brandName,
+                dominio: r.dominio ? String(r.dominio) : '',
+                marca: r.marca || '',
                 invId,
                 due,
                 dueMonth: due.substring(0, 7),
                 status: r.status || '',
-                total: typeof r.total === 'number' ? r.total : parseInvoiceTotal(String(r.total || '')),
+                total: r.valor || 0,
                 plan: r.plan || '',
-                custId: r.custId || '',
             });
         }
     });
     console.log('  Unique invoices: ' + invoices.length);
 
-    // Group invoices by brand name
-    const invoicesByBrand = {};
+    // Group by dominio + by marca (for fallback matching)
+    const invoicesByDominio = {};
+    const invoicesByMarca = {};
     invoices.forEach(i => {
-        if (!invoicesByBrand[i.brand]) invoicesByBrand[i.brand] = { brand: i.brand, plan: '', invoices: [], paid: 0, pending: 0, expired: 0, canceled: 0, totalInvoices: 0 };
-        const b = invoicesByBrand[i.brand];
-        if (i.plan && !b.plan) b.plan = i.plan;
-        b.totalInvoices++;
-        b.invoices.push({ mes: i.dueMonth, status: i.status, total: i.total, due: i.due });
-        if (i.status === 'paid' || i.status === 'externally_paid') b.paid += i.total;
-        else if (i.status === 'pending') b.pending += i.total;
-        else if (i.status === 'expired') b.expired += i.total;
-        else if (i.status === 'canceled') b.canceled += i.total;
+        function addTo(map, key) {
+            if (!key) return;
+            if (!map[key]) map[key] = { plan: '', invoices: [], paid: 0, pending: 0, expired: 0, canceled: 0, totalInvoices: 0 };
+            const b = map[key];
+            if (i.plan && !b.plan) b.plan = i.plan;
+            b.totalInvoices++;
+            b.invoices.push({ mes: i.dueMonth, status: i.status, total: i.total, due: i.due });
+            if (i.status === 'paid' || i.status === 'externally_paid') b.paid += i.total;
+            else if (i.status === 'pending') b.pending += i.total;
+            else if (i.status === 'expired') b.expired += i.total;
+            else if (i.status === 'canceled') b.canceled += i.total;
+        }
+        addTo(invoicesByDominio, i.dominio);
+        addTo(invoicesByMarca, normalize(i.marca));
     });
-    console.log('  Invoice brands: ' + Object.keys(invoicesByBrand).length);
+    console.log('  Invoice domains: ' + Object.keys(invoicesByDominio).length + ' | brands: ' + Object.keys(invoicesByMarca).length);
 
     // ---------- 3. Fetch HubSpot Oráculo tickets ----------
     console.log('\nFetching HubSpot...');
@@ -1262,29 +1267,33 @@ async function main() {
             };
         });
 
-    // ---------- 8b. Match Invoices (Iugu) to empresas ----------
+    // ---------- 8b. Match Invoices (Painel CS) to empresas ----------
     let invoiceMatched = 0;
     for (const emp of empresasList) {
-        const nomeNorm = normalize(emp.nome);
-        let brandData = null;
-        for (const [brand, data] of Object.entries(invoicesByBrand)) {
-            const brandNorm = normalize(brand);
-            if (brandNorm.length < 4) continue;
-            if (nomeNorm === brandNorm) { brandData = data; break; }
-            const shorter = Math.min(nomeNorm.length, brandNorm.length);
-            if (shorter >= 5 && (nomeNorm.startsWith(brandNorm) || brandNorm.startsWith(nomeNorm))) {
-                brandData = data; break;
+        let data = null;
+        // 1. Match by idDominio
+        if (emp.idDominio) data = invoicesByDominio[String(emp.idDominio)];
+        // 2. Fallback: match by nome -> marca
+        if (!data) {
+            const nomeNorm = normalize(emp.nome);
+            data = invoicesByMarca[nomeNorm];
+            if (!data) {
+                for (const [mk, md] of Object.entries(invoicesByMarca)) {
+                    if (mk.length >= 4 && (nomeNorm.startsWith(mk) || mk.startsWith(nomeNorm))) {
+                        data = md; break;
+                    }
+                }
             }
         }
-        if (brandData) {
+        if (data) {
             emp.faturamento = {
-                planoIugu: brandData.plan,
-                totalPago: Math.round(brandData.paid * 100) / 100,
-                totalPendente: Math.round(brandData.pending * 100) / 100,
-                totalVencido: Math.round(brandData.expired * 100) / 100,
-                totalCancelado: Math.round(brandData.canceled * 100) / 100,
-                qtdFaturas: brandData.totalInvoices,
-                faturas: brandData.invoices.sort((a, b) => b.due.localeCompare(a.due)).slice(0, 12).map(f => ({
+                planoIugu: data.plan,
+                totalPago: Math.round(data.paid * 100) / 100,
+                totalPendente: Math.round(data.pending * 100) / 100,
+                totalVencido: Math.round(data.expired * 100) / 100,
+                totalCancelado: Math.round(data.canceled * 100) / 100,
+                qtdFaturas: data.totalInvoices,
+                faturas: data.invoices.sort((a, b) => b.due.localeCompare(a.due)).slice(0, 12).map(f => ({
                     mes: f.mes,
                     status: f.status,
                     total: f.total,
