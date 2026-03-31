@@ -777,12 +777,17 @@ function updateEmpresaPanel(){
                 return html;
             }).join('');
         } else if(show.nps!=null){
-            // Show NPS as fallback when no CSAT
             csatPanel.style.display='block';
             const cor=show.nps>=50?'var(--success)':show.nps>=0?'var(--warning)':'var(--danger)';
             csatContent.innerHTML='<div style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:120px;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);margin-bottom:4px;">NPS</div><div style="font-size:28px;font-weight:800;color:'+cor+';">'+show.nps.toFixed(0)+'</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Net Promoter Score</div></div>';
         } else {
-            csatPanel.style.display='none';
+            // Always show panel with "Sem dados" if empresa has oráculo
+            if(show.temOraculoFabric||show.oraculoEtapa){
+                csatPanel.style.display='block';
+                csatContent.innerHTML='<div style="background:rgba(90,94,114,0.08);border:1px solid rgba(90,94,114,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:120px;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);margin-bottom:4px;">CSAT / NPS</div><div style="font-size:18px;font-weight:600;color:var(--text-muted);">Sem dados</div></div>';
+            } else {
+                csatPanel.style.display='none';
+            }
         }
         // Show/hide the combined row container
         const rowContainer=document.getElementById('oraculoCsatRow');
@@ -1164,16 +1169,23 @@ function renderTabFin(){
         uniquePlano.push(e);
     });
 
-    // Invoices (Iugu) aggregates - deduplicated by CNPJ
+    // Invoices (Iugu) aggregates - deduplicated by CNPJ, filtered to current month
     const seenFatCnpj=new Set();
+    const mesAtualFat=new Date().toISOString().substring(0,7);
     let fatPago=0,fatPendente=0,fatVencido=0,fatQtd=0,fatEmpresas=0;
     es.forEach(e=>{
-        if(!e.faturamento)return;
+        if(!e.faturamento||!e.faturamento.faturas)return;
         const cnpj=(e.cnpj||'').replace(/[.\-\/]/g,'');
         if(cnpj&&seenFatCnpj.has(cnpj))return;
         if(cnpj)seenFatCnpj.add(cnpj);
-        fatPago+=e.faturamento.totalPago;fatPendente+=e.faturamento.totalPendente;
-        fatVencido+=e.faturamento.totalVencido;fatQtd+=e.faturamento.qtdFaturas;fatEmpresas++;
+        fatEmpresas++;
+        const fatsAteMes=e.faturamento.faturas.filter(f=>f.mes<=mesAtualFat);
+        fatsAteMes.forEach(f=>{
+            fatQtd++;
+            if(f.status==='paid'||f.status==='externally_paid')fatPago+=f.total;
+            else if(f.status==='pending')fatPendente+=f.total;
+            else if(f.status==='expired')fatVencido+=f.total;
+        });
     });
 
     // Aggregate totals (used by KPIs and charts) - deduplicated
@@ -1213,7 +1225,12 @@ function renderTabFin(){
             kpis.push({icon:isOrac?'&#128302;':'&#128179;',label:p.plano||'Plano',value:fmtCFull(p.totalCobrado),color:isOrac?'var(--accent-purple)':undefined});
         });
     } else if(isSingleBrand&&ref){
-        kpis.push({icon:'&#128179;',label:ref.plano||'Plano',value:fmtCFull(ref.planoTotalCobrado)});
+        const base=ref.planoMensalidade||ref.planoTotalCobrado;
+        kpis.push({icon:'&#128179;',label:ref.plano||'Plano',value:fmtCFull(base)});
+        const adicionais=(ref.planoIntegracao||0)+(ref.planoAssistente||0)+(ref.planoFilial||0);
+        if(adicionais>0)kpis.push({icon:'&#10133;',label:'Adicionais',value:fmtCFull(adicionais)});
+        if(ref.planoDescontos)kpis.push({icon:'&#128181;',label:'Descontos',value:'-'+fmtCFull(Math.abs(ref.planoDescontos)),color:'var(--success)'});
+        if(ref.planoTotalCobrado&&ref.planoTotalCobrado!==base)kpis.push({icon:'&#128176;',label:'Total Cobrado',value:fmtCFull(ref.planoTotalCobrado)});
     } else if(totalPlano>0){
         kpis.push({icon:'&#128179;',label:'Total Planos',value:fmtCFull(totalPlano)});
         kpis.push({icon:'&#128178;',label:'Mensalidade',value:fmtCFull(totalMensal)});

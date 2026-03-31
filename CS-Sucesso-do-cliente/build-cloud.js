@@ -1133,7 +1133,7 @@ async function main() {
     // ---------- 8. Build final empresas list ----------
     console.log('\nBuilding empresas list...');
     let empIndex = 0;
-    const empresasList = Object.values(empresasMap)
+    let empresasList = Object.values(empresasMap)
         .filter(e => e.nomeFantasia || e.nomeDominio)
         .map(e => {
             const cnpjNum = (e.cnpj || '').replace(/[.\-\/]/g, '');
@@ -1424,6 +1424,20 @@ async function main() {
         }
     }
     console.log('  Invoices matched to empresas: ' + invoiceMatched + '/' + empresasList.length);
+
+    // ---------- 8c. Filter to only active companies (from Métricas Query1) ----------
+    const activeBeforeFilter = empresasList.length;
+    empresasList = empresasList.filter(e => {
+        // Keep if statusEmpresa is 'Ativa' (from Query1)
+        if (e.statusEmpresa === 'Ativa') return true;
+        // Discard if explicitly 'Desativada'
+        if (e.statusEmpresa === 'Desativada') return false;
+        // Keep if not in Query1 but has recent orders (safety net)
+        if (e.pedidos > 0) return true;
+        // Discard the rest (trial, old, no data)
+        return false;
+    });
+    console.log('  Active filter: ' + empresasList.length + ' kept (was ' + activeBeforeFilter + ')');
 
     // ---------- 9. Build output ----------
     const oraculoSummary = {};
