@@ -94,7 +94,7 @@ async function getAccessToken() {
     }
 
     const postBody = querystring.stringify({
-        client_id: '1950a258-227b-4e31-a9cf-717495945fc2',
+        client_id: _localEnv.FABRIC_CLIENT_ID || '14d82eec-204b-4c2f-b7e8-296a70dab67e',
         grant_type: 'refresh_token',
         refresh_token: FABRIC_REFRESH_TOKEN,
         scope: 'https://analysis.windows.net/powerbi/api/.default offline_access',
@@ -628,11 +628,11 @@ async function main() {
     // Build Frete map by company name
     const freteByCompany = {};
     freteRows.forEach(r => {
-        const name = r['Merged[Companies.company_name]'] || r['Companies.company_name'] || '';
-        const frete = r['[TotalFrete]'] || 0;
+        const name = r['Companies.company_name'] || '';
+        const frete = r['TotalFrete'] || 0;
         const keys = Object.keys(r);
-        const yearKey = keys.find(k => k.includes('[Year]'));
-        const monthKey = keys.find(k => k.includes('[MonthNo]'));
+        const yearKey = keys.find(k => k.includes('Year'));
+        const monthKey = keys.find(k => k.includes('MonthNo'));
         const year = yearKey ? r[yearKey] : null;
         const month = monthKey ? r[monthKey] : null;
         if (!name || !year || !month) return;
