@@ -44,8 +44,8 @@ async function main() {
     if (!token) { console.error('No token'); process.exit(1); }
 
     // Fetch ALL Invoices from Confecção - Assinaturas dataset
-    const WS = '786bfd95-0733-4fcb-aa84-ef2c97518959';
-    const DS = '66e1e1d7-0ea5-4a50-b9e1-5958892debde';
+    const WS = 'aced753a-0f0e-4bcf-9264-72f6496cf2cf';
+    const DS = 'becfc71d-0794-41fd-abdb-38bf9e0f2fd0';
 
     console.log('Buscando Invoices...');
     const dax = `EVALUATE SELECTCOLUMNS(Invoices, "subId", Invoices[items.id], "name", Invoices[items.customer_name], "invId", Invoices[items.recent_invoices.id], "due", Invoices[items.recent_invoices.due_date], "status", Invoices[items.recent_invoices.status], "total", Invoices[items.recent_invoices.total], "plan", Invoices[items.plan_name], "custId", Invoices[items.customer_id])`;
@@ -140,6 +140,26 @@ async function main() {
                     total: f.total,
                 })),
             };
+            // Atualizar mensalidade com valor da ultima fatura (mais recente, nao cancelada)
+            const sortedInvs = brandData.invoices.sort((a, b) => b.due.localeCompare(a.due));
+            const ultimaFatura = sortedInvs.find(f => f.status !== 'canceled') || sortedInvs[0];
+            if (ultimaFatura && ultimaFatura.total > 0) {
+                e.planoMensalidade = Math.round(ultimaFatura.total * 100) / 100;
+                e.mensalidade = 'R$ ' + ultimaFatura.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            }
+            // Status da ultima fatura para exibicao no painel
+            if (ultimaFatura) {
+                e.faturaStatus = ultimaFatura.status;
+                const statusCount = { pagas: 0, pendentes: 0, vencidas: 0 };
+                sortedInvs.forEach(f => {
+                    if (f.status === 'paid' || f.status === 'externally_paid') statusCount.pagas++;
+                    else if (f.status === 'pending') statusCount.pendentes++;
+                    else if (f.status === 'expired') statusCount.vencidas++;
+                });
+                e.faturasPagas = statusCount.pagas;
+                e.faturasPendentes = statusCount.pendentes;
+                e.faturasVencidas = statusCount.vencidas;
+            }
             matched++;
         }
     }
