@@ -705,15 +705,25 @@ function updateEmpresaPanel(){
                     const hasPeriodo=fDe||fAte;
                     let vendasValor=oc.vendasOraculo||0;
                     let labelVendas='valor total em vendas (acumulado)';
-                    if(hasPeriodo&&oc.vendasMensal){
+                    let subText='Pedidos pelo Oráculo: '+fmtN(oc.pedidosOraculo||0);
+                    if(hasPeriodo&&oc.vendasMensal&&Object.keys(oc.vendasMensal).length>0){
                         vendasValor=0;
-                        Object.keys(oc.vendasMensal).forEach(mes=>{
-                            if((!fDe||mes>=fDe)&&(!fAte||mes<=fAte))vendasValor+=oc.vendasMensal[mes];
+                        const mesesUsados=[];
+                        Object.keys(oc.vendasMensal).sort().forEach(function(mes){
+                            if((!fDe||mes>=fDe)&&(!fAte||mes<=fAte)){vendasValor+=oc.vendasMensal[mes];mesesUsados.push(mes);}
                         });
                         vendasValor=Math.round(vendasValor*100)/100;
-                        labelVendas='vendas no período '+(fDe||'...')+' a '+(fAte||'...');
+                        if(mesesUsados.length>0){
+                            labelVendas='vendas de '+mesesUsados[0].substring(5)+'/'+mesesUsados[0].substring(2,4)+' a '+mesesUsados[mesesUsados.length-1].substring(5)+'/'+mesesUsados[mesesUsados.length-1].substring(2,4);
+                            subText='Dados de '+mesesUsados.length+' mes(es) | Pedidos: '+fmtN(oc.pedidosOraculo||0);
+                        } else {
+                            labelVendas='sem vendas no período selecionado';
+                            subText='Total acumulado: '+fmtCFull(oc.vendasOraculo||0);
+                        }
+                    } else if(hasPeriodo){
+                        labelVendas='valor total (dados mensais indisponíveis)';
                     }
-                    return{title:'Vendas pelo Oráculo',kpi:vendasValor>0?fmtCFull(vendasValor):'Sem dados',label:labelVendas,color:'var(--success)',bg:'rgba(16,185,129,0.1)',sub:'Pedidos pelo Oráculo: '+fmtN(oc.pedidosOraculo||0)};
+                    return{title:'Vendas pelo Oráculo',kpi:vendasValor>0?fmtCFull(vendasValor):'R$ 0,00',label:labelVendas,color:'var(--success)',bg:'rgba(16,185,129,0.1)',sub:subText};
                 })(),
                 // Slide 4: Config
                 {title:'Configuração',kpi:'',label:'',color:'var(--accent-purple)',bg:'rgba(168,85,247,0.1)',config:true,oc},
@@ -1111,7 +1121,7 @@ function renderTab1(){
 
     // Evolucao valor mensal (GMV por mês - responde aos filtros)
     const meses=DADOS.meses||[];
-    const isFiltered1=es.length<DADOS.empresas.length;
+    const isFiltered1=es.length<DADOS.empresas.length||(document.getElementById('fPedDe').value||document.getElementById('fPedAte').value?true:false);
     const valMensalPagos=meses.map(m=>{
         if(isFiltered1){return es.reduce((s,e)=>{const md=e.m&&e.m[m];return s+(md?md[5]:0);},0);}
         const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.valPagos||0:0;
