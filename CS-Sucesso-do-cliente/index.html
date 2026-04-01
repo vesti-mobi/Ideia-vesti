@@ -1537,6 +1537,11 @@ function loadApp(){
         document.getElementById('badgeTotal').textContent=DADOS.totalEmpresas+' empresas';
         document.getElementById('badgeDate').textContent=DADOS.geradoEm?new Date(DADOS.geradoEm).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
         populateFilters();
+        // Filtro padrão: 2 meses atrás até mês atual
+        const _h=new Date();
+        const _m2=new Date(_h.getFullYear(),_h.getMonth()-2,1);
+        document.getElementById('fPedDe').value=_m2.getFullYear()+'-'+String(_m2.getMonth()+1).padStart(2,'0');
+        document.getElementById('fPedAte').value=_h.getFullYear()+'-'+String(_h.getMonth()+1).padStart(2,'0');
         applyFilters();
         document.querySelectorAll('.filter-select,.filter-date,.filter-input').forEach(el=>el.addEventListener('change',()=>{tablePage=1;applyFilters();}));
         document.getElementById('fAnjo').addEventListener('change',()=>{updateEmpresaDatalist();});
