@@ -47,13 +47,7 @@ jobs:
           FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
         run: node CS-Sucesso-do-cliente/patch-oraculo.js
 
-      - name: Rebuild Pedidos por Marca via Fabric
-        env:
-          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-        run: node Pedidos-por-Marca/build-cloud.js
-
-      - name: Atualizar refresh token se renovado
+      - name: Atualizar refresh token antes de Pedidos por Marca
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
@@ -61,8 +55,16 @@ jobs:
           if [ -f CS-Sucesso-do-cliente/.new_refresh_token ]; then
             NEW_TOKEN=$(cat CS-Sucesso-do-cliente/.new_refresh_token)
             gh secret set FABRIC_REFRESH_TOKEN --body "$NEW_TOKEN" || echo "WARN nao atualizou secret"
+            echo "FABRIC_REFRESH_TOKEN=$NEW_TOKEN" >> $GITHUB_ENV
             rm -f CS-Sucesso-do-cliente/.new_refresh_token
           fi
+
+      - name: Rebuild Pedidos por Marca via Fabric
+        continue-on-error: true
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+        run: node Pedidos-por-Marca/build-cloud.js
 
       - name: Verificar se houve alteracao
         id: check
