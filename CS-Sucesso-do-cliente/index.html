@@ -861,9 +861,14 @@ function updateFinanceiroDetail(match){
         if(hasFat){
             const f=match.faturamento;
             const statusBadge=(s)=>{if(s==='paid')return'<span class="cell-badge badge-sim">Pago</span>';if(s==='pending')return'<span class="cell-badge" style="background:rgba(245,158,11,0.15);color:var(--warning);">Pendente</span>';if(s==='expired')return'<span class="cell-badge badge-nao">Vencido</span>';if(s==='canceled')return'<span class="cell-badge" style="background:rgba(90,94,114,0.15);color:var(--text-muted);">Cancelado</span>';if(s==='externally_paid')return'<span class="cell-badge badge-sim">Pago ext.</span>';return s;};
+            // Recalcular totais das faturas individuais para garantir consistência com KPIs
+            let detPago=0,detPendente=0,detVencido=0;
+            if(f.faturas){f.faturas.forEach(inv=>{if(inv.status==='paid'||inv.status==='externally_paid')detPago+=inv.total;else if(inv.status==='pending')detPendente+=inv.total;else if(inv.status==='expired')detVencido+=inv.total;});}
             // Summary KPIs
             html+='<tr><td colspan="4" style="padding:10px 12px;font-weight:700;color:var(--primary);font-size:13px;border-bottom:1px solid var(--border);">Faturas Iugu — '+f.planoIugu+'</td></tr>';
             html+='<tr><td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Total Pago</td><td style="padding:6px 12px;color:var(--success);font-weight:700;">'+fmtCFull(f.totalPago)+'</td>';
+            html+='<td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Pendente</td><td style="padding:6px 12px;color:var(--warning);font-weight:700;">'+(detPendente>0?fmtCFull(detPendente):'-')+'</td></tr>';
+            html+='<tr><td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Vencido</td><td style="padding:6px 12px;color:var(--danger);font-weight:700;">'+(detVencido>0?fmtCFull(detVencido):'-')+'</td>';
             html+='<td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Faturas</td><td style="padding:6px 12px;font-weight:600;">'+f.qtdFaturas+'</td></tr>';
             // Individual invoices table
             if(f.faturas&&f.faturas.length>0){
@@ -1185,11 +1190,13 @@ function renderTabFin(){
         const stIcon={paid:"&#9989;",pending:"&#9888;",expired:"&#10060;",canceled:"&#128683;",externally_paid:"&#9989;"};
         kpis.push({icon:stIcon[uf.status]||"&#128176;",label:"Status Mensalidade",value:stMap[uf.status]||uf.status,color:stColor[uf.status]||"var(--text-primary)"});
     }
-    // Invoices KPIs - usar dados da empresa individual quando selecionada
-    const kpiFatPago=isSingleBrand&&ref&&ref.faturamento?ref.faturamento.totalPago:fatPago;
-    const kpiFatPendente=isSingleBrand&&ref&&ref.faturamento?ref.faturamento.totalPendente:fatPendente;
-    const kpiFatVencido=isSingleBrand&&ref&&ref.faturamento?ref.faturamento.totalVencido:fatVencido;
-    const kpiFatQtd=isSingleBrand&&ref&&ref.faturamento?ref.faturamento.qtdFaturas:fatQtd;
+    // Invoices KPIs - recalcular das faturas individuais para consistência com detalhes
+    let kpiFatPago=fatPago,kpiFatPendente=fatPendente,kpiFatVencido=fatVencido,kpiFatQtd=fatQtd;
+    if(isSingleBrand&&ref&&ref.faturamento){
+        const ff=ref.faturamento.faturas||[];
+        kpiFatPago=0;kpiFatPendente=0;kpiFatVencido=0;kpiFatQtd=ref.faturamento.qtdFaturas;
+        ff.forEach(function(inv){if(inv.status==='paid'||inv.status==='externally_paid')kpiFatPago+=inv.total;else if(inv.status==='pending')kpiFatPendente+=inv.total;else if(inv.status==='expired')kpiFatVencido+=inv.total;});
+    }
     if(kpiFatPago>0||kpiFatPendente>0||kpiFatVencido>0) {
         kpis.push({icon:'&#128176;',label:'Faturado (Pago)',value:fmtCFull(kpiFatPago)});
         if(kpiFatPendente>0)kpis.push({icon:'&#9888;',label:'Pendente',value:fmtCFull(kpiFatPendente),color:'var(--warning)'});
