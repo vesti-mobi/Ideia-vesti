@@ -31,29 +31,52 @@ jobs:
           FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
         run: node CS-Sucesso-do-cliente/build-cloud.js
 
-      - name: Patch Invoices Iugu
+      - name: Propagar refresh token entre steps
         continue-on-error: true
-        env:
-          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-        run: node CS-Sucesso-do-cliente/patch-invoices.js
-
-      - name: Patch Oraculo Fabric
-        continue-on-error: true
-        env:
-          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-        run: node CS-Sucesso-do-cliente/patch-oraculo.js
+        run: |
+          if [ -f CS-Sucesso-do-cliente/.new_refresh_token ]; then
+            echo "FABRIC_REFRESH_TOKEN=$(cat CS-Sucesso-do-cliente/.new_refresh_token)" >> $GITHUB_ENV
+          fi
 
       - name: Patch Painel CS vendas mensais e invoices
         continue-on-error: true
         env:
-          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
           FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
           FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
         run: node CS-Sucesso-do-cliente/patch-painel-cs.js
+
+      - name: Patch Oraculo Fabric lote 1
+        continue-on-error: true
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+        run: node CS-Sucesso-do-cliente/patch-oraculo.js
+
+      - name: Patch Oraculo Fabric lote 2
+        continue-on-error: true
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+        run: sleep 30 && node CS-Sucesso-do-cliente/patch-oraculo.js
+
+      - name: Patch Oraculo Fabric lote 3
+        continue-on-error: true
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+        run: sleep 30 && node CS-Sucesso-do-cliente/patch-oraculo.js
+
+      - name: Patch Invoices Iugu
+        continue-on-error: true
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+        run: node CS-Sucesso-do-cliente/patch-invoices.js
 
       - name: Atualizar refresh token antes de Pedidos por Marca
         continue-on-error: true
