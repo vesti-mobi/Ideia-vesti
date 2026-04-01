@@ -864,8 +864,6 @@ function updateFinanceiroDetail(match){
             // Summary KPIs
             html+='<tr><td colspan="4" style="padding:10px 12px;font-weight:700;color:var(--primary);font-size:13px;border-bottom:1px solid var(--border);">Faturas Iugu — '+f.planoIugu+'</td></tr>';
             html+='<tr><td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Total Pago</td><td style="padding:6px 12px;color:var(--success);font-weight:700;">'+fmtCFull(f.totalPago)+'</td>';
-            html+='<td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Pendente</td><td style="padding:6px 12px;color:var(--warning);font-weight:700;">'+(f.totalPendente?fmtCFull(f.totalPendente):'-')+'</td></tr>';
-            html+='<tr><td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Vencido</td><td style="padding:6px 12px;color:var(--danger);font-weight:700;">'+(f.totalVencido?fmtCFull(f.totalVencido):'-')+'</td>';
             html+='<td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Faturas</td><td style="padding:6px 12px;font-weight:600;">'+f.qtdFaturas+'</td></tr>';
             // Individual invoices table
             if(f.faturas&&f.faturas.length>0){
