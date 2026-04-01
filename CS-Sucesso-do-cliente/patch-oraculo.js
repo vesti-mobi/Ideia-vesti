@@ -77,7 +77,7 @@ async function daxQuery(token, wsId, dsId, query) {
     return { rows: data.results[0].tables[0].rows || [] };
 }
 
-async function fetchAllOraculoData(token) {
+async function fetchAllOraculoData(token, alreadyFetched) {
     console.log('Buscando datasets do workspace Oráculo painéis...');
     const dsRes = await httpsRequest({
         hostname: 'api.powerbi.com',
@@ -101,6 +101,7 @@ async function fetchAllOraculoData(token) {
     for (const ds of datasets) {
         if (ds.name === 'Report Usage Metrics Model') continue;
         const name = ds.name.replace(' - Oráculo', '').replace(' - Oraculo', '').trim();
+        if (alreadyFetched && alreadyFetched.has(name.toLowerCase())) { console.log('  SKIP: ' + name + ' (já buscado)'); continue; }
 
         try {
             // KPIs
@@ -242,8 +243,21 @@ async function main() {
     if (!token) { console.error('Falha token'); process.exit(1); }
     console.log('  Token obtido\n');
 
+    // Load existing dados.js to find already-fetched datasets
+    const _dp = path.join(DIR, 'dados.js');
+    const existingContent = fs.readFileSync(_dp, 'utf-8');
+    const existingFn = new Function(existingContent + '; return DADOS;');
+    const existingDados = existingFn();
+    const alreadyFetched = new Set();
+    existingDados.empresas.forEach(e => {
+        if (e.oraculoFabric && e.oraculoFabric.vendasSemanal && e.oraculoFabric.vendasSemanal.length > 0) {
+            alreadyFetched.add(normalize(e.nome));
+        }
+    });
+    console.log('  Já buscados: ' + alreadyFetched.size + ' empresas\n');
+
     const [painelStats, configs] = await Promise.all([
-        fetchAllOraculoData(token),
+        fetchAllOraculoData(token, alreadyFetched),
         fetchOraculoConfigurations(token),
     ]);
 
