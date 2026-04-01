@@ -175,7 +175,6 @@
     <div class="header-right">
         <span class="header-badge" id="badgeTotal"></span>
         <span class="header-badge" id="badgeDate"></span>
-        <span class="header-badge" id="badgeVisits" title="Acessos ao dashboard" style="cursor:default;"></span>
     </div>
 </div>
 
@@ -186,7 +185,7 @@
         <datalist id="dlEmpresas"></datalist>
     </div>
     <div class="filter-group">
-        <span class="filter-label">CS</span>
+        <span class="filter-label">Anjo</span>
         <select id="fAnjo" class="filter-select"><option value="">Todos</option></select>
     </div>
     <div class="filter-group">
@@ -234,7 +233,7 @@
 </div>
 
 <div class="empresa-info-panel" id="empresaInfoPanel">
-    <div class="empresa-info-item"><strong>CS:</strong> <span id="eiAnjo">-</span></div>
+    <div class="empresa-info-item"><strong>Anjo:</strong> <span id="eiAnjo">-</span></div>
     <div class="empresa-info-item"><strong>Company ID:</strong> <span id="eiCompanyId" style="font-size:11px;user-select:all">-</span></div>
     <div class="empresa-info-item"><strong>Domínio:</strong> <span id="eiDominio">-</span></div>
     <div class="empresa-info-item"><strong>Domínio ID:</strong> <span id="eiDominioId" style="font-size:11px;user-select:all">-</span></div>
@@ -245,39 +244,36 @@
     <div class="empresa-info-item"><strong>Tipo Integração:</strong> <span id="eiTipoInteg">-</span></div>
     <div class="empresa-info-item"><strong>Canal de Vendas:</strong> <span id="eiCanal">-</span></div>
     <div class="empresa-info-item"><strong>Plano:</strong> <span id="eiPlano">-</span></div>
-    <div class="empresa-info-item"><strong>Mensalidade:</strong> <span id="eiMensal">-</span></div>
     <div class="empresa-info-item"><strong>Última Fatura:</strong> <span id="eiUltimaFatura">-</span></div>
-    <div class="empresa-info-item" id="rowPlanoInteg" style="display:none;"><strong>Integração (Plano):</strong> <span id="eiPlanoInteg">-</span></div>
-    <div class="empresa-info-item" id="rowAssistente" style="display:none;"><strong>Assistente:</strong> <span id="eiAssistente">-</span></div>
-    <div class="empresa-info-item" id="rowPlanoFilial" style="display:none;"><strong>Filial (Plano):</strong> <span id="eiPlanoFilial">-</span></div>
-    <div class="empresa-info-item" id="rowDescontos" style="display:none;"><strong>Descontos:</strong> <span id="eiDescontos">-</span></div>
-    <div class="empresa-info-item" id="rowTotalCobrado" style="display:none;"><strong>Total Cobrado:</strong> <span id="eiTotalCobrado">-</span></div>
-    <div class="empresa-info-item"><strong>Frete Ativo:</strong> <span id="eiFreteAtivo">-</span></div>
-    <div class="empresa-info-item" id="rowFreteTotal" style="display:none;"><strong>Frete Total:</strong> <span id="eiFreteTotal">-</span></div>
+    <div class="empresa-info-item"><strong>Integração (Plano):</strong> <span id="eiPlanoInteg">-</span></div>
+    <div class="empresa-info-item"><strong>Assistente:</strong> <span id="eiAssistente">-</span></div>
+    <div class="empresa-info-item"><strong>Filial (Plano):</strong> <span id="eiPlanoFilial">-</span></div>
+    <div class="empresa-info-item"><strong>Descontos:</strong> <span id="eiDescontos">-</span></div>
+    <div class="empresa-info-item"><strong>Total Cobrado:</strong> <span id="eiTotalCobrado">-</span></div>
     <div class="empresa-info-item"><strong>Tem Oráculo:</strong> <span id="eiTemOraculo">-</span></div>
-    <div class="empresa-info-item" id="rowFaseOraculo" style="display:none;"><strong>Fase Oráculo:</strong> <span id="eiOraculoColuna">-</span></div>
+    <div class="empresa-info-item"><strong>Fase Oráculo:</strong> <span id="eiOraculoColuna">-</span></div>
     <div class="empresa-info-item"><strong>Status Empresa:</strong> <span id="eiStatusEmpresa">-</span></div>
     <div class="empresa-info-item"><strong>Controle de Estoque:</strong> <span id="eiControleEstoque">-</span></div>
     <div class="empresa-info-item"><strong>Risco Churn:</strong> <span id="eiChurn">-</span></div>
     <div class="empresa-info-item"><strong>Filial:</strong> <span id="eiFilial">-</span></div>
 </div>
-<div id="oraculoCsatRow" style="display:none;padding:14px 32px;border-bottom:1px solid var(--border);display:none;">
-    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;">
-        <div id="oraculoDetailPanel" style="flex:1;min-width:280px;padding:14px;background:rgba(168,85,247,0.06);border-radius:10px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-                <div style="font-size:13px;font-weight:700;color:var(--accent-purple);">Oráculo</div>
-                <div style="display:flex;gap:6px;">
-                    <button onclick="oraculoSlide(-1)" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;">&#9664;</button>
-                    <button onclick="oraculoSlide(1)" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;">&#9654;</button>
-                </div>
-            </div>
-            <div id="oraculoDetailContent"></div>
-        </div>
-        <div id="csatPanel" style="flex:1;min-width:220px;padding:14px;background:rgba(234,179,8,0.06);border-radius:10px;display:none;">
-            <div style="font-size:13px;font-weight:700;color:var(--accent-gold);margin-bottom:8px;">CSAT / NPS</div>
-            <div id="csatContent" style="display:flex;gap:12px;flex-wrap:wrap;"></div>
+<div id="csatPanel" style="display:none;padding:10px 32px;background:rgba(234,179,8,0.06);border-bottom:1px solid var(--border);">
+    <div style="font-size:13px;font-weight:700;color:var(--accent-gold);margin-bottom:8px;">CSAT - Satisfação do Cliente</div>
+    <div id="csatContent" style="display:flex;gap:16px;flex-wrap:wrap;"></div>
+</div>
+<div id="npsPanel" style="display:none;padding:10px 32px;background:rgba(16,185,129,0.06);border-bottom:1px solid var(--border);">
+    <div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:8px;">NPS - Net Promoter Score</div>
+    <div id="npsContent" style="display:flex;gap:16px;flex-wrap:wrap;"></div>
+</div>
+<div id="oraculoDetailPanel" style="display:none;padding:14px 32px;background:rgba(168,85,247,0.06);border-bottom:1px solid var(--border);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:700;color:var(--accent-purple);">Oráculo</div>
+        <div style="display:flex;gap:6px;">
+            <button onclick="oraculoSlide(-1)" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;">&#9664;</button>
+            <button onclick="oraculoSlide(1)" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;">&#9654;</button>
         </div>
     </div>
+    <div id="oraculoDetailContent"></div>
 </div>
 
 <div class="main">
@@ -365,7 +361,7 @@
         </div>
         <div class="charts-grid">
             <div class="chart-card full-width">
-                <div class="chart-header"><div><div class="chart-title">Distribuição por CS</div></div></div>
+                <div class="chart-header"><div><div class="chart-title">Distribuição por Anjo</div></div></div>
                 <div class="chart-wrapper"><canvas id="chartAnjo"></canvas></div>
             </div>
         </div>
@@ -427,7 +423,7 @@
         </div>
         <div class="charts-grid">
             <div class="chart-card">
-                <div class="chart-header"><div><div class="chart-title">Risco de Churn por CS</div><div class="chart-subtitle">Clientes em risco por responsável</div></div><span class="chart-badge badge-orange">Ação</span></div>
+                <div class="chart-header"><div><div class="chart-title">Risco de Churn por Anjo</div><div class="chart-subtitle">Clientes em risco por responsável</div></div><span class="chart-badge badge-orange">Ação</span></div>
                 <div class="chart-wrapper tall"><canvas id="chartHubChurn"></canvas></div>
             </div>
             <div class="chart-card">
@@ -566,8 +562,8 @@ function applyFilters(){
         if(fCr==='Nao'&&e.cartao==='Sim')return false;
         if(fPx==='Sim'&&e.pix!=='Sim')return false;
         if(fPx==='Nao'&&e.pix==='Sim')return false;
-        if(fIn==='Sim'&&e.temIntegracao!=='Sim')return false;
-        if(fIn==='Nao'&&e.temIntegracao==='Sim')return false;
+        if(fIn==='Sim'&&!e.temIntegracao)return false;
+        if(fIn==='Nao'&&e.temIntegracao)return false;
         if(fMo&&e.modulo!==fMo)return false;
         if(fAt==='1'&&(e.pedidos||0)===0)return false;
         if(fEH&&e.etapaHub!==fEH)return false;
@@ -653,51 +649,35 @@ function updateEmpresaPanel(){
         document.getElementById('eiDominioId').textContent=show.idDominio||'-';
         document.getElementById('eiCnpj').textContent=show.cnpj||'-';
         document.getElementById('eiUsuario').textContent=show.usuario||'-';
-        document.getElementById('eiInteg').textContent=show.temIntegracao==='Sim'?'Sim':'Não';
+        document.getElementById('eiInteg').textContent=show.temIntegracao?'Sim':'Não';
         document.getElementById('eiIntegDetalhe').textContent=show.integracao||'-';
         document.getElementById('eiTipoInteg').textContent=show.tipoIntegracao||'-';
         document.getElementById('eiCanal').textContent=show.canal||'-';
         // Plano / Financeiro
         document.getElementById('eiPlano').textContent=show.plano||'-';
-        // Mensalidade: show value + status from latest invoice
-        const mensalVal=show.planoMensalidade||show.planoTotalCobrado;
-        const eiMensal=document.getElementById('eiMensal');
-        if(mensalVal&&show.faturamento&&show.faturamento.faturas&&show.faturamento.faturas.length>0){
-            const mesAtualM=new Date().toISOString().substring(0,7);
-            const faturaAtual=show.faturamento.faturas.find(f=>f.mes===mesAtualM&&f.status!=='canceled');
-            const faturaRecente=show.faturamento.faturas.find(f=>f.mes<=mesAtualM&&f.status!=='canceled');
-            const fat=faturaAtual||faturaRecente;
-            if(fat){
-                const sMap={paid:'Pago',pending:'Pendente',expired:'Vencido',externally_paid:'Pago ext.'};
-                const cMap={paid:'var(--success)',pending:'var(--warning)',expired:'var(--danger)',externally_paid:'var(--success)'};
-                eiMensal.innerHTML=fmtCFull(fat.total)+' <span style="color:'+(cMap[fat.status]||'var(--text-primary)')+';font-weight:700;font-size:11px;">'+(sMap[fat.status]||fat.status)+'</span> <span style="color:var(--text-muted);font-size:10px;">('+fat.mes+')</span>';
-            } else {
-                eiMensal.textContent=fmtCFull(mensalVal);
-            }
-        } else if(mensalVal){
-            eiMensal.textContent=fmtCFull(mensalVal);
-        } else {
-            eiMensal.textContent=show.mensalidade||'-';
-        }
-        // Última fatura Iugu - status + valor + mês
+        // Última fatura Iugu - status da mensalidade
         const ufEl=document.getElementById('eiUltimaFatura');
-        if(show.faturamento&&show.faturamento.faturas&&show.faturamento.faturas.length>0){
-            const mesAtual=new Date().toISOString().substring(0,7);
-            const uf=show.faturamento.faturas.find(f=>f.mes<=mesAtual&&f.status!=='canceled')||show.faturamento.faturas.find(f=>f.mes<=mesAtual)||show.faturamento.faturas[0];
-            const statusMap={paid:'Pago',pending:'Pendente',expired:'Vencido',canceled:'Cancelado',externally_paid:'Pago ext.'};
-            const colorMap={paid:'var(--success)',pending:'var(--warning)',expired:'var(--danger)',canceled:'var(--text-muted)',externally_paid:'var(--success)'};
-            ufEl.innerHTML='<span style="color:'+( colorMap[uf.status]||'var(--text-primary)')+';font-weight:700;">'+(statusMap[uf.status]||uf.status)+'</span> — '+fmtCFull(uf.total)+' <span style="color:var(--text-muted);font-size:11px;">('+uf.mes+')</span>';
+        const statusMap={paid:'Pago',pending:'Pendente',expired:'Vencido',canceled:'Cancelado',externally_paid:'Pago ext.'};
+        const colorMap={paid:'var(--success)',pending:'var(--warning)',expired:'var(--danger)',canceled:'var(--text-muted)',externally_paid:'var(--success)'};
+        if(show.faturaStatus){
+            const s=show.faturaStatus;
+            let detail=(statusMap[s]||s);
+            if(show.faturasPagas)detail+=' ('+show.faturasPagas+' pagas';
+            if(show.faturasPendentes)detail+=', '+show.faturasPendentes+' pendentes';
+            if(show.faturasVencidas)detail+=', '+show.faturasVencidas+' vencidas';
+            detail+=')';
+            ufEl.innerHTML='<span style="color:'+(colorMap[s]||'var(--text-primary)')+';font-weight:700;">'+detail+'</span>';
+        } else if(show.faturamento&&show.faturamento.faturas&&show.faturamento.faturas.length>0){
+            const uf=show.faturamento.faturas[0];
+            ufEl.innerHTML='<span style="color:'+(colorMap[uf.status]||'var(--text-primary)')+';font-weight:700;">'+(statusMap[uf.status]||uf.status)+'</span> — '+fmtCFull(uf.total)+' <span style="color:var(--text-muted);font-size:11px;">('+uf.mes+')</span>';
         } else {
             ufEl.textContent='-';
         }
-        if(show.planoIntegracao){document.getElementById('eiPlanoInteg').textContent=fmtCFull(show.planoIntegracao);document.getElementById('rowPlanoInteg').style.display='';}else{document.getElementById('rowPlanoInteg').style.display='none';}
-        if(show.planoAssistente){document.getElementById('eiAssistente').textContent=fmtCFull(show.planoAssistente);document.getElementById('rowAssistente').style.display='';}else{document.getElementById('rowAssistente').style.display='none';}
-        if(show.planoFilial){document.getElementById('eiPlanoFilial').textContent=fmtCFull(show.planoFilial);document.getElementById('rowPlanoFilial').style.display='';}else{document.getElementById('rowPlanoFilial').style.display='none';}
-        if(show.planoDescontos){document.getElementById('eiDescontos').textContent=fmtCFull(show.planoDescontos);document.getElementById('rowDescontos').style.display='';}else{document.getElementById('rowDescontos').style.display='none';}
-        if(show.planoTotalCobrado){document.getElementById('eiTotalCobrado').textContent=fmtCFull(show.planoTotalCobrado);document.getElementById('rowTotalCobrado').style.display='';}else{document.getElementById('rowTotalCobrado').style.display='none';}
-        // Frete
-        const freteEl=document.getElementById('eiFreteAtivo');
-        if(show.freteAtivo){freteEl.innerHTML='<span style="color:var(--success);font-weight:700;">Sim</span>';document.getElementById('eiFreteTotal').textContent=fmtCFull(show.freteTotal);document.getElementById('rowFreteTotal').style.display='';}else{freteEl.innerHTML='<span style="color:var(--text-muted);">Não</span>';document.getElementById('rowFreteTotal').style.display='none';}
+        document.getElementById('eiPlanoInteg').textContent=show.planoIntegracao?fmtCFull(show.planoIntegracao):'-';
+        document.getElementById('eiAssistente').textContent=show.planoAssistente?fmtCFull(show.planoAssistente):'-';
+        document.getElementById('eiPlanoFilial').textContent=show.planoFilial?fmtCFull(show.planoFilial):'-';
+        document.getElementById('eiDescontos').textContent=show.planoDescontos?fmtCFull(show.planoDescontos):'-';
+        document.getElementById('eiTotalCobrado').textContent=show.planoTotalCobrado?fmtCFull(show.planoTotalCobrado):'-';
         // Oráculo: Tem ou não + coluna
         const temOrac=document.getElementById('eiTemOraculo');
         const colOrac=document.getElementById('eiOraculoColuna');
@@ -705,36 +685,37 @@ function updateEmpresaPanel(){
         if(temOraculoReal){
             temOrac.innerHTML='<span style="color:var(--success);font-weight:700;">Sim</span>';
             colOrac.innerHTML='<span style="color:var(--primary);font-weight:600;">'+(show.oraculoEtapa||'Ativo')+'</span>';
-            document.getElementById('rowFaseOraculo').style.display='';
         } else {
             temOrac.innerHTML='<span style="color:var(--accent-red);font-weight:700;">Não</span>';
-            document.getElementById('rowFaseOraculo').style.display='none';
+            colOrac.textContent='-';
         }
         // Oráculo detail panel (Fabric) - mini dashboard com slides
         if(show.temOraculoFabric&&show.oraculoFabric){
             oraculoPanel.style.display='block';
             const oc=show.oraculoFabric;
-            // Check if period filter is active - if so, filter monthly data
-            const fPedDe=document.getElementById('fPedDe').value;
-            const fPedAte=document.getElementById('fPedAte').value;
-            let ocPed=oc.pedidosOraculo||0,ocInter=oc.interacoesOraculo||0,ocAtend=oc.atendimentosOraculo||0,ocPctIA=(oc.pctIAOraculo||0),ocVendas=oc.vendasOraculo||0;
-            let periodoLabel='total';
-            if((fPedDe||fPedAte)&&oc.mensal&&oc.mensal.length>0){
-                const filtered=oc.mensal.filter(m=>(!fPedDe||m.mes>=fPedDe)&&(!fPedAte||m.mes<=fPedAte));
-                if(filtered.length>0){
-                    ocPed=filtered.reduce((s,m)=>s+m.pedidos,0);
-                    ocInter=filtered.reduce((s,m)=>s+m.interacoes,0);
-                    ocAtend=ocInter;
-                    const totalIA=filtered.reduce((s,m)=>s+m.ia,0);
-                    ocPctIA=ocInter>0?Math.round(totalIA/ocInter*1000)/10:0;
-                    ocVendas=filtered.reduce((s,m)=>s+m.vendas,0);
-                    periodoLabel=filtered.map(m=>m.mes).join(', ');
-                }
-            }
             window._oraculoSlides=[
-                {title:'Clientes Atendidos',kpi:fmtN(ocAtend),label:'atendimentos ('+periodoLabel+')',color:'var(--primary)',bg:'rgba(124,58,237,0.1)',sub:'Pedidos: '+fmtN(ocPed)+' | Interações: '+fmtN(ocInter)},
-                {title:'% Atendimento por IA',kpi:ocPctIA.toFixed(1)+'%',label:'dos atendimentos feitos por IA',color:'var(--teal)',bg:'rgba(6,182,212,0.1)',sub:fmtN(Math.round(ocAtend*ocPctIA/100))+' por IA de '+fmtN(ocAtend)+' totais'},
-                {title:'Vendas pelo Oráculo',kpi:ocVendas>0?fmtCFull(ocVendas):'Sem dados',label:'valor em vendas ('+periodoLabel+')',color:'var(--success)',bg:'rgba(16,185,129,0.1)',sub:'Pedidos: '+fmtN(ocPed)},
+                // Slide 1: Atendimentos
+                {title:'Clientes Atendidos',kpi:fmtN(oc.atendimentosOraculo||0),label:'atendimentos totais',color:'var(--primary)',bg:'rgba(124,58,237,0.1)',sub:'Pedidos: '+fmtN(oc.pedidosOraculo||0)+' | Interações: '+fmtN(oc.interacoesOraculo||0)},
+                // Slide 2: % IA
+                {title:'% Atendimento por IA',kpi:(oc.pctIAOraculo||0).toFixed(1)+'%',label:'dos atendimentos feitos por IA',color:'var(--teal)',bg:'rgba(6,182,212,0.1)',sub:fmtN(Math.round((oc.atendimentosOraculo||0)*(oc.pctIAOraculo||0)/100))+' atendimentos por IA de '+fmtN(oc.atendimentosOraculo||0)+' totais'},
+                // Slide 3: Vendas - filtra por período se selecionado
+                (function(){
+                    const fDe=document.getElementById('fPedDe').value;
+                    const fAte=document.getElementById('fPedAte').value;
+                    const hasPeriodo=fDe||fAte;
+                    let vendasValor=oc.vendasOraculo||0;
+                    let labelVendas='valor total em vendas (acumulado)';
+                    if(hasPeriodo&&oc.vendasMensal){
+                        vendasValor=0;
+                        Object.keys(oc.vendasMensal).forEach(mes=>{
+                            if((!fDe||mes>=fDe)&&(!fAte||mes<=fAte))vendasValor+=oc.vendasMensal[mes];
+                        });
+                        vendasValor=Math.round(vendasValor*100)/100;
+                        labelVendas='vendas no período '+(fDe||'...')+' a '+(fAte||'...');
+                    }
+                    return{title:'Vendas pelo Oráculo',kpi:vendasValor>0?fmtCFull(vendasValor):'Sem dados',label:labelVendas,color:'var(--success)',bg:'rgba(16,185,129,0.1)',sub:'Pedidos pelo Oráculo: '+fmtN(oc.pedidosOraculo||0)};
+                })(),
+                // Slide 4: Config
                 {title:'Configuração',kpi:'',label:'',color:'var(--accent-purple)',bg:'rgba(168,85,247,0.1)',config:true,oc},
             ];
             window._oraculoSlideIdx=0;
@@ -760,41 +741,47 @@ function updateEmpresaPanel(){
         if(show.controleEstoque==='Sim')ceEl.style.cssText='color:var(--success);font-weight:700;';
         else if(show.controleEstoque==='Não')ceEl.style.cssText='color:var(--text-muted);';
         else ceEl.style.cssText='';
-        // CSAT panel
+        // CSAT panel - mostrar para empresas com oráculo mesmo se nota=0
         const csatPanel=document.getElementById('csatPanel');
         const csatContent=document.getElementById('csatContent');
+        const temOraculoReal=show.temOraculoFabric||!!show.oraculoEtapa;
         if(show.csat&&show.csat.length>0){
             csatPanel.style.display='block';
             const mesesNome={'-01':'Jan','-02':'Fev','-03':'Mar','-04':'Abr','-05':'Mai','-06':'Jun','-07':'Jul','-08':'Ago','-09':'Set','-10':'Out','-11':'Nov','-12':'Dez'};
             csatContent.innerHTML=show.csat.map(c=>{
                 const mesLabel=mesesNome[c.mes.substring(4)]||c.mes;
-                const cor=c.nota>=5?'var(--success)':c.nota>=4?'var(--accent-gold)':c.nota>=3?'var(--warning)':'var(--danger)';
+                const cor=c.nota>=5?'var(--success)':c.nota>=4?'var(--accent-gold)':c.nota>=3?'var(--warning)':c.nota>0?'var(--danger)':'var(--text-muted)';
                 let html='<div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:100px;">';
                 html+='<div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);margin-bottom:4px;">'+mesLabel+' '+c.mes.substring(0,4)+'</div>';
-                html+='<div style="font-size:28px;font-weight:800;color:'+cor+';">'+c.nota+'</div>';
+                html+='<div style="font-size:28px;font-weight:800;color:'+cor+';">'+(c.nota||0)+'</div>';
                 if(c.obs)html+='<div style="font-size:10px;color:var(--text-muted);margin-top:4px;max-width:150px;" title="'+c.obs+'">'+c.obs.substring(0,40)+(c.obs.length>40?'...':'')+'</div>';
                 html+='</div>';
                 return html;
             }).join('');
-        } else if(show.nps!=null){
+        } else if(temOraculoReal){
             csatPanel.style.display='block';
-            const cor=show.nps>=50?'var(--success)':show.nps>=0?'var(--warning)':'var(--danger)';
-            csatContent.innerHTML='<div style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:120px;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);margin-bottom:4px;">NPS</div><div style="font-size:28px;font-weight:800;color:'+cor+';">'+show.nps.toFixed(0)+'</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Net Promoter Score</div></div>';
+            csatContent.innerHTML='<div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:100px;"><div style="font-size:28px;font-weight:800;color:var(--text-muted);">0</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Sem avaliação CSAT</div></div>';
         } else {
-            // Always show panel with "Sem dados" if empresa has oráculo
-            if(show.temOraculoFabric||show.oraculoEtapa){
-                csatPanel.style.display='block';
-                csatContent.innerHTML='<div style="background:rgba(90,94,114,0.08);border:1px solid rgba(90,94,114,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:120px;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);margin-bottom:4px;">CSAT / NPS</div><div style="font-size:18px;font-weight:600;color:var(--text-muted);">Sem dados</div></div>';
-            } else {
-                csatPanel.style.display='none';
-            }
+            csatPanel.style.display='none';
         }
-        // Show/hide the combined row container
-        const rowContainer=document.getElementById('oraculoCsatRow');
-        if(oraculoPanel.style.display!=='none'||csatPanel.style.display!=='none'){
-            rowContainer.style.display='block';
+        // NPS panel - mostrar para todas as empresas selecionadas
+        const npsPanel=document.getElementById('npsPanel');
+        const npsContent=document.getElementById('npsContent');
+        if(show.nps&&show.nps.length>0){
+            npsPanel.style.display='block';
+            const mesesNome={'-01':'Jan','-02':'Fev','-03':'Mar','-04':'Abr','-05':'Mai','-06':'Jun','-07':'Jul','-08':'Ago','-09':'Set','-10':'Out','-11':'Nov','-12':'Dez'};
+            npsContent.innerHTML=show.nps.map(n=>{
+                const mesLabel=n.mes?mesesNome[n.mes.substring(4)]||n.mes:'';
+                const cor=n.nota>=9?'var(--success)':n.nota>=7?'var(--accent-gold)':'var(--danger)';
+                let html='<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:100px;">';
+                if(mesLabel)html+='<div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);margin-bottom:4px;">'+mesLabel+' '+n.mes.substring(0,4)+'</div>';
+                html+='<div style="font-size:28px;font-weight:800;color:'+cor+';">'+n.nota+'</div>';
+                html+='</div>';
+                return html;
+            }).join('');
         } else {
-            rowContainer.style.display='none';
+            npsPanel.style.display='block';
+            npsContent.innerHTML='<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:100px;"><div style="font-size:28px;font-weight:800;color:var(--text-muted);">-</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Sem avaliação NPS</div></div>';
         }
         // Filiais filter (always uses main match)
         updateFiliaisFilter(match);
@@ -806,7 +793,7 @@ function updateEmpresaPanel(){
         panel.classList.remove('visible');
         oraculoPanel.style.display='none';
         document.getElementById('csatPanel').style.display='none';
-        document.getElementById('oraculoCsatRow').style.display='none';
+        document.getElementById('npsPanel').style.display='none';
         document.getElementById('filiaisSection').style.display='none';
         document.getElementById('filialFilterGroup').style.display='none';
         document.getElementById('finEmpresaDetail').style.display='none';
@@ -878,16 +865,12 @@ function updateFinanceiroDetail(match){
             // Summary KPIs
             html+='<tr><td colspan="4" style="padding:10px 12px;font-weight:700;color:var(--primary);font-size:13px;border-bottom:1px solid var(--border);">Faturas Iugu — '+f.planoIugu+'</td></tr>';
             html+='<tr><td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Total Pago</td><td style="padding:6px 12px;color:var(--success);font-weight:700;">'+fmtCFull(f.totalPago)+'</td>';
-            html+='<td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Pendente</td><td style="padding:6px 12px;color:var(--warning);font-weight:700;">'+(f.totalPendente?fmtCFull(f.totalPendente):'-')+'</td></tr>';
-            html+='<tr><td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Vencido</td><td style="padding:6px 12px;color:var(--danger);font-weight:700;">'+(f.totalVencido?fmtCFull(f.totalVencido):'-')+'</td>';
             html+='<td style="padding:6px 12px;font-weight:600;color:var(--text-secondary);">Faturas</td><td style="padding:6px 12px;font-weight:600;">'+f.qtdFaturas+'</td></tr>';
             // Individual invoices table
-            const mesAtualFin=new Date().toISOString().substring(0,7);
-            const faturasVisiveis=f.faturas.filter(inv=>inv.mes<=mesAtualFin);
-            if(faturasVisiveis.length>0){
+            if(f.faturas&&f.faturas.length>0){
                 html+='<tr><td colspan="4" style="padding:10px 12px 4px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);border-top:1px solid var(--border);">Histórico de Faturas</td></tr>';
                 html+='<tr><th style="padding:6px 12px;font-size:10px;text-transform:uppercase;color:var(--text-secondary);">Mês</th><th style="padding:6px 12px;font-size:10px;text-transform:uppercase;color:var(--text-secondary);">Status</th><th style="padding:6px 12px;font-size:10px;text-transform:uppercase;color:var(--text-secondary);">Valor</th><th></th></tr>';
-                faturasVisiveis.forEach(inv=>{
+                f.faturas.forEach(inv=>{
                     html+='<tr><td style="padding:4px 12px;">'+inv.mes+'</td><td style="padding:4px 12px;">'+statusBadge(inv.status)+'</td><td style="padding:4px 12px;font-weight:600;">'+fmtCFull(inv.total)+'</td><td></td></tr>';
                 });
             }
@@ -1003,14 +986,6 @@ function renderTab0(){
         {icon:'&#127915;',label:'Ticket Médio',value:fmtC(ticket)},
         {icon:'&#10060;',label:'Pedidos Cancelados',value:fmtN(canc)},
         {icon:'&#9888;',label:'Risco Alto Churn',value:fmtN(riscoAlto),color:'var(--danger)'},
-        {icon:'&#128666;',label:'Frete Total',value:fmtC(es.reduce((s,e)=>{
-            const fPDe=document.getElementById('fPedDe').value;
-            const fPAte=document.getElementById('fPedAte').value;
-            if((fPDe||fPAte)&&e.freteMensal&&e.freteMensal.length>0){
-                return s+e.freteMensal.filter(m=>(!fPDe||m.mes>=fPDe)&&(!fPAte||m.mes<=fPAte)).reduce((t,m)=>t+m.valor,0);
-            }
-            return s+(e.freteTotal||0);
-        },0))},
     ]);
 
     // Chart: Pedidos - Últimos 6 Meses (responde aos filtros)
@@ -1063,7 +1038,7 @@ function renderTab0(){
 
     // Chart: Implementação (stacked bar)
     const implLabels=['Cartão','PIX','Integração','Marca Ativa'];
-    const simCounts=[es.filter(e=>e.cartao==='Sim').length,es.filter(e=>e.pix==='Sim').length,es.filter(e=>e.temIntegracao==='Sim').length,es.filter(e=>e.marcaAtiva==='Sim').length];
+    const simCounts=[es.filter(e=>e.cartao==='Sim').length,es.filter(e=>e.pix==='Sim').length,es.filter(e=>e.temIntegracao).length,es.filter(e=>e.marcaAtiva).length];
     const naoCounts=[es.length-simCounts[0],es.length-simCounts[1],es.length-simCounts[2],es.length-simCounts[3]];
     getOrCreate('chartImpl',{type:'bar',data:{labels:implLabels,datasets:[{label:'Sim',data:simCounts,backgroundColor:'rgba(16,185,129,0.7)'},{label:'Não',data:naoCounts,backgroundColor:'rgba(214,69,80,0.5)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip},scales:{x:{stacked:true,ticks:darkTick,grid:darkGrid},y:{stacked:true,ticks:darkTick,grid:darkGrid}}}});
 
@@ -1125,15 +1100,14 @@ function renderTab1(){
     const top10V=[...es].sort((a,b)=>(b._valCartao+b._valPix)-(a._valCartao+a._valPix)).slice(0,10).reverse();
     getOrCreate('chartTopVal',{type:'bar',data:{labels:top10V.map(e=>e.nome.length>20?e.nome.substring(0,20)+'...':e.nome),datasets:[{label:'Valor',data:top10V.map(e=>e._valCartao+e._valPix),backgroundColor:'rgba(124,58,237,0.7)',borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...darkTooltip,callbacks:{label:ctx=>fmtC(ctx.raw)}}},scales:{x:{ticks:{...darkTick,callback:v=>fmtC(v)},grid:darkGrid},y:{ticks:darkTick,grid:darkGrid}}}});
 
-    // Marcas Ativas doughnut - only count empresas that have statusEmpresa data
-    const comStatus=es.filter(e=>e.statusEmpresa);
-    const ativas=comStatus.filter(e=>e.statusEmpresa==='Ativa').length;
-    const inativas=comStatus.filter(e=>e.statusEmpresa==='Desativada').length;
-    getOrCreate('chartMarcas',{type:'doughnut',data:{labels:['Ativas ('+ativas+')','Desativadas ('+inativas+')'],datasets:[{data:[ativas,inativas],backgroundColor:['#10B981','#EF4444'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip}}});
+    // Marcas Ativas doughnut
+    const ativas=es.filter(e=>e.marcaAtiva).length;
+    const inativas=es.length-ativas;
+    getOrCreate('chartMarcas',{type:'doughnut',data:{labels:['Ativas','Inativas'],datasets:[{data:[ativas,inativas],backgroundColor:['#10B981','#5a5e72'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip}}});
 
     // Evolucao valor mensal (GMV por mês - responde aos filtros)
     const meses=DADOS.meses||[];
-    const isFiltered1=es.length<DADOS.empresas.length||document.getElementById('fPedDe').value||document.getElementById('fPedAte').value;
+    const isFiltered1=es.length<DADOS.empresas.length;
     const valMensalPagos=meses.map(m=>{
         if(isFiltered1){return es.reduce((s,e)=>{const md=e.m&&e.m[m];return s+(md?md[5]:0);},0);}
         const mm=DADOS.mensal.find(x=>x.mes===m);return mm?mm.valPagos||0:0;
@@ -1149,7 +1123,7 @@ function renderTab1(){
     getOrCreate('chartTopPed',{type:'bar',data:{labels:top10P.map(e=>e.nome.length>20?e.nome.substring(0,20)+'...':e.nome),datasets:[{label:'Pedidos Pagos',data:top10P.map(e=>e._pedidosPagos),backgroundColor:'rgba(16,185,129,0.7)',borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:darkTooltip},scales:{x:{ticks:darkTick,grid:darkGrid},y:{ticks:darkTick,grid:darkGrid}}}});
 
     // Distribuicao por Anjo (pie)
-    const anjoMap={};es.filter(e=>e.isMatriz||!e.matrizId).forEach(e=>{const a=e.anjo||'N/A';anjoMap[a]=(anjoMap[a]||0)+1;});
+    const anjoMap={};es.forEach(e=>{const a=e.anjo||'N/A';anjoMap[a]=(anjoMap[a]||0)+1;});
     const anjoLabels=Object.keys(anjoMap).sort((a,b)=>anjoMap[b]-anjoMap[a]);
     const anjoColors=['#7C3AED','#06B6D4','#A855F7','#EC4899','#8B5CF6','#EAB308','#EF4444','#10B981','#F59E0B','#5B21B6','#0891B2','#8b8fa3'];
     getOrCreate('chartAnjo',{type:'pie',data:{labels:anjoLabels,datasets:[{data:anjoLabels.map(l=>anjoMap[l]),backgroundColor:anjoColors.slice(0,anjoLabels.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:darkLegend,tooltip:darkTooltip}}});
@@ -1169,23 +1143,16 @@ function renderTabFin(){
         uniquePlano.push(e);
     });
 
-    // Invoices (Iugu) aggregates - deduplicated by CNPJ, filtered to current month
+    // Invoices (Iugu) aggregates - deduplicated by CNPJ
     const seenFatCnpj=new Set();
-    const mesAtualFat=new Date().toISOString().substring(0,7);
     let fatPago=0,fatPendente=0,fatVencido=0,fatQtd=0,fatEmpresas=0;
     es.forEach(e=>{
-        if(!e.faturamento||!e.faturamento.faturas)return;
+        if(!e.faturamento)return;
         const cnpj=(e.cnpj||'').replace(/[.\-\/]/g,'');
         if(cnpj&&seenFatCnpj.has(cnpj))return;
         if(cnpj)seenFatCnpj.add(cnpj);
-        fatEmpresas++;
-        const fatsAteMes=e.faturamento.faturas.filter(f=>f.mes<=mesAtualFat);
-        fatsAteMes.forEach(f=>{
-            fatQtd++;
-            if(f.status==='paid'||f.status==='externally_paid')fatPago+=f.total;
-            else if(f.status==='pending')fatPendente+=f.total;
-            else if(f.status==='expired')fatVencido+=f.total;
-        });
+        fatPago+=e.faturamento.totalPago;fatPendente+=e.faturamento.totalPendente;
+        fatVencido+=e.faturamento.totalVencido;fatQtd+=e.faturamento.qtdFaturas;fatEmpresas++;
     });
 
     // Aggregate totals (used by KPIs and charts) - deduplicated
@@ -1198,7 +1165,7 @@ function renderTabFin(){
                 else{totalPlano+=p.totalCobrado;totalMensal+=p.mensalidade;totalInteg+=p.integracao;totalFilial+=p.filial;totalDesc+=p.descontos;totalAssist+=p.assistente;}
             });
         } else {
-            totalPlano+=e.planoTotalCobrado;totalMensal+=(e.planoMensalidade||e.planoTotalCobrado);
+            totalPlano+=e.planoTotalCobrado;totalMensal+=e.planoMensalidade;
             totalInteg+=(e.planoIntegracao||0);totalAssist+=(e.planoAssistente||0);
             totalFilial+=(e.planoFilial||0);totalDesc+=(e.planoDescontos||0);
         }
@@ -1211,12 +1178,24 @@ function renderTabFin(){
 
     // Build KPIs - Faturamento Iugu first, then Marcas e Planos
     const kpis=[];
-    // Invoices KPIs
-    if(fatPago>0||fatPendente>0) {
-        kpis.push({icon:'&#128176;',label:'Faturado (Pago)',value:fmtCFull(fatPago)});
-        if(fatPendente>0)kpis.push({icon:'&#9888;',label:'Pendente',value:fmtCFull(fatPendente),color:'var(--warning)'});
-        if(fatVencido>0)kpis.push({icon:'&#10060;',label:'Vencido',value:fmtCFull(fatVencido),color:'var(--danger)'});
-        kpis.push({icon:'&#128196;',label:'Faturas',value:fmtN(fatQtd)});
+    // Status Mensalidade KPI - when a single company is selected, show last invoice status
+    if(isSingleBrand&&ref&&ref.faturamento&&ref.faturamento.faturas&&ref.faturamento.faturas.length>0){
+        const uf=ref.faturamento.faturas[0];
+        const stMap={paid:"Pago",pending:"Pendente",expired:"Vencido",canceled:"Cancelado",externally_paid:"Pago ext."};
+        const stColor={paid:"var(--success)",pending:"var(--warning)",expired:"var(--danger)",canceled:"var(--text-muted)",externally_paid:"var(--success)"};
+        const stIcon={paid:"&#9989;",pending:"&#9888;",expired:"&#10060;",canceled:"&#128683;",externally_paid:"&#9989;"};
+        kpis.push({icon:stIcon[uf.status]||"&#128176;",label:"Status Mensalidade",value:stMap[uf.status]||uf.status,color:stColor[uf.status]||"var(--text-primary)"});
+    }
+    // Invoices KPIs - usar dados da empresa individual quando selecionada
+    const kpiFatPago=isSingleBrand&&ref&&ref.faturamento?ref.faturamento.totalPago:fatPago;
+    const kpiFatPendente=isSingleBrand&&ref&&ref.faturamento?ref.faturamento.totalPendente:fatPendente;
+    const kpiFatVencido=isSingleBrand&&ref&&ref.faturamento?ref.faturamento.totalVencido:fatVencido;
+    const kpiFatQtd=isSingleBrand&&ref&&ref.faturamento?ref.faturamento.qtdFaturas:fatQtd;
+    if(kpiFatPago>0||kpiFatPendente>0||kpiFatVencido>0) {
+        kpis.push({icon:'&#128176;',label:'Faturado (Pago)',value:fmtCFull(kpiFatPago)});
+        if(kpiFatPendente>0)kpis.push({icon:'&#9888;',label:'Pendente',value:fmtCFull(kpiFatPendente),color:'var(--warning)'});
+        if(kpiFatVencido>0)kpis.push({icon:'&#10060;',label:'Vencido',value:fmtCFull(kpiFatVencido),color:'var(--danger)'});
+        kpis.push({icon:'&#128196;',label:'Faturas',value:fmtN(kpiFatQtd)});
     }
     // Marcas e Planos KPIs
     if(isSingleBrand&&ref&&ref.planos&&ref.planos.length>1){
@@ -1225,12 +1204,17 @@ function renderTabFin(){
             kpis.push({icon:isOrac?'&#128302;':'&#128179;',label:p.plano||'Plano',value:fmtCFull(p.totalCobrado),color:isOrac?'var(--accent-purple)':undefined});
         });
     } else if(isSingleBrand&&ref){
-        const base=ref.planoMensalidade||ref.planoTotalCobrado;
-        kpis.push({icon:'&#128179;',label:ref.plano||'Plano',value:fmtCFull(base)});
+        kpis.push({icon:'&#128179;',label:'Mensalidade',value:fmtCFull(ref.planoMensalidade||0)});
         const adicionais=(ref.planoIntegracao||0)+(ref.planoAssistente||0)+(ref.planoFilial||0);
-        if(adicionais>0)kpis.push({icon:'&#10133;',label:'Adicionais',value:fmtCFull(adicionais)});
-        if(ref.planoDescontos)kpis.push({icon:'&#128181;',label:'Descontos',value:'-'+fmtCFull(Math.abs(ref.planoDescontos)),color:'var(--success)'});
-        if(ref.planoTotalCobrado&&ref.planoTotalCobrado!==base)kpis.push({icon:'&#128176;',label:'Total Cobrado',value:fmtCFull(ref.planoTotalCobrado)});
+        if(adicionais>0){
+            const detalhes=[];
+            if(ref.planoIntegracao)detalhes.push('Integr: '+fmtCFull(ref.planoIntegracao));
+            if(ref.planoAssistente)detalhes.push('Assist: '+fmtCFull(ref.planoAssistente));
+            if(ref.planoFilial)detalhes.push('Filial: '+fmtCFull(ref.planoFilial));
+            kpis.push({icon:'&#10133;',label:'Adicionais',value:fmtCFull(adicionais)});
+        }
+        if(ref.planoDescontos)kpis.push({icon:'&#128181;',label:'Descontos',value:fmtCFull(Math.abs(ref.planoDescontos)),color:'var(--danger)'});
+        kpis.push({icon:'&#128176;',label:'Total Cobrado ('+(ref.plano||'Plano')+')',value:fmtCFull(ref.planoTotalCobrado)});
     } else if(totalPlano>0){
         kpis.push({icon:'&#128179;',label:'Total Planos',value:fmtCFull(totalPlano)});
         kpis.push({icon:'&#128178;',label:'Mensalidade',value:fmtCFull(totalMensal)});
@@ -1306,7 +1290,7 @@ function renderTab2(){
     // Risco de Churn por Anjo (horizontal stacked bar)
     const anjoRisco={};
     es.forEach(e=>{
-        const anjo=e.anjo||'Sem CS';
+        const anjo=e.anjo||'Sem anjo';
         if(!anjoRisco[anjo])anjoRisco[anjo]={alto:0,medio:0,baixo:0,gmvRisco:0};
         if(e.churnRisco==='Alto'){anjoRisco[anjo].alto++;anjoRisco[anjo].gmvRisco+=(e._gmv||0);}
         else if(e.churnRisco==='Medio'||e.churnRisco==='Médio')anjoRisco[anjo].medio++;
@@ -1358,7 +1342,7 @@ function renderTab2(){
             <td>${oracInfo}</td>
             <td>${e.etapaHub||'-'}</td>
             <td class="cell-currency">${fmtC(e._gmv||0)}</td>
-            <td>${e.mensalidade||(e.planoTotalCobrado?fmtC(e.planoTotalCobrado):'-')}</td>
+            <td>${e.mensalidade||'-'}</td>
             <td class="churn-motivos">${explicacao||'-'}</td>
         </tr>`;
     }).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--success);padding:20px;font-weight:600;">Sem risco de churn — todas as empresas filtradas estão saudáveis</td></tr>';
@@ -1368,11 +1352,11 @@ function renderTab2(){
 const TABLE_COLS=[
     {key:'nome',label:'Nome Fantasia',fmt:v=>v},
     {key:'canal',label:'Canal',fmt:v=>v||'-'},
-    {key:'anjo',label:'CS',fmt:v=>v||'-'},
+    {key:'anjo',label:'Anjo',fmt:v=>v||'-'},
     {key:'cnpj',label:'CNPJ',fmt:v=>v||'-'},
     {key:'cartao',label:'Cartão',fmt:v=>v==='Sim'?'<span class="cell-badge badge-sim">Sim</span>':'<span class="cell-badge badge-nao">Não</span>'},
     {key:'pix',label:'PIX',fmt:v=>v==='Sim'?'<span class="cell-badge badge-sim">Sim</span>':'<span class="cell-badge badge-nao">Não</span>'},
-    {key:'temIntegracao',label:'Integração',fmt:v=>v==='Sim'?'<span class="cell-badge badge-sim">Sim</span>':'<span class="cell-badge badge-nao">Não</span>'},
+    {key:'temIntegracao',label:'Integração',fmt:v=>v?'<span class="cell-badge badge-sim">Sim</span>':'<span class="cell-badge badge-nao">Não</span>'},
     {key:'tipoIntegracao',label:'Tipo Integ.',fmt:v=>v||'-'},
     {key:'plano',label:'Plano',fmt:v=>v||'-'},
     {key:'planoMensalidade',label:'Mensalidade (Plano)',fmt:(v,e)=>e.plano?fmtCFull(v||0):'-',css:'cell-currency'},
@@ -1536,7 +1520,7 @@ function doLogin(){
     crypto.subtle.digest('SHA-256',new TextEncoder().encode(pass)).then(buf=>{
         const hex=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
         if(hex==='bc2e1f676370b8131e3a1f84fc6c1cd6c9266f279030c92604fde8cfa8a1e0d3'){
-            sessionStorage.setItem('auth_cs','ok');
+            localStorage.setItem('auth_cs','ok');
             loadApp();
         } else {
             document.getElementById('loginError').style.display='block';
@@ -1552,11 +1536,13 @@ function loadApp(){
         document.getElementById('badgeTotal').textContent=DADOS.totalEmpresas+' empresas';
         document.getElementById('badgeDate').textContent=DADOS.geradoEm?new Date(DADOS.geradoEm).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
         populateFilters();
-        // Default period: last month to current month
-        const now=new Date();
-        const lastMonth=new Date(now.getFullYear(),now.getMonth()-1,1);
-        document.getElementById('fPedDe').value=lastMonth.getFullYear()+'-'+String(lastMonth.getMonth()+1).padStart(2,'0');
-        document.getElementById('fPedAte').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+        // Definir filtro de período padrão: mês anterior e mês atual
+        const hoje=new Date();
+        const mesAtual=hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
+        const mesAnteriorDate=new Date(hoje.getFullYear(),hoje.getMonth()-1,1);
+        const mesAnterior=mesAnteriorDate.getFullYear()+'-'+String(mesAnteriorDate.getMonth()+1).padStart(2,'0');
+        document.getElementById('fPedDe').value=mesAnterior;
+        document.getElementById('fPedAte').value=mesAtual;
         applyFilters();
         document.querySelectorAll('.filter-select,.filter-date,.filter-input').forEach(el=>el.addEventListener('change',()=>{tablePage=1;applyFilters();}));
         document.getElementById('fAnjo').addEventListener('change',()=>{updateEmpresaDatalist();});
@@ -1573,23 +1559,10 @@ function loadApp(){
     };
     document.head.appendChild(s);
 }
-if(sessionStorage.getItem('auth_cs')==='ok'){
+if(localStorage.getItem('auth_cs')==='ok'){
     if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',loadApp);}
     else{loadApp();}
 }
-// Visitor counter using CountAPI-compatible localStorage + namespace
-(function(){
-    const KEY='cs_dashboard_visits';
-    let count=parseInt(localStorage.getItem(KEY)||'0',10);
-    // Count once per session
-    if(!sessionStorage.getItem('cs_counted')){
-        count++;
-        localStorage.setItem(KEY,count);
-        sessionStorage.setItem('cs_counted','1');
-    }
-    const el=document.getElementById('badgeVisits');
-    if(el) el.textContent=count+' acesso'+(count!==1?'s':'');
-})();
 </script>
 </body>
 </html>

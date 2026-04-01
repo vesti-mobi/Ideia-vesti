@@ -7,9 +7,13 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const DIR = __dirname;
-const envFile = fs.readFileSync(path.join(DIR, '.env'), 'utf-8');
 const ENV = {};
-envFile.split('\n').forEach(l => { const m = l.match(/^([^#=]+)=(.*)$/); if (m) ENV[m[1].trim()] = m[2].trim(); });
+const envPath = path.join(DIR, '.env');
+if (fs.existsSync(envPath)) {
+    fs.readFileSync(envPath, 'utf-8').split('\n').forEach(l => { const m = l.match(/^([^#=]+)=(.*)$/); if (m) ENV[m[1].trim()] = m[2].trim(); });
+}
+// Fallback to process.env
+['FABRIC_TENANT_ID','FABRIC_REFRESH_TOKEN','FABRIC_CLIENT_ID'].forEach(k => { if (!ENV[k] && process.env[k]) ENV[k] = process.env[k]; });
 
 const token_body = require('querystring').stringify({ client_id: ENV.FABRIC_CLIENT_ID, grant_type: 'refresh_token', refresh_token: ENV.FABRIC_REFRESH_TOKEN, scope: 'https://analysis.windows.net/powerbi/api/.default' });
 
@@ -36,9 +40,12 @@ async function main() {
     const tr = await hr({ hostname: 'login.microsoftonline.com', path: '/' + ENV.FABRIC_TENANT_ID + '/oauth2/v2.0/token', method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(token_body) } }, token_body);
     const td = JSON.parse(tr.b);
     if (td.refresh_token) {
-        let env = fs.readFileSync(path.join(DIR, '.env'), 'utf-8');
-        env = env.replace(/^FABRIC_REFRESH_TOKEN=.*$/m, 'FABRIC_REFRESH_TOKEN=' + td.refresh_token);
-        fs.writeFileSync(path.join(DIR, '.env'), env, 'utf-8');
+        const envUpdatePath = path.join(DIR, '.env');
+        if (fs.existsSync(envUpdatePath)) {
+            let env = fs.readFileSync(envUpdatePath, 'utf-8');
+            env = env.replace(/^FABRIC_REFRESH_TOKEN=.*$/m, 'FABRIC_REFRESH_TOKEN=' + td.refresh_token);
+            fs.writeFileSync(envUpdatePath, env, 'utf-8');
+        }
     }
     const token = td.access_token;
     if (!token) { console.error('No token'); process.exit(1); }

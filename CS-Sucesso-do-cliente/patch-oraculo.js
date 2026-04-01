@@ -9,12 +9,16 @@ const fs = require('fs');
 const path = require('path');
 
 const DIR = __dirname;
-const envFile = fs.readFileSync(path.join(DIR, '.env'), 'utf-8');
 const ENV = {};
-envFile.split('\n').forEach(l => {
-    const m = l.match(/^([^#=]+)=(.*)$/);
-    if (m) ENV[m[1].trim()] = m[2].trim();
-});
+const envPath = path.join(DIR, '.env');
+if (fs.existsSync(envPath)) {
+    fs.readFileSync(envPath, 'utf-8').split('\n').forEach(l => {
+        const m = l.match(/^([^#=]+)=(.*)$/);
+        if (m) ENV[m[1].trim()] = m[2].trim();
+    });
+}
+// Fallback to process.env
+['FABRIC_TENANT_ID','FABRIC_REFRESH_TOKEN','FABRIC_CLIENT_ID'].forEach(k => { if (!ENV[k] && process.env[k]) ENV[k] = process.env[k]; });
 
 const FABRIC_TENANT_ID = ENV.FABRIC_TENANT_ID || '';
 const FABRIC_REFRESH_TOKEN = ENV.FABRIC_REFRESH_TOKEN || '';
@@ -52,11 +56,17 @@ async function getFabricToken() {
     }, postBody);
     const tokenData = JSON.parse(tokenRes.body);
     if (tokenData.refresh_token) {
-        const envPath = path.join(DIR, '.env');
-        let env = fs.readFileSync(envPath, 'utf-8');
-        env = env.replace(/^FABRIC_REFRESH_TOKEN=.*$/m, 'FABRIC_REFRESH_TOKEN=' + tokenData.refresh_token);
-        fs.writeFileSync(envPath, env, 'utf-8');
-        console.log('  Refresh token atualizado no .env');
+        const envUpdatePath = path.join(DIR, '.env');
+        if (fs.existsSync(envUpdatePath)) {
+            let env = fs.readFileSync(envUpdatePath, 'utf-8');
+            env = env.replace(/^FABRIC_REFRESH_TOKEN=.*$/m, 'FABRIC_REFRESH_TOKEN=' + tokenData.refresh_token);
+            fs.writeFileSync(envUpdatePath, env, 'utf-8');
+            console.log('  Refresh token atualizado no .env');
+        } else {
+            // In CI, save for later use
+            fs.writeFileSync(path.join(DIR, '.new_refresh_token'), tokenData.refresh_token, 'utf-8');
+            console.log('  New refresh token saved to .new_refresh_token');
+        }
     }
     return tokenData.access_token || null;
 }
@@ -77,6 +87,8 @@ async function fetchOraculoPainelStats(token) {
     console.log('  Encontrados ' + datasets.length + ' datasets');
 
     const dax = "EVALUATE ROW(\"pedidos\", COUNTROWS('f_Pedidos Oraculo'), \"interacoes\", COUNTROWS('f_Interacoes Oraculo Semanal'), \"atendimentos\", [KPI Atendimentos Oraculo], \"pctIA\", [KPI % Atendimento Oraculo], \"vendas\", [KPI Vendas Totais])";
+    // DAX para vendas diárias (agregar para mensal no código)
+    const daxVendasDiarias = "EVALUATE SUMMARIZECOLUMNS('f_Pedidos Oraculo'[settings_createdAt_TIMESTAMP], \"vendas\", [KPI Vendas Totais])";
     const map = new Map();
     let ok = 0, fail = 0;
     for (const ds of datasets) {
@@ -92,15 +104,39 @@ async function fetchOraculoPainelStats(token) {
             }, body);
             if (res.statusCode === 200) {
                 const val = JSON.parse(res.body).results?.[0]?.tables?.[0]?.rows?.[0] || {};
-                map.set(name.toLowerCase(), {
+                const stats = {
                     name,
                     pedidosOraculo: val['[pedidos]'] || 0,
                     interacoesOraculo: val['[interacoes]'] || 0,
                     atendimentosOraculo: val['[atendimentos]'] || 0,
                     pctIAOraculo: val['[pctIA]'] != null ? Math.round(val['[pctIA]'] * 1000) / 10 : 0,
                     vendasOraculo: val['[vendas]'] != null ? Math.round(val['[vendas]'] * 100) / 100 : 0,
-                });
-                console.log('  OK: ' + name + ' (ped=' + (val['[pedidos]'] || 0) + ', atend=' + (val['[atendimentos]'] || 0) + ')');
+                    vendasMensal: {},
+                };
+                // Buscar vendas diárias e agregar por mês
+                try {
+                    const bodyD = JSON.stringify({ queries: [{ query: daxVendasDiarias }], serializerSettings: { includeNulls: true } });
+                    const resD = await httpsRequest({
+                        hostname: 'api.powerbi.com',
+                        path: '/v1.0/myorg/groups/' + ORACULO_PAINEIS_WS_ID + '/datasets/' + ds.id + '/executeQueries',
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(bodyD) },
+                    }, bodyD);
+                    if (resD.statusCode === 200) {
+                        const dailyRows = JSON.parse(resD.body).results?.[0]?.tables?.[0]?.rows || [];
+                        dailyRows.forEach(r => {
+                            const dt = r["f_Pedidos Oraculo[settings_createdAt_TIMESTAMP]"] || r["'f_Pedidos Oraculo'[settings_createdAt_TIMESTAMP]"] || r['[settings_createdAt_TIMESTAMP]'] || '';
+                            const v = r['[vendas]'] || 0;
+                            if (dt && v) {
+                                const mes = String(dt).substring(0, 7); // "YYYY-MM"
+                                if (mes.length === 7) stats.vendasMensal[mes] = (stats.vendasMensal[mes] || 0) + Math.round(v * 100) / 100;
+                            }
+                        });
+                    }
+                } catch (e2) { /* ignore daily vendas errors */ }
+                map.set(name.toLowerCase(), stats);
+                const meses = Object.keys(stats.vendasMensal).length;
+                console.log('  OK: ' + name + ' (ped=' + (val['[pedidos]'] || 0) + ', atend=' + (val['[atendimentos]'] || 0) + (meses > 0 ? ', vendasMeses=' + meses : '') + ')');
                 ok++;
             } else {
                 console.log('  FAIL: ' + name + ' HTTP ' + res.statusCode);
@@ -243,6 +279,7 @@ async function main() {
                 atendimentosOraculo: stats ? stats.atendimentosOraculo : 0,
                 pctIAOraculo: stats ? stats.pctIAOraculo : 0,
                 vendasOraculo: stats ? stats.vendasOraculo : 0,
+                vendasMensal: stats && stats.vendasMensal && Object.keys(stats.vendasMensal).length > 0 ? stats.vendasMensal : undefined,
             };
             // Set oraculoEtapa if not already set
             if (!e.oraculoEtapa && stats) {
