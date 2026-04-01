@@ -98,8 +98,9 @@ async function main() {
         'Vendas mensais'
     );
 
-    // Agrupar por companyId -> {mes: {vendas, pedidos}}
+    // Agrupar por companyId E por nome -> {mes: {vendas, pedidos}}
     const vendasByCompany = {};
+    const vendasByName = {};
     vendasRows.forEach(r => {
         const companyId = r['Consulta1[companyId]'] || '';
         const companyName = r['Consulta1[company_name]'] || '';
@@ -107,18 +108,25 @@ async function main() {
         const mes = dt.substring(0, 7);
         const vendas = r['[vendas]'] || 0;
         const pedidos = r['[pedidos]'] || 0;
-        if (!companyId || !mes || mes.length !== 7) return;
-        if (!vendasByCompany[companyId]) vendasByCompany[companyId] = { name: companyName, mensal: {} };
-        vendasByCompany[companyId].mensal[mes] = { vendas: Math.round(vendas * 100) / 100, pedidos };
+        if (!mes || mes.length !== 7) return;
+        // Index by companyId
+        if (companyId) {
+            if (!vendasByCompany[companyId]) vendasByCompany[companyId] = { name: companyName, mensal: {} };
+            if (!vendasByCompany[companyId].mensal[mes]) vendasByCompany[companyId].mensal[mes] = { vendas: 0, pedidos: 0 };
+            vendasByCompany[companyId].mensal[mes].vendas += Math.round(vendas * 100) / 100;
+            vendasByCompany[companyId].mensal[mes].pedidos += pedidos;
+        }
+        // Index by name (aggregate all companyIds with same name)
+        const n = normalize(companyName);
+        if (n) {
+            if (!vendasByName[n]) vendasByName[n] = { name: companyName, mensal: {} };
+            if (!vendasByName[n].mensal[mes]) vendasByName[n].mensal[mes] = { vendas: 0, pedidos: 0 };
+            vendasByName[n].mensal[mes].vendas += Math.round(vendas * 100) / 100;
+            vendasByName[n].mensal[mes].pedidos += pedidos;
+        }
     });
-    console.log('  Empresas com dados mensais: ' + Object.keys(vendasByCompany).length);
-
-    // Build name index for fallback matching
-    const vendasByName = {};
-    Object.entries(vendasByCompany).forEach(([id, data]) => {
-        const n = normalize(data.name);
-        if (n) vendasByName[n] = { id, ...data };
-    });
+    console.log('  Empresas com dados mensais (por ID): ' + Object.keys(vendasByCompany).length);
+    console.log('  Empresas com dados mensais (por nome): ' + Object.keys(vendasByName).length);
 
     // 2. Buscar invoices com mês
     console.log('\nBuscando invoices...');
@@ -181,19 +189,16 @@ async function main() {
         if (vData && Object.keys(vData.mensal).length > 0) {
             if (!e.oraculoFabric) e.oraculoFabric = {};
             e.oraculoFabric.vendasMensal = {};
+            e.oraculoFabric.pedidosMensal = {};
             let totalVendas = 0, totalPedidos = 0;
             Object.entries(vData.mensal).forEach(([mes, d]) => {
                 e.oraculoFabric.vendasMensal[mes] = d.vendas;
+                e.oraculoFabric.pedidosMensal[mes] = d.pedidos;
                 totalVendas += d.vendas;
                 totalPedidos += d.pedidos;
             });
-            // Update totals if we have better data
-            if (totalVendas > 0 && (!e.oraculoFabric.vendasOraculo || e.oraculoFabric.vendasOraculo === 0)) {
-                e.oraculoFabric.vendasOraculo = Math.round(totalVendas * 100) / 100;
-            }
-            if (totalPedidos > 0 && (!e.oraculoFabric.pedidosOraculo || e.oraculoFabric.pedidosOraculo === 0)) {
-                e.oraculoFabric.pedidosOraculo = totalPedidos;
-            }
+            e.oraculoFabric.vendasOraculo = Math.round(totalVendas * 100) / 100;
+            e.oraculoFabric.pedidosOraculo = totalPedidos;
             matchedVendas++;
         }
 
@@ -224,10 +229,10 @@ async function main() {
                 totalPendente: Math.round(pending * 100) / 100,
                 totalVencido: Math.round(expired * 100) / 100,
                 qtdFaturas: invs.length,
-                faturas: invs.slice(0, 12),
+                faturas: invs, // todas as faturas, sem corte
             };
             // Update faturaStatus
-            const uf = invs[0];
+            const uf = invs.find(i => i.status !== 'canceled') || invs[0];
             e.faturaStatus = uf.status;
             matchedInvoices++;
         }

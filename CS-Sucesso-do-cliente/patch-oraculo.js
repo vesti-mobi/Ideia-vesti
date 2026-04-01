@@ -282,7 +282,7 @@ async function main() {
                 atendimentosOraculo: stats ? stats.atendimentosOraculo : (existing.atendimentosOraculo || 0),
                 pctIAOraculo: stats ? stats.pctIAOraculo : (existing.pctIAOraculo || 0),
                 vendasOraculo: stats && stats.vendasOraculo ? stats.vendasOraculo : (existing.vendasOraculo || 0),
-                vendasMensal: (stats && stats.vendasMensal && Object.keys(stats.vendasMensal).length > 0) ? stats.vendasMensal : (existing.vendasMensal || undefined),
+                vendasMensal: (stats && stats.vendasMensal && Object.keys(stats.vendasMensal).length > (existing.vendasMensal ? Object.keys(existing.vendasMensal).length : 0)) ? stats.vendasMensal : (existing.vendasMensal || undefined),
             };
             // Set oraculoEtapa if not already set
             if (!e.oraculoEtapa && stats) {

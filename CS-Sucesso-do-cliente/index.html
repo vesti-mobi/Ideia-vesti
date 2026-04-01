@@ -731,11 +731,15 @@ function updateEmpresaPanel(){
                     periodoLabel=filtered.map(m=>m.mes).join(', ');
                 }
             } else if((fPedDe||fPedAte)&&oc.vendasMensal&&Object.keys(oc.vendasMensal).length>0){
-                // Fallback: usar vendasMensal (objeto {mes:valor}) do patch-oraculo
-                ocVendas=0;
+                // Fallback: usar vendasMensal/pedidosMensal do patch-painel-cs
+                ocVendas=0;ocPed=0;
                 const mesesFiltrados=[];
                 Object.keys(oc.vendasMensal).sort().forEach(function(mes){
-                    if((!fPedDe||mes>=fPedDe)&&(!fPedAte||mes<=fPedAte)){ocVendas+=oc.vendasMensal[mes];mesesFiltrados.push(mes);}
+                    if((!fPedDe||mes>=fPedDe)&&(!fPedAte||mes<=fPedAte)){
+                        ocVendas+=oc.vendasMensal[mes];
+                        if(oc.pedidosMensal&&oc.pedidosMensal[mes])ocPed+=oc.pedidosMensal[mes];
+                        mesesFiltrados.push(mes);
+                    }
                 });
                 ocVendas=Math.round(ocVendas*100)/100;
                 if(mesesFiltrados.length>0)periodoLabel=mesesFiltrados.map(function(m){return m.substring(5)+'/'+m.substring(2,4)}).join(', ');
