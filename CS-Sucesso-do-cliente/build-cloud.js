@@ -27,6 +27,24 @@ const DAX_ENDPOINT = `/v1.0/myorg/groups/${WORKSPACE_ID}/datasets/${DATASET_ID}/
 const VP_WORKSPACE_ID = 'f80301c2-8735-40d2-8662-1f8a627d3f61';
 const VP_DATASET_ID = '606be0ee-2c8c-4f43-8ad6-0be04f95d616';
 
+// Invoices - dataset "Painel CS" (mesmo workspace do Oráculo)
+const INV_WORKSPACE_ID = '2929476c-7b92-4366-9236-ccd13ffbd917';
+const INV_DATASET_ID = '583e34d7-6dd1-467b-86aa-3b74cfe1ca56';
+
+// Confeccao Métricas 2025 - Status Empresa + Controle de Estoque (mesmo workspace principal)
+const METRICAS_WORKSPACE_ID = '786bfd95-0733-4fcb-aa84-ef2c97518959';
+const METRICAS_DATASET_ID = '6d232602-d209-4dab-8be5-d9c34db57c0b';
+
+// Frete - dataset "Relatorio Confeccoes - Agencia"
+const FRETE_WORKSPACE_ID = '0f5bd202-471f-482d-bf3d-38295044d7db';
+const FRETE_DATASET_ID = '92a0cf18-2bfd-4b02-873f-615df3ce2d7f';
+
+// Oráculo Fabric workspace + datasets
+const FABRIC_CLIENT_ID = '14d82eec-204b-4c2f-b7e8-296a70dab67e';
+const ORACULO_WS_ID = '2929476c-7b92-4366-9236-ccd13ffbd917';
+const ORACULO_DS_ID = 'c6a480e9-2db4-45f7-ba67-b489407f59e6';
+const ORACULO_PAINEIS_WS_ID = '63a65f3e-d96b-446e-a01d-f219132e1144';
+
 const ORACULO_PIPELINE_ID = '794686264';
 const ORACULO_STAGES = {
     '1165541427':'Fila','1165361278':'Grupo de Implementação','1165350737':'Reunião 1',
@@ -37,18 +55,19 @@ const ORACULO_STAGES = {
     '1165361281':'Concluído','1238455699':'Parado','1249275660':'Churn'
 };
 
-// Load .env file if available (local dev), fallback to process.env (CI)
+// Load .env file if present (for local execution)
 const _envPath = path.join(DIR, '.env');
-const _envVars = {};
+const _localEnv = {};
 if (fs.existsSync(_envPath)) {
-    fs.readFileSync(_envPath, 'utf-8').split('\n').forEach(line => {
-        const m = line.match(/^([^#=]+)=(.*)$/);
-        if (m) _envVars[m[1].trim()] = m[2].trim();
+    fs.readFileSync(_envPath, 'utf-8').split('\n').forEach(l => {
+        const m = l.match(/^([^#=]+)=(.*)$/);
+        if (m) _localEnv[m[1].trim()] = m[2].trim();
     });
 }
-const HUBSPOT_TOKEN = _envVars.HUBSPOT_TOKEN || process.env.HUBSPOT_TOKEN || '';
-const FABRIC_REFRESH_TOKEN = _envVars.FABRIC_REFRESH_TOKEN || process.env.FABRIC_REFRESH_TOKEN || '';
-const FABRIC_TENANT_ID = _envVars.FABRIC_TENANT_ID || process.env.FABRIC_TENANT_ID || '';
+
+const HUBSPOT_TOKEN = process.env.HUBSPOT_TOKEN || _localEnv.HUBSPOT_TOKEN || '';
+const FABRIC_REFRESH_TOKEN = process.env.FABRIC_REFRESH_TOKEN || _localEnv.FABRIC_REFRESH_TOKEN || '';
+const FABRIC_TENANT_ID = process.env.FABRIC_TENANT_ID || _localEnv.FABRIC_TENANT_ID || '';
 
 // ===================== HTTP HELPERS =====================
 function httpsRequest(options, body) {
@@ -74,9 +93,8 @@ async function getAccessToken() {
         throw new Error('FABRIC_REFRESH_TOKEN and FABRIC_TENANT_ID env vars are required');
     }
 
-    const clientId = _envVars.FABRIC_CLIENT_ID || process.env.FABRIC_CLIENT_ID || '14d82eec-204b-4c2f-b7e8-296a70dab67e';
     const postBody = querystring.stringify({
-        client_id: clientId,
+        client_id: _localEnv.FABRIC_CLIENT_ID || '14d82eec-204b-4c2f-b7e8-296a70dab67e',
         grant_type: 'refresh_token',
         refresh_token: FABRIC_REFRESH_TOKEN,
         scope: 'https://analysis.windows.net/powerbi/api/.default offline_access',
@@ -100,19 +118,18 @@ async function getAccessToken() {
 
     console.log('  Access token obtained.');
 
-    // Save new refresh token if returned
+    // Save new refresh token if returned (for GitHub Action to update the secret)
     if (data.refresh_token) {
-        const localEnvPath = path.join(DIR, '.env');
-        if (fs.existsSync(localEnvPath)) {
-            let envContent = fs.readFileSync(localEnvPath, 'utf-8');
-            envContent = envContent.replace(/^FABRIC_REFRESH_TOKEN=.*$/m, 'FABRIC_REFRESH_TOKEN=' + data.refresh_token);
-            fs.writeFileSync(localEnvPath, envContent, 'utf-8');
-            console.log('  Refresh token atualizado no .env');
-        }
-        // Also save for GitHub Action
         const rtPath = path.join(DIR, '.new_refresh_token');
         fs.writeFileSync(rtPath, data.refresh_token, 'utf-8');
         console.log('  New refresh token saved to .new_refresh_token');
+        // Also update .env if it exists (for local execution)
+        if (fs.existsSync(_envPath)) {
+            let env = fs.readFileSync(_envPath, 'utf-8');
+            env = env.replace(/^FABRIC_REFRESH_TOKEN=.*$/m, 'FABRIC_REFRESH_TOKEN=' + data.refresh_token);
+            fs.writeFileSync(_envPath, env, 'utf-8');
+            console.log('  .env refresh token updated');
+        }
     }
 
     return data.access_token;
@@ -313,6 +330,165 @@ async function fetchOraculoTickets() {
     }
 }
 
+// ===================== ORÁCULO FABRIC: PAINEL STATS (with monthly data) =====================
+async function fetchOraculoPainelStats(accessToken) {
+    try {
+        console.log('  Listing Oráculo painéis datasets...');
+        const dsRes = await httpsRequest({
+            hostname: 'api.powerbi.com',
+            path: '/v1.0/myorg/groups/' + ORACULO_PAINEIS_WS_ID + '/datasets',
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+        });
+        if (dsRes.statusCode !== 200) { console.log('  WARN: Oráculo painéis list failed HTTP ' + dsRes.statusCode); return new Map(); }
+        const datasets = JSON.parse(dsRes.body).value || [];
+
+        // Use direct queries instead of KPI measures (which return null for some datasets)
+        const daxPedidos = "EVALUATE SUMMARIZECOLUMNS('f_Pedidos Oraculo'[settings_createdAt_TIMESTAMP], \"pedidos\", COUNTROWS('f_Pedidos Oraculo'), \"vendas\", SUM('f_Pedidos Oraculo'[summary_total]))";
+        const daxInteracoes = "EVALUATE SUMMARIZECOLUMNS('f_Interacoes Oraculo Semanal'[DataReferencia], \"interacoes\", COUNTROWS('f_Interacoes Oraculo Semanal'), \"ia\", SUM('f_Interacoes Oraculo Semanal'[IA]))";
+
+        const map = new Map();
+        let ok = 0, fail = 0;
+        for (const ds of datasets) {
+            if (ds.name === 'Report Usage Metrics Model') continue;
+            const name = ds.name.replace(' - Oráculo', '').replace(' - Oraculo', '').trim();
+            try {
+                // Fetch pedidos
+                const pBody = JSON.stringify({ queries: [{ query: daxPedidos }], serializerSettings: { includeNulls: true } });
+                const pRes = await httpsRequest({
+                    hostname: 'api.powerbi.com',
+                    path: '/v1.0/myorg/groups/' + ORACULO_PAINEIS_WS_ID + '/datasets/' + ds.id + '/executeQueries',
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(pBody) },
+                }, pBody);
+                // Fetch interacoes
+                const iBody = JSON.stringify({ queries: [{ query: daxInteracoes }], serializerSettings: { includeNulls: true } });
+                const iRes = await httpsRequest({
+                    hostname: 'api.powerbi.com',
+                    path: '/v1.0/myorg/groups/' + ORACULO_PAINEIS_WS_ID + '/datasets/' + ds.id + '/executeQueries',
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(iBody) },
+                }, iBody);
+
+                const pRows = (pRes.statusCode === 200 ? JSON.parse(pRes.body).results?.[0]?.tables?.[0]?.rows : null) || [];
+                const iRows = (iRes.statusCode === 200 ? JSON.parse(iRes.body).results?.[0]?.tables?.[0]?.rows : null) || [];
+
+                // Aggregate by month
+                const monthly = {};
+                let totalPedidos = 0, totalVendas = 0, totalInteracoes = 0, totalIA = 0;
+                pRows.forEach(r => {
+                    const dt = r["f_Pedidos Oraculo[settings_createdAt_TIMESTAMP]"] || '';
+                    const mes = dt.substring(0, 7);
+                    if (!mes) return;
+                    const ped = r['[pedidos]'] || 0;
+                    const ven = r['[vendas]'] || 0;
+                    if (!monthly[mes]) monthly[mes] = { pedidos: 0, vendas: 0, interacoes: 0, ia: 0 };
+                    monthly[mes].pedidos += ped;
+                    monthly[mes].vendas += ven;
+                    totalPedidos += ped;
+                    totalVendas += ven;
+                });
+                iRows.forEach(r => {
+                    const dt = r["f_Interacoes Oraculo Semanal[DataReferencia]"] || '';
+                    const mes = dt.substring(0, 7);
+                    if (!mes) return;
+                    const inter = r['[interacoes]'] || 0;
+                    const ia = r['[ia]'] || 0;
+                    if (!monthly[mes]) monthly[mes] = { pedidos: 0, vendas: 0, interacoes: 0, ia: 0 };
+                    monthly[mes].interacoes += inter;
+                    monthly[mes].ia += ia;
+                    totalInteracoes += inter;
+                    totalIA += ia;
+                });
+
+                const atendimentos = totalInteracoes; // unique customers approximated by total interactions
+                const pctIA = totalInteracoes > 0 ? Math.round((totalIA / totalInteracoes) * 1000) / 10 : 0;
+
+                // Build monthly array sorted desc
+                const mensalArr = Object.entries(monthly)
+                    .map(([mes, d]) => ({ mes, pedidos: d.pedidos, vendas: Math.round(d.vendas * 100) / 100, interacoes: d.interacoes, ia: d.ia, pctIA: d.interacoes > 0 ? Math.round((d.ia / d.interacoes) * 1000) / 10 : 0 }))
+                    .sort((a, b) => b.mes.localeCompare(a.mes))
+                    .slice(0, 12);
+
+                if (totalPedidos > 0 || totalInteracoes > 0) {
+                    map.set(name.toLowerCase(), {
+                        name,
+                        pedidosOraculo: totalPedidos,
+                        interacoesOraculo: totalInteracoes,
+                        atendimentosOraculo: atendimentos,
+                        pctIAOraculo: pctIA,
+                        vendasOraculo: Math.round(totalVendas * 100) / 100,
+                        mensal: mensalArr,
+                    });
+                    ok++;
+                } else { fail++; }
+            } catch (e) { fail++; }
+        }
+        console.log('  Oráculo painéis stats: ' + ok + ' OK, ' + fail + ' failed (of ' + datasets.length + ')');
+        return map;
+    } catch (e) {
+        console.log('  WARN: Oráculo painéis fetch failed: ' + e.message);
+        return new Map();
+    }
+}
+
+// ===================== ORÁCULO FABRIC: CONFIGURATIONS =====================
+async function fetchOraculoConfigurations(accessToken) {
+    try {
+        const query = `EVALUATE SELECTCOLUMNS(
+            FILTER(Oraculo_configurations, NOT ISBLANK(Oraculo_configurations[n8n_url])),
+            "company_id", Oraculo_configurations[company_id],
+            "domain_id", Oraculo_configurations[domain_id],
+            "name", Oraculo_configurations[name],
+            "n8n_url", Oraculo_configurations[n8n_url],
+            "phone_origin", Oraculo_configurations[phone_origin],
+            "created_at", Oraculo_configurations[created_at],
+            "updated_at", Oraculo_configurations[updated_at],
+            "link_report", Oraculo_configurations[link_report],
+            "phone_by_vesti", Oraculo_configurations[phone_by_vesti],
+            "catalogue_with_price", Oraculo_configurations[catalogue_with_price],
+            "agent_retail", Oraculo_configurations[agent_retail],
+            "works_with_closed_square", Oraculo_configurations[works_with_closed_square],
+            "keep_assigned_seller", Oraculo_configurations[keep_assigned_seller]
+        )`;
+        const rows = await executeDaxQueryOn(accessToken, ORACULO_WS_ID, ORACULO_DS_ID, query, 'Oráculo Configurations');
+        const map = new Map();
+        rows.forEach(r => {
+            const companyId = r.company_id || '';
+            if (companyId) {
+                map.set(companyId, {
+                    name: r.name || '',
+                    domain_id: r.domain_id || '',
+                    n8n_url: r.n8n_url || '',
+                    phone: r.phone_origin || '',
+                    created_at: r.created_at || '',
+                    updated_at: r.updated_at || '',
+                    link_report: r.link_report || '',
+                    phone_by_vesti: r.phone_by_vesti === '1' || r.phone_by_vesti === 1 || r.phone_by_vesti === true,
+                    catalogue_with_price: r.catalogue_with_price === '1' || r.catalogue_with_price === 1 || r.catalogue_with_price === true,
+                    agent_retail: r.agent_retail === '1' || r.agent_retail === 1 || r.agent_retail === true,
+                    works_with_closed_square: r.works_with_closed_square === '1' || r.works_with_closed_square === 1 || r.works_with_closed_square === true,
+                    keep_assigned_seller: r.keep_assigned_seller === '1' || r.keep_assigned_seller === 1 || r.keep_assigned_seller === true,
+                });
+            }
+        });
+        console.log('  Oráculo configurations: ' + map.size);
+        return map;
+    } catch (e) {
+        console.log('  WARN: Oráculo config fetch failed: ' + e.message);
+        return new Map();
+    }
+}
+
+// ===================== INVOICE TOTAL PARSER =====================
+function parseInvoiceTotal(s) {
+    if (!s || typeof s !== 'string') return 0;
+    s = s.trim();
+    if (s.includes('BRL')) return parseFloat(s.replace('BRL', '').trim()) || 0;
+    s = s.replace('R$', '').trim().replace(/\./g, '').replace(',', '.');
+    return parseFloat(s) || 0;
+}
+
 // ===================== FUZZY MATCHING (same as build-data.js) =====================
 function normalize(s) {
     return (s || '').toLowerCase()
@@ -407,8 +583,17 @@ async function main() {
     // Pedidos per company per month (churn + period filters + payment)
     const daxPedidosCompanyMonthly = `EVALUATE SUMMARIZECOLUMNS('Merged Pedidos'[ID Empresa], 'Merged Pedidos'[Data Criacao].[Year], 'Merged Pedidos'[Data Criacao].[MonthNo], "Qtd", COUNTROWS('Merged Pedidos'), "Pagos", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pago]=TRUE()), "Cancelados", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Cancelado]=TRUE()), "Pendentes", CALCULATE(COUNTROWS('Merged Pedidos'), 'Merged Pedidos'[Pendente]=TRUE()), "Val", SUM('Merged Pedidos'[Total]), "ValPagos", CALCULATE(SUM('Merged Pedidos'[Total]), 'Merged Pedidos'[Pago]=TRUE()), "TC", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroCartao}), "TP", CALCULATE(COUNTROWS('Merged Pedidos'), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroPix}), "VC", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroCartao}), "VP", CALCULATE(SUM('Merged Pedidos'[Total]), NOT(ISBLANK('Merged Pedidos'[docs.payment.method])) && ${filtroPix}))`;
 
+    // Invoices (Iugu) - from Painel CS dataset
+    const daxInvoices = `EVALUATE SELECTCOLUMNS(Invoices, "invId", Invoices[id], "dominio", Invoices[Dominio], "marca", Invoices[Marca], "iugu_name", Invoices[Iugu_name], "due", Invoices[due_date_TIMESTAMP], "status", Invoices[status], "valor", Invoices[ValorFatura], "plan", Invoices[Plano])`;
+
+    // Status Empresa + Controle de Estoque - from Confeccao Métricas 2025
+    const daxMetricas = `EVALUATE SELECTCOLUMNS(Query1, "id", Query1[Id Empresa], "status", Query1[Status Empresa 2], "estoque", Query1[Controle de Estoque], "cs", Query1[Anjo])`;
+
+    // Frete por empresa/mês - from Relatorio Confeccoes
+    const daxFrete = `EVALUATE FILTER(SUMMARIZECOLUMNS(Merged[Companies.company_name], Merged[Recebido].[Year], Merged[Recebido].[MonthNo], "TotalFrete", SUM(Merged[Valor Frete])), [TotalFrete] > 0)`;
+
     // Run all queries in parallel (including VestiPago companies from separate dataset)
-    const [cadastrosRows, configRows, marcasRows, productRows, rankingsRows, pedidosCompanyRows, pedidosMonthlyRows, pedidosCompanyMonthlyRows, vestiPagoRows, linksMonthlyRows, cliquesMonthlyRows, linksCompanyMonthlyRows, cliquesCompanyMonthlyRows] = await Promise.all([
+    const [cadastrosRows, configRows, marcasRows, productRows, rankingsRows, pedidosCompanyRows, pedidosMonthlyRows, pedidosCompanyMonthlyRows, vestiPagoRows, linksMonthlyRows, cliquesMonthlyRows, linksCompanyMonthlyRows, cliquesCompanyMonthlyRows, invoiceRows, metricasRows, freteRows] = await Promise.all([
         executeDaxQuery(accessToken, daxCadastros, 'Cadastros Empresas'),
         executeDaxQuery(accessToken, daxConfig, 'Config Empresas'),
         executeDaxQuery(accessToken, daxMarcas, 'Marcas e Planos'),
@@ -422,6 +607,9 @@ async function main() {
         executeDaxQuery(accessToken, daxCliquesMonthly, 'Cliques Monthly'),
         executeDaxQuery(accessToken, daxLinksCompanyMonthly, 'Links Company Monthly'),
         executeDaxQuery(accessToken, daxCliquesCompanyMonthly, 'Cliques Company Monthly'),
+        executeDaxQueryOn(accessToken, INV_WORKSPACE_ID, INV_DATASET_ID, daxInvoices, 'Invoices Iugu'),
+        executeDaxQueryOn(accessToken, METRICAS_WORKSPACE_ID, METRICAS_DATASET_ID, daxMetricas, 'Métricas (Status/Estoque)'),
+        executeDaxQueryOn(accessToken, FRETE_WORKSPACE_ID, FRETE_DATASET_ID, daxFrete, 'Frete por empresa'),
     ]);
 
     // Build VestiPago set
@@ -429,9 +617,90 @@ async function main() {
     vestiPagoRows.forEach(r => { if (r.companyId) vestiPagoSet.add(r.companyId); });
     console.log('  VestiPago companies: ' + vestiPagoSet.size);
 
+    // Build Status/Estoque map from Métricas
+    const metricasMap = {};
+    metricasRows.forEach(r => {
+        const id = r.id;
+        if (id) metricasMap[id] = { statusEmpresa: r.status || '', controleEstoque: r.estoque || '', cs: r.cs || '' };
+    });
+    console.log('  Métricas (status/estoque): ' + Object.keys(metricasMap).length);
+
+    // Build Frete map by company name
+    const freteByCompany = {};
+    freteRows.forEach(r => {
+        const name = r['Companies.company_name'] || '';
+        const frete = r['TotalFrete'] || 0;
+        const keys = Object.keys(r);
+        const yearKey = keys.find(k => k.includes('Year'));
+        const monthKey = keys.find(k => k.includes('MonthNo'));
+        const year = yearKey ? r[yearKey] : null;
+        const month = monthKey ? r[monthKey] : null;
+        if (!name || !year || !month) return;
+        const mes = year + '-' + String(month).padStart(2, '0');
+        const key = normalize(name);
+        if (!freteByCompany[key]) freteByCompany[key] = { mensal: [], total: 0 };
+        freteByCompany[key].mensal.push({ mes, valor: Math.round(frete * 100) / 100 });
+        freteByCompany[key].total += frete;
+    });
+    for (const c of Object.values(freteByCompany)) {
+        c.mensal.sort((a, b) => b.mes.localeCompare(a.mes));
+        c.total = Math.round(c.total * 100) / 100;
+    }
+    console.log('  Frete companies: ' + Object.keys(freteByCompany).length);
+
+    // ---------- 2b. Process Invoices (Painel CS) ----------
+    const seenInvIds = new Set();
+    const invoices = [];
+    invoiceRows.forEach(r => {
+        const invId = r.invId;
+        if (invId && !seenInvIds.has(invId)) {
+            seenInvIds.add(invId);
+            const due = (r.due || '').substring(0, 10);
+            invoices.push({
+                dominio: r.dominio ? String(r.dominio) : '',
+                marca: r.marca || '',
+                invId,
+                due,
+                dueMonth: due.substring(0, 7),
+                status: r.status || '',
+                total: r.valor || 0,
+                plan: r.plan || '',
+            });
+        }
+    });
+    console.log('  Unique invoices: ' + invoices.length);
+
+    // Group by dominio + by marca (for fallback matching)
+    const invoicesByDominio = {};
+    const invoicesByMarca = {};
+    invoices.forEach(i => {
+        function addTo(map, key) {
+            if (!key) return;
+            if (!map[key]) map[key] = { plan: '', invoices: [], paid: 0, pending: 0, expired: 0, canceled: 0, totalInvoices: 0 };
+            const b = map[key];
+            if (i.plan && !b.plan) b.plan = i.plan;
+            b.totalInvoices++;
+            b.invoices.push({ mes: i.dueMonth, status: i.status, total: i.total, due: i.due });
+            if (i.status === 'paid' || i.status === 'externally_paid') b.paid += i.total;
+            else if (i.status === 'pending') b.pending += i.total;
+            else if (i.status === 'expired') b.expired += i.total;
+            else if (i.status === 'canceled') b.canceled += i.total;
+        }
+        addTo(invoicesByDominio, i.dominio);
+        addTo(invoicesByMarca, normalize(i.marca));
+    });
+    console.log('  Invoice domains: ' + Object.keys(invoicesByDominio).length + ' | brands: ' + Object.keys(invoicesByMarca).length);
+
     // ---------- 3. Fetch HubSpot Oráculo tickets ----------
     console.log('\nFetching HubSpot...');
     const oraculoTickets = await fetchOraculoTickets();
+
+    // ---------- 3b. Fetch Oráculo Fabric data (painel stats + configurations) ----------
+    console.log('\nFetching Oráculo Fabric data...');
+    const [oraculoPainelStats, oraculoConfigMap] = await Promise.all([
+        fetchOraculoPainelStats(accessToken),
+        fetchOraculoConfigurations(accessToken),
+    ]);
 
     // ---------- 4. Read Controle Geral Luana CSV (apenas mensalidade, email, senha, etapaHub) ----------
     console.log('\nReading Controle Geral Luana (campos selecionados)...');
@@ -451,6 +720,36 @@ async function main() {
     });
     console.log('  Controle Luana loaded: ' + Object.keys(controleMap).length + ' companies (email, senha, etapaHub, mensalidade)');
 
+    // ---------- 4b. Load CSAT data from _csat.json ----------
+    const csatByEmpresa = {};
+    const csatPath = path.join(DIR, '_csat.json');
+    if (fs.existsSync(csatPath)) {
+        try {
+            const csatData = JSON.parse(fs.readFileSync(csatPath, 'utf-8'));
+            csatData.forEach(c => {
+                const key = (c.empresa || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+                if (!csatByEmpresa[key]) csatByEmpresa[key] = [];
+                csatByEmpresa[key].push({ mes: c.mes, nota: c.nota, obs: c.obs || '' });
+            });
+            console.log('  CSAT loaded: ' + csatData.length + ' entries for ' + Object.keys(csatByEmpresa).length + ' empresas');
+        } catch (e) { console.log('  WARN: Failed to read _csat.json: ' + e.message); }
+    } else {
+        console.log('  SKIP: _csat.json not found');
+    }
+
+    // ---------- 4c. Load NPS data from _nps.json ----------
+    const npsMap = {};
+    const npsPath = path.join(DIR, '_nps.json');
+    if (fs.existsSync(npsPath)) {
+        try {
+            const npsData = JSON.parse(fs.readFileSync(npsPath, 'utf-8'));
+            npsData.forEach(n => { if (n.dominio) npsMap[String(n.dominio)] = n.nps; });
+            console.log('  NPS loaded: ' + npsData.length + ' entries');
+        } catch (e) { console.log('  WARN: Failed to read _nps.json: ' + e.message); }
+    } else {
+        console.log('  SKIP: _nps.json not found');
+    }
+
     // ---------- 5. Process Power BI data ----------
     console.log('\nProcessing data...');
 
@@ -460,8 +759,6 @@ async function main() {
     for (const row of cadastrosRows) {
         const id = row['Id Empresa'];
         if (!id) continue;
-        // Detectar status da empresa (pode vir como 'Status', 'Domains.status', 'Status Empresa', etc.)
-        const statusEmpresa = row['Status'] || row['Domains.status'] || row['Status Empresa'] || row['status'] || '';
         empresasMap[id] = {
             id,
             cnpj: row['CNPJ'] || '',
@@ -480,7 +777,6 @@ async function main() {
             tipoIntegracao: row['Domains.integration_type'] || '',
             dataPrimeiroPedido: row['Data do Primeiro Pedido VESTIPAGO'] || '',
             valorPlano: parseFloat(row['Valor Cobrado Plano']) || 0,
-            statusEmpresa,
             // Aggregated fields - populated from DAX results
             transCartao: 0, transPix: 0, transTotal: 0,
             valCartao: 0, valPix: 0, valTotal: 0,
@@ -836,12 +1132,10 @@ async function main() {
 
     // ---------- 8. Build final empresas list ----------
     console.log('\nBuilding empresas list...');
-    let empIndex = 0;
-    // Filtrar empresas: manter apenas as que têm plano na planilha Marcas e Planos (Vivi).
-    // Empresas que não estão na planilha são consideradas inativas/desativadas.
-    const empresasAtivas = Object.values(empresasMap).filter(e => {
-        if (!e.nomeFantasia && !e.nomeDominio) return false;
-        // Tem plano na planilha Marcas e Planos (Vivi)?
+
+    // Filtrar empresas: manter apenas as que têm plano na planilha Marcas e Planos
+    const allEmps = Object.values(empresasMap).filter(e => e.nomeFantasia || e.nomeDominio);
+    const empresasAtivas = allEmps.filter(e => {
         const cnpjNum = (e.cnpj || '').replace(/[.\-\/]/g, '');
         let temPlano = !!marcasMap[cnpjNum];
         if (!temPlano && cnpjNum.length >= 8) {
@@ -850,59 +1144,29 @@ async function main() {
             }
         }
         if (!temPlano) {
-            const nomeEmp = (e.nomeFantasia || e.nomeDominio || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+            const nomeEmp = normalize(e.nomeFantasia || e.nomeDominio || '');
             for (const [, mdata] of Object.entries(marcasMap)) {
-                const nMarca = (mdata.marca || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+                const nMarca = normalize(mdata.marca || '');
                 if (nMarca && nomeEmp && (nMarca === nomeEmp || (nMarca.length >= 5 && nomeEmp.length >= 5 && (nomeEmp.includes(nMarca) || nMarca.includes(nomeEmp))))) { temPlano = true; break; }
             }
         }
         return temPlano;
     });
-    console.log('  Empresas ativas (na planilha Marcas e Planos): ' + empresasAtivas.length + ' de ' + Object.keys(empresasMap).length);
-
-    // Adicionar empresas que estão na planilha Marcas e Planos mas não no Cadastros Empresas (Fabric)
-    const matchedCnpjRoots = new Set();
-    empresasAtivas.forEach(e => {
-        const c = (e.cnpj || '').replace(/[.\-\/]/g, '');
-        if (c.length >= 8) matchedCnpjRoots.add(c.substring(0, 8));
-    });
-    let addedFromExcel = 0;
+    // Add empresas from Excel not found in Fabric
+    const matchedRoots = new Set();
+    empresasAtivas.forEach(e => { const c = (e.cnpj || '').replace(/[.\-\/]/g, ''); if (c.length >= 8) matchedRoots.add(c.substring(0, 8)); });
+    let addedExcel = 0;
     for (const [cnpj, marca] of Object.entries(marcasMap)) {
         const root = cnpj.length >= 8 ? cnpj.substring(0, 8) : cnpj;
-        if (matchedCnpjRoots.has(root)) continue;
-        // Esta marca da planilha não tem empresa correspondente no Fabric
-        const fakeId = 'excel-' + cnpj;
-        empresasAtivas.push({
-            id: fakeId,
-            cnpj: cnpj,
-            nomeFantasia: marca.marca || '',
-            nomeDominio: marca.marca || '',
-            anjo: '',
-            canal: marca.canal || '',
-            modulo: '',
-            tags: '',
-            temIntegracao: '',
-            tipoIntegracao: '',
-            criacao: '',
-            idDominio: '',
-            valorPlano: marca.totalCobrado || 0,
-            statusEmpresa: 'Ativa',
-            transCartao: 0, transPix: 0, transTotal: 0,
-            valCartao: 0, valPix: 0, valTotal: 0,
-            pedidos: 0, pedidosPagos: 0, pedidosCancelados: 0, pedidosPendentes: 0,
-            valPedidosPagos: 0, valPedidosCancelados: 0, valPedidosPendentes: 0,
-            linksEnviados: 0, cliques: 0,
-            cartaoImpl: false, pixImpl: false,
-        });
-        matchedCnpjRoots.add(root);
-        addedFromExcel++;
+        if (matchedRoots.has(root)) continue;
+        empresasAtivas.push({ id: 'excel-' + cnpj, cnpj, nomeFantasia: marca.marca || '', nomeDominio: marca.marca || '', anjo: '', canal: marca.canal || '', modulo: '', tags: '', temIntegracao: '', tipoIntegracao: '', criacao: '', idDominio: '', valorPlano: marca.totalCobrado || 0, statusEmpresa: 'Ativa', transCartao: 0, transPix: 0, transTotal: 0, valCartao: 0, valPix: 0, valTotal: 0, pedidos: 0, pedidosPagos: 0, pedidosCancelados: 0, pedidosPendentes: 0, valPedidosPagos: 0, valPedidosCancelados: 0, valPedidosPendentes: 0, linksEnviados: 0, cliques: 0, cartaoImpl: false, pixImpl: false, integracao: '' });
+        matchedRoots.add(root);
+        addedExcel++;
     }
-    if (addedFromExcel > 0) {
-        console.log('  Empresas adicionadas da planilha (sem correspondência no Fabric): ' + addedFromExcel);
-        console.log('  Total empresas: ' + empresasAtivas.length);
-    }
+    console.log('  Empresas ativas: ' + empresasAtivas.length + ' de ' + allEmps.length + ' (+' + addedExcel + ' da planilha)');
 
-    const empresasList = empresasAtivas
+    let empIndex = 0;
+    let empresasList = empresasAtivas
         .map(e => {
             const cnpjNum = (e.cnpj || '').replace(/[.\-\/]/g, '');
             let marca = marcasMap[cnpjNum];
@@ -1033,6 +1297,23 @@ async function main() {
 
             const temVestiPago = vestiPagoSet.has(e.id);
 
+            // Oráculo Fabric (configurations + painel stats)
+            const oraculoConfig = oraculoConfigMap.get(e.id) || null;
+            let oraculoStats = oraculoPainelStats.get(nome.toLowerCase()) || null;
+            if (!oraculoStats && oraculoConfig) {
+                const ocName = (oraculoConfig.name || '').toLowerCase().replace(/^churn\s*-\s*/i, '').replace(/^chrun\s*-\s*/i, '').trim();
+                if (ocName) oraculoStats = oraculoPainelStats.get(ocName) || null;
+                if (!oraculoStats) {
+                    const nNorm = normalize(nome);
+                    for (const [pName, pStats] of oraculoPainelStats) {
+                        const pNorm = normalize(pName);
+                        if (pNorm && nNorm && (nNorm.includes(pNorm) || pNorm.includes(nNorm))) {
+                            oraculoStats = pStats; break;
+                        }
+                    }
+                }
+            }
+
             // Filiais
             const groupRoot = ufFind(e.id);
             const filiaisGroup = filialGroups[groupRoot] || [];
@@ -1080,10 +1361,11 @@ async function main() {
                 valPedidosPendentes: Math.round(e.valPedidosPendentes * 100) / 100,
                 linksEnviados: e.linksEnviados,
                 cliques: e.cliques,
-                anjo: e.anjo,
+                anjo: (metricasMap[e.id] && metricasMap[e.id].cs) || e.anjo,
                 modulo: e.modulo,
                 tags: e.tags,
                 temIntegracao: e.temIntegracao,
+                integracao: e.integracao || '',
                 tipoIntegracao: e.tipoIntegracao,
                 criacao: e.criacao,
                 valorPlano: e.valorPlano,
@@ -1098,23 +1380,84 @@ async function main() {
                 planoObservacoes: marca ? marca.observacoes : '',
                 planoSubconta: marca ? marca.subconta : '',
                 planos: marca && marca.planos ? marca.planos : undefined,
-                marcaAtiva: e.transCartao >= 250 ? 'Sim' : 'Não',
-                statusEmpresa: e.statusEmpresa || 'Ativa',
+                marcaAtiva: metricasMap[e.id] && metricasMap[e.id].statusEmpresa === 'Ativa' ? 'Sim' : metricasMap[e.id] && metricasMap[e.id].statusEmpresa === 'Desativada' ? 'Não' : '',
                 mensalidade,
                 etapaHub,
                 oraculoEtapa,
+                temOraculoFabric: !!(oraculoStats || oraculoConfig),
+                oraculoFabric: (oraculoStats || oraculoConfig) ? {
+                    ...(oraculoConfig || {}),
+                    pedidosOraculo: oraculoStats ? oraculoStats.pedidosOraculo : 0,
+                    interacoesOraculo: oraculoStats ? oraculoStats.interacoesOraculo : 0,
+                    atendimentosOraculo: oraculoStats ? oraculoStats.atendimentosOraculo : 0,
+                    pctIAOraculo: oraculoStats ? oraculoStats.pctIAOraculo : 0,
+                    vendasOraculo: oraculoStats ? oraculoStats.vendasOraculo : 0,
+                    mensal: oraculoStats ? oraculoStats.mensal : undefined,
+                } : undefined,
                 usuario: ctrl ? ctrl.usuario : '',
                 senha: ctrl ? ctrl.senha : '',
                 churnScore,
                 churnRisco,
                 churnMotivos: churnMotivos.length > 0 ? churnMotivos.join('; ') : '',
+                statusEmpresa: metricasMap[e.id] ? metricasMap[e.id].statusEmpresa : '',
+                controleEstoque: metricasMap[e.id] ? metricasMap[e.id].controleEstoque : '',
+                freteAtivo: !!freteByCompany[normalize(nome)],
+                freteTotal: freteByCompany[normalize(nome)] ? freteByCompany[normalize(nome)].total : 0,
+                freteMensal: freteByCompany[normalize(nome)] ? freteByCompany[normalize(nome)].mensal.slice(0, 12) : undefined,
                 naoPagos: e.pedidosPendentes,
+                csat: (() => {
+                    const nk = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+                    if (csatByEmpresa[nk]) return csatByEmpresa[nk];
+                    for (const [ck, cv] of Object.entries(csatByEmpresa)) {
+                        if (ck.length >= 4 && nk.startsWith(ck)) return cv;
+                    }
+                })(),
+                nps: npsMap[String(e.idDominio)] != null ? npsMap[String(e.idDominio)] : undefined,
                 isMatriz: filiaisGroup.length > 1 ? isMatriz : undefined,
                 matrizId: filiaisGroup.length > 1 && !isMatriz ? matrizId : undefined,
                 filiais: filiais.length > 0 ? filiais : undefined,
                 m,
             };
         });
+
+    // ---------- 8b. Match Invoices (Painel CS) to empresas ----------
+    let invoiceMatched = 0;
+    for (const emp of empresasList) {
+        let data = null;
+        // 1. Match by idDominio
+        if (emp.idDominio) data = invoicesByDominio[String(emp.idDominio)];
+        // 2. Fallback: match by nome -> marca
+        if (!data) {
+            const nomeNorm = normalize(emp.nome);
+            data = invoicesByMarca[nomeNorm];
+            if (!data) {
+                for (const [mk, md] of Object.entries(invoicesByMarca)) {
+                    if (mk.length >= 4 && (nomeNorm.startsWith(mk) || mk.startsWith(nomeNorm))) {
+                        data = md; break;
+                    }
+                }
+            }
+        }
+        if (data) {
+            emp.faturamento = {
+                planoIugu: data.plan,
+                totalPago: Math.round(data.paid * 100) / 100,
+                totalPendente: Math.round(data.pending * 100) / 100,
+                totalVencido: Math.round(data.expired * 100) / 100,
+                totalCancelado: Math.round(data.canceled * 100) / 100,
+                qtdFaturas: data.totalInvoices,
+                faturas: data.invoices.sort((a, b) => b.due.localeCompare(a.due)).slice(0, 12).map(f => ({
+                    mes: f.mes,
+                    status: f.status,
+                    total: f.total,
+                })),
+            };
+            invoiceMatched++;
+        }
+    }
+    console.log('  Invoices matched to empresas: ' + invoiceMatched + '/' + empresasList.length);
+
+    // Filtro de empresas ativas já aplicado acima (planilha Marcas e Planos)
 
     // ---------- 9. Build output ----------
     const oraculoSummary = {};

@@ -272,14 +272,17 @@ async function main() {
 
         if (stats || config) {
             e.temOraculoFabric = true;
+            // Merge com dados existentes (preservar vendasMensal do patch-painel-cs)
+            const existing = e.oraculoFabric || {};
             e.oraculoFabric = {
+                ...existing,
                 ...(config || {}),
-                pedidosOraculo: stats ? stats.pedidosOraculo : 0,
-                interacoesOraculo: stats ? stats.interacoesOraculo : 0,
-                atendimentosOraculo: stats ? stats.atendimentosOraculo : 0,
-                pctIAOraculo: stats ? stats.pctIAOraculo : 0,
-                vendasOraculo: stats ? stats.vendasOraculo : 0,
-                vendasMensal: stats && stats.vendasMensal && Object.keys(stats.vendasMensal).length > 0 ? stats.vendasMensal : undefined,
+                pedidosOraculo: stats ? stats.pedidosOraculo : (existing.pedidosOraculo || 0),
+                interacoesOraculo: stats ? stats.interacoesOraculo : (existing.interacoesOraculo || 0),
+                atendimentosOraculo: stats ? stats.atendimentosOraculo : (existing.atendimentosOraculo || 0),
+                pctIAOraculo: stats ? stats.pctIAOraculo : (existing.pctIAOraculo || 0),
+                vendasOraculo: stats && stats.vendasOraculo ? stats.vendasOraculo : (existing.vendasOraculo || 0),
+                vendasMensal: (stats && stats.vendasMensal && Object.keys(stats.vendasMensal).length > 0) ? stats.vendasMensal : (existing.vendasMensal || undefined),
             };
             // Set oraculoEtapa if not already set
             if (!e.oraculoEtapa && stats) {
