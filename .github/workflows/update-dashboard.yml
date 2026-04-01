@@ -47,6 +47,14 @@ jobs:
           FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
         run: node CS-Sucesso-do-cliente/patch-oraculo.js
 
+      - name: Patch Painel CS vendas mensais e invoices
+        continue-on-error: true
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+        run: node CS-Sucesso-do-cliente/patch-painel-cs.js
+
       - name: Atualizar refresh token antes de Pedidos por Marca
         continue-on-error: true
         env:
