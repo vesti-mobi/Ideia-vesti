@@ -674,11 +674,18 @@ function updateEmpresaPanel(){
         const ufEl=document.getElementById('eiUltimaFatura');
         if(show.faturamento&&show.faturamento.faturas&&show.faturamento.faturas.length>0){
             const mesAtual=new Date().toISOString().substring(0,7);
-            const uf=show.faturamento.faturas.find(f=>f.mes<=mesAtual&&f.status!=='canceled')||show.faturamento.faturas.find(f=>f.mes<=mesAtual)||show.faturamento.faturas[0];
             const statusMap={paid:'Pago',pending:'Pendente',expired:'Vencido',canceled:'Cancelado',externally_paid:'Pago ext.'};
             const colorMap={paid:'var(--success)',pending:'var(--warning)',expired:'var(--danger)',canceled:'var(--text-muted)',externally_paid:'var(--success)'};
+            const statusPrio={expired:0,pending:1,paid:2,externally_paid:3,canceled:4};
+            // Achar o mês mais recente com faturas não canceladas
+            const ufRef=show.faturamento.faturas.find(f=>f.mes<=mesAtual&&f.status!=='canceled')||show.faturamento.faturas.find(f=>f.mes<=mesAtual)||show.faturamento.faturas[0];
+            const ufMes=ufRef.mes;
+            // Somar todas as faturas do mesmo mês (exceto canceladas)
+            const faturasMes=show.faturamento.faturas.filter(f=>f.mes===ufMes&&f.status!=='canceled');
+            const ufTotal=faturasMes.reduce((s,f)=>s+f.total,0);
+            const ufStatus=faturasMes.reduce((worst,f)=>(statusPrio[f.status]||99)<(statusPrio[worst]||99)?f.status:worst,faturasMes[0].status);
             const totalCobrado=show.planoTotalCobrado||0;
-            ufEl.innerHTML='<span style="color:'+(colorMap[uf.status]||'var(--text-primary)')+';font-weight:700;">'+(statusMap[uf.status]||uf.status)+'</span> — '+fmtCFull(uf.total)+' <span style="color:var(--text-muted);font-size:11px;">('+uf.mes+')</span>'+(totalCobrado>0?' <span style="color:var(--primary);font-weight:600;font-size:11px;margin-left:6px;">Total Cobrado: '+fmtCFull(totalCobrado)+'</span>':'');
+            ufEl.innerHTML='<span style="color:'+(colorMap[ufStatus]||'var(--text-primary)')+';font-weight:700;">'+(statusMap[ufStatus]||ufStatus)+'</span> — '+fmtCFull(ufTotal)+' <span style="color:var(--text-muted);font-size:11px;">('+ufMes+')</span>'+(totalCobrado>0?' <span style="color:var(--primary);font-weight:600;font-size:11px;margin-left:6px;">Total Cobrado: '+fmtCFull(totalCobrado)+'</span>':'');
         } else if(show.planoTotalCobrado>0){
             ufEl.innerHTML='<span style="color:var(--text-muted);">Sem fatura</span> <span style="color:var(--primary);font-weight:600;font-size:11px;margin-left:6px;">Total Cobrado: '+fmtCFull(show.planoTotalCobrado)+'</span>';
         } else {
