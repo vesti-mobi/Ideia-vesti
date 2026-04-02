@@ -184,8 +184,10 @@ function updateAll(){
     document.getElementById('k-csat').textContent=ca;document.getElementById('k-csat-s').textContent=csat.length?csat.length+' avaliacoes de '+new Set(csat.map(function(r){return r.empresa})).size+' empresas':'Sem dados';
     if(cm.length>=2){var df=(cm[cm.length-1].avg-cm[cm.length-2].avg).toFixed(1);var el=document.getElementById('k-csat-t');el.textContent=(df>=0?'+':'')+df+' vs mes anterior';el.className='kt '+(df>0?'up':df<0?'down':'')}else document.getElementById('k-csat-t').textContent='';
     document.getElementById('k-resp').textContent=nps.length;
-    var aN=new Set(NPS_DATA.map(function(r){return r.empresa})),aC=new Set(CSAT_DATA.map(function(r){return r.empresa})),ab=0;aN.forEach(function(e){if(aC.has(e))ab++});
-    document.getElementById('k-pesq').innerHTML='<b style="color:var(--p)">'+aN.size+'</b> com NPS &nbsp;|&nbsp; <b style="color:var(--s)">'+aC.size+'</b> com CSAT &nbsp;|&nbsp; <b style="color:var(--dk)">'+ab+'</b> com ambos';
+    var cNps=list.filter(function(c){return c.hasNps}).length;
+    var cCsat=list.filter(function(c){return c.hasCsat}).length;
+    var cBoth=list.filter(function(c){return c.hasNps&&c.hasCsat}).length;
+    document.getElementById('k-pesq').innerHTML='<b style="color:var(--p)">'+cNps+'</b> com NPS &nbsp;|&nbsp; <b style="color:var(--s)">'+cCsat+'</b> com CSAT &nbsp;|&nbsp; <b style="color:var(--dk)">'+cBoth+'</b> com ambos';
     // KPI unica resposta NPS
     var kuEl=document.getElementById('kpiUnica'),normEl=document.getElementById('kpiNormal');if(nps.length===1){var r=nps[0];kuEl.style.display='grid';normEl.style.display='none';document.getElementById('ku-nota').textContent=r.nota;document.getElementById('ku-data').textContent=r.data;var cls=r.nota>=9?'Promotor':r.nota>=7?'Neutro':'Detrator';var clr=r.nota>=9?'#00B894':r.nota>=7?'#F39C12':'#E17055';document.getElementById('ku-class').innerHTML='<span style="color:'+clr+'">'+cls+'</span>';document.getElementById('ku-resp-info').textContent='1 resposta em '+r.data;document.getElementById('ku-com').textContent=r.comentario||'Sem comentario'}else{kuEl.style.display='none';normEl.style.display='grid'}
     document.getElementById('k-resp-s').textContent=nps.length?'De '+new Set(nps.map(function(r){return r.empresa})).size+' empresas':'';
