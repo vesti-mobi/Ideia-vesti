@@ -127,20 +127,17 @@ async function main() {
     const fn = new Function(content + '; return DADOS;');
     const DADOS = fn();
 
-    // Match: add NPS to empresas that don't have CSAT
-    let matched = 0, skipped = 0;
+    // Match: always set NPS (even if empresa has CSAT)
+    let matched = 0, withCsat = 0;
     for (const e of DADOS.empresas) {
         const dom = String(e.idDominio || '');
         if (npsMap[dom] != null) {
-            if (e.csat && e.csat.length > 0) {
-                skipped++; // Already has CSAT, skip
-            } else {
-                e.nps = npsMap[dom];
-                matched++;
-            }
+            e.nps = npsMap[dom];
+            matched++;
+            if (e.csat && e.csat.length > 0) withCsat++;
         }
     }
-    console.log('NPS matched:', matched, '| Skipped (has CSAT):', skipped);
+    console.log('NPS matched:', matched, '| Also have CSAT:', withCsat);
 
     const output = 'const DADOS = ' + JSON.stringify(DADOS);
     fs.writeFileSync(path.join(DIR, 'dados.js'), output, 'utf-8');

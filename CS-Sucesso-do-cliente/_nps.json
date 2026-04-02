@@ -1,7 +1,7 @@
 [
   {
     "dominio": "8",
-    "nps": 0
+    "nps": 100
   },
   {
     "dominio": "12",
@@ -9,7 +9,7 @@
   },
   {
     "dominio": "16",
-    "nps": 89.5
+    "nps": 87.5
   },
   {
     "dominio": "57",
@@ -77,7 +77,7 @@
   },
   {
     "dominio": "19261",
-    "nps": 50
+    "nps": 33.3
   },
   {
     "dominio": "22077",
@@ -132,10 +132,6 @@
     "nps": 83.3
   },
   {
-    "dominio": "38651",
-    "nps": 100
-  },
-  {
     "dominio": "41496",
     "nps": 100
   },
@@ -161,7 +157,7 @@
   },
   {
     "dominio": "48202",
-    "nps": 66.7
+    "nps": 33.3
   },
   {
     "dominio": "48997",
@@ -169,7 +165,7 @@
   },
   {
     "dominio": "49554",
-    "nps": 33.3
+    "nps": 0
   },
   {
     "dominio": "50178",
@@ -177,7 +173,7 @@
   },
   {
     "dominio": "50269",
-    "nps": 60
+    "nps": 75
   },
   {
     "dominio": "51962",
@@ -185,10 +181,6 @@
   },
   {
     "dominio": "52808",
-    "nps": 100
-  },
-  {
-    "dominio": "53378",
     "nps": 100
   },
   {
@@ -229,11 +221,11 @@
   },
   {
     "dominio": "68527",
-    "nps": 47.6
+    "nps": 48
   },
   {
     "dominio": "70832",
-    "nps": 50
+    "nps": 66.7
   },
   {
     "dominio": "74171",
@@ -245,15 +237,11 @@
   },
   {
     "dominio": "89170",
-    "nps": 50
-  },
-  {
-    "dominio": "95387",
     "nps": 100
   },
   {
     "dominio": "97181",
-    "nps": 66.7
+    "nps": 100
   },
   {
     "dominio": "103213",
@@ -261,11 +249,11 @@
   },
   {
     "dominio": "105975",
-    "nps": 14.3
+    "nps": 33.3
   },
   {
     "dominio": "107077",
-    "nps": 70.6
+    "nps": 61.5
   },
   {
     "dominio": "107524",
@@ -304,10 +292,6 @@
     "nps": 100
   },
   {
-    "dominio": "123613",
-    "nps": 100
-  },
-  {
     "dominio": "124451",
     "nps": 100
   },
@@ -329,11 +313,11 @@
   },
   {
     "dominio": "129809",
-    "nps": -50
+    "nps": 0
   },
   {
     "dominio": "130315",
-    "nps": 50
+    "nps": 100
   },
   {
     "dominio": "130927",
@@ -341,7 +325,7 @@
   },
   {
     "dominio": "135667",
-    "nps": 50
+    "nps": 40
   },
   {
     "dominio": "135861",
@@ -353,7 +337,7 @@
   },
   {
     "dominio": "139895",
-    "nps": 75
+    "nps": 100
   },
   {
     "dominio": "139911",
@@ -405,7 +389,7 @@
   },
   {
     "dominio": "157680",
-    "nps": 25
+    "nps": 0
   },
   {
     "dominio": "158492",
@@ -433,7 +417,7 @@
   },
   {
     "dominio": "185643",
-    "nps": 60
+    "nps": 33.3
   },
   {
     "dominio": "186110",
@@ -453,7 +437,7 @@
   },
   {
     "dominio": "190250",
-    "nps": 85.7
+    "nps": 100
   },
   {
     "dominio": "192345",
@@ -461,11 +445,11 @@
   },
   {
     "dominio": "202785",
-    "nps": 0
+    "nps": -50
   },
   {
     "dominio": "203228",
-    "nps": 42.9
+    "nps": 50
   },
   {
     "dominio": "218051",
@@ -477,7 +461,7 @@
   },
   {
     "dominio": "240758",
-    "nps": 50
+    "nps": 100
   },
   {
     "dominio": "244109",
@@ -492,10 +476,6 @@
     "nps": 71.4
   },
   {
-    "dominio": "251048",
-    "nps": -100
-  },
-  {
     "dominio": "257448",
     "nps": 100
   },
@@ -506,10 +486,6 @@
   {
     "dominio": "261508",
     "nps": 100
-  },
-  {
-    "dominio": "264639",
-    "nps": 0
   },
   {
     "dominio": "280295",
@@ -525,11 +501,7 @@
   },
   {
     "dominio": "288450",
-    "nps": 66.7
-  },
-  {
-    "dominio": "290692",
-    "nps": 50
+    "nps": 100
   },
   {
     "dominio": "292317",
@@ -561,15 +533,15 @@
   },
   {
     "dominio": "312379",
-    "nps": 25
+    "nps": 0
   },
   {
     "dominio": "313429",
-    "nps": 50
+    "nps": 100
   },
   {
     "dominio": "317136",
-    "nps": 33.3
+    "nps": 100
   },
   {
     "dominio": "317706",
@@ -581,7 +553,7 @@
   },
   {
     "dominio": "323816",
-    "nps": 50
+    "nps": 33.3
   },
   {
     "dominio": "324397",
@@ -604,10 +576,6 @@
     "nps": 100
   },
   {
-    "dominio": "344129",
-    "nps": 0
-  },
-  {
     "dominio": "347376",
     "nps": 100
   },
@@ -617,7 +585,7 @@
   },
   {
     "dominio": "350323",
-    "nps": 66.7
+    "nps": 80
   },
   {
     "dominio": "351565",
@@ -717,7 +685,7 @@
   },
   {
     "dominio": "534132",
-    "nps": 50
+    "nps": 0
   },
   {
     "dominio": "538866",
@@ -729,10 +697,6 @@
   },
   {
     "dominio": "543364",
-    "nps": 100
-  },
-  {
-    "dominio": "548863",
     "nps": 100
   },
   {
@@ -777,7 +741,7 @@
   },
   {
     "dominio": "627689",
-    "nps": 85.7
+    "nps": 83.3
   },
   {
     "dominio": "628065",
@@ -789,7 +753,7 @@
   },
   {
     "dominio": "632540",
-    "nps": 66.7
+    "nps": 100
   },
   {
     "dominio": "641768",
@@ -805,10 +769,6 @@
   },
   {
     "dominio": "650196",
-    "nps": 100
-  },
-  {
-    "dominio": "654724",
     "nps": 100
   },
   {
@@ -837,11 +797,11 @@
   },
   {
     "dominio": "711696",
-    "nps": 80
+    "nps": 75
   },
   {
     "dominio": "712379",
-    "nps": 50
+    "nps": 40
   },
   {
     "dominio": "713252",
@@ -849,7 +809,7 @@
   },
   {
     "dominio": "713811",
-    "nps": 0
+    "nps": -100
   },
   {
     "dominio": "727491",
@@ -857,11 +817,7 @@
   },
   {
     "dominio": "728141",
-    "nps": 33.3
-  },
-  {
-    "dominio": "731799",
-    "nps": 100
+    "nps": 0
   },
   {
     "dominio": "754709",
@@ -869,7 +825,7 @@
   },
   {
     "dominio": "758201",
-    "nps": 25
+    "nps": 33.3
   },
   {
     "dominio": "762147",
@@ -881,7 +837,7 @@
   },
   {
     "dominio": "762660",
-    "nps": 0
+    "nps": -100
   },
   {
     "dominio": "778175",
@@ -909,7 +865,7 @@
   },
   {
     "dominio": "842293",
-    "nps": 83.3
+    "nps": 75
   },
   {
     "dominio": "844604",
@@ -936,12 +892,8 @@
     "nps": 100
   },
   {
-    "dominio": "914287",
-    "nps": 100
-  },
-  {
     "dominio": "917059",
-    "nps": 33.3
+    "nps": 0
   },
   {
     "dominio": "918504",
@@ -957,7 +909,7 @@
   },
   {
     "dominio": "948623",
-    "nps": 43.5
+    "nps": 38.9
   },
   {
     "dominio": "949606",
@@ -965,7 +917,7 @@
   },
   {
     "dominio": "960500",
-    "nps": 50
+    "nps": 100
   },
   {
     "dominio": "961198",
@@ -973,7 +925,7 @@
   },
   {
     "dominio": "961331",
-    "nps": 66.7
+    "nps": 50
   },
   {
     "dominio": "965096",
@@ -1005,7 +957,7 @@
   },
   {
     "dominio": "1017092",
-    "nps": 75
+    "nps": 50
   },
   {
     "dominio": "1024333",
@@ -1021,7 +973,7 @@
   },
   {
     "dominio": "1044170",
-    "nps": 60
+    "nps": 50
   },
   {
     "dominio": "1058361",
@@ -1032,12 +984,8 @@
     "nps": 100
   },
   {
-    "dominio": "1090412",
-    "nps": 100
-  },
-  {
     "dominio": "1094612",
-    "nps": 60
+    "nps": 50
   },
   {
     "dominio": "1098231",
@@ -1061,7 +1009,7 @@
   },
   {
     "dominio": "1123393",
-    "nps": 46.2
+    "nps": 30
   },
   {
     "dominio": "1126062",
@@ -1104,10 +1052,6 @@
     "nps": 0
   },
   {
-    "dominio": "1186697",
-    "nps": -100
-  },
-  {
     "dominio": "1189507",
     "nps": 100
   },
@@ -1140,20 +1084,16 @@
     "nps": 25
   },
   {
-    "dominio": "1264967",
-    "nps": 100
-  },
-  {
     "dominio": "1266888",
     "nps": 100
   },
   {
     "dominio": "1271690",
-    "nps": 75
+    "nps": 100
   },
   {
     "dominio": "1272421",
-    "nps": 33.3
+    "nps": 50
   },
   {
     "dominio": "1278467",
@@ -1169,10 +1109,6 @@
   },
   {
     "dominio": "1291372",
-    "nps": 100
-  },
-  {
-    "dominio": "1294689",
     "nps": 100
   },
   {
@@ -1204,20 +1140,16 @@
     "nps": 100
   },
   {
-    "dominio": "1348564",
-    "nps": 100
-  },
-  {
     "dominio": "1355848",
     "nps": 0
   },
   {
     "dominio": "1361483",
-    "nps": 0
+    "nps": 100
   },
   {
     "dominio": "1372995",
-    "nps": 75
+    "nps": 100
   },
   {
     "dominio": "1375391",
@@ -1242,10 +1174,6 @@
   {
     "dominio": "1409509",
     "nps": -100
-  },
-  {
-    "dominio": "1412742",
-    "nps": 100
   },
   {
     "dominio": "1414238",
@@ -1316,31 +1244,619 @@
     "nps": 0
   },
   {
-    "dominio": "1531346",
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED98B30>",
     "nps": 100
   },
   {
-    "dominio": "1536130",
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED0B6E0>",
     "nps": 100
   },
   {
-    "dominio": "1541315",
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED0ABA0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED098E0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD7C50>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD6FC0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD4CB0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD54F0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1B470>",
     "nps": 0
   },
   {
-    "dominio": "1549925",
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1A8A0>",
     "nps": 100
   },
   {
-    "dominio": "1566528",
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED18E00>",
     "nps": 100
   },
   {
-    "dominio": "1568965",
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED18230>",
     "nps": 100
   },
   {
-    "dominio": "1582558",
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED19FD0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1ACC0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0D310>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED19F70>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED187A0>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED19760>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1BEF0>",
     "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD55E0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD6DB0>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD7CB0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED09940>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED087D0>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED0B770>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED98740>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9B9B0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9A270>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAECF6F90>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAECF4950>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAECF4740>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE40320>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAECF6E10>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED99BE0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9B770>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED990A0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED0B9E0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED08680>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD7D10>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD4F20>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD62D0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1A5D0>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED18740>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1B110>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1AE40>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1A9C0>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1A0C0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED19F10>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1A1E0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE42300>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED19D00>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED18BF0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1B740>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD4A70>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED09C10>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED0A810>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED0BDA0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9BB60>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9A240>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAECF78F0>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAECF5370>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAECF6F30>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021E8DAA5A00>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAECF4B90>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED996A0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED99580>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9A420>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9AD80>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE43A40>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9ACC0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED0B980>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED08770>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD72F0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD5580>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED190A0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0C9B0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0C470>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0E600>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0D940>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0F530>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0F080>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0EA20>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0FE90>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0FDD0>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0FE30>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0EF90>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE4D910>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0ED20>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0F560>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0CF80>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0DFA0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0CBF0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED18B30>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD5340>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED09580>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED0B620>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9AF90>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9B200>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9B8C0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9B7D0>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED985F0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED98920>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED98410>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED991F0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED99250>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE4EED0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED0A360>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD6B70>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1A630>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0CB30>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0E330>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0DC10>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0F860>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE43A70>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE41760>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE40CB0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE40140>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE42A50>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE43740>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE43470>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE43770>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE43680>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE43830>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE58D10>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE43050>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE42480>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE40D10>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE41850>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE43C80>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0F350>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0E480>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1AF30>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEDD66C0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED09820>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9A5D0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED0AFF0>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED09430>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED0A150>",
+    "nps": -100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED09550>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED08470>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED089E0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE5AB40>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED9AC90>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAED1B6E0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0C440>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE0DB20>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE43EF0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE418B0>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE407A0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE42B40>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE4FDA0>",
+    "nps": 0
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE4F4D0>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE4D580>",
+    "nps": 100
+  },
+  {
+    "dominio": "<openpyxl.worksheet.formula.ArrayFormula object at 0x0000021EAEE4CAD0>",
+    "nps": 100
   }
 ]

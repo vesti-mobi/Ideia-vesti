@@ -732,25 +732,30 @@ function updateEmpresaPanel(){
         // CSAT panel
         const csatPanel=document.getElementById('csatPanel');
         const csatContent=document.getElementById('csatContent');
-        if(show.csat&&show.csat.length>0){
+        const hasCsat=show.csat&&show.csat.length>0;
+        const hasNps=show.nps!=null;
+        if(hasCsat||hasNps){
             csatPanel.style.display='block';
-            const mesesNome={'-01':'Jan','-02':'Fev','-03':'Mar','-04':'Abr','-05':'Mai','-06':'Jun','-07':'Jul','-08':'Ago','-09':'Set','-10':'Out','-11':'Nov','-12':'Dez'};
-            csatContent.innerHTML=show.csat.map(c=>{
-                const mesLabel=mesesNome[c.mes.substring(4)]||c.mes;
-                const cor=c.nota>=5?'var(--success)':c.nota>=4?'var(--accent-gold)':c.nota>=3?'var(--warning)':'var(--danger)';
-                let html='<div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:100px;">';
-                html+='<div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);margin-bottom:4px;">'+mesLabel+' '+c.mes.substring(0,4)+'</div>';
-                html+='<div style="font-size:28px;font-weight:800;color:'+cor+';">'+c.nota+'</div>';
-                if(c.obs)html+='<div style="font-size:10px;color:var(--text-muted);margin-top:4px;max-width:150px;" title="'+c.obs+'">'+c.obs.substring(0,40)+(c.obs.length>40?'...':'')+'</div>';
-                html+='</div>';
-                return html;
-            }).join('');
-        } else if(show.nps!=null){
-            csatPanel.style.display='block';
-            const cor=show.nps>=50?'var(--success)':show.nps>=0?'var(--warning)':'var(--danger)';
-            csatContent.innerHTML='<div style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:120px;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);margin-bottom:4px;">NPS</div><div style="font-size:28px;font-weight:800;color:'+cor+';">'+show.nps.toFixed(0)+'</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Net Promoter Score</div></div>';
+            let html='';
+            if(hasCsat){
+                const mesesNome={'-01':'Jan','-02':'Fev','-03':'Mar','-04':'Abr','-05':'Mai','-06':'Jun','-07':'Jul','-08':'Ago','-09':'Set','-10':'Out','-11':'Nov','-12':'Dez'};
+                html+=show.csat.map(c=>{
+                    const mesLabel=mesesNome[c.mes.substring(4)]||c.mes;
+                    const cor=c.nota>=5?'var(--success)':c.nota>=4?'var(--accent-gold)':c.nota>=3?'var(--warning)':'var(--danger)';
+                    let h='<div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:100px;">';
+                    h+='<div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);margin-bottom:4px;">CSAT '+mesLabel+' '+c.mes.substring(0,4)+'</div>';
+                    h+='<div style="font-size:28px;font-weight:800;color:'+cor+';">'+c.nota+'</div>';
+                    if(c.obs)h+='<div style="font-size:10px;color:var(--text-muted);margin-top:4px;max-width:150px;" title="'+c.obs+'">'+c.obs.substring(0,40)+(c.obs.length>40?'...':'')+'</div>';
+                    h+='</div>';
+                    return h;
+                }).join('');
+            }
+            if(hasNps){
+                const cor=show.nps>=50?'var(--success)':show.nps>=0?'var(--warning)':'var(--danger)';
+                html+='<div style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:120px;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);margin-bottom:4px;">NPS</div><div style="font-size:28px;font-weight:800;color:'+cor+';">'+show.nps.toFixed(0)+'</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Net Promoter Score</div></div>';
+            }
+            csatContent.innerHTML=html;
         } else {
-            // Always show panel with "Sem dados" if empresa has oráculo
             if(show.temOraculoFabric||show.oraculoEtapa){
                 csatPanel.style.display='block';
                 csatContent.innerHTML='<div style="background:rgba(90,94,114,0.08);border:1px solid rgba(90,94,114,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:120px;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-secondary);margin-bottom:4px;">CSAT / NPS</div><div style="font-size:18px;font-weight:600;color:var(--text-muted);">Sem dados</div></div>';
@@ -1614,7 +1619,9 @@ function loadApp(){
     document.getElementById('appContent').style.display='block';
     const s=document.createElement('script');s.src='dados.js';
     s.onload=function(){
-        document.getElementById('badgeTotal').textContent=DADOS.totalEmpresas+' empresas';
+        const nEmp=DADOS.empresas.filter(e=>e.isMatriz||!e.isFilial).length;
+        const nFil=DADOS.empresas.filter(e=>e.isFilial&&!e.isMatriz).length;
+        document.getElementById('badgeTotal').textContent=nEmp+' empresas + '+nFil+' filiais';
         document.getElementById('badgeDate').textContent=DADOS.geradoEm?new Date(DADOS.geradoEm).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
         populateFilters();
         // Default period: 2 months back to current month
