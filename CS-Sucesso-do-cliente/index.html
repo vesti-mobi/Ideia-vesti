@@ -695,7 +695,7 @@ function updateEmpresaPanel(){
         if(show.planoAssistente){document.getElementById('eiAssistente').textContent=fmtCFull(show.planoAssistente);document.getElementById('rowAssistente').style.display='';}else{document.getElementById('rowAssistente').style.display='none';}
         if(show.planoFilial){document.getElementById('eiPlanoFilial').textContent=fmtCFull(show.planoFilial);document.getElementById('rowPlanoFilial').style.display='';}else{document.getElementById('rowPlanoFilial').style.display='none';}
         if(show.planoDescontos){document.getElementById('eiDescontos').textContent=fmtCFull(show.planoDescontos);document.getElementById('rowDescontos').style.display='';}else{document.getElementById('rowDescontos').style.display='none';}
-        if(show.planoTotalCobrado){document.getElementById('eiTotalCobrado').textContent=fmtCFull(show.planoTotalCobrado);document.getElementById('rowTotalCobrado').style.display='';}else{document.getElementById('rowTotalCobrado').style.display='none';}
+        document.getElementById('rowTotalCobrado').style.display='none';
         // Frete
         const freteEl=document.getElementById('eiFreteAtivo');
         if(show.freteAtivo){freteEl.innerHTML='<span style="color:var(--success);font-weight:700;">Sim</span>';document.getElementById('eiFreteTotal').textContent=fmtCFull(show.freteTotal);document.getElementById('rowFreteTotal').style.display='';}else{freteEl.innerHTML='<span style="color:var(--text-muted);">Não</span>';document.getElementById('rowFreteTotal').style.display='none';}
