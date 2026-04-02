@@ -802,7 +802,7 @@ async function main() {
 
     // 5c. Pedidos per company (from DAX aggregated query)
     // Cap: ticket médio máximo razoável = R$ 500.000 por pedido (acima disso é dado corrompido)
-    const MAX_TICKET = 500000;
+    const MAX_TICKET = 50000;
     for (const row of pedidosCompanyRows) {
         const empresaId = row['ID Empresa'];
         const emp = empresasMap[empresaId];
