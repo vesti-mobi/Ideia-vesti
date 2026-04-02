@@ -245,7 +245,6 @@
     <div class="empresa-info-item"><strong>Tipo Integração:</strong> <span id="eiTipoInteg">-</span></div>
     <div class="empresa-info-item"><strong>Canal de Vendas:</strong> <span id="eiCanal">-</span></div>
     <div class="empresa-info-item"><strong>Plano:</strong> <span id="eiPlano">-</span></div>
-    <div class="empresa-info-item"><strong>Mensalidade Total:</strong> <span id="eiMensal">-</span></div>
     <div class="empresa-info-item"><strong>Última Fatura:</strong> <span id="eiUltimaFatura">-</span></div>
     <div class="empresa-info-item" id="rowPlanoInteg" style="display:none;"><strong>Integração (Plano):</strong> <span id="eiPlanoInteg">-</span></div>
     <div class="empresa-info-item" id="rowAssistente" style="display:none;"><strong>Assistente:</strong> <span id="eiAssistente">-</span></div>
@@ -671,26 +670,6 @@ function updateEmpresaPanel(){
         document.getElementById('eiCanal').textContent=show.canal||'-';
         // Plano / Financeiro
         document.getElementById('eiPlano').textContent=show.plano||'-';
-        // Mensalidade: show value + status from latest invoice
-        const mensalVal=show.planoMensalidade||show.planoTotalCobrado;
-        const eiMensal=document.getElementById('eiMensal');
-        if(mensalVal&&show.faturamento&&show.faturamento.faturas&&show.faturamento.faturas.length>0){
-            const mesAtualM=new Date().toISOString().substring(0,7);
-            const faturaAtual=show.faturamento.faturas.find(f=>f.mes===mesAtualM&&f.status!=='canceled');
-            const faturaRecente=show.faturamento.faturas.find(f=>f.mes<=mesAtualM&&f.status!=='canceled');
-            const fat=faturaAtual||faturaRecente;
-            if(fat){
-                const sMap={paid:'Pago',pending:'Pendente',expired:'Vencido',externally_paid:'Pago ext.'};
-                const cMap={paid:'var(--success)',pending:'var(--warning)',expired:'var(--danger)',externally_paid:'var(--success)'};
-                eiMensal.innerHTML=fmtCFull(fat.total)+' <span style="color:'+(cMap[fat.status]||'var(--text-primary)')+';font-weight:700;font-size:11px;">'+(sMap[fat.status]||fat.status)+'</span> <span style="color:var(--text-muted);font-size:10px;">('+fat.mes+')</span>';
-            } else {
-                eiMensal.textContent=fmtCFull(mensalVal);
-            }
-        } else if(mensalVal){
-            eiMensal.textContent=fmtCFull(mensalVal);
-        } else {
-            eiMensal.textContent=show.mensalidade||'-';
-        }
         // Última fatura Iugu - status + valor + mês
         const ufEl=document.getElementById('eiUltimaFatura');
         if(show.faturamento&&show.faturamento.faturas&&show.faturamento.faturas.length>0){
@@ -1650,20 +1629,15 @@ function loadApp(){
     };
     document.head.appendChild(s);
 }
-if(localStorage.getItem('auth_cs')==='ok'){
-    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',loadApp);}
-    else{loadApp();}
-}
+// Sempre exigir senha ao carregar/atualizar a página
+localStorage.removeItem('auth_cs');
 // Visitor counter using CountAPI-compatible localStorage + namespace
 (function(){
     const KEY='cs_dashboard_visits';
     let count=parseInt(localStorage.getItem(KEY)||'0',10);
-    // Count once per session
-    if(!sessionStorage.getItem('cs_counted')){
-        count++;
-        localStorage.setItem(KEY,count);
-        sessionStorage.setItem('cs_counted','1');
-    }
+    // Contar cada acesso/atualização
+    count++;
+    localStorage.setItem(KEY,count);
     const el=document.getElementById('badgeVisits');
     if(el) el.textContent=count+' acesso'+(count!==1?'s':'');
 })();
