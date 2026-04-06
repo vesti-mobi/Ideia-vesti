@@ -1,0 +1,218 @@
+{
+  "ticket": "Cliente fora do endpoint listar clientes",
+  "integrador": "UPDash",
+  "cnpj": "57.663.493/0001-67",
+  "companyId": "86341028-49f1-45eb-bce8-b2ebf5f6bcf4",
+  "nomeEmpresa": "{\"CNPJ\":\"45.338.742/0001-60\",\"Anjo\":\"N/A\",\"Integração\":null,\"Tags\":\" feminino\",\"Data Dominio\":\"08/06",
+  "empresaEncontradaNoFabric": true,
+  "cadastroDetalhes": [
+    {
+      "CNPJ": "45.338.742/0001-60",
+      "Anjo": "N/A",
+      "Integração": null,
+      "Tags": " feminino",
+      "Data Dominio": "08/06/2020",
+      "Tem Integração?": "Não",
+      "Id Dominio": 139895,
+      "Nome do Dominio": "Elika",
+      "Id Empresa": "86341028-49f1-45eb-bce8-b2ebf5f6bcf4",
+      "Razao Social": "Confecções Adama Ltda",
+      "Nome Fantasia": "Adama",
+      "Canal de Vendas": "Attasoft",
+      "Modulo": "Vendas e Compras",
+      "Tipo Atacado  Varejo": "Atacado",
+      "Criação do Dominio": "2020-06-08T00:00:00",
+      "Domains.integration_type": null,
+      "Data do Primeiro Pedido VESTIPAGO": null,
+      "CNPJ num": "45338742000160",
+      "Valor Cobrado Plano": 425.33
+    }
+  ],
+  "pedidosRecentes": [
+    {
+      "docs.payment.method": null,
+      "payment.paidAt": "2026-04-01T00:00:00",
+      "settings.source": "Vestishop",
+      "Nome do Dominio": null,
+      "Status Payment": null,
+      "Status": null,
+      "ID Pedido": "69cd0d6a5d89040210074ef9",
+      "ID Empresa": "86341028-49f1-45eb-bce8-b2ebf5f6bcf4",
+      "Data Criacao": "2026-04-01T00:00:00",
+      "ID Dominio": "139895",
+      "dataBase": "Mongo",
+      "Total": 2764.62,
+      "Cancelado": false,
+      "Pago": true,
+      "Pendente": false
+    },
+    {
+      "docs.payment.method": null,
+      "payment.paidAt": null,
+      "settings.source": "Link",
+      "Nome do Dominio": null,
+      "Status Payment": null,
+      "Status": null,
+      "ID Pedido": "69cd1e285b77baedfa081a38",
+      "ID Empresa": "86341028-49f1-45eb-bce8-b2ebf5f6bcf4",
+      "Data Criacao": "2026-04-01T00:00:00",
+      "ID Dominio": "139895",
+      "dataBase": "Mongo",
+      "Total": 1962,
+      "Cancelado": false,
+      "Pago": false,
+      "Pendente": true
+    },
+    {
+      "docs.payment.method": null,
+      "payment.paidAt": "2026-04-02T00:00:00",
+      "settings.source": "Link",
+      "Nome do Dominio": null,
+      "Status Payment": null,
+      "Status": null,
+      "ID Pedido": "69cd2acb737f3bd8460f3b2f",
+      "ID Empresa": "86341028-49f1-45eb-bce8-b2ebf5f6bcf4",
+      "Data Criacao": "2026-04-01T00:00:00",
+      "ID Dominio": "139895",
+      "dataBase": "Mongo",
+      "Total": 1313.1,
+      "Cancelado": false,
+      "Pago": true,
+      "Pendente": false
+    },
+    {
+      "docs.payment.method": null,
+      "payment.paidAt": null,
+      "settings.source": "Link",
+      "Nome do Dominio": null,
+      "Status Payment": null,
+      "Status": null,
+      "ID Pedido": "69cd6652646690177f0fb607",
+      "ID Empresa": "86341028-49f1-45eb-bce8-b2ebf5f6bcf4",
+      "Data Criacao": "2026-04-01T00:00:00",
+      "ID Dominio": "139895",
+      "dataBase": "Mongo",
+      "Total": 2089,
+      "Cancelado": false,
+      "Pago": false,
+      "Pendente": true
+    },
+    {
+      "docs.payment.method": null,
+      "payment.paidAt": "2026-04-02T00:00:00",
+      "settings.source": "Link",
+      "Nome do Dominio": null,
+      "Status Payment": null,
+      "Status": null,
+      "ID Pedido": "69cd6217531bc43ac501d6ea",
+      "ID Empresa": "86341028-49f1-45eb-bce8-b2ebf5f6bcf4",
+      "Data Criacao": "2026-04-01T00:00:00",
+      "ID Dominio": "139895",
+      "dataBase": "Mongo",
+      "Total": 1538.8,
+      "Cancelado": false,
+      "Pago": true,
+      "Pendente": false
+    }
+  ],
+  "pedidosPorMes": [
+    {
+      "Year": 2025,
+      "MonthNo": 1,
+      "Qtd": 41,
+      "Val": 39346.96
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 2,
+      "Qtd": 35,
+      "Val": 62077.76
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 3,
+      "Qtd": 37,
+      "Val": 41843.13
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 4,
+      "Qtd": 49,
+      "Val": 50080.65
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 5,
+      "Qtd": 81,
+      "Val": 71596.53
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 6,
+      "Qtd": 37,
+      "Val": 40791.31
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 7,
+      "Qtd": 26,
+      "Val": 27743.02
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 8,
+      "Qtd": 28,
+      "Val": 37924.11
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 9,
+      "Qtd": 62,
+      "Val": 76297.43
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 10,
+      "Qtd": 90,
+      "Val": 91008.75
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 11,
+      "Qtd": 132,
+      "Val": 104799.95
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 12,
+      "Qtd": 69,
+      "Val": 58228.8
+    },
+    {
+      "Year": 2026,
+      "MonthNo": 1,
+      "Qtd": 32,
+      "Val": 16834.39
+    },
+    {
+      "Year": 2026,
+      "MonthNo": 2,
+      "Qtd": 41,
+      "Val": 46462.83
+    },
+    {
+      "Year": 2026,
+      "MonthNo": 3,
+      "Qtd": 62,
+      "Val": 62110.49
+    },
+    {
+      "Year": 2026,
+      "MonthNo": 4,
+      "Qtd": 10,
+      "Val": 19226.69
+    }
+  ],
+  "analise": "Empresa EXISTE no Fabric com pedidos. O problema é no endpoint da API de listagem de clientes (filtro de data, paginação ou bug no backend). Esse ticket é para o suporte (Teixeira/Priscila/Renata) com os dados abaixo como evidência.",
+  "recomendacao": "Passar para suporte com: (1) empresa existe no Fabric, (2) dados de pedidos comprovam atividade, (3) endpoint específico funciona mas listagem não retorna o cliente."
+}

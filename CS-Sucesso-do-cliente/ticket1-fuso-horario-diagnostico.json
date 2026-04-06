@@ -1,0 +1,90 @@
+{
+  "ticket": "Diferenças relatório outubro vs API (fuso horário)",
+  "diagnostico": "Datas armazenadas em UTC, relatório extrai mês sem converter para BRT (UTC-3)",
+  "impacto": "Pedidos criados entre 00:00-02:59 UTC do dia 1 de cada mês pertencem ao mês anterior em BRT",
+  "pedidosPorMes": [
+    {
+      "Year": 2025,
+      "MonthNo": 1,
+      "TotalPedidos": 41333
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 2,
+      "TotalPedidos": 46065
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 3,
+      "TotalPedidos": 48522
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 4,
+      "TotalPedidos": 56518
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 5,
+      "TotalPedidos": 63570
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 6,
+      "TotalPedidos": 63151
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 7,
+      "TotalPedidos": 57478
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 8,
+      "TotalPedidos": 61673
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 9,
+      "TotalPedidos": 68598
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 10,
+      "TotalPedidos": 70593
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 11,
+      "TotalPedidos": 76573
+    },
+    {
+      "Year": 2025,
+      "MonthNo": 12,
+      "TotalPedidos": 70972
+    },
+    {
+      "Year": 2026,
+      "MonthNo": 1,
+      "TotalPedidos": 52385
+    },
+    {
+      "Year": 2026,
+      "MonthNo": 2,
+      "TotalPedidos": 45918
+    },
+    {
+      "Year": 2026,
+      "MonthNo": 3,
+      "TotalPedidos": 65419
+    },
+    {
+      "Year": 2026,
+      "MonthNo": 4,
+      "TotalPedidos": 6310
+    }
+  ],
+  "pedidosAfetados": [],
+  "correcao": "Criar coluna calculada DataBRT = [Data Criacao] - TIME(3,0,0) no modelo semântico do Power BI",
+  "daxCorrecao": "DataBRT = 'Merged Pedidos'[Data Criacao] - TIME(3, 0, 0)"
+}
