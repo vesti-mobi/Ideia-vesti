@@ -1479,6 +1479,16 @@ async function main() {
         geradoEm: new Date().toISOString(),
     };
 
+    // Sanity check: se os dados vieram com 0 pedidos e 0 meses, algo falhou nas queries DAX.
+    // Nesse caso, NÃO sobrescrever o dados.js existente com dados vazios.
+    const totalGMV = empresasList.reduce((s, e) => s + e.gmv, 0);
+    const totalPedidos = empresasList.reduce((s, e) => s + e.pedidos, 0);
+    if (totalPedidos === 0 && monthlyData.length === 0 && empresasList.length > 0) {
+        console.error('\n*** ABORTING: queries DAX retornaram sem dados (0 pedidos, 0 meses). ***');
+        console.error('*** dados.js NÃO foi atualizado para preservar a versão anterior. ***');
+        process.exit(1);
+    }
+
     const jsonStr = JSON.stringify(output);
     const jsContent = 'const DADOS = ' + jsonStr + ';';
     fs.writeFileSync(path.join(DIR, 'dados.js'), jsContent, 'utf-8');
@@ -1489,8 +1499,6 @@ async function main() {
     console.log('Meses (global): ' + monthlyData.length);
     console.log('Output: dados.js (' + (jsContent.length / 1024).toFixed(0) + ' KB)');
 
-    const totalGMV = empresasList.reduce((s, e) => s + e.gmv, 0);
-    const totalPedidos = empresasList.reduce((s, e) => s + e.pedidos, 0);
     const totalLinks = empresasList.reduce((s, e) => s + e.linksEnviados, 0);
     console.log('Total GMV: R$ ' + totalGMV.toLocaleString('pt-BR', { minimumFractionDigits: 2 }));
     console.log('Total Pedidos: ' + totalPedidos.toLocaleString('pt-BR'));
