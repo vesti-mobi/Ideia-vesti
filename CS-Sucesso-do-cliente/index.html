@@ -488,8 +488,6 @@ const darkLegend={labels:{color:'#f0f2f5',font:{family:'Inter',size:11},padding:
 const darkTooltip={backgroundColor:'#1a1d27',titleColor:'#f0f2f5',bodyColor:'#8b8fa3',borderColor:'#2a2e3d',borderWidth:1,padding:10,titleFont:{family:'Inter',weight:'600'},bodyFont:{family:'Inter'}};
 
 /* ========== STATE ========== */
-// Filtrar somente empresas ativas (statusEmpresa === 'Ativa' ou sem status mas com plano)
-DADOS.empresas=DADOS.empresas.filter(e=>e.statusEmpresa==='Ativa');
 let filtered=[];
 let tablePage=1;
 const PER_PAGE=10;
@@ -1621,6 +1619,7 @@ function loadApp(){
     document.getElementById('appContent').style.display='block';
     const s=document.createElement('script');s.src='dados.js';
     s.onload=function(){
+        DADOS.empresas=DADOS.empresas.filter(e=>e.statusEmpresa==='Ativa');
         const nEmp=DADOS.empresas.filter(e=>e.isMatriz||!e.isFilial).length;
         const nFil=DADOS.empresas.filter(e=>e.isFilial&&!e.isMatriz).length;
         document.getElementById('badgeTotal').textContent=nEmp+' empresas + '+nFil+' filiais';
