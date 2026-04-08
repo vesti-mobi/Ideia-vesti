@@ -35,9 +35,15 @@ const INV_DATASET_ID = '583e34d7-6dd1-467b-86aa-3b74cfe1ca56';
 const METRICAS_WORKSPACE_ID = '786bfd95-0733-4fcb-aa84-ef2c97518959';
 const METRICAS_DATASET_ID = '6d232602-d209-4dab-8be5-d9c34db57c0b';
 
-// Frete - dataset "Relatorio Confeccoes - Agencia"
+// Frete - duas fontes que se complementam:
+// (1) "Relatorio Confeccoes - Agencia" - canal antigo, ~34 empresas, match por nome
+// (2) "Painel Frete" (workspace Vesti / Metricas) - 'OnLog - Fechamento', match por idDominio.
+//     Cobre clientes que o canal (1) nao tem (ex: Arary).
+// Damos merge dos dois mapas; se uma empresa aparece nos dois, somamos.
 const FRETE_WORKSPACE_ID = '0f5bd202-471f-482d-bf3d-38295044d7db';
 const FRETE_DATASET_ID = '92a0cf18-2bfd-4b02-873f-615df3ce2d7f';
+const FRETE2_WORKSPACE_ID = '786bfd95-0733-4fcb-aa84-ef2c97518959';
+const FRETE2_DATASET_ID = '6fd1cfe9-cedc-4028-8d11-b6eb1d653d46';
 
 // Oráculo Fabric workspace + datasets
 const FABRIC_CLIENT_ID = '14d82eec-204b-4c2f-b7e8-296a70dab67e';
@@ -589,11 +595,13 @@ async function main() {
     // Status Empresa + Controle de Estoque - from Confeccao Métricas 2025
     const daxMetricas = `EVALUATE SELECTCOLUMNS(Query1, "id", Query1[Id Empresa], "status", Query1[Status Empresa 2], "estoque", Query1[Controle de Estoque], "cs", Query1[Anjo])`;
 
-    // Frete por empresa/mês - from Relatorio Confeccoes
+    // Frete fonte 1: Relatorio Confeccoes - Agencia (match por nome)
     const daxFrete = `EVALUATE FILTER(SUMMARIZECOLUMNS(Merged[Companies.company_name], Merged[Recebido].[Year], Merged[Recebido].[MonthNo], "TotalFrete", SUM(Merged[Valor Frete])), [TotalFrete] > 0)`;
+    // Frete fonte 2: Painel Frete -> OnLog - Fechamento (match por idDominio)
+    const daxFrete2 = `EVALUATE FILTER(SUMMARIZECOLUMNS('OnLog - Fechamento'[Dominio], 'OnLog - Fechamento'[Data].[Year], 'OnLog - Fechamento'[Data].[MonthNo], "TotalFrete", SUM('OnLog - Fechamento'[ValorPostagem])), [TotalFrete] > 0)`;
 
     // Run all queries in parallel (including VestiPago companies from separate dataset)
-    const [cadastrosRows, configRows, marcasRows, productRows, rankingsRows, pedidosCompanyRows, pedidosMonthlyRows, pedidosCompanyMonthlyRows, vestiPagoRows, linksMonthlyRows, cliquesMonthlyRows, linksCompanyMonthlyRows, cliquesCompanyMonthlyRows, invoiceRows, metricasRows, freteRows] = await Promise.all([
+    const [cadastrosRows, configRows, marcasRows, productRows, rankingsRows, pedidosCompanyRows, pedidosMonthlyRows, pedidosCompanyMonthlyRows, vestiPagoRows, linksMonthlyRows, cliquesMonthlyRows, linksCompanyMonthlyRows, cliquesCompanyMonthlyRows, invoiceRows, metricasRows, freteRows, frete2Rows] = await Promise.all([
         executeDaxQuery(accessToken, daxCadastros, 'Cadastros Empresas'),
         executeDaxQuery(accessToken, daxConfig, 'Config Empresas'),
         executeDaxQuery(accessToken, daxMarcas, 'Marcas e Planos'),
@@ -609,7 +617,8 @@ async function main() {
         executeDaxQuery(accessToken, daxCliquesCompanyMonthly, 'Cliques Company Monthly'),
         executeDaxQueryOn(accessToken, INV_WORKSPACE_ID, INV_DATASET_ID, daxInvoices, 'Invoices Iugu'),
         executeDaxQueryOn(accessToken, METRICAS_WORKSPACE_ID, METRICAS_DATASET_ID, daxMetricas, 'Métricas (Status/Estoque)'),
-        executeDaxQueryOn(accessToken, FRETE_WORKSPACE_ID, FRETE_DATASET_ID, daxFrete, 'Frete por empresa'),
+        executeDaxQueryOn(accessToken, FRETE_WORKSPACE_ID, FRETE_DATASET_ID, daxFrete, 'Frete (Relatorio Confeccoes)'),
+        executeDaxQueryOn(accessToken, FRETE2_WORKSPACE_ID, FRETE2_DATASET_ID, daxFrete2, 'Frete (Painel Frete - OnLog)'),
     ]);
 
     // Build VestiPago set
@@ -625,16 +634,16 @@ async function main() {
     });
     console.log('  Métricas (status/estoque): ' + Object.keys(metricasMap).length);
 
-    // Build Frete map by company name
+    // Fonte 1: Relatorio Confeccoes - Agencia, mapeada por nome normalizado.
     const freteByCompany = {};
     freteRows.forEach(r => {
-        const name = r['Companies.company_name'] || '';
-        const frete = r['TotalFrete'] || 0;
+        const name = r['Companies.company_name'] || r['Merged[Companies.company_name]'] || '';
         const keys = Object.keys(r);
         const yearKey = keys.find(k => k.includes('Year'));
         const monthKey = keys.find(k => k.includes('MonthNo'));
         const year = yearKey ? r[yearKey] : null;
         const month = monthKey ? r[monthKey] : null;
+        const frete = r['[TotalFrete]'] != null ? r['[TotalFrete]'] : (r['TotalFrete'] || 0);
         if (!name || !year || !month) return;
         const mes = year + '-' + String(month).padStart(2, '0');
         const key = normalize(name);
@@ -646,7 +655,51 @@ async function main() {
         c.mensal.sort((a, b) => b.mes.localeCompare(a.mes));
         c.total = Math.round(c.total * 100) / 100;
     }
-    console.log('  Frete companies: ' + Object.keys(freteByCompany).length);
+    console.log('  Frete (Relatorio Confeccoes / nome): ' + Object.keys(freteByCompany).length + ' empresas, R$ ' +
+        Object.values(freteByCompany).reduce((s, c) => s + c.total, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }));
+
+    // Fonte 2: Painel Frete -> OnLog - Fechamento, mapeada por idDominio.
+    const freteByDominio = {};
+    (frete2Rows || []).forEach(r => {
+        const keys = Object.keys(r);
+        const dominioKey = keys.find(k => k.includes('Dominio'));
+        const yearKey = keys.find(k => k.includes('Year'));
+        const monthKey = keys.find(k => k.includes('MonthNo'));
+        const dominio = dominioKey ? r[dominioKey] : null;
+        const year = yearKey ? r[yearKey] : null;
+        const month = monthKey ? r[monthKey] : null;
+        const frete = r['[TotalFrete]'] != null ? r['[TotalFrete]'] : (r['TotalFrete'] || 0);
+        if (!dominio || !year || !month) return;
+        const mes = year + '-' + String(month).padStart(2, '0');
+        const id = String(dominio);
+        if (!freteByDominio[id]) freteByDominio[id] = { mensal: [], total: 0 };
+        freteByDominio[id].mensal.push({ mes, valor: Math.round(frete * 100) / 100 });
+        freteByDominio[id].total += frete;
+    });
+    for (const c of Object.values(freteByDominio)) {
+        c.mensal.sort((a, b) => b.mes.localeCompare(a.mes));
+        c.total = Math.round(c.total * 100) / 100;
+    }
+    console.log('  Frete (Painel Frete / idDominio): ' + Object.keys(freteByDominio).length + ' empresas, R$ ' +
+        Object.values(freteByDominio).reduce((s, c) => s + c.total, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }));
+
+    // Helper: combina os dois mapas para uma empresa especifica.
+    // Soma totais e mensais (mesmo mes vira 1 entrada com soma dos valores).
+    function getFreteCombinado(empresa) {
+        const a = freteByCompany[normalize(empresa.nome)];
+        const b = empresa.idDominio ? freteByDominio[String(empresa.idDominio)] : null;
+        if (!a && !b) return null;
+        if (a && !b) return a;
+        if (b && !a) return b;
+        // Merge
+        const mensalMap = {};
+        a.mensal.forEach(m => { mensalMap[m.mes] = (mensalMap[m.mes] || 0) + m.valor; });
+        b.mensal.forEach(m => { mensalMap[m.mes] = (mensalMap[m.mes] || 0) + m.valor; });
+        const mensal = Object.entries(mensalMap)
+            .map(([mes, valor]) => ({ mes, valor: Math.round(valor * 100) / 100 }))
+            .sort((x, y) => y.mes.localeCompare(x.mes));
+        return { total: Math.round((a.total + b.total) * 100) / 100, mensal };
+    }
 
     // ---------- 2b. Process Invoices (Painel CS) ----------
     const seenInvIds = new Set();
@@ -1401,9 +1454,14 @@ async function main() {
                 churnMotivos: churnMotivos.length > 0 ? churnMotivos.join('; ') : '',
                 statusEmpresa: metricasMap[e.id] ? metricasMap[e.id].statusEmpresa : '',
                 controleEstoque: metricasMap[e.id] ? metricasMap[e.id].controleEstoque : '',
-                freteAtivo: !!freteByCompany[normalize(nome)],
-                freteTotal: freteByCompany[normalize(nome)] ? freteByCompany[normalize(nome)].total : 0,
-                freteMensal: freteByCompany[normalize(nome)] ? freteByCompany[normalize(nome)].mensal.slice(0, 12) : undefined,
+                ...(function () {
+                    const f = getFreteCombinado(e);
+                    return {
+                        freteAtivo: !!f,
+                        freteTotal: f ? f.total : 0,
+                        freteMensal: f ? f.mensal.slice(0, 12) : undefined,
+                    };
+                })(),
                 naoPagos: e.pedidosPendentes,
                 csat: (() => {
                     const nk = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
