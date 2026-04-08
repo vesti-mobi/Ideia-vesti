@@ -1479,14 +1479,49 @@ async function main() {
         geradoEm: new Date().toISOString(),
     };
 
-    // Sanity check: se os dados vieram com 0 pedidos e 0 meses, algo falhou nas queries DAX.
-    // Nesse caso, NÃO sobrescrever o dados.js existente com dados vazios.
+    // Sanity check: comparar contra a versão anterior do dados.js. Se as queries DAX
+    // falharem parcialmente (Fabric devolvendo subconjunto), os totais despencam mas não
+    // chegam a zero — então a checagem precisa ser relativa, não absoluta.
     const totalGMV = empresasList.reduce((s, e) => s + e.gmv, 0);
     const totalPedidos = empresasList.reduce((s, e) => s + e.pedidos, 0);
-    if (totalPedidos === 0 && monthlyData.length === 0 && empresasList.length > 0) {
-        console.error('\n*** ABORTING: queries DAX retornaram sem dados (0 pedidos, 0 meses). ***');
-        console.error('*** dados.js NÃO foi atualizado para preservar a versão anterior. ***');
+    const semStatus = empresasList.filter(e => !e.statusEmpresa).length;
+    const pctSemStatus = empresasList.length > 0 ? semStatus / empresasList.length : 0;
+
+    function abort(motivo) {
+        console.error('\n*** ABORTING BUILD: ' + motivo + ' ***');
+        console.error('*** dados.js NÃO foi sobrescrito — versão anterior preservada. ***');
         process.exit(1);
+    }
+
+    if (totalPedidos === 0 && monthlyData.length === 0 && empresasList.length > 0) {
+        abort('queries DAX retornaram sem dados (0 pedidos, 0 meses)');
+    }
+    if (pctSemStatus > 0.20) {
+        abort('mais de 20% das empresas vieram sem statusEmpresa (' + (pctSemStatus * 100).toFixed(1) + '% — provável falha do dataset CS)');
+    }
+
+    // Comparar com versão anterior do dados.js (se existir) para detectar regressão grande.
+    try {
+        const prevPath = path.join(DIR, 'dados.js');
+        if (fs.existsSync(prevPath)) {
+            const prevTxt = fs.readFileSync(prevPath, 'utf-8');
+            const prev = JSON.parse(prevTxt.replace(/^const DADOS\s*=\s*/, '').replace(/;\s*$/, ''));
+            const prevEmp = (prev.empresas || []).length;
+            const prevGMV = (prev.empresas || []).reduce((s, e) => s + (e.gmv || 0), 0);
+            const prevPed = (prev.empresas || []).reduce((s, e) => s + (e.pedidos || 0), 0);
+
+            if (prevEmp > 0 && empresasList.length < prevEmp * 0.90) {
+                abort('queda de empresas: ' + empresasList.length + ' vs ' + prevEmp + ' anterior (>10%)');
+            }
+            if (prevGMV > 0 && totalGMV < prevGMV * 0.75) {
+                abort('queda de GMV: ' + totalGMV.toFixed(0) + ' vs ' + prevGMV.toFixed(0) + ' anterior (>25%)');
+            }
+            if (prevPed > 0 && totalPedidos < prevPed * 0.75) {
+                abort('queda de Pedidos: ' + totalPedidos + ' vs ' + prevPed + ' anterior (>25%)');
+            }
+        }
+    } catch (err) {
+        console.warn('AVISO: nao foi possivel comparar com dados.js anterior:', err.message);
     }
 
     const jsonStr = JSON.stringify(output);

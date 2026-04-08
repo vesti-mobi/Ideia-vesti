@@ -1619,7 +1619,9 @@ function loadApp(){
     document.getElementById('appContent').style.display='block';
     const s=document.createElement('script');s.src='dados.js';
     s.onload=function(){
-        DADOS.empresas=DADOS.empresas.filter(e=>e.statusEmpresa==='Ativa');
+        // Mostrar empresas Ativas + as sem status preenchido (build parcial nao deve apagar tudo).
+        // Apenas Desativada eh excluida explicitamente.
+        DADOS.empresas=DADOS.empresas.filter(e=>e.statusEmpresa!=='Desativada');
         const nEmp=DADOS.empresas.filter(e=>e.isMatriz||!e.isFilial).length;
         const nFil=DADOS.empresas.filter(e=>e.isFilial&&!e.isMatriz).length;
         document.getElementById('badgeTotal').textContent=nEmp+' empresas + '+nFil+' filiais';
