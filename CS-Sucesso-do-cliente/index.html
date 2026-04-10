@@ -1627,11 +1627,16 @@ function loadApp(){
         document.getElementById('badgeTotal').textContent=nEmp+' empresas + '+nFil+' filiais';
         document.getElementById('badgeDate').textContent=DADOS.geradoEm?new Date(DADOS.geradoEm).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
         populateFilters();
-        // Default period: 2 months back to current month
-        const now=new Date();
-        const _m2=new Date(now.getFullYear(),now.getMonth()-2,1);
-        document.getElementById('fPedDe').value=_m2.getFullYear()+'-'+String(_m2.getMonth()+1).padStart(2,'0');
-        document.getElementById('fPedAte').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+        // Default period: 2 ultimos meses com dados (DADOS.meses), nao "now". O dataset
+        // DAX as vezes esta atrasado em relacao ao calendario — usar new Date() resultava
+        // em filtros vazios e KPIs zerados.
+        const _meses=(DADOS.meses||[]).slice().sort();
+        if(_meses.length>0){
+            const _ate=_meses[_meses.length-1];
+            const _de=_meses.length>=3?_meses[_meses.length-3]:_meses[0];
+            document.getElementById('fPedDe').value=_de;
+            document.getElementById('fPedAte').value=_ate;
+        }
         applyFilters();
         document.querySelectorAll('.filter-select,.filter-date,.filter-input').forEach(el=>el.addEventListener('change',()=>{tablePage=1;applyFilters();}));
         document.getElementById('fAnjo').addEventListener('change',()=>{updateEmpresaDatalist();});
