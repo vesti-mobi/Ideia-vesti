@@ -226,16 +226,15 @@ function runSqlQuery(token, query, label, timeoutMs) {
 
 // ===================== LAKEHOUSE FETCH: empresas ativas via ODBC_Domains =====================
 // Fonte de verdade: ODBC_Domains WHERE modulos LIKE '%vendas%' — todas as marcas com modulo
-// Vendas habilitado sao consideradas ativas. Enriquecemos com Confeccao2025_Query1 (Id Empresa
-// GUID, CNPJ, Status, Anjo, Canal, etc.) e fallback em ODBC_Companies (para os dominios que
-// ainda nao foram ingeridos no Query1).
+// Vendas habilitado, excluindo trial/treino/teste. Cada linha eh uma company de ODBC_Companies
+// (matriz + filiais) — mesmo padrao do PainelCSGerencial. Filiais sao detectadas via
+// ROW_NUMBER() OVER (PARTITION BY domain_id ORDER BY created_at ASC): rn=1 eh matriz, rn>1
+// eh filial. Enriquecemos cada company com Confeccao2025_Query1 (Status, Anjo, Canal, etc.)
+// via JOIN c.id = q.[Id Empresa].
 async function fetchLakehouseEmpresas(sqlToken) {
-    // Exclui partners de Trial e Treino, e dominios com 'teste' no nome (testes internos).
-    // partner_id NULL eh aceito (clientes sem partner). LIKE ja eh case-insensitive na
-    // collation default, mas mantemos as duas variantes pra ficar explicito.
     const q = `
-        WITH vendas AS (
-            SELECT DISTINCT id AS dominio_id FROM dbo.ODBC_Domains
+        WITH active_domains AS (
+            SELECT id, name FROM dbo.ODBC_Domains
             WHERE modulos LIKE '%vendas%'
               AND (partner_id IS NULL OR partner_id NOT IN (
                   'ff66c2f1-1f9f-456c-9308-028e48c89582',
@@ -243,67 +242,60 @@ async function fetchLakehouseEmpresas(sqlToken) {
               ))
               AND name NOT LIKE '%teste%'
               AND name NOT LIKE '%Teste%'
+        ),
+        ranked_companies AS (
+            SELECT
+                c.id, c.domain_id, c.tax_document, c.social_name, c.company_name,
+                c.scheme_url, c.created_at, c.status,
+                ROW_NUMBER() OVER (PARTITION BY c.domain_id ORDER BY c.created_at ASC) AS rn
+            FROM dbo.ODBC_Companies c
+            WHERE c.domain_id IN (SELECT id FROM active_domains)
         )
         SELECT
-            v.dominio_id,
-            q.[Id Empresa]        AS q_id_empresa,
-            q.CNPJ                AS q_cnpj,
-            q.[Nome Fantasia]     AS q_nome_fantasia,
-            q.[Nome do Dominio]   AS q_nome_dominio,
-            q.[Razão Social]      AS q_razao_social,
-            q.[Canal de Vendas]   AS q_canal,
-            q.Anjo                AS q_anjo,
-            q.Integracao          AS q_integracao,
-            q.[Status Empresa]    AS q_status,
-            q.Email               AS q_email,
+            rc.id              AS empresa_id,
+            rc.domain_id       AS dominio_id,
+            rc.tax_document    AS cnpj,
+            rc.social_name     AS razao_social,
+            rc.company_name    AS company_name,
+            rc.scheme_url      AS scheme_url,
+            rc.created_at      AS created_at,
+            rc.status          AS company_status,
+            rc.rn              AS row_num,
+            d.name             AS domain_name,
+            q.[Nome Fantasia]  AS q_nome_fantasia,
+            q.[Status Empresa] AS q_status,
+            q.[Canal de Vendas] AS q_canal,
+            q.Anjo             AS q_anjo,
+            q.Integracao       AS q_integracao,
+            q.Email            AS q_email,
             q.[Tipo _Atacado | Varejo_] AS q_tipo,
-            q.Tags                AS q_tags,
-            q.[Modulos 2]         AS q_modulos,
-            c.id                  AS c_empresa_id,
-            c.tax_document        AS c_cnpj,
-            c.company_name        AS c_nome_fantasia,
-            c.social_name         AS c_razao_social,
-            c.scheme_url          AS c_scheme,
-            c.created_at          AS c_created_at,
-            c.status              AS c_status
-        FROM vendas v
-        LEFT JOIN dbo.Confeccao2025_Query1 q ON v.dominio_id = q.[Id Dominio]
-        OUTER APPLY (
-            SELECT TOP 1 id, tax_document, company_name, social_name, scheme_url, created_at, status
-            FROM dbo.ODBC_Companies
-            WHERE domain_id = v.dominio_id
-            ORDER BY created_at DESC
-        ) c
+            q.Tags             AS q_tags,
+            q.[Modulos 2]      AS q_modulos
+        FROM ranked_companies rc
+        INNER JOIN active_domains d ON d.id = rc.domain_id
+        LEFT JOIN dbo.Confeccao2025_Query1 q ON q.[Id Empresa] = rc.id
     `;
-    const rows = await runSqlQuery(sqlToken, q, 'Lakehouse empresas (vendas)');
-    // Consolida: pode ter multiplas linhas Q1 por dominio (varias empresas no mesmo dominio).
-    // Preferimos a linha com Id Empresa preenchido e Status = 1 (Ativa).
-    const byDominio = new Map();
-    for (const r of rows) {
-        const dominioId = r.dominio_id;
-        if (dominioId == null) continue;
-        const existing = byDominio.get(dominioId);
-        const hasId = !!r.q_id_empresa;
-        const isAtiva = r.q_status === 1;
-        if (!existing) { byDominio.set(dominioId, r); continue; }
-        // Prefer existing if it already has id+ativa
-        const exHasId = !!existing.q_id_empresa;
-        const exIsAtiva = existing.q_status === 1;
-        if (exHasId && exIsAtiva) continue;
-        if (hasId && isAtiva) { byDominio.set(dominioId, r); continue; }
-        if (hasId && !exHasId) { byDominio.set(dominioId, r); continue; }
-    }
-    // Normaliza pro formato que build usa
+    const rows = await runSqlQuery(sqlToken, q, 'Lakehouse empresas (vendas + filiais)');
+
     const empresas = [];
-    for (const [dominioId, r] of byDominio) {
+    for (const r of rows) {
+        const empresaId = r.empresa_id;
+        if (!empresaId) continue;
+        const isFilial = (r.row_num || 1) > 1;
         const statusText = r.q_status === 1 ? 'Ativa' : r.q_status === 2 ? 'Desativada' : '';
         empresas.push({
-            dominioId,
-            id: r.q_id_empresa || r.c_empresa_id || '',
-            cnpj: r.q_cnpj || r.c_cnpj || '',
-            nomeFantasia: r.q_nome_fantasia || r.c_nome_fantasia || '',
-            nomeDominio: r.q_nome_dominio || r.c_scheme || '',
-            razaoSocial: r.q_razao_social || r.c_razao_social || '',
+            id: empresaId,
+            dominioId: r.dominio_id,
+            rn: r.row_num || 1,
+            isFilial,
+            isMatriz: !isFilial,
+            cnpj: r.cnpj || '',
+            razaoSocial: r.razao_social || r.company_name || '',
+            // nomeFantasia: pra matriz prefere domain_name (consistente com PainelCSGerencial),
+            // pra filial usa company_name (nome especifico da filial)
+            nomeFantasia: isFilial ? (r.company_name || r.domain_name || '') : (r.q_nome_fantasia || r.company_name || r.domain_name || ''),
+            nomeDominio: r.domain_name || r.scheme_url || '',
+            schemeUrl: r.scheme_url || '',
             canal: r.q_canal || '',
             anjo: r.q_anjo || '',
             integracao: r.q_integracao || '',
@@ -312,13 +304,15 @@ async function fetchLakehouseEmpresas(sqlToken) {
             tipoAtacado: r.q_tipo || '',
             tags: r.q_tags || '',
             modulos: r.q_modulos || '',
-            criacao: r.c_created_at ? (r.c_created_at.toISOString ? r.c_created_at.toISOString() : String(r.c_created_at)) : '',
+            criacao: r.created_at ? (r.created_at.toISOString ? r.created_at.toISOString() : String(r.created_at)) : '',
             fromLakehouse: true,
         });
     }
-    console.log('  Lakehouse empresas consolidadas: ' + empresas.length +
-        ' (com Id Empresa GUID: ' + empresas.filter(e => e.id).length +
-        ', status Ativa: ' + empresas.filter(e => e.statusEmpresa === 'Ativa').length + ')');
+    const matrizes = empresas.filter(e => !e.isFilial).length;
+    const filiais = empresas.filter(e => e.isFilial).length;
+    console.log('  Lakehouse empresas: ' + empresas.length +
+        ' (' + matrizes + ' matrizes + ' + filiais + ' filiais, ' +
+        empresas.filter(e => e.statusEmpresa === 'Ativa').length + ' Ativa)');
     return empresas;
 }
 
@@ -807,10 +801,14 @@ async function main() {
     // antigo baseado em Marcas e Planos (Excel) + Cadastros Empresas (DAX).
     console.log('\nFetching empresas ativas do Lakehouse (ODBC_Domains vendas)...');
     const lakehouseEmpresas = await fetchLakehouseEmpresas(sqlToken);
-    const vendasDomainIds = new Set(lakehouseEmpresas.map(e => e.dominioId));
-    const lakehouseByDominio = new Map(lakehouseEmpresas.map(e => [e.dominioId, e]));
+    // Index por id (c.id de ODBC_Companies, mesmo GUID de Merged Pedidos[ID Empresa])
     const lakehouseByEmpresaId = new Map();
     lakehouseEmpresas.forEach(e => { if (e.id) lakehouseByEmpresaId.set(e.id, e); });
+    // Index por dominio (qualquer linha do dominio serve como fallback de enriquecimento)
+    const lakehouseByDominio = new Map();
+    lakehouseEmpresas.forEach(e => {
+        if (!lakehouseByDominio.has(e.dominioId)) lakehouseByDominio.set(e.dominioId, e);
+    });
 
     // ---------- 2. Query Power BI tables in parallel ----------
     console.log('\nQuerying Power BI DAX API...');
@@ -1394,148 +1392,106 @@ async function main() {
         cliques: cliquesMensais[m] || 0,
     }));
 
-    // ---------- 7b. Build filiais map (Union-Find by CNPJ root + Domain ID) ----------
-    const ufParent = {};
-    function ufFind(x) { if (ufParent[x] !== x) ufParent[x] = ufFind(ufParent[x]); return ufParent[x]; }
-    function ufUnion(a, b) { const pa = ufFind(a), pb = ufFind(b); if (pa !== pb) ufParent[pa] = pb; }
-
-    const allEmpIds = Object.values(empresasMap).filter(e => e.id).map(e => e.id);
-    allEmpIds.forEach(id => { ufParent[id] = id; });
-
-    // Strategy A: group by CNPJ root (first 8 digits of 14-digit CNPJ)
-    const cnpjRootMap = {};
-    Object.values(empresasMap).forEach(e => {
-        const clean = (e.cnpj || '').replace(/[.\-\/]/g, '');
-        if (clean.length >= 14 && e.id) {
-            const root = clean.substring(0, 8);
-            if (!cnpjRootMap[root]) cnpjRootMap[root] = [];
-            cnpjRootMap[root].push(e.id);
-        }
-    });
-    Object.values(cnpjRootMap).forEach(ids => {
-        if (ids.length > 1 && ids.length <= 20) {
-            for (let i = 1; i < ids.length; i++) ufUnion(ids[0], ids[i]);
-        }
-    });
-
-    // Strategy B: group by Domínio ID
-    const domIdMap = {};
-    Object.values(empresasMap).forEach(e => {
-        if (e.idDominio && e.id) {
-            if (!domIdMap[e.idDominio]) domIdMap[e.idDominio] = [];
-            domIdMap[e.idDominio].push(e.id);
-        }
-    });
-    Object.values(domIdMap).forEach(ids => {
-        if (ids.length > 1 && ids.length <= 15) {
-            for (let i = 1; i < ids.length; i++) ufUnion(ids[0], ids[i]);
-        }
-    });
-
-    // Build final groups
+    // ---------- 7b. Filial detection: agora vem do lakehouse (ROW_NUMBER PARTITION BY domain_id)
+    // Inicializa estruturas vazias — populadas apos o loop empresasAtivas (linha ~1495).
     const filialGroups = {};
-    Object.values(empresasMap).forEach(e => {
-        if (!e.id) return;
-        const root = ufFind(e.id);
-        if (!filialGroups[root]) filialGroups[root] = [];
-        filialGroups[root].push(e);
-    });
-    const groupsWithFiliais = Object.values(filialGroups).filter(g => g.length > 1);
-    console.log('  Filial groups detected: ' + groupsWithFiliais.length + ' (total companies in groups: ' + groupsWithFiliais.reduce((s, g) => s + g.length, 0) + ')');
-
-    // Identify matriz in each group
     const matrizIds = new Set();
-    for (const group of groupsWithFiliais) {
-        const withInfo = group.map(e => {
-            const clean = (e.cnpj || '').replace(/[.\-\/]/g, '');
-            const branchNum = clean.length >= 12 ? clean.substring(8, 12) : '9999';
-            const cnpjRoot = clean.length >= 8 ? clean.substring(0, 8) : '';
-            const nome = e.nomeFantasia || e.nomeDominio || '';
-            return { emp: e, branchNum, cnpjRoot, orders: e.pedidos || 0, nameLen: nome.length };
-        });
-        const roots0001 = new Set(withInfo.filter(x => x.branchNum === '0001').map(x => x.cnpjRoot));
-        withInfo.sort((a, b) => {
-            const aIs0001 = a.branchNum === '0001';
-            const bIs0001 = b.branchNum === '0001';
-            if (aIs0001 && !bIs0001 && roots0001.size === 1) return -1;
-            if (bIs0001 && !aIs0001 && roots0001.size === 1) return 1;
-            if (b.orders !== a.orders) return b.orders - a.orders;
-            return a.nameLen - b.nameLen;
-        });
-        matrizIds.add(withInfo[0].emp.id);
-    }
+    function ufFind(x) { return x; } // identidade — cada empresa eh seu proprio "root"
 
     // ---------- 8. Build final empresas list ----------
     console.log('\nBuilding empresas list...');
 
-    // Filtrar empresas: manter apenas as que tem modulo "vendas" habilitado no ODBC_Domains
-    // (lakehouse VestiHouse). Esta eh a fonte de verdade de marca ativa — substitui o filtro
-    // antigo baseado em Marcas e Planos do Excel.
-    const allEmps = Object.values(empresasMap).filter(e => e.nomeFantasia || e.nomeDominio);
-    const empresasAtivas = allEmps.filter(e => {
-        const dom = e.idDominio != null ? Number(e.idDominio) : NaN;
-        return Number.isFinite(dom) && vendasDomainIds.has(dom);
-    });
-    // Enriquece com statusEmpresa vindo do Lakehouse (Confeccao2025_Query1) — fonte mais
-    // atualizada que a DAX Metricas (CS 2024 incompleto).
+    // FONTE DE VERDADE: lakehouse retorna 1 linha por (dominio × company) — matrizes + filiais
+    // expandidas via ROW_NUMBER. Cada linha vira uma "empresa" no dashboard, com id = c.id
+    // (= [Id Empresa] do Cadastros DAX e do Merged Pedidos, ja validado). Para cada lakehouse
+    // empresa, usamos a entry do empresasMap (vinda do Cadastros DAX) se existir, senao
+    // criamos um stub. Em ambos casos enriquecemos com dados do lakehouse.
+    const empresasAtivas = [];
+    let addedLakehouse = 0;
+    let enrichedFromCadastros = 0;
+    for (const lh of lakehouseEmpresas) {
+        let emp = empresasMap[lh.id];
+        if (!emp) {
+            // Cria stub mantendo a mesma shape do empresasMap original
+            emp = {
+                id: lh.id,
+                cnpj: lh.cnpj,
+                anjo: lh.anjo,
+                integracao: lh.integracao,
+                tags: lh.tags,
+                temIntegracao: lh.integracao ? 'Sim' : '',
+                idDominio: lh.dominioId,
+                nomeDominio: lh.nomeDominio,
+                nomeFantasia: lh.nomeFantasia,
+                razaoSocial: lh.razaoSocial,
+                canal: lh.canal,
+                modulo: lh.modulos,
+                tipoAtacado: lh.tipoAtacado,
+                criacao: lh.criacao,
+                tipoIntegracao: '',
+                dataPrimeiroPedido: '',
+                valorPlano: 0,
+                statusEmpresa: lh.statusEmpresa || '',
+                transCartao: 0, transPix: 0, transTotal: 0,
+                valCartao: 0, valPix: 0, valTotal: 0,
+                pedidos: 0, pedidosPagos: 0, pedidosCancelados: 0, pedidosPendentes: 0,
+                valPedidosPagos: 0, valPedidosCancelados: 0, valPedidosPendentes: 0,
+                linksEnviados: 0, cliques: 0,
+                cartaoImpl: false, pixImpl: false,
+            };
+            empresasMap[lh.id] = emp;
+            addedLakehouse++;
+        } else {
+            enrichedFromCadastros++;
+            // Cadastros DAX existe — preenche campos vazios com lakehouse mas mantem
+            // os dados do Cadastros como prioridade (ele tem mais campos)
+            if (!emp.idDominio) emp.idDominio = lh.dominioId;
+            if (!emp.cnpj) emp.cnpj = lh.cnpj;
+            if (!emp.nomeFantasia) emp.nomeFantasia = lh.nomeFantasia;
+            if (!emp.nomeDominio) emp.nomeDominio = lh.nomeDominio;
+            if (!emp.razaoSocial) emp.razaoSocial = lh.razaoSocial;
+            if (!emp.canal) emp.canal = lh.canal;
+            if (!emp.anjo) emp.anjo = lh.anjo;
+            if (!emp.integracao) emp.integracao = lh.integracao;
+        }
+        // Lakehouse Q1 statusEmpresa eh sempre prioritario (mais atualizado que DAX Metricas)
+        if (lh.statusEmpresa) emp.statusEmpresa = lh.statusEmpresa;
+        // Marcadores de matriz/filial vindos do ROW_NUMBER do lakehouse
+        emp.isMatriz = lh.isMatriz;
+        emp.isFilial = lh.isFilial;
+        emp.lakehouseRn = lh.rn;
+        empresasAtivas.push(emp);
+    }
+    console.log('  Empresas do lakehouse: ' + empresasAtivas.length +
+        ' (' + enrichedFromCadastros + ' enriched do Cadastros DAX, ' +
+        addedLakehouse + ' stubs novos)');
+
+    // Popula filialGroups/matrizIds usando o ROW_NUMBER do lakehouse: empresas com mesmo
+    // dominioId formam grupo, rn=1 (mais antiga em ODBC_Companies) eh a matriz.
     empresasAtivas.forEach(e => {
-        const lh = lakehouseByDominio.get(Number(e.idDominio));
-        if (lh && lh.statusEmpresa) {
-            e.statusEmpresa = lh.statusEmpresa;
+        if (!e.idDominio) return;
+        const key = String(e.idDominio);
+        if (!filialGroups[key]) filialGroups[key] = [];
+        filialGroups[key].push(e);
+        if (e.isMatriz) matrizIds.add(e.id);
+    });
+    // Para cada grupo, garante que tem pelo menos 1 matriz (caso o lakehouse nao tenha marcado)
+    Object.values(filialGroups).forEach(group => {
+        if (!group.some(e => matrizIds.has(e.id))) {
+            // Fallback: marca a primeira como matriz
+            const sorted = [...group].sort((a, b) => (a.lakehouseRn || 999) - (b.lakehouseRn || 999));
+            if (sorted[0]) matrizIds.add(sorted[0].id);
         }
     });
-    // Dominios vendas do lakehouse que nao estao no Cadastros Empresas DAX: adiciona stubs
-    // pra nao perder cobertura. Keys sintetizadas se Q1 nao tiver GUID.
-    const knownDominios = new Set();
-    empresasAtivas.forEach(e => { if (e.idDominio) knownDominios.add(Number(e.idDominio)); });
-    let addedLakehouse = 0;
-    for (const lh of lakehouseEmpresas) {
-        if (knownDominios.has(lh.dominioId)) continue;
-        const empresaId = lh.id || ('lakehouse-' + lh.dominioId);
-        empresasAtivas.push({
-            id: empresaId,
-            cnpj: lh.cnpj,
-            nomeFantasia: lh.nomeFantasia,
-            nomeDominio: lh.nomeDominio,
-            razaoSocial: lh.razaoSocial,
-            canal: lh.canal,
-            anjo: lh.anjo,
-            integracao: lh.integracao,
-            tags: lh.tags,
-            temIntegracao: lh.integracao ? 'Sim' : '',
-            idDominio: lh.dominioId,
-            modulo: lh.modulos,
-            tipoAtacado: lh.tipoAtacado,
-            criacao: lh.criacao,
-            tipoIntegracao: '',
-            dataPrimeiroPedido: '',
-            valorPlano: 0,
-            statusEmpresa: lh.statusEmpresa || '',
-            transCartao: 0, transPix: 0, transTotal: 0,
-            valCartao: 0, valPix: 0, valTotal: 0,
-            pedidos: 0, pedidosPagos: 0, pedidosCancelados: 0, pedidosPendentes: 0,
-            valPedidosPagos: 0, valPedidosCancelados: 0, valPedidosPendentes: 0,
-            linksEnviados: 0, cliques: 0,
-            cartaoImpl: false, pixImpl: false,
-        });
-        empresasMap[empresaId] = empresasAtivas[empresasAtivas.length - 1];
-        addedLakehouse++;
-    }
-    console.log('  Empresas adicionadas do Lakehouse (nao estavam em Cadastros DAX): ' + addedLakehouse);
+    const groupsWithFiliais = Object.values(filialGroups).filter(g => g.length > 1);
+    console.log('  Filial groups (lakehouse): ' + groupsWithFiliais.length +
+        ' grupos com filial, ' + groupsWithFiliais.reduce((s, g) => s + g.length, 0) + ' empresas total nos grupos');
 
-    // Continua adicionando empresas do Excel Marcas e Planos que nao foram cobertas,
-    // mas agora *apenas* quando o CNPJ ainda nao esta no conjunto (legacy, pouco usado).
-    const matchedRoots = new Set();
-    empresasAtivas.forEach(e => { const c = (e.cnpj || '').replace(/[.\-\/]/g, ''); if (c.length >= 8) matchedRoots.add(c.substring(0, 8)); });
-    let addedExcel = 0;
-    for (const [cnpj, marca] of Object.entries(marcasMap)) {
-        const root = cnpj.length >= 8 ? cnpj.substring(0, 8) : cnpj;
-        if (matchedRoots.has(root)) continue;
-        empresasAtivas.push({ id: 'excel-' + cnpj, cnpj, nomeFantasia: marca.marca || '', nomeDominio: marca.marca || '', anjo: '', canal: marca.canal || '', modulo: '', tags: '', temIntegracao: '', tipoIntegracao: '', criacao: '', idDominio: '', valorPlano: marca.totalCobrado || 0, statusEmpresa: 'Ativa', transCartao: 0, transPix: 0, transTotal: 0, valCartao: 0, valPix: 0, valTotal: 0, pedidos: 0, pedidosPagos: 0, pedidosCancelados: 0, pedidosPendentes: 0, valPedidosPagos: 0, valPedidosCancelados: 0, valPedidosPendentes: 0, linksEnviados: 0, cliques: 0, cartaoImpl: false, pixImpl: false, integracao: '' });
-        matchedRoots.add(root);
-        addedExcel++;
-    }
-    console.log('  Empresas ativas: ' + empresasAtivas.length + ' de ' + allEmps.length + ' (+' + addedExcel + ' da planilha)');
+    // Excel Marcas e Planos NAO eh mais usado como fonte de empresas — apenas pra
+    // enriquecimento de plano/mensalidade no map abaixo (marcasMap[cnpjNum]). A fonte
+    // unica de marcas ativas eh ODBC_Domains do lakehouse.
+    const addedExcel = 0;
+    console.log('  Empresas ativas: ' + empresasAtivas.length + ' (fonte unica: lakehouse ODBC_Domains)');
 
     let empIndex = 0;
     let empresasList = empresasAtivas
@@ -1686,8 +1642,8 @@ async function main() {
                 }
             }
 
-            // Filiais
-            const groupRoot = ufFind(e.id);
+            // Filiais: agrupadas por idDominio (lakehouse), nao mais por UF
+            const groupRoot = String(e.idDominio || e.id);
             const filiaisGroup = filialGroups[groupRoot] || [];
             const isMatriz = matrizIds.has(e.id);
             const matrizEmp = filiaisGroup.find(f => matrizIds.has(f.id));
