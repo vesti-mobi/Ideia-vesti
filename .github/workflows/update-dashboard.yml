@@ -35,7 +35,10 @@ jobs:
         continue-on-error: true
         run: |
           if [ -f CS-Sucesso-do-cliente/.new_refresh_token ]; then
-            echo "FABRIC_REFRESH_TOKEN=$(cat CS-Sucesso-do-cliente/.new_refresh_token)" >> $GITHUB_ENV
+            NEW_TOKEN=$(cat CS-Sucesso-do-cliente/.new_refresh_token)
+            # Mascara o token nos logs (sem isso, qualquer step que printe env mostra o token em texto puro)
+            echo "::add-mask::$NEW_TOKEN"
+            echo "FABRIC_REFRESH_TOKEN=$NEW_TOKEN" >> $GITHUB_ENV
           fi
 
       - name: Patch Painel CS vendas mensais e invoices
@@ -85,7 +88,12 @@ jobs:
         run: |
           if [ -f CS-Sucesso-do-cliente/.new_refresh_token ]; then
             NEW_TOKEN=$(cat CS-Sucesso-do-cliente/.new_refresh_token)
-            gh secret set FABRIC_REFRESH_TOKEN --body "$NEW_TOKEN" || echo "WARN nao atualizou secret"
+            echo "::add-mask::$NEW_TOKEN"
+            if [ -n "$GH_TOKEN" ]; then
+              gh secret set FABRIC_REFRESH_TOKEN --body "$NEW_TOKEN" && echo "Secret rotacionado" || echo "WARN: gh secret set falhou"
+            else
+              echo "WARN: GH_PAT nao configurado — secret nao sera rotacionado (token vai expirar)"
+            fi
             echo "FABRIC_REFRESH_TOKEN=$NEW_TOKEN" >> $GITHUB_ENV
             rm -f CS-Sucesso-do-cliente/.new_refresh_token
           fi
