@@ -105,6 +105,14 @@ jobs:
           FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
         run: node Pedidos-por-Marca/build-cloud.js
 
+      - name: Rebuild Novos VestiPago via Fabric lakehouse
+        continue-on-error: true
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+        run: node NovosVestiPago/build.js
+
       - name: Verificar se houve alteracao
         id: check
         run: |
@@ -116,7 +124,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add CS-Sucesso-do-cliente/dados.js Pedidos-por-Marca/dados.js Pedidos-por-Marca/chunks.js Pedidos-por-Marca/data/
+          git add CS-Sucesso-do-cliente/dados.js Pedidos-por-Marca/dados.js Pedidos-por-Marca/chunks.js Pedidos-por-Marca/data/ NovosVestiPago/dados.js
           git commit -m "Atualizacao automatica completa $(date +'%d/%m/%Y %H:%M')"
           # Retry com rebase em caso de race condition (alguem pushou durante o run)
           for i in 1 2 3; do

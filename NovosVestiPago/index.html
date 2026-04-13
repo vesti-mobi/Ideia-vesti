@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Novos VestiPago</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--p:#6C5CE7;--g:#00B894;--r:#E17055;--y:#F39C12;--bg:#F5F6FA;--card:#fff;--tx:#2D3436;--mut:#636E72;--bd:#DFE6E9;--rd:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);padding:24px;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto}
+.top{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#6C5CE7,#00B894);color:#fff;padding:20px 28px;border-radius:var(--rd);margin-bottom:20px}
+.top h1{font-size:22px;font-weight:800;letter-spacing:-.2px}
+.top .sub{font-size:13px;opacity:.88;margin-top:2px}
+.top .info{margin-left:auto;text-align:right;font-size:12px;opacity:.9}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.kpi{background:var(--card);border-radius:var(--rd);padding:18px 22px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.kpi .lbl{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+.kpi .val{font-size:28px;font-weight:800;margin-top:6px;color:var(--p)}
+.kpi.green .val{color:var(--g)}
+.kpi.orange .val{color:var(--y)}
+.filters{display:flex;gap:12px;align-items:flex-end;background:var(--card);border-radius:var(--rd);padding:16px 20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);flex-wrap:wrap}
+.fg{display:flex;flex-direction:column;gap:4px;min-width:180px}
+.fg label{font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+.fg select,.fg input{padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font:14px 'Inter',sans-serif;outline:none;background:#fff}
+.fg select:focus,.fg input:focus{border-color:var(--p)}
+.clear-btn{padding:10px 16px;background:var(--p);color:#fff;border:none;border-radius:8px;font:600 13px 'Inter',sans-serif;cursor:pointer;height:38px}
+.clear-btn:hover{opacity:.9}
+.tbl-card{background:var(--card);border-radius:var(--rd);padding:16px 4px 8px;box-shadow:0 2px 8px rgba(0,0,0,.04);overflow:hidden}
+.tbl-head{display:flex;align-items:center;justify-content:space-between;padding:0 20px 12px;border-bottom:1px solid var(--bd)}
+.tbl-head h3{font-size:15px;font-weight:700}
+.tbl-head .count{font-size:12px;color:var(--mut)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:12px 20px;font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;background:#FAFBFC;border-bottom:1px solid var(--bd)}
+td{padding:12px 20px;border-bottom:1px solid #F1F2F4;vertical-align:middle}
+tr:hover td{background:#FAFBFC}
+td.money{font-weight:700;color:var(--g);text-align:right;white-space:nowrap}
+td.n{text-align:right;color:var(--mut)}
+td.date{color:var(--mut);white-space:nowrap}
+.marca{font-weight:600;color:var(--tx)}
+.cs-badge{display:inline-block;padding:3px 10px;background:#F0EFFF;color:var(--p);border-radius:12px;font-size:11px;font-weight:600}
+.empty{text-align:center;padding:40px;color:var(--mut)}
+@media(max-width:720px){.kpis{grid-template-columns:1fr}.filters{flex-direction:column;align-items:stretch}.top{flex-direction:column;align-items:flex-start}.top .info{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top">
+        <img src="../CS-Sucesso-do-cliente/logo-vesti.png" alt="Vesti" style="height:44px;width:auto" onerror="this.style.display='none'">
+        <div>
+            <h1>Novos VestiPago</h1>
+            <div class="sub">Clientes cujo primeiro pedido VestiPago (PIX ou Cartão) foi a partir de <b id="dtInicio">--</b></div>
+        </div>
+        <div class="info">Atualizado em <span id="dtGerado">--</span></div>
+    </div>
+
+    <div class="kpis">
+        <div class="kpi"><div class="lbl">Clientes novos</div><div class="val" id="kpiN">--</div></div>
+        <div class="kpi green"><div class="lbl">Valor transacionado no período</div><div class="val" id="kpiVal">R$ --</div></div>
+        <div class="kpi orange"><div class="lbl">Total de pedidos</div><div class="val" id="kpiPed">--</div></div>
+    </div>
+
+    <div class="filters">
+        <div class="fg">
+            <label>CS responsável</label>
+            <select id="fCS"><option value="">Todos</option></select>
+        </div>
+        <div class="fg" style="flex:1">
+            <label>Marca (busca)</label>
+            <input type="text" id="fMarca" placeholder="Digite o nome da marca...">
+        </div>
+        <button class="clear-btn" onclick="clearFilters()">Limpar</button>
+    </div>
+
+    <div class="tbl-card">
+        <div class="tbl-head">
+            <h3>Clientes</h3>
+            <span class="count" id="tblCount">--</span>
+        </div>
+        <div style="overflow-x:auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>CS</th>
+                    <th>Marca</th>
+                    <th>Primeiro pedido VP</th>
+                    <th style="text-align:right">Valor no período</th>
+                    <th style="text-align:right">Qtd pedidos</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+        </div>
+    </div>
+</div>
+
+<script src="dados.js?v="></script>
+<script>
+// Cache-bust no src (Date.now via inline edit). O script acima recebe um ?v= placeholder
+// que o navegador trata como fresh se mudar. Pra garantir, refazemos o fetch dinamico.
+(function(){
+    const old=document.querySelector('script[src^="dados.js"]');
+    if(old&&!window.DADOS){const s=document.createElement('script');s.src='dados.js?v='+Date.now();s.onload=init;document.body.appendChild(s);return}
+    init();
+})();
+
+function fmtC(v){return 'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fmtN(v){return (v||0).toLocaleString('pt-BR')}
+function fmtD(s){if(!s||s.length<10)return s||'-';const [y,m,d]=s.substring(0,10).split('-');return d+'/'+m+'/'+y}
+
+function init(){
+    document.getElementById('dtInicio').textContent=fmtD(DADOS.inicio);
+    const gd=new Date(DADOS.geradoEm);
+    document.getElementById('dtGerado').textContent=gd.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+
+    const cs=document.getElementById('fCS');
+    DADOS.csList.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o)});
+    cs.addEventListener('change',render);
+    document.getElementById('fMarca').addEventListener('input',render);
+    render();
+}
+
+function clearFilters(){document.getElementById('fCS').value='';document.getElementById('fMarca').value='';render()}
+
+function render(){
+    const fcs=document.getElementById('fCS').value;
+    const fm=(document.getElementById('fMarca').value||'').toLowerCase().trim();
+    let rows=DADOS.clientes.slice();
+    if(fcs)rows=rows.filter(r=>r.cs===fcs);
+    if(fm)rows=rows.filter(r=>(r.marca||'').toLowerCase().includes(fm));
+
+    document.getElementById('kpiN').textContent=fmtN(rows.length);
+    const totVal=rows.reduce((s,r)=>s+(r.valPeriodo||0),0);
+    document.getElementById('kpiVal').textContent=fmtC(totVal);
+    const totPed=rows.reduce((s,r)=>s+(r.qtPeriodo||0),0);
+    document.getElementById('kpiPed').textContent=fmtN(totPed);
+
+    document.getElementById('tblCount').textContent=rows.length+' cliente(s)';
+    const tb=document.getElementById('tbody');
+    if(!rows.length){tb.innerHTML='<tr><td colspan="5" class="empty">Nenhum cliente com os filtros atuais</td></tr>';return}
+    tb.innerHTML=rows.map(r=>'<tr>'+
+        '<td><span class="cs-badge">'+escapeHtml(r.cs||'-')+'</span></td>'+
+        '<td class="marca">'+escapeHtml(r.marca||'-')+'</td>'+
+        '<td class="date">'+fmtD(r.primeiroPedidoVp)+'</td>'+
+        '<td class="money">'+fmtC(r.valPeriodo)+'</td>'+
+        '<td class="n">'+fmtN(r.qtPeriodo)+'</td>'+
+    '</tr>').join('');
+}
+
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+</script>
+</body>
+</html>
