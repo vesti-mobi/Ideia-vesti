@@ -15,7 +15,7 @@ const querystring = require('querystring');
 const DIR = __dirname;
 const SQL_SERVER = '7sowj2vsfd6efgf3phzgjfmvaq-nrdsskmspnteherwztit766zc4.datawarehouse.fabric.microsoft.com';
 const SQL_DATABASE = 'VestiHouse';
-const START_DATE = '2026-03-01'; // inicio da janela "novos VestiPago"
+const START_DATE = '2026-02-01'; // inicio da janela "novos VestiPago"
 
 // ----- env loading (local .env OR CI env vars) -----
 const ENV = {};
@@ -125,8 +125,9 @@ async function main() {
             FROM vp
             GROUP BY domainId
         ),
-        vp_periodo AS (
+        vp_mensal AS (
             SELECT domainId,
+                   FORMAT(settings_createdAt_TIMESTAMP, 'yyyy-MM') AS mes,
                    SUM(CASE WHEN payment_method = 'PIX' THEN summary_total ELSE 0 END) AS val_pix,
                    SUM(CASE WHEN payment_method = 'CREDIT_CARD' THEN summary_total ELSE 0 END) AS val_cartao,
                    SUM(summary_total) AS val_total,
@@ -135,23 +136,43 @@ async function main() {
                    COUNT(*) AS qt_total
             FROM vp
             WHERE settings_createdAt_TIMESTAMP >= '${START_DATE}'
-            GROUP BY domainId
+            GROUP BY domainId, FORMAT(settings_createdAt_TIMESTAMP, 'yyyy-MM')
         )
         SELECT fv.domainId,
                fv.first_at,
-               vp.val_pix,
-               vp.val_cartao,
-               vp.val_total,
-               vp.qt_pix,
-               vp.qt_cartao,
-               vp.qt_total
+               vm.mes,
+               vm.val_pix,
+               vm.val_cartao,
+               vm.val_total,
+               vm.qt_pix,
+               vm.qt_cartao,
+               vm.qt_total
         FROM first_vp fv
-        LEFT JOIN vp_periodo vp ON vp.domainId = fv.domainId
+        LEFT JOIN vp_mensal vm ON vm.domainId = fv.domainId
         WHERE fv.first_at >= '${START_DATE}'
-        ORDER BY vp.val_total DESC
+        ORDER BY fv.domainId, vm.mes
     `;
-    const novos = await runSql(token, qNovos, 'Novos VestiPago (first_at >= ' + START_DATE + ')');
-    console.log(`  ${novos.length} empresas com primeiro pedido VP a partir de ${START_DATE}`);
+    const novosMensal = await runSql(token, qNovos, 'Novos VestiPago (first_at >= ' + START_DATE + ')');
+    // Agrupa as linhas mensais por domainId
+    const novosPorDom = new Map();
+    for (const r of novosMensal) {
+        const k = String(r.domainId);
+        if (!novosPorDom.has(k)) {
+            novosPorDom.set(k, { first_at: r.first_at, meses: {} });
+        }
+        const entry = novosPorDom.get(k);
+        if (r.mes) {
+            entry.meses[r.mes] = {
+                valPix: Math.round((Number(r.val_pix) || 0) * 100) / 100,
+                valCartao: Math.round((Number(r.val_cartao) || 0) * 100) / 100,
+                valTotal: Math.round((Number(r.val_total) || 0) * 100) / 100,
+                qtPix: Number(r.qt_pix) || 0,
+                qtCartao: Number(r.qt_cartao) || 0,
+                qtTotal: Number(r.qt_total) || 0,
+            };
+        }
+    }
+    console.log(`  ${novosPorDom.size} empresas com primeiro pedido VP a partir de ${START_DATE}`);
 
     // 2. Empresas do lakehouse (nome marca + anjo/CS) - so matriz (rn=1)
     const qEmpresas = `
@@ -194,13 +215,25 @@ async function main() {
         });
     }
 
-    // Join
+    // Join + totais agregados por cliente
     const clientes = [];
+    const mesesSet = new Set();
     let semMatch = 0;
-    for (const n of novos) {
-        const k = String(n.domainId);
+    for (const [k, n] of novosPorDom) {
         const emp = empByDominio.get(k);
         if (!emp) { semMatch++; continue; }
+        // Totais agregados sobre todos os meses
+        let totPix = 0, totCar = 0, totTot = 0, qtPix = 0, qtCar = 0, qtTot = 0;
+        for (const m of Object.keys(n.meses)) {
+            mesesSet.add(m);
+            const mv = n.meses[m];
+            totPix += mv.valPix;
+            totCar += mv.valCartao;
+            totTot += mv.valTotal;
+            qtPix += mv.qtPix;
+            qtCar += mv.qtCartao;
+            qtTot += mv.qtTotal;
+        }
         clientes.push({
             dominioId: k,
             empresaId: emp.empresaId,
@@ -210,16 +243,16 @@ async function main() {
             cnpj: emp.cnpj,
             statusEmpresa: emp.statusEmpresa,
             primeiroPedidoVp: n.first_at ? (n.first_at.toISOString ? n.first_at.toISOString().substring(0, 10) : String(n.first_at).substring(0, 10)) : '',
-            valPix: Math.round((Number(n.val_pix) || 0) * 100) / 100,
-            valCartao: Math.round((Number(n.val_cartao) || 0) * 100) / 100,
-            valTotal: Math.round((Number(n.val_total) || 0) * 100) / 100,
-            qtPix: Number(n.qt_pix) || 0,
-            qtCartao: Number(n.qt_cartao) || 0,
-            qtTotal: Number(n.qt_total) || 0,
+            meses: n.meses, // { "2026-02": {valPix, valCartao, valTotal, qtPix, qtCartao, qtTotal}, ... }
+            valPix: Math.round(totPix * 100) / 100,
+            valCartao: Math.round(totCar * 100) / 100,
+            valTotal: Math.round(totTot * 100) / 100,
+            qtPix, qtCartao: qtCar, qtTotal: qtTot,
         });
     }
     console.log(`  Joined: ${clientes.length} com match, ${semMatch} domain_id sem empresa no lakehouse`);
     clientes.sort((a, b) => b.valTotal - a.valTotal);
+    const mesesList = [...mesesSet].sort();
 
     // Lista unica de CS pra dropdown
     const csSet = new Set(clientes.map(c => c.cs).filter(Boolean));
@@ -235,6 +268,7 @@ async function main() {
         geradoEm: new Date().toISOString(),
         clientes,
         csList,
+        mesesList,
         resumo: {
             nClientes: clientes.length,
             totalValor: Math.round(totalGeral * 100) / 100,

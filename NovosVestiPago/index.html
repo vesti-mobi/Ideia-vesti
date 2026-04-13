@@ -82,7 +82,7 @@ td.date{color:var(--mut);white-space:nowrap}
         <img src="../CS-Sucesso-do-cliente/logo-vesti.png" alt="Vesti" style="height:44px;width:auto" onerror="this.style.display='none'">
         <div>
             <h1>Novos VestiPago</h1>
-            <div class="sub">Clientes cujo primeiro pedido VestiPago (PIX ou Cartão) foi a partir de <b id="dtInicio">--</b></div>
+            <div class="sub">Clientes cujo primeiro pedido VestiPago (PIX ou Cartão) foi a partir de <b id="dtInicio">--</b> · use o filtro de mês pra ver o transacionado num mês fechado</div>
         </div>
         <div class="info">Atualizado em <span id="dtGerado">--</span></div>
         <button class="logout" onclick="doLogout()">Sair</button>
@@ -96,6 +96,10 @@ td.date{color:var(--mut);white-space:nowrap}
     </div>
 
     <div class="filters">
+        <div class="fg">
+            <label>Mês</label>
+            <select id="fMes"><option value="">Todos (total)</option></select>
+        </div>
         <div class="fg">
             <label>CS responsável</label>
             <select id="fCS"><option value="">Todos</option></select>
@@ -168,6 +172,7 @@ function loadData(){
 function fmtC(v){return 'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function fmtN(v){return (v||0).toLocaleString('pt-BR')}
 function fmtD(s){if(!s||s.length<10)return s||'-';var p=s.substring(0,10).split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+function fmtMes(m){if(!m)return '';var n=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];var p=m.split('-');return n[parseInt(p[1])-1]+'/'+p[0].substring(2)}
 
 function init(){
     document.getElementById('dtInicio').textContent=fmtD(DADOS.inicio);
@@ -176,43 +181,62 @@ function init(){
 
     var cs=document.getElementById('fCS');
     DADOS.csList.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o)});
+    var mes=document.getElementById('fMes');
+    (DADOS.mesesList||[]).forEach(function(m){var o=document.createElement('option');o.value=m;o.textContent=fmtMes(m);mes.appendChild(o)});
     cs.addEventListener('change',render);
+    mes.addEventListener('change',render);
     document.getElementById('fMarca').addEventListener('input',render);
     render();
 }
 
-function clearFilters(){document.getElementById('fCS').value='';document.getElementById('fMarca').value='';render()}
+function clearFilters(){document.getElementById('fCS').value='';document.getElementById('fMarca').value='';document.getElementById('fMes').value='';render()}
 
 function render(){
     var fcs=document.getElementById('fCS').value;
     var fm=(document.getElementById('fMarca').value||'').toLowerCase().trim();
+    var fmes=document.getElementById('fMes').value;
+
+    // "valores efetivos" - se mes selecionado, usa os valores daquele mes; senao agregado
+    function effective(r){
+        if(fmes){
+            var mv=r.meses&&r.meses[fmes];
+            return {valPix:mv?mv.valPix:0,valCartao:mv?mv.valCartao:0,valTotal:mv?mv.valTotal:0,qtPix:mv?mv.qtPix:0,qtCartao:mv?mv.qtCartao:0,qtTotal:mv?mv.qtTotal:0};
+        }
+        return {valPix:r.valPix,valCartao:r.valCartao,valTotal:r.valTotal,qtPix:r.qtPix,qtCartao:r.qtCartao,qtTotal:r.qtTotal};
+    }
+
     var rows=DADOS.clientes.slice();
     if(fcs)rows=rows.filter(function(r){return r.cs===fcs});
     if(fm)rows=rows.filter(function(r){return (r.marca||'').toLowerCase().indexOf(fm)>=0});
+    // Se filtrou por mes, esconde empresas que nao tiveram nenhum pedido naquele mes
+    if(fmes)rows=rows.filter(function(r){return r.meses&&r.meses[fmes]&&r.meses[fmes].valTotal>0});
+    // Re-sort by effective value total
+    rows.sort(function(a,b){return effective(b).valTotal-effective(a).valTotal});
 
     document.getElementById('kpiN').textContent=fmtN(rows.length);
-    var totT=rows.reduce(function(s,r){return s+(r.valTotal||0)},0);
-    var totP=rows.reduce(function(s,r){return s+(r.valPix||0)},0);
-    var totC=rows.reduce(function(s,r){return s+(r.valCartao||0)},0);
+    var totT=0,totP=0,totC=0;
+    rows.forEach(function(r){var e=effective(r);totT+=e.valTotal;totP+=e.valPix;totC+=e.valCartao});
     document.getElementById('kpiTot').textContent=fmtC(totT);
     document.getElementById('kpiPix').textContent=fmtC(totP);
     document.getElementById('kpiCar').textContent=fmtC(totC);
 
-    document.getElementById('tblCount').textContent=rows.length+' cliente(s)';
+    var mesLabel=fmes?' em '+fmtMes(fmes):'';
+    document.getElementById('tblCount').textContent=rows.length+' cliente(s)'+mesLabel;
     var tb=document.getElementById('tbody');
     if(!rows.length){tb.innerHTML='<tr><td colspan="7" class="empty">Nenhum cliente com os filtros atuais</td></tr>';return}
     tb.innerHTML=rows.map(function(r){
-        var pixCls=r.valPix>0?'money pix':'money zero';
-        var carCls=r.valCartao>0?'money cartao':'money zero';
+        var e=effective(r);
+        var pixCls=e.valPix>0?'money pix':'money zero';
+        var carCls=e.valCartao>0?'money cartao':'money zero';
         var nome=(r.marca||'').replace(/'/g,"\\'");
         return '<tr class="clickable" onclick="selectMarca(\''+nome+'\')">'+
             '<td><span class="cs-badge">'+esc(r.cs||'-')+'</span></td>'+
             '<td class="marca">'+esc(r.marca||'-')+'</td>'+
             '<td class="date">'+fmtD(r.primeiroPedidoVp)+'</td>'+
-            '<td class="'+pixCls+'">'+(r.valPix>0?fmtC(r.valPix)+'<div style="font-size:10px;font-weight:500;color:var(--mut);margin-top:2px">'+r.qtPix+' ped</div>':'—')+'</td>'+
-            '<td class="'+carCls+'">'+(r.valCartao>0?fmtC(r.valCartao)+'<div style="font-size:10px;font-weight:500;color:var(--mut);margin-top:2px">'+r.qtCartao+' ped</div>':'—')+'</td>'+
-            '<td class="money total">'+fmtC(r.valTotal)+'</td>'+
-            '<td class="qty">'+fmtN(r.qtTotal)+'</td>'+
+            '<td class="'+pixCls+'">'+(e.valPix>0?fmtC(e.valPix)+'<div style="font-size:10px;font-weight:500;color:var(--mut);margin-top:2px">'+e.qtPix+' ped</div>':'—')+'</td>'+
+            '<td class="'+carCls+'">'+(e.valCartao>0?fmtC(e.valCartao)+'<div style="font-size:10px;font-weight:500;color:var(--mut);margin-top:2px">'+e.qtCartao+' ped</div>':'—')+'</td>'+
+            '<td class="money total">'+fmtC(e.valTotal)+'</td>'+
+            '<td class="qty">'+fmtN(e.qtTotal)+'</td>'+
         '</tr>'
     }).join('');
 }
