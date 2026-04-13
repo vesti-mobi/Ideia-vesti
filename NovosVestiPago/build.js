@@ -245,7 +245,7 @@ async function main() {
     };
 
     const outPath = path.join(DIR, 'dados.js');
-    fs.writeFileSync(outPath, 'const DADOS = ' + JSON.stringify(output) + ';\n', 'utf-8');
+    fs.writeFileSync(outPath, 'window.DADOS = ' + JSON.stringify(output) + ';\n', 'utf-8');
     console.log(`\nOK: dados.js escrito (${clientes.length} clientes, R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 })})`);
 }
 
