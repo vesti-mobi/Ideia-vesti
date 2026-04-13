@@ -992,13 +992,19 @@ async function main() {
     // VestiPago Pedidos 2025 (split Cartao/PIX): tabela '2025' do semantic model novo.
     // Filtra a provider=IUGU (transacoes VestiPago) e agrega por empresa e por empresa+mes.
     const daxVpTotals = `EVALUATE SUMMARIZECOLUMNS('2025'[companyId], FILTER(ALL('2025'), '2025'[payment.transaction.provider]="IUGU"), "qtPedidos", COUNTROWS('2025'), "qtPagos", CALCULATE(COUNTROWS('2025'), '2025'[payment.consolidatedPaymentStatus]="PAID"), "valTotal", SUMX('2025','2025'[summary.total]), "valPagos", CALCULATE(SUMX('2025','2025'[summary.total]), '2025'[payment.consolidatedPaymentStatus]="PAID"), "qtCartao", CALCULATE(COUNTROWS('2025'), '2025'[payment.method]="CREDIT_CARD"), "valCartao", CALCULATE(SUMX('2025','2025'[summary.total]), '2025'[payment.method]="CREDIT_CARD"), "qtPix", CALCULATE(COUNTROWS('2025'), '2025'[payment.method]="PIX"), "valPix", CALCULATE(SUMX('2025','2025'[summary.total]), '2025'[payment.method]="PIX"))`;
-    const daxVpMonthly = `EVALUATE SUMMARIZECOLUMNS('2025'[companyId], '2025'[Mes], FILTER(ALL('2025'), '2025'[payment.transaction.provider]="IUGU"), "qtPedidos", COUNTROWS('2025'), "qtPagos", CALCULATE(COUNTROWS('2025'), '2025'[payment.consolidatedPaymentStatus]="PAID"), "valTotal", SUMX('2025','2025'[summary.total]), "valPagos", CALCULATE(SUMX('2025','2025'[summary.total]), '2025'[payment.consolidatedPaymentStatus]="PAID"), "qtCartao", CALCULATE(COUNTROWS('2025'), '2025'[payment.method]="CREDIT_CARD"), "valCartao", CALCULATE(SUMX('2025','2025'[summary.total]), '2025'[payment.method]="CREDIT_CARD"), "qtPix", CALCULATE(COUNTROWS('2025'), '2025'[payment.method]="PIX"), "valPix", CALCULATE(SUMX('2025','2025'[summary.total]), '2025'[payment.method]="PIX"))`;
+    // Monthly: a tabela '2025' contem dados de jan/2025 ate o presente (apesar do nome)
+    // e [Mes] eh so nome pt-BR sem ano. DAX nao deixa agrupar por LEFT() de coluna string,
+    // entao rodamos 2 queries: uma filtrada a LEFT(createdAt,4)="2025" e outra "2026".
+    // Combinamos os dois resultados em JS com prefixo de ano.
+    const mkVpMonthly = (year) => `EVALUATE SUMMARIZECOLUMNS('2025'[companyId],'2025'[Mes],FILTER(ALL('2025'),'2025'[payment.transaction.provider]="IUGU" && LEFT('2025'[settings.createdAt],4)="${year}"),"qtPedidos",COUNTROWS('2025'),"qtPagos",CALCULATE(COUNTROWS('2025'),'2025'[payment.consolidatedPaymentStatus]="PAID"),"valTotal",SUMX('2025','2025'[summary.total]),"valPagos",CALCULATE(SUMX('2025','2025'[summary.total]),'2025'[payment.consolidatedPaymentStatus]="PAID"),"qtCartao",CALCULATE(COUNTROWS('2025'),'2025'[payment.method]="CREDIT_CARD"),"valCartao",CALCULATE(SUMX('2025','2025'[summary.total]),'2025'[payment.method]="CREDIT_CARD"),"qtPix",CALCULATE(COUNTROWS('2025'),'2025'[payment.method]="PIX"),"valPix",CALCULATE(SUMX('2025','2025'[summary.total]),'2025'[payment.method]="PIX"))`;
+    const daxVpMonthly2025 = mkVpMonthly('2025');
+    const daxVpMonthly2026 = mkVpMonthly('2026');
 
     // Run all queries in parallel.
     // Pedidos/GMV: AGORA via SQL no MongoDB_Pedidos_Geral (lakehouse), nao mais via DAX Merged Pedidos.
     // Product/Rankings (links/cliques): trocados pro dataset CS 2025 (LINKS_DATASET_ID),
     //   o dataset 2024 que estavamos usando estava com dados ate 2025-01.
-    const [cadastrosRows, configRows, marcasRows, productRows, rankingsRows, vestiPagoRows, linksMonthlyRows, cliquesMonthlyRows, linksCompanyMonthlyRows, cliquesCompanyMonthlyRows, invoiceRows, metricasRows, freteRows, frete2Rows, mongoPedidos, vpTotalsRows, vpMonthlyRows] = await Promise.all([
+    const [cadastrosRows, configRows, marcasRows, productRows, rankingsRows, vestiPagoRows, linksMonthlyRows, cliquesMonthlyRows, linksCompanyMonthlyRows, cliquesCompanyMonthlyRows, invoiceRows, metricasRows, freteRows, frete2Rows, mongoPedidos, vpTotalsRows, vpMonthlyRows2025, vpMonthlyRows2026] = await Promise.all([
         executeDaxQuery(accessToken, daxCadastros, 'Cadastros Empresas'),
         executeDaxQuery(accessToken, daxConfig, 'Config Empresas'),
         executeDaxQuery(accessToken, daxMarcas, 'Marcas e Planos'),
@@ -1015,7 +1021,8 @@ async function main() {
         executeDaxQueryOn(accessToken, FRETE2_WORKSPACE_ID, FRETE2_DATASET_ID, daxFrete2, 'Frete (Painel Frete - OnLog Descritivo)'),
         fetchPedidosFromMongo(sqlToken),
         executeDaxQueryOn(accessToken, VP_WORKSPACE_ID, VP_PEDIDOS_DATASET_ID, daxVpTotals, 'VestiPago Totals (Cartao/PIX)'),
-        executeDaxQueryOn(accessToken, VP_WORKSPACE_ID, VP_PEDIDOS_DATASET_ID, daxVpMonthly, 'VestiPago Monthly (Cartao/PIX)'),
+        executeDaxQueryOn(accessToken, VP_WORKSPACE_ID, VP_PEDIDOS_DATASET_ID, daxVpMonthly2025, 'VestiPago Monthly 2025 (Cartao/PIX)'),
+        executeDaxQueryOn(accessToken, VP_WORKSPACE_ID, VP_PEDIDOS_DATASET_ID, daxVpMonthly2026, 'VestiPago Monthly 2026 (Cartao/PIX)'),
     ]);
     // Empty stubs (DAX queries removidas mas codigo abaixo ainda referencia)
     const pedidosCompanyRows = [];
@@ -1340,7 +1347,6 @@ async function main() {
     // 5c2. VestiPago (Fabric '2025' table) - sobrescreve transCartao/transPix/valCartao/valPix
     // per empresa. O mongo nao tem breakdown por metodo de pagamento, entao populamos aqui
     // a partir da tabela '2025' filtrada a provider=IUGU (transacoes VestiPago reais).
-    const MES_PT_TO_NUM = { 'janeiro':'01','fevereiro':'02','março':'03','marco':'03','abril':'04','maio':'05','junho':'06','julho':'07','agosto':'08','setembro':'09','outubro':'10','novembro':'11','dezembro':'12' };
     const vpPorEmpresa = new Map();
     for (const row of (vpTotalsRows || [])) {
         const cid = row.companyId;
@@ -1368,29 +1374,33 @@ async function main() {
     }
     console.log('  VestiPago totals aplicados: ' + vpMatched + '/' + vpPorEmpresa.size + ' empresas');
 
-    // VestiPago monthly por empresa - same logic, keyed por (companyId, mesKey YYYY-MM).
-    // A tabela '2025' so tem dados de 2025, entao hardcode ano.
+    // VestiPago monthly por empresa - 2 queries (2025 e 2026) combinadas, com prefixo de ano.
+    const MES_PT_TO_NUM = { 'janeiro':'01','fevereiro':'02','março':'03','marco':'03','abril':'04','maio':'05','junho':'06','julho':'07','agosto':'08','setembro':'09','outubro':'10','novembro':'11','dezembro':'12' };
     const vpPorEmpresaMensal = new Map();
-    for (const row of (vpMonthlyRows || [])) {
-        const cid = row.companyId;
-        const mesPt = (row.Mes || '').toLowerCase().trim();
-        if (!cid || !mesPt) continue;
-        const mm = MES_PT_TO_NUM[mesPt];
-        if (!mm) continue;
-        const mesKey = '2025-' + mm;
-        if (!vpPorEmpresaMensal.has(cid)) vpPorEmpresaMensal.set(cid, new Map());
-        vpPorEmpresaMensal.get(cid).set(mesKey, {
-            qtCartao: row.qtCartao || 0,
-            valCartao: row.valCartao || 0,
-            qtPix: row.qtPix || 0,
-            valPix: row.valPix || 0,
-            qtPedidos: row.qtPedidos || 0,
-            qtPagos: row.qtPagos || 0,
-            valTotal: row.valTotal || 0,
-            valPagos: row.valPagos || 0,
-        });
-    }
-    console.log('  VestiPago monthly aplicados: ' + vpPorEmpresaMensal.size + ' empresas x meses');
+    const addMonthlyRows = (rows, year) => {
+        for (const row of (rows || [])) {
+            const cid = row.companyId;
+            const mesPt = (row.Mes || '').toLowerCase().trim();
+            if (!cid || !mesPt) continue;
+            const mm = MES_PT_TO_NUM[mesPt];
+            if (!mm) continue;
+            const mesKey = year + '-' + mm;
+            if (!vpPorEmpresaMensal.has(cid)) vpPorEmpresaMensal.set(cid, new Map());
+            vpPorEmpresaMensal.get(cid).set(mesKey, {
+                qtCartao: row.qtCartao || 0,
+                valCartao: row.valCartao || 0,
+                qtPix: row.qtPix || 0,
+                valPix: row.valPix || 0,
+                qtPedidos: row.qtPedidos || 0,
+                qtPagos: row.qtPagos || 0,
+                valTotal: row.valTotal || 0,
+                valPagos: row.valPagos || 0,
+            });
+        }
+    };
+    addMonthlyRows(vpMonthlyRows2025, '2025');
+    addMonthlyRows(vpMonthlyRows2026, '2026');
+    console.log('  VestiPago monthly aplicados: ' + vpPorEmpresaMensal.size + ' empresas (' + (vpMonthlyRows2025 || []).length + ' rows 2025 + ' + (vpMonthlyRows2026 || []).length + ' rows 2026)');
 
     // 5d. Product - links per company
     for (const row of productRows) {
