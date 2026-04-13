@@ -1617,7 +1617,7 @@ function doLogin(){
 function loadApp(){
     document.getElementById('loginScreen').style.display='none';
     document.getElementById('appContent').style.display='block';
-    const s=document.createElement('script');s.src='dados.js';
+    const s=document.createElement('script');s.src='dados.js?v='+Date.now();
     s.onload=function(){
         // Mostrar empresas Ativas + as sem status preenchido (build parcial nao deve apagar tudo).
         // Apenas Desativada eh excluida explicitamente.
