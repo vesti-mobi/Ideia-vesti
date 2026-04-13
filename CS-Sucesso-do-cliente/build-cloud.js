@@ -1367,6 +1367,13 @@ async function main() {
         vpMatched++;
     }
     console.log('  VestiPago totals aplicados: ' + vpMatched + '/' + vpPorEmpresa.size + ' empresas');
+    // DEBUG: amostra 3 empresas IUGU com o maior valor pra rastrear persistencia
+    const _dbgIds = [...vpPorEmpresa.entries()].sort((a,b)=>(b[1].valCartao+b[1].valPix)-(a[1].valCartao+a[1].valPix)).slice(0,3).map(x=>x[0]);
+    _dbgIds.forEach(id => {
+        const e = empresasMap[id];
+        console.log('  [DBG after-vp-overlay] ' + id + ': ' + (e ? ('valCartao=' + e.valCartao + ' valPix=' + e.valPix) : 'NAO ESTA em empresasMap'));
+    });
+    globalThis.__dbgVpIds = _dbgIds;
 
     // VestiPago monthly por empresa - same logic, keyed por (companyId, mesKey YYYY-MM).
     // A tabela '2025' so tem dados de 2025, entao hardcode ano.
@@ -2040,6 +2047,14 @@ async function main() {
 
     const churnAlto = empresasList.filter(e => e.churnRisco === 'Alto').length;
     const churnMedio = empresasList.filter(e => e.churnRisco === 'Médio').length;
+
+    // DEBUG: rastreia as mesmas empresas IUGU na empresasList final
+    if (globalThis.__dbgVpIds) {
+        globalThis.__dbgVpIds.forEach(id => {
+            const e = empresasList.find(x => x.id === id);
+            console.log('  [DBG final-output] ' + id + ': ' + (e ? ('valCartao=' + e.valCartao + ' valPix=' + e.valPix + ' nome=' + e.nome) : 'AUSENTE da empresasList'));
+        });
+    }
 
     const output = {
         empresas: empresasList,
