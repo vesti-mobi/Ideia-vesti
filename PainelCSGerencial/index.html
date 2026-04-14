@@ -117,12 +117,15 @@ table.dt tr:hover td{background:#FAFAFA}
     <div class="kpi"><div class="ki" style="background:#FFF3E0">&#127970;</div><div class="kl">Filiais</div><div class="kv" style="color:var(--w)" id="k-fil">--</div></div>
     <div class="kpi"><div class="ki" style="background:#FDEAEA">&#127970;</div><div class="kl">Sem NPS e sem CSAT</div><div class="kv" style="color:var(--d)" id="k-sem">--</div></div>
 </div>
-<!-- TAB NAV -->
-<div class="tabs">
-    <button class="tab-btn active" id="tb-home" onclick="switchTab('home')">Geral</button>
-    <button class="tab-btn" id="tb-csat" onclick="switchTab('csat')">CSAT</button>
-    <button class="tab-btn" id="tb-nps" onclick="switchTab('nps')">NPS</button>
-    <button class="tab-btn" id="tb-vp" onclick="switchTab('vp')">Novos VestiPago</button>
+<!-- BACK NAV (aparece so fora da Home) -->
+<div id="backNav" style="display:none;margin-bottom:12px">
+    <button onclick="goBack()" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:var(--card);border:2px solid var(--lg);border-radius:10px;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--p);box-shadow:var(--sh)">&larr; <span id="backNavLabel">Voltar</span></button>
+    <span id="breadcrumb" style="margin-left:12px;font-size:12px;color:var(--g)"></span>
+</div>
+<!-- SUBTABS Satisfacao (CSAT/NPS) -->
+<div id="satSubtabs" class="sub-tabs" style="display:none;margin-bottom:16px">
+    <button class="sub-tab-btn" id="stb-sat-csat" onclick="switchTab('csat')">CSAT</button>
+    <button class="sub-tab-btn" id="stb-sat-nps" onclick="switchTab('nps')">NPS</button>
 </div>
 <!-- ============ HOME (GERAL) TAB ============ -->
 <div class="tab-panel active" id="tab-home">
@@ -153,9 +156,8 @@ table.dt tr:hover td{background:#FAFAFA}
     </div>
     <div class="filters">
         <div class="filter-group"><label>Mes completado:</label><select class="f-select" id="vpFMes" onchange="updateVp()"><option value="">Todos (agregado)</option></select></div>
-        <div class="filter-group"><label>CS:</label><select class="f-select" id="vpFCS" onchange="updateVp()"><option value="">Todos</option></select></div>
-        <div class="filter-group"><label>Marca:</label><input type="text" class="f-input" id="vpFMarca" placeholder="Buscar marca..." style="min-width:200px" oninput="updateVp()"></div>
         <button class="f-btn" onclick="vpClearFilters()">Limpar</button>
+        <span style="font-size:11px;color:var(--g);margin-left:auto">Os filtros globais de Empresa e CS (barra acima) tambem se aplicam aqui.</span>
     </div>
     <div style="font-size:11px;color:var(--g);margin-bottom:12px;padding:0 2px"><b>Como ler:</b> o filtro "Mes completado" mostra clientes que completaram o 1o mes de VestiPago no mes selecionado (ex: Fev/26 = comecaram em Jan/26). Sem filtro = agregado total desde jan/2026.</div>
     <div class="tbl-card">
@@ -341,21 +343,37 @@ function fmtM(m){if(!m||!m.split)return m;var p=m.split('-');if(p.length<2)retur
 function kill(id){if(charts[id]){charts[id].destroy();delete charts[id]}}
 
 // === TAB SWITCHING ===
-function switchTab(t){
+var navStack=[];
+function switchTab(t,skipPush){
+    var prev=currentTab;
+    if(prev && prev!==t && !skipPush){navStack.push(prev)}
     currentTab=t;
     var tabs=['home','csat','nps','vp'];
     tabs.forEach(function(x){
-        var btn=document.getElementById('tb-'+x);if(btn)btn.classList.toggle('active',x===t);
         var pan=document.getElementById('tab-'+x);if(pan)pan.classList.toggle('active',x===t);
     });
     chartFilter=null;
     document.getElementById('chartFilterBar').style.display='none';
-    // Esconde filtros globais e KPIs globais nas abas Home e VestiPago (elas tem seus proprios contextos)
-    var hideGlobals=(t==='home'||t==='vp');
-    document.querySelector('.filters').style.display=hideGlobals?'none':'flex';
-    document.getElementById('globalKpiRow').style.display=hideGlobals?'none':'grid';
-    var cd=document.getElementById('coDetail');if(cd)cd.style.display=hideGlobals?'none':'';
+    // Subtabs Satisfacao (CSAT/NPS) sempre visiveis dentro dessa pagina
+    var inSat=(t==='csat'||t==='nps');
+    document.getElementById('satSubtabs').style.display=inSat?'inline-flex':'none';
+    document.getElementById('stb-sat-csat').classList.toggle('active',t==='csat');
+    document.getElementById('stb-sat-nps').classList.toggle('active',t==='nps');
+    // Back nav aparece fora da home
+    var bn=document.getElementById('backNav');
+    bn.style.display=t==='home'?'none':'block';
+    var labels={'csat':'Satisfacao (CSAT)','nps':'Satisfacao (NPS)','vp':'Novos VestiPago','home':'Geral'};
+    document.getElementById('breadcrumb').textContent='Voce esta em: '+(labels[t]||t);
+    // Filtros globais (empresa/CS) visiveis em TODAS as paginas; KPIs globais so fora de vp
+    document.querySelector('.filters').style.display='flex';
+    document.getElementById('globalKpiRow').style.display=(t==='vp'||t==='home')?'none':'grid';
+    var cd=document.getElementById('coDetail');if(cd)cd.style.display=(t==='vp'||t==='home')?'none':'';
     updateAll();
+}
+function goBack(){
+    var prev=navStack.pop();
+    if(!prev||prev===currentTab)prev='home';
+    switchTab(prev,true);
 }
 function switchCsat(s){currentCsat=s;document.getElementById('stb-oraculo').classList.toggle('active',s==='oraculo');document.getElementById('stb-plataforma').classList.toggle('active',s==='plataforma');document.getElementById('csat-oraculo').classList.toggle('active',s==='oraculo');document.getElementById('csat-plataforma').classList.toggle('active',s==='plataforma');chartFilter=null;document.getElementById('chartFilterBar').style.display='none';updateAll()}
 
@@ -495,19 +513,24 @@ function updateCsatPlataforma(){
 
 // === UPDATE: HOME (GERAL) ===
 function updateHome(){
-    // Satisfacao: mostra NPS score e CSAT medio juntos
-    var nRec=(typeof NPS_DATA!=='undefined'?NPS_DATA:[]).filter(function(r){return r.nota!=null});
+    // Satisfacao respeita filtros globais (selCo, fCS)
+    var nRec=getfNps().filter(function(r){return r.nota!=null});
     var nScore=calcNps(nRec);
+    var ora=getfCsatOra(),plat=getfCsatPlat();
     var allCsat=[];
-    (typeof CSAT_ORACULO_DATA!=='undefined'?CSAT_ORACULO_DATA:[]).forEach(function(r){if(r.nota!=null)allCsat.push(+r.nota)});
-    (typeof CSAT_PLATAFORMA_DATA!=='undefined'?CSAT_PLATAFORMA_DATA:[]).forEach(function(r){if(r.nota!=null)allCsat.push(+r.nota)});
+    ora.forEach(function(r){if(r.nota!=null)allCsat.push(+r.nota)});
+    plat.forEach(function(r){if(r.nota!=null)allCsat.push(+r.nota)});
     var csatAvg=allCsat.length?(allCsat.reduce(function(a,b){return a+b},0)/allCsat.length):null;
     document.getElementById('home-csat-nps-val').textContent='NPS '+(nScore==null?'--':nScore);
     document.getElementById('home-csat-nps-sub').textContent='CSAT medio '+(csatAvg==null?'--':csatAvg.toFixed(2))+'/5 ('+allCsat.length+' respostas)';
-    // Novos VestiPago
+    // Novos VestiPago respeita filtros globais
     var vp=(typeof VP_DATA!=='undefined'?VP_DATA:null);
-    var nClientes=(vp&&vp.resumo&&vp.resumo.nClientes)||0;
-    var totalValor=(vp&&vp.resumo&&vp.resumo.totalValor)||0;
+    var nClientes=0,totalValor=0;
+    if(vp&&vp.clientes){
+        var rows=_vpFilterRows(vp);
+        nClientes=rows.length;
+        rows.forEach(function(r){totalValor+=(r.valTotal||0)});
+    }
     document.getElementById('home-vp-val').textContent=nClientes+' clientes';
     document.getElementById('home-vp-sub').textContent='R$ '+totalValor.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' transacionado';
 }
@@ -517,14 +540,33 @@ var _vpInited=false;
 function vpInit(){
     if(_vpInited)return;_vpInited=true;
     var vp=(typeof VP_DATA!=='undefined'?VP_DATA:null);if(!vp||!vp.clientes)return;
-    var cs=document.getElementById('vpFCS');
-    (vp.csList||[]).forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o)});
     var mes=document.getElementById('vpFMes');
-    (vp.mesesList||[]).forEach(function(m){var o=document.createElement('option');o.value=m;o.textContent=fmtM(m);mes.appendChild(o)});
+    // Exclui 2026-01 (seria clientes de dez/2025, fora do escopo)
+    (vp.mesesList||[]).filter(function(m){return m!=='2026-01'}).forEach(function(m){var o=document.createElement('option');o.value=m;o.textContent=fmtM(m);mes.appendChild(o)});
 }
-function vpClearFilters(){document.getElementById('vpFMes').value='';document.getElementById('vpFCS').value='';document.getElementById('vpFMarca').value='';updateVp()}
+function vpClearFilters(){document.getElementById('vpFMes').value='';updateVp()}
 function fmtVpC(v){return 'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function fmtVpD(s){if(!s||s.length<10)return s||'-';var p=s.substring(0,10).split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+function _vpFilterRows(vp){
+    var fcsGlobal=(fCS&&fCS.value)||'';
+    var selCoLow=selCo?selCo.toLowerCase():'';
+    var fmes=document.getElementById('vpFMes').value;
+    var rows=vp.clientes.slice();
+    // Filtro global CS
+    if(fcsGlobal)rows=rows.filter(function(r){return (r.cs||'')===fcsGlobal});
+    // Filtro global empresa (selCo) - match por marca substring
+    if(selCoLow)rows=rows.filter(function(r){return (r.marca||'').toLowerCase().indexOf(selCoLow)>=0});
+    // Mes completado: primeiroPedidoVp = mes-1 E o mes tem que ter dados (nao 2026-01)
+    if(fmes){
+        if(fmes==='2026-01')return [];
+        var _pp=fmes.split('-'),_py=+_pp[0],_pm=+_pp[1]-1;if(_pm<1){_pm=12;_py--}
+        var prevMes=_py+'-'+(_pm<10?'0':'')+_pm;
+        rows=rows.filter(function(r){return (r.primeiroPedidoVp||'').substring(0,7)===prevMes});
+    }
+    // Tambem exclui clientes cujo primeiroPedidoVp eh 2025-12 (so deveria se nao houver, mas por seguranca)
+    rows=rows.filter(function(r){return (r.primeiroPedidoVp||'')>='2026-01-01'});
+    return rows;
+}
 function updateVp(){
     vpInit();
     var vp=(typeof VP_DATA!=='undefined'?VP_DATA:null);
@@ -534,23 +576,13 @@ function updateVp(){
         tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#999;padding:24px">Sem dados (VP_DATA vazio). Rode node NovosVestiPago/build.js</td></tr>';
         return;
     }
-    var fcs=document.getElementById('vpFCS').value;
-    var fm=(document.getElementById('vpFMarca').value||'').toLowerCase().trim();
     var fmes=document.getElementById('vpFMes').value;
     // effective: se mes selecionado, usa valores daquele mes; senao agregado
     function eff(r){
         if(fmes){var mv=r.meses&&r.meses[fmes];return {valPix:mv?mv.valPix:0,valCartao:mv?mv.valCartao:0,valTotal:mv?mv.valTotal:0,qtPix:mv?mv.qtPix:0,qtCartao:mv?mv.qtCartao:0,qtTotal:mv?mv.qtTotal:0}}
         return {valPix:r.valPix,valCartao:r.valCartao,valTotal:r.valTotal,qtPix:r.qtPix,qtCartao:r.qtCartao,qtTotal:r.qtTotal};
     }
-    var rows=vp.clientes.slice();
-    if(fcs)rows=rows.filter(function(r){return r.cs===fcs});
-    if(fm)rows=rows.filter(function(r){return (r.marca||'').toLowerCase().indexOf(fm)>=0});
-    // Mes completado = primeiroPedidoVp no mes anterior ao selecionado
-    if(fmes){
-        var _pp=fmes.split('-'),_py=+_pp[0],_pm=+_pp[1]-1;if(_pm<1){_pm=12;_py--}
-        var prevMes=_py+'-'+(_pm<10?'0':'')+_pm;
-        rows=rows.filter(function(r){return (r.primeiroPedidoVp||'').substring(0,7)===prevMes});
-    }
+    var rows=_vpFilterRows(vp);
     rows.sort(function(a,b){return eff(b).valTotal-eff(a).valTotal});
     document.getElementById('vp-kn').textContent=rows.length;
     var tT=0,tP=0,tC=0;rows.forEach(function(r){var e=eff(r);tT+=e.valTotal;tP+=e.valPix;tC+=e.valCartao});
@@ -582,10 +614,11 @@ function updateAll(){
     else if(currentTab==='csat'){if(currentCsat==='oraculo')updateCsatOraculo();else updateCsatPlataforma()}
     else if(currentTab==='vp')updateVp();
 }
-window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;window.updateVp=updateVp;window.vpClearFilters=vpClearFilters;
-// Inicia oculto os filtros/KPIs globais porque default tab eh Home
-document.querySelector('.filters').style.display='none';
+window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;window.updateVp=updateVp;window.vpClearFilters=vpClearFilters;window.goBack=goBack;
+// Inicializacao: Home e default; filtros globais visiveis, KPIs globais ocultos
+document.querySelector('.filters').style.display='flex';
 document.getElementById('globalKpiRow').style.display='none';
+document.getElementById('backNav').style.display='none';
 updateAll();
 }
 if(sessionStorage.getItem('cs_auth')==='1')initDashboard();
