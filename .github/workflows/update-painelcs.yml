@@ -18,6 +18,14 @@ jobs:
         with:
           python-version: '3.12'
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias Node (NovosVestiPago)
+        working-directory: NovosVestiPago
+        run: npm init -y >/dev/null 2>&1 || true && npm install --silent tedious
+
       - name: Instalar ODBC Driver 18 for SQL Server
         run: |
           . /etc/os-release
@@ -47,6 +55,14 @@ jobs:
             "database": "VestiHouse"
           }
           EOF
+
+      - name: Rodar build NovosVestiPago
+        working-directory: NovosVestiPago
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+        run: node build.js || echo "WARN: NovosVestiPago build falhou"
 
       - name: Rodar pipeline
         working-directory: PainelCSGerencial

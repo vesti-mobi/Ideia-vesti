@@ -119,8 +119,54 @@ table.dt tr:hover td{background:#FAFAFA}
 </div>
 <!-- TAB NAV -->
 <div class="tabs">
-    <button class="tab-btn active" id="tb-csat" onclick="switchTab('csat')">CSAT</button>
+    <button class="tab-btn active" id="tb-home" onclick="switchTab('home')">Geral</button>
+    <button class="tab-btn" id="tb-csat" onclick="switchTab('csat')">CSAT</button>
     <button class="tab-btn" id="tb-nps" onclick="switchTab('nps')">NPS</button>
+    <button class="tab-btn" id="tb-vp" onclick="switchTab('vp')">Novos VestiPago</button>
+</div>
+<!-- ============ HOME (GERAL) TAB ============ -->
+<div class="tab-panel active" id="tab-home">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div class="hl-card" style="background:linear-gradient(135deg,#6C5CE7,#8B7BF7);cursor:pointer" onclick="switchTab('csat')">
+            <div class="hl-icon">&#128202;</div>
+            <div class="hl-label">Satisfacao (CSAT + NPS)</div>
+            <div class="hl-cargo" id="home-csat-nps-val">--</div>
+            <div class="hl-score" style="font-size:22px;margin-top:8px" id="home-csat-nps-sub">--</div>
+            <div class="hl-meta" style="margin-top:10px">Clique para ver detalhes de CSAT (Oraculo e Plataforma) e NPS &rarr;</div>
+        </div>
+        <div class="hl-card" style="background:linear-gradient(135deg,#00B894,#00D4A0);cursor:pointer" onclick="switchTab('vp')">
+            <div class="hl-icon">&#128176;</div>
+            <div class="hl-label">Novos VestiPago</div>
+            <div class="hl-cargo" id="home-vp-val">--</div>
+            <div class="hl-score" style="font-size:22px;margin-top:8px" id="home-vp-sub">--</div>
+            <div class="hl-meta" style="margin-top:10px" id="home-vp-legend">Clientes que contrataram VestiPago a partir de janeiro/2026</div>
+        </div>
+    </div>
+</div>
+<!-- ============ NOVOS VESTIPAGO TAB ============ -->
+<div class="tab-panel" id="tab-vp">
+    <div class="kpi-row">
+        <div class="kpi"><div class="ki" style="background:#F0EFFF">&#128100;</div><div class="kl">Clientes novos</div><div class="kv" style="color:var(--p)" id="vp-kn">--</div><div class="ks">desde jan/2026</div></div>
+        <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128181;</div><div class="kl">Total transacionado</div><div class="kv" style="color:var(--s);font-size:20px" id="vp-ktot">R$ --</div></div>
+        <div class="kpi"><div class="ki" style="background:#E8EAF6">&#128178;</div><div class="kl">Total PIX</div><div class="kv" style="color:#0984E3;font-size:20px" id="vp-kpix">R$ --</div></div>
+        <div class="kpi"><div class="ki" style="background:#FFF3E0">&#128179;</div><div class="kl">Total Cartao</div><div class="kv" style="color:var(--w);font-size:20px" id="vp-kcar">R$ --</div></div>
+    </div>
+    <div class="filters">
+        <div class="filter-group"><label>Mes completado:</label><select class="f-select" id="vpFMes" onchange="updateVp()"><option value="">Todos (agregado)</option></select></div>
+        <div class="filter-group"><label>CS:</label><select class="f-select" id="vpFCS" onchange="updateVp()"><option value="">Todos</option></select></div>
+        <div class="filter-group"><label>Marca:</label><input type="text" class="f-input" id="vpFMarca" placeholder="Buscar marca..." style="min-width:200px" oninput="updateVp()"></div>
+        <button class="f-btn" onclick="vpClearFilters()">Limpar</button>
+    </div>
+    <div style="font-size:11px;color:var(--g);margin-bottom:12px;padding:0 2px"><b>Como ler:</b> o filtro "Mes completado" mostra clientes que completaram o 1o mes de VestiPago no mes selecionado (ex: Fev/26 = comecaram em Jan/26). Sem filtro = agregado total desde jan/2026.</div>
+    <div class="tbl-card">
+        <h4 id="vp-tbl-title">Clientes &middot; <span id="vp-tbl-count" style="color:var(--g);font-weight:500">--</span></h4>
+        <div style="max-height:520px;overflow-y:auto;overflow-x:auto">
+            <table class="dt" id="tVp">
+                <thead><tr><th>CS</th><th>Marca</th><th>1&ordm; pedido VP</th><th style="text-align:right">PIX</th><th style="text-align:right">Cartao</th><th style="text-align:right">Total</th><th style="text-align:right">Qtd</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 <!-- ============ NPS TAB ============ -->
 <div class="tab-panel" id="tab-nps">
@@ -150,7 +196,7 @@ table.dt tr:hover td{background:#FAFAFA}
     <div class="tbl-card"><h4>Ultimas Respostas NPS</h4><div style="max-height:350px;overflow-y:auto"><table class="dt" id="tNps"><thead><tr><th>Data</th><th>Empresa</th><th>Usuario</th><th>Cargo</th><th>Nota</th><th>Tipo</th><th>Comentario</th></tr></thead><tbody></tbody></table></div></div>
 </div>
 <!-- ============ CSAT TAB ============ -->
-<div class="tab-panel active" id="tab-csat">
+<div class="tab-panel" id="tab-csat">
     <div class="sub-tabs">
         <button class="sub-tab-btn active" id="stb-oraculo" onclick="switchCsat('oraculo')">Oraculo</button>
         <button class="sub-tab-btn" id="stb-plataforma" onclick="switchCsat('plataforma')">Plataforma</button>
@@ -258,7 +304,7 @@ activeList.sort(function(a,b){return a.name.localeCompare(b.name)});
 var fCS=document.getElementById('fCS');CS_NAMES.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;fCS.appendChild(o)});
 
 // === STATE ===
-var selCo=null,charts={},chartFilter=null,currentTab='csat',currentCsat='oraculo';
+var selCo=null,charts={},chartFilter=null,currentTab='home',currentCsat='oraculo';
 var fEmpresa=document.getElementById('fEmpresa'),fDropdown=document.getElementById('fDropdown');
 
 function setChartFilter(type,value,label){if(chartFilter&&chartFilter.type===type&&chartFilter.value===value){clearChartFilter();return}chartFilter={type:type,value:value,label:label};document.getElementById('chartFilterBar').style.display='flex';document.getElementById('chartFilterLabel').textContent=label;updateAll()}
@@ -287,7 +333,22 @@ function fmtM(m){if(!m||!m.split)return m;var p=m.split('-');if(p.length<2)retur
 function kill(id){if(charts[id]){charts[id].destroy();delete charts[id]}}
 
 // === TAB SWITCHING ===
-function switchTab(t){currentTab=t;document.getElementById('tb-nps').classList.toggle('active',t==='nps');document.getElementById('tb-csat').classList.toggle('active',t==='csat');document.getElementById('tab-nps').classList.toggle('active',t==='nps');document.getElementById('tab-csat').classList.toggle('active',t==='csat');chartFilter=null;document.getElementById('chartFilterBar').style.display='none';updateAll()}
+function switchTab(t){
+    currentTab=t;
+    var tabs=['home','csat','nps','vp'];
+    tabs.forEach(function(x){
+        var btn=document.getElementById('tb-'+x);if(btn)btn.classList.toggle('active',x===t);
+        var pan=document.getElementById('tab-'+x);if(pan)pan.classList.toggle('active',x===t);
+    });
+    chartFilter=null;
+    document.getElementById('chartFilterBar').style.display='none';
+    // Esconde filtros globais e KPIs globais nas abas Home e VestiPago (elas tem seus proprios contextos)
+    var hideGlobals=(t==='home'||t==='vp');
+    document.querySelector('.filters').style.display=hideGlobals?'none':'flex';
+    document.getElementById('globalKpiRow').style.display=hideGlobals?'none':'grid';
+    var cd=document.getElementById('coDetail');if(cd)cd.style.display=hideGlobals?'none':'';
+    updateAll();
+}
 function switchCsat(s){currentCsat=s;document.getElementById('stb-oraculo').classList.toggle('active',s==='oraculo');document.getElementById('stb-plataforma').classList.toggle('active',s==='plataforma');document.getElementById('csat-oraculo').classList.toggle('active',s==='oraculo');document.getElementById('csat-plataforma').classList.toggle('active',s==='plataforma');chartFilter=null;document.getElementById('chartFilterBar').style.display='none';updateAll()}
 
 // === UPDATE: GLOBAL KPIs (sempre) ===
@@ -424,12 +485,99 @@ function updateCsatPlataforma(){
     kill('cp3');var byImpl={};d.forEach(function(r){var i=(r.implementador||'Sem implementador').trim();if(!i)i='Sem implementador';if(!byImpl[i])byImpl[i]=[];byImpl[i].push(r.nota)});var implList=Object.keys(byImpl).map(function(i){var ns=byImpl[i];return{impl:i,avg:ns.reduce(function(a,b){return a+b},0)/ns.length,ct:ns.length}}).sort(function(a,b){return b.ct-a.ct});if(implList.length){var _il=implList;charts['cp3']=new Chart(document.getElementById('cp3'),{type:'bar',data:{labels:implList.map(function(x){return x.impl+' ('+x.ct+')'}),datasets:[{label:'CSAT',data:implList.map(function(x){return+x.avg.toFixed(2)}),backgroundColor:implList.map(function(x){return x.avg>=4.5?'#00B894':x.avg>=3.5?'#F39C12':'#E17055'}),borderRadius:6,barPercentage:.6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',onClick:function(e,els){if(els.length){var idx=els[0].index;if(_il[idx])setChartFilter('implementador',_il[idx].impl,'Implementador: '+_il[idx].impl)}},plugins:{legend:{display:false},datalabels:{display:true,anchor:'end',align:'right',font:{weight:'bold',size:11}}},scales:{x:{min:0,max:5}}},plugins:[ChartDataLabels]})}
     var tb=document.querySelector('#tCsatPlat tbody'),h=[];d.slice().sort(function(a,b){return (b.data||'').localeCompare(a.data||'')}).forEach(function(r){h.push('<tr><td>'+(r.data||'-')+'</td><td>'+(r.empresa||'-')+'</td><td><b>'+r.nota+'</b></td><td>'+(r.comentario||'-')+'</td></tr>')});tb.innerHTML=h.join('')}
 
+// === UPDATE: HOME (GERAL) ===
+function updateHome(){
+    // Satisfacao: mostra NPS score e CSAT medio juntos
+    var nRec=(typeof NPS_DATA!=='undefined'?NPS_DATA:[]).filter(function(r){return r.nota!=null});
+    var nScore=calcNps(nRec);
+    var allCsat=[];
+    (typeof CSAT_ORACULO_DATA!=='undefined'?CSAT_ORACULO_DATA:[]).forEach(function(r){if(r.nota!=null)allCsat.push(+r.nota)});
+    (typeof CSAT_PLATAFORMA_DATA!=='undefined'?CSAT_PLATAFORMA_DATA:[]).forEach(function(r){if(r.nota!=null)allCsat.push(+r.nota)});
+    var csatAvg=allCsat.length?(allCsat.reduce(function(a,b){return a+b},0)/allCsat.length):null;
+    document.getElementById('home-csat-nps-val').textContent='NPS '+(nScore==null?'--':nScore);
+    document.getElementById('home-csat-nps-sub').textContent='CSAT medio '+(csatAvg==null?'--':csatAvg.toFixed(2))+'/5 ('+allCsat.length+' respostas)';
+    // Novos VestiPago
+    var vp=(typeof VP_DATA!=='undefined'?VP_DATA:null);
+    var nClientes=(vp&&vp.resumo&&vp.resumo.nClientes)||0;
+    var totalValor=(vp&&vp.resumo&&vp.resumo.totalValor)||0;
+    document.getElementById('home-vp-val').textContent=nClientes+' clientes';
+    document.getElementById('home-vp-sub').textContent='R$ '+totalValor.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' transacionado';
+}
+
+// === UPDATE: NOVOS VESTIPAGO ===
+var _vpInited=false;
+function vpInit(){
+    if(_vpInited)return;_vpInited=true;
+    var vp=(typeof VP_DATA!=='undefined'?VP_DATA:null);if(!vp||!vp.clientes)return;
+    var cs=document.getElementById('vpFCS');
+    (vp.csList||[]).forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o)});
+    var mes=document.getElementById('vpFMes');
+    (vp.mesesList||[]).forEach(function(m){var o=document.createElement('option');o.value=m;o.textContent=fmtM(m);mes.appendChild(o)});
+}
+function vpClearFilters(){document.getElementById('vpFMes').value='';document.getElementById('vpFCS').value='';document.getElementById('vpFMarca').value='';updateVp()}
+function fmtVpC(v){return 'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fmtVpD(s){if(!s||s.length<10)return s||'-';var p=s.substring(0,10).split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+function updateVp(){
+    vpInit();
+    var vp=(typeof VP_DATA!=='undefined'?VP_DATA:null);
+    var tb=document.querySelector('#tVp tbody');
+    if(!vp||!vp.clientes||!vp.clientes.length){
+        document.getElementById('vp-kn').textContent='0';document.getElementById('vp-ktot').textContent='R$ 0,00';document.getElementById('vp-kpix').textContent='R$ 0,00';document.getElementById('vp-kcar').textContent='R$ 0,00';document.getElementById('vp-tbl-count').textContent='0 clientes';
+        tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#999;padding:24px">Sem dados (VP_DATA vazio). Rode node NovosVestiPago/build.js</td></tr>';
+        return;
+    }
+    var fcs=document.getElementById('vpFCS').value;
+    var fm=(document.getElementById('vpFMarca').value||'').toLowerCase().trim();
+    var fmes=document.getElementById('vpFMes').value;
+    // effective: se mes selecionado, usa valores daquele mes; senao agregado
+    function eff(r){
+        if(fmes){var mv=r.meses&&r.meses[fmes];return {valPix:mv?mv.valPix:0,valCartao:mv?mv.valCartao:0,valTotal:mv?mv.valTotal:0,qtPix:mv?mv.qtPix:0,qtCartao:mv?mv.qtCartao:0,qtTotal:mv?mv.qtTotal:0}}
+        return {valPix:r.valPix,valCartao:r.valCartao,valTotal:r.valTotal,qtPix:r.qtPix,qtCartao:r.qtCartao,qtTotal:r.qtTotal};
+    }
+    var rows=vp.clientes.slice();
+    if(fcs)rows=rows.filter(function(r){return r.cs===fcs});
+    if(fm)rows=rows.filter(function(r){return (r.marca||'').toLowerCase().indexOf(fm)>=0});
+    // Mes completado = primeiroPedidoVp no mes anterior ao selecionado
+    if(fmes){
+        var _pp=fmes.split('-'),_py=+_pp[0],_pm=+_pp[1]-1;if(_pm<1){_pm=12;_py--}
+        var prevMes=_py+'-'+(_pm<10?'0':'')+_pm;
+        rows=rows.filter(function(r){return (r.primeiroPedidoVp||'').substring(0,7)===prevMes});
+    }
+    rows.sort(function(a,b){return eff(b).valTotal-eff(a).valTotal});
+    document.getElementById('vp-kn').textContent=rows.length;
+    var tT=0,tP=0,tC=0;rows.forEach(function(r){var e=eff(r);tT+=e.valTotal;tP+=e.valPix;tC+=e.valCartao});
+    document.getElementById('vp-ktot').textContent=fmtVpC(tT);
+    document.getElementById('vp-kpix').textContent=fmtVpC(tP);
+    document.getElementById('vp-kcar').textContent=fmtVpC(tC);
+    var mesLbl=fmes?(' completados em '+fmtM(fmes)):'';
+    document.getElementById('vp-tbl-count').textContent=rows.length+' cliente(s)'+mesLbl;
+    if(!rows.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#999;padding:24px">Nenhum cliente com os filtros atuais</td></tr>';return}
+    tb.innerHTML=rows.map(function(r){
+        var e=eff(r);
+        var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+        return '<tr>'+
+            '<td><span class="badge sm">'+esc(r.cs||'-')+'</span></td>'+
+            '<td><b>'+esc(r.marca||'-')+'</b></td>'+
+            '<td style="color:var(--g);white-space:nowrap">'+fmtVpD(r.primeiroPedidoVp)+'</td>'+
+            '<td style="text-align:right;font-weight:600;color:'+(e.valPix>0?'#0984E3':'#B2BEC3')+'">'+(e.valPix>0?fmtVpC(e.valPix):'&mdash;')+'</td>'+
+            '<td style="text-align:right;font-weight:600;color:'+(e.valCartao>0?'#F39C12':'#B2BEC3')+'">'+(e.valCartao>0?fmtVpC(e.valCartao):'&mdash;')+'</td>'+
+            '<td style="text-align:right;font-weight:700;color:var(--s)">'+fmtVpC(e.valTotal)+'</td>'+
+            '<td style="text-align:right;color:var(--g)">'+(e.qtTotal||0)+'</td>'+
+        '</tr>'
+    }).join('');
+}
+
 function updateAll(){
     updateGlobalKpis();
-    if(currentTab==='nps')updateNps();
+    if(currentTab==='home')updateHome();
+    else if(currentTab==='nps')updateNps();
     else if(currentTab==='csat'){if(currentCsat==='oraculo')updateCsatOraculo();else updateCsatPlataforma()}
+    else if(currentTab==='vp')updateVp();
 }
-window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;
+window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;window.updateVp=updateVp;window.vpClearFilters=vpClearFilters;
+// Inicia oculto os filtros/KPIs globais porque default tab eh Home
+document.querySelector('.filters').style.display='none';
+document.getElementById('globalKpiRow').style.display='none';
 updateAll();
 }
 if(sessionStorage.getItem('cs_auth')==='1')initDashboard();

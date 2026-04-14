@@ -15,7 +15,7 @@ const querystring = require('querystring');
 const DIR = __dirname;
 const SQL_SERVER = '7sowj2vsfd6efgf3phzgjfmvaq-nrdsskmspnteherwztit766zc4.datawarehouse.fabric.microsoft.com';
 const SQL_DATABASE = 'VestiHouse';
-const START_DATE = '2026-02-01'; // inicio da janela "novos VestiPago"
+const START_DATE = '2026-01-01'; // inicio da janela "novos VestiPago"
 
 // ----- env loading (local .env OR CI env vars) -----
 const ENV = {};

@@ -7,6 +7,7 @@ Consts gerados:
   NPS_DATA             -> sheets_data.json.nps (fetch_sheets)
   CSAT_ORACULO_DATA    -> sheets_data.json.csat_oraculo (fetch_sheets)
   CSAT_PLATAFORMA_DATA -> hubspot_data.json (fetch_hubspot) [pode ser []]
+  VP_DATA              -> ../NovosVestiPago/dados.js (node build.js) [pode ser {}]
   USERS_DATA           -> users_data.json (fetch_users)
   CS_NAMES             -> derivado de COMPANIES_DATA.anjo + NPS_DATA.anjo
 """
@@ -130,11 +131,30 @@ def derive_cs_names(companies: list, nps: list) -> list[str]:
     return sorted(s)
 
 
+def load_vp() -> dict:
+    """Le NovosVestiPago/dados.js (window.DADOS = {...};) e retorna o dict."""
+    p = ROOT.parent / "NovosVestiPago" / "dados.js"
+    if not p.exists():
+        print(f"[merge] {p.name} nao existe, VP_DATA vazio")
+        return {}
+    txt = p.read_text(encoding="utf-8").strip()
+    if txt.startswith("window.DADOS ="):
+        txt = txt[len("window.DADOS ="):].strip()
+    if txt.endswith(";"):
+        txt = txt[:-1]
+    try:
+        return json.loads(txt)
+    except json.JSONDecodeError as e:
+        print(f"[merge] falha ao parsear dados.js do NovosVestiPago: {e}")
+        return {}
+
+
 def main() -> None:
     companies = load("companies_data.json", [])
     sheets = load("sheets_data.json", {"nps": [], "csat_oraculo": []})
     users = load("users_data.json", [])
     hubspot = load("hubspot_data.json", [])
+    vp = load_vp()
 
     nps = build_nps(sheets)
     csat_oraculo = build_csat_oraculo(sheets)
@@ -153,6 +173,7 @@ def main() -> None:
         + dump("COMPANIES_DATA", companies)
         + dump("USERS_DATA", users)
         + dump("CS_NAMES", cs_names)
+        + dump("VP_DATA", vp)
     )
     OUT.write_text(content, encoding="utf-8")
     print(f"[merge] {OUT.name} escrito")
@@ -163,6 +184,7 @@ def main() -> None:
     print(f"  COMPANIES_DATA:       {len(companies)}")
     print(f"  USERS_DATA:           {len(users)}")
     print(f"  CS_NAMES:             {len(cs_names)}")
+    print(f"  VP_DATA.clientes:     {len(vp.get('clientes', [])) if isinstance(vp, dict) else 0}")
 
 
 if __name__ == "__main__":
