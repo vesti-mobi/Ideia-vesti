@@ -26,11 +26,25 @@ if %errorlevel% neq 0 (
     echo [%date% %time%] AVISO: patch-invoices.js falhou >> atualizar.log
 )
 
+REM 2c. Patch: Links/Cliques (Product + Rankings do report CS - Sucesso 2025)
+echo [%date% %time%] Executando patch-links.js... >> atualizar.log
+node patch-links.js >> atualizar.log 2>&1
+if %errorlevel% neq 0 (
+    echo [%date% %time%] AVISO: patch-links.js falhou >> atualizar.log
+)
+
 REM 3. Patch: Oráculo (Fabric painéis + configs)
 echo [%date% %time%] Executando patch-oraculo.js... >> atualizar.log
 node patch-oraculo.js >> atualizar.log 2>&1
 if %errorlevel% neq 0 (
     echo [%date% %time%] AVISO: patch-oraculo.js falhou >> atualizar.log
+)
+
+REM 3b. Patch: Empresas (contagem Fabric = PainelCSGerencial) — por ultimo pra preservar o campo
+echo [%date% %time%] Executando patch-empresas.js... >> atualizar.log
+node patch-empresas.js >> atualizar.log 2>&1
+if %errorlevel% neq 0 (
+    echo [%date% %time%] AVISO: patch-empresas.js falhou >> atualizar.log
 )
 
 REM 4. Verificar se dados.js mudou

@@ -55,7 +55,7 @@ async function main() {
     const DS = 'becfc71d-0794-41fd-abdb-38bf9e0f2fd0';
 
     console.log('Buscando Invoices...');
-    const dax = `EVALUATE SELECTCOLUMNS(Invoices, "invId", Invoices[id], "custId", Invoices[customer_id], "status", Invoices[status], "plan", Invoices[plano], "priceCents", Invoices[items_price_cents], "qty", Invoices[items_quantity])`;
+    const dax = `EVALUATE SELECTCOLUMNS(Invoices, "invId", Invoices[id], "custId", Invoices[customer_id], "status", Invoices[status], "plan", Invoices[Plano], "priceCents", Invoices[items_price_cents], "qty", Invoices[items_quantity], "dueDate", Invoices[due_date_TIMESTAMP], "createdAt", Invoices[created_at_iso_TIMESTAMP], "marca", Invoices[Marca])`;
     const body = JSON.stringify({ queries: [{ query: dax }], serializerSettings: { includeNulls: true } });
     const res = await hr({ hostname: 'api.powerbi.com', path: '/v1.0/myorg/groups/' + WS + '/datasets/' + DS + '/executeQueries', method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) } }, body);
     const data = JSON.parse(res.b);
@@ -87,14 +87,17 @@ async function main() {
         if (invId && !seen.has(invId)) {
             seen.add(invId);
             const custId = r['[custId]'] || '';
-            const brandName = custMap[custId] || '';
+            const brandName = (r['[marca]'] || '').trim() || custMap[custId] || '';
             const priceCents = r['[priceCents]'] || 0;
             const total = Math.abs(priceCents) / 100; // centavos -> reais
+            const dueRaw = r['[dueDate]'] || r['[createdAt]'] || '';
+            const due = typeof dueRaw === 'string' ? dueRaw.substring(0, 10) : '';
+            const dueMonth = due ? due.substring(0, 7) : '';
             invoices.push({
                 brand: brandName,
                 invId,
-                due: '', // not available in this dataset
-                dueMonth: '',
+                due,
+                dueMonth,
                 status: r['[status]'] || '',
                 total,
                 plan: r['[plan]'] || '',

@@ -684,7 +684,10 @@ function updateEmpresaPanel(){
             const faturasMes=show.faturamento.faturas.filter(f=>f.mes===ufMes&&f.status!=='canceled');
             const ufTotal=faturasMes.reduce((s,f)=>s+f.total,0);
             const ufStatus=faturasMes.reduce((worst,f)=>(statusPrio[f.status]||99)<(statusPrio[worst]||99)?f.status:worst,faturasMes[0].status);
-            ufEl.innerHTML='<span style="color:'+(colorMap[ufStatus]||'var(--text-primary)')+';font-weight:700;">'+(statusMap[ufStatus]||ufStatus)+'</span> — '+fmtCFull(ufTotal)+' <span style="color:var(--text-muted);font-size:11px;">('+ufMes+')</span>'+(ufTotal>0?' <span style="color:var(--primary);font-weight:600;font-size:11px;margin-left:6px;">Total Cobrado: '+fmtCFull(ufTotal)+'</span>':'');
+            // Mensalidade fixa = valor da fatura de referencia (1 fatura do mes, nao a soma).
+            // Se houver mais de uma fatura no mes (ex.: upgrade + mensalidade), mostra a de maior valor nao cancelada.
+            const ufMensal=faturasMes.reduce((mx,f)=>f.total>mx?f.total:mx,0)||ufRef.total||0;
+            ufEl.innerHTML='<span style="color:'+(colorMap[ufStatus]||'var(--text-primary)')+';font-weight:700;">'+(statusMap[ufStatus]||ufStatus)+'</span> — '+fmtCFull(ufMensal)+' <span style="color:var(--text-muted);font-size:11px;">('+ufMes+')</span>'+(ufMensal>0?' <span style="color:var(--primary);font-weight:600;font-size:11px;margin-left:6px;">Mensalidade: '+fmtCFull(ufMensal)+'</span>':'');
         } else if(show.planoTotalCobrado>0){
             ufEl.innerHTML='<span style="color:var(--text-muted);">Sem fatura</span> <span style="color:var(--primary);font-weight:600;font-size:11px;margin-left:6px;">Plano: '+fmtCFull(show.planoTotalCobrado)+'</span>';
         } else {
@@ -1045,7 +1048,16 @@ function renderTab0(){
 
     document.getElementById('kpiGrid0').innerHTML=kpiHTML([
         {icon:'&#128176;',label:'GMV Total',value:fmtC(gmv)},
-        {icon:'&#127980;',label:'Marcas',value:'<div style="display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;margin-top:2px"><div style="display:flex;flex-direction:column;align-items:center;line-height:1.2"><span style="font-size:22px;font-weight:800">'+fmtN(es.filter(e=>e.isMatriz||!e.matrizId).length)+'</span><span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);font-weight:600">Empresas</span></div><div style="display:flex;flex-direction:column;align-items:center;line-height:1.2"><span style="font-size:22px;font-weight:800">'+fmtN(es.filter(e=>e.matrizId&&!e.isMatriz).length)+'</span><span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);font-weight:600">Filiais</span></div><div style="display:flex;flex-direction:column;align-items:center;line-height:1.2"><span style="font-size:22px;font-weight:800">'+fmtN(es.length)+'</span><span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);font-weight:600">Total</span></div></div>'},
+        (function(){
+            // Usa fabricCounts (PainelCSGerencial) quando disponivel e sem filtros ativos,
+            // garantindo contagem identica ao Fabric. Com filtros volta para es local.
+            const _filtroAtivo=(document.getElementById('fCanal')&&document.getElementById('fCanal').value)||(document.getElementById('fAnjo')&&document.getElementById('fAnjo').value)||(document.getElementById('fBuscaEmp')&&document.getElementById('fBuscaEmp').value);
+            const _useFabric=DADOS.fabricCounts&&!_filtroAtivo;
+            const _emp=_useFabric?DADOS.fabricCounts.matriz:es.filter(e=>e.isMatriz||!e.matrizId).length;
+            const _fil=_useFabric?DADOS.fabricCounts.filial:es.filter(e=>e.matrizId&&!e.isMatriz).length;
+            const _tot=_useFabric?DADOS.fabricCounts.total:es.length;
+            return {icon:'&#127980;',label:'Marcas',value:'<div style="display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;margin-top:2px"><div style="display:flex;flex-direction:column;align-items:center;line-height:1.2"><span style="font-size:22px;font-weight:800">'+fmtN(_emp)+'</span><span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);font-weight:600">Empresas</span></div><div style="display:flex;flex-direction:column;align-items:center;line-height:1.2"><span style="font-size:22px;font-weight:800">'+fmtN(_fil)+'</span><span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);font-weight:600">Filiais</span></div><div style="display:flex;flex-direction:column;align-items:center;line-height:1.2"><span style="font-size:22px;font-weight:800">'+fmtN(_tot)+'</span><span style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);font-weight:600">Total</span></div></div>'};
+        })(),
         {icon:'&#128230;',label:'Total Pedidos',value:fmtN(ped)},
         {icon:'&#9989;',label:'Pedidos Pagos',value:fmtN(pagos)},
         {icon:'&#128178;',label:'Valor Pedidos Pagos',value:fmtC(valPag)},
@@ -1622,8 +1634,10 @@ function loadApp(){
         // Mostrar empresas Ativas + as sem status preenchido (build parcial nao deve apagar tudo).
         // Apenas Desativada eh excluida explicitamente.
         DADOS.empresas=DADOS.empresas.filter(e=>e.statusEmpresa!=='Desativada');
-        const nEmp=DADOS.empresas.filter(e=>e.isMatriz||!e.isFilial).length;
-        const nFil=DADOS.empresas.filter(e=>e.isFilial&&!e.isMatriz).length;
+        // Fabric (PainelCSGerencial) eh a fonte da verdade para contagem de empresas.
+        // Se patch-empresas.js rodou, DADOS.fabricCounts existe e tem {matriz,filial,total}.
+        const nEmp=(DADOS.fabricCounts&&DADOS.fabricCounts.matriz)||DADOS.empresas.filter(e=>e.isMatriz||!e.isFilial).length;
+        const nFil=(DADOS.fabricCounts&&DADOS.fabricCounts.filial)||DADOS.empresas.filter(e=>e.isFilial&&!e.isMatriz).length;
         document.getElementById('badgeTotal').textContent=nEmp+' empresas + '+nFil+' filiais';
         document.getElementById('badgeDate').textContent=DADOS.geradoEm?new Date(DADOS.geradoEm).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
         populateFilters();
