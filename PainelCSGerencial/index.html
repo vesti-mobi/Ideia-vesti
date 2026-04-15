@@ -160,7 +160,7 @@ table.dt tr:hover td{background:#FAFAFA}
         <div class="kpi"><div class="ki" style="background:#FDEAEA">&#128201;</div><div class="kl">Total Churn VestiPago</div><div class="kv" style="color:var(--d)" id="ch-ktot">--</div><div class="ks" id="ch-ktot-s">no periodo</div></div>
         <div class="kpi"><div class="ki" style="background:#FFF3E0">&#128197;</div><div class="kl">Mes de Pico</div><div class="kv" style="color:var(--w);font-size:20px" id="ch-kpeak">--</div><div class="ks" id="ch-kpeak-s"></div></div>
         <div class="kpi"><div class="ki" style="background:#F0EFFF">&#128100;</div><div class="kl">CS Mais Impactado</div><div class="kv" style="color:var(--p);font-size:18px" id="ch-kcs">--</div><div class="ks" id="ch-kcs-s"></div></div>
-        <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128181;</div><div class="kl">Valor Perdido</div><div class="kv" style="color:var(--s);font-size:20px" id="ch-kvalor">R$ --</div><div class="ks">mes anterior ao churn</div></div>
+        <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128181;</div><div class="kl">Valor Perdido</div><div class="kv" style="color:var(--s);font-size:20px" id="ch-kvalor">R$ --</div><div class="ks">ultimo mes completo antes do churn</div></div>
     </div>
     <div class="filters">
         <div class="filter-group"><label>Mes:</label><select class="f-select" id="chFMes" onchange="updateChurn()"><option value="">Todos</option></select></div>
@@ -644,18 +644,19 @@ function updateVp(){
 // mes = mes em que pararam o VP (= mes do ultimo pedido VP + 1)
 // Obs: o mes corrente e excluido porque payment_method em dbo.MongoDB_Pedidos_Geral
 // e populado com atraso (pedidos VP recentes aparecem como NULL e viram falso churn).
-// valorPerdido = soma dos pedidos VP (PIX/CREDIT_CARD) no mes imediatamente
-// anterior ao churn (ex: churn em Mar -> valor de Fev).
+// valorPerdido = soma dos pedidos VP (PIX/CREDIT_CARD) no ULTIMO MES COMPLETO
+// anterior ao mes do ultimo pedido VP (ex: ultVP 2026-02-10 -> ref = Janeiro inteiro).
+// valorPerdido = 0 significa que VP era esporadico, nao havia recorrencia mensal.
 var CHURN_DATA=[
-{mes:'2026-01',cs:'Jennyfer Rabelo',empresa:'Viotto',domainId:'1482280',ultVP:'2025-12-11',ultPed:'2026-04-14',totalVP:77,totalPed:3530,valorPerdido:12515.08},
-{mes:'2026-01',cs:'Thamiris Ribeiro',empresa:'Muna',domainId:'1516190',ultVP:'2025-12-15',ultPed:'2026-04-15',totalVP:41,totalPed:1277,valorPerdido:1549.10},
-{mes:'2026-02',cs:'Elisa Marques',empresa:'N-BLOOM',domainId:'1687315',ultVP:'2026-01-28',ultPed:'2026-03-29',totalVP:87,totalPed:192,valorPerdido:1789.75},
-{mes:'2026-02',cs:'Luana Coutinho',empresa:'G&B Bros',domainId:'1776270',ultVP:'2026-01-12',ultPed:'2026-04-14',totalVP:106,totalPed:213,valorPerdido:1955.00},
-{mes:'2026-02',cs:'Sem CS',empresa:'Bling Bling',domainId:'709790',ultVP:'2026-01-06',ultPed:'2026-03-25',totalVP:6,totalPed:108,valorPerdido:687.00},
-{mes:'2026-02',cs:'Thamiris Ribeiro',empresa:'Little Star',domainId:'1391220',ultVP:'2026-01-27',ultPed:'2026-03-28',totalVP:12,totalPed:54,valorPerdido:890.67},
-{mes:'2026-03',cs:'Jennyfer Rabelo',empresa:'Sued T-Shirt',domainId:'1436061',ultVP:'2026-02-05',ultPed:'2026-03-27',totalVP:22,totalPed:42,valorPerdido:324.00},
-{mes:'2026-03',cs:'Luana Coutinho',empresa:'Boise',domainId:'828876',ultVP:'2026-02-20',ultPed:'2026-04-15',totalVP:64,totalPed:12443,valorPerdido:887.97},
-{mes:'2026-03',cs:'Shirley Silva',empresa:'Bem Me Quer',domainId:'166943',ultVP:'2026-02-10',ultPed:'2026-04-14',totalVP:14,totalPed:3968,valorPerdido:2522.80}
+{mes:'2026-01',cs:'Jennyfer Rabelo',empresa:'Viotto',domainId:'1482280',ultVP:'2025-12-11',ultPed:'2026-04-14',totalVP:77,totalPed:3530,valorPerdido:0},
+{mes:'2026-01',cs:'Thamiris Ribeiro',empresa:'Muna',domainId:'1516190',ultVP:'2025-12-15',ultPed:'2026-04-15',totalVP:41,totalPed:1277,valorPerdido:0},
+{mes:'2026-02',cs:'Elisa Marques',empresa:'N-BLOOM',domainId:'1687315',ultVP:'2026-01-28',ultPed:'2026-03-29',totalVP:87,totalPed:192,valorPerdido:17696.28},
+{mes:'2026-02',cs:'Luana Coutinho',empresa:'G&B Bros',domainId:'1776270',ultVP:'2026-01-12',ultPed:'2026-04-14',totalVP:106,totalPed:213,valorPerdido:15934.00},
+{mes:'2026-02',cs:'Sem CS',empresa:'Bling Bling',domainId:'709790',ultVP:'2026-01-06',ultPed:'2026-03-25',totalVP:6,totalPed:108,valorPerdido:132.69},
+{mes:'2026-02',cs:'Thamiris Ribeiro',empresa:'Little Star',domainId:'1391220',ultVP:'2026-01-27',ultPed:'2026-03-28',totalVP:12,totalPed:54,valorPerdido:9192.36},
+{mes:'2026-03',cs:'Jennyfer Rabelo',empresa:'Sued T-Shirt',domainId:'1436061',ultVP:'2026-02-05',ultPed:'2026-03-27',totalVP:22,totalPed:42,valorPerdido:0},
+{mes:'2026-03',cs:'Luana Coutinho',empresa:'Boise',domainId:'828876',ultVP:'2026-02-20',ultPed:'2026-04-15',totalVP:64,totalPed:12443,valorPerdido:671.90},
+{mes:'2026-03',cs:'Shirley Silva',empresa:'Bem Me Quer',domainId:'166943',ultVP:'2026-02-10',ultPed:'2026-04-14',totalVP:14,totalPed:3968,valorPerdido:0}
 ];
 var _churnInited=false;
 function churnInit(){
