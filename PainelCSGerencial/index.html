@@ -160,7 +160,7 @@ table.dt tr:hover td{background:#FAFAFA}
         <div class="kpi"><div class="ki" style="background:#FDEAEA">&#128201;</div><div class="kl">Total Churn VestiPago</div><div class="kv" style="color:var(--d)" id="ch-ktot">--</div><div class="ks" id="ch-ktot-s">no periodo</div></div>
         <div class="kpi"><div class="ki" style="background:#FFF3E0">&#128197;</div><div class="kl">Mes de Pico</div><div class="kv" style="color:var(--w);font-size:20px" id="ch-kpeak">--</div><div class="ks" id="ch-kpeak-s"></div></div>
         <div class="kpi"><div class="ki" style="background:#F0EFFF">&#128100;</div><div class="kl">CS Mais Impactado</div><div class="kv" style="color:var(--p);font-size:18px" id="ch-kcs">--</div><div class="ks" id="ch-kcs-s"></div></div>
-        <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128230;</div><div class="kl">Media por Mes</div><div class="kv" style="color:var(--s)" id="ch-kavg">--</div><div class="ks">empresas/mes</div></div>
+        <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128181;</div><div class="kl">Valor Perdido</div><div class="kv" style="color:var(--s);font-size:20px" id="ch-kvalor">R$ --</div><div class="ks">mes anterior ao churn</div></div>
     </div>
     <div class="filters">
         <div class="filter-group"><label>Mes:</label><select class="f-select" id="chFMes" onchange="updateChurn()"><option value="">Todos</option></select></div>
@@ -174,7 +174,7 @@ table.dt tr:hover td{background:#FAFAFA}
         <h4>Detalhamento &middot; <span id="ch-tbl-count" style="color:var(--g);font-weight:500">--</span></h4>
         <div style="max-height:520px;overflow-y:auto">
             <table class="dt" id="tChurn">
-                <thead><tr><th>Mes Parou</th><th>Empresa</th><th>CS</th><th style="text-align:right">Ult. Pedido VP</th><th style="text-align:right">Ult. Pedido</th><th style="text-align:right">Total VP</th></tr></thead>
+                <thead><tr><th>Mes Parou</th><th>Empresa</th><th>CS</th><th style="text-align:right">Ult. Pedido VP</th><th style="text-align:right">Ult. Pedido</th><th style="text-align:right">Total VP</th><th style="text-align:right">Valor Perdido</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
@@ -646,16 +646,18 @@ function updateVp(){
 // mes = mes em que pararam o VP (= mes do ultimo pedido VP + 1)
 // Obs: o mes corrente e excluido porque payment_method em dbo.MongoDB_Pedidos_Geral
 // e populado com atraso (pedidos VP recentes aparecem como NULL e viram falso churn).
+// valorPerdido = soma dos pedidos VP (PIX/CREDIT_CARD) no mes imediatamente
+// anterior ao churn (ex: churn em Mar -> valor de Fev).
 var CHURN_DATA=[
-{mes:'2026-01',cs:'Jennyfer Rabelo',empresa:'Viotto',domainId:'1482280',ultVP:'2025-12-11',ultPed:'2026-04-14',totalVP:77,totalPed:3530},
-{mes:'2026-01',cs:'Thamiris Ribeiro',empresa:'Muna',domainId:'1516190',ultVP:'2025-12-15',ultPed:'2026-04-15',totalVP:41,totalPed:1277},
-{mes:'2026-02',cs:'Elisa Marques',empresa:'N-BLOOM',domainId:'1687315',ultVP:'2026-01-28',ultPed:'2026-03-29',totalVP:87,totalPed:192},
-{mes:'2026-02',cs:'Luana Coutinho',empresa:'G&B Bros',domainId:'1776270',ultVP:'2026-01-12',ultPed:'2026-04-14',totalVP:106,totalPed:213},
-{mes:'2026-02',cs:'Sem CS',empresa:'Bling Bling',domainId:'709790',ultVP:'2026-01-06',ultPed:'2026-03-25',totalVP:6,totalPed:108},
-{mes:'2026-02',cs:'Thamiris Ribeiro',empresa:'Little Star',domainId:'1391220',ultVP:'2026-01-27',ultPed:'2026-03-28',totalVP:12,totalPed:54},
-{mes:'2026-03',cs:'Jennyfer Rabelo',empresa:'Sued T-Shirt',domainId:'1436061',ultVP:'2026-02-05',ultPed:'2026-03-27',totalVP:22,totalPed:42},
-{mes:'2026-03',cs:'Luana Coutinho',empresa:'Boise',domainId:'828876',ultVP:'2026-02-20',ultPed:'2026-04-15',totalVP:64,totalPed:12443},
-{mes:'2026-03',cs:'Shirley Silva',empresa:'Bem Me Quer',domainId:'166943',ultVP:'2026-02-10',ultPed:'2026-04-14',totalVP:14,totalPed:3968}
+{mes:'2026-01',cs:'Jennyfer Rabelo',empresa:'Viotto',domainId:'1482280',ultVP:'2025-12-11',ultPed:'2026-04-14',totalVP:77,totalPed:3530,valorPerdido:12515.08},
+{mes:'2026-01',cs:'Thamiris Ribeiro',empresa:'Muna',domainId:'1516190',ultVP:'2025-12-15',ultPed:'2026-04-15',totalVP:41,totalPed:1277,valorPerdido:1549.10},
+{mes:'2026-02',cs:'Elisa Marques',empresa:'N-BLOOM',domainId:'1687315',ultVP:'2026-01-28',ultPed:'2026-03-29',totalVP:87,totalPed:192,valorPerdido:1789.75},
+{mes:'2026-02',cs:'Luana Coutinho',empresa:'G&B Bros',domainId:'1776270',ultVP:'2026-01-12',ultPed:'2026-04-14',totalVP:106,totalPed:213,valorPerdido:1955.00},
+{mes:'2026-02',cs:'Sem CS',empresa:'Bling Bling',domainId:'709790',ultVP:'2026-01-06',ultPed:'2026-03-25',totalVP:6,totalPed:108,valorPerdido:687.00},
+{mes:'2026-02',cs:'Thamiris Ribeiro',empresa:'Little Star',domainId:'1391220',ultVP:'2026-01-27',ultPed:'2026-03-28',totalVP:12,totalPed:54,valorPerdido:890.67},
+{mes:'2026-03',cs:'Jennyfer Rabelo',empresa:'Sued T-Shirt',domainId:'1436061',ultVP:'2026-02-05',ultPed:'2026-03-27',totalVP:22,totalPed:42,valorPerdido:324.00},
+{mes:'2026-03',cs:'Luana Coutinho',empresa:'Boise',domainId:'828876',ultVP:'2026-02-20',ultPed:'2026-04-15',totalVP:64,totalPed:12443,valorPerdido:887.97},
+{mes:'2026-03',cs:'Shirley Silva',empresa:'Bem Me Quer',domainId:'166943',ultVP:'2026-02-10',ultPed:'2026-04-14',totalVP:14,totalPed:3968,valorPerdido:2522.80}
 ];
 var _churnInited=false;
 function churnInit(){
@@ -686,7 +688,8 @@ function updateChurn(){
     var peak=null;mesKeys.forEach(function(k){if(!peak||byMes[k]>peak.v)peak={k:k,v:byMes[k]}});
     document.getElementById('ch-kpeak').textContent=peak?fmtM(peak.k):'--';
     document.getElementById('ch-kpeak-s').textContent=peak?peak.v+' empresas':'';
-    document.getElementById('ch-kavg').textContent=mesKeys.length?Math.round(total/mesKeys.length):'--';
+    var totalValor=d.reduce(function(a,b){return a+(b.valorPerdido||0)},0);
+    document.getElementById('ch-kvalor').textContent='R$ '+totalValor.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
     // por cs (top)
     var byCs={};d.forEach(function(r){byCs[r.cs]=(byCs[r.cs]||0)+1});
     var csList=Object.keys(byCs).map(function(c){return{c:c,v:byCs[c]}}).sort(function(a,b){return b.v-a.v});
@@ -706,19 +709,18 @@ function updateChurn(){
     }
     // tabela
     var tb=document.querySelector('#tChurn tbody'),h=[];
-    d.slice().sort(function(a,b){return (b.mes||'').localeCompare(a.mes||'')||b.totalVP-a.totalVP}).forEach(function(r){
-        h.push('<tr><td>'+fmtM(r.mes)+'</td><td><b>'+r.empresa+'</b> <span style="color:var(--g);font-size:10px">#'+r.domainId+'</span></td><td>'+r.cs+'</td><td style="text-align:right">'+fmtD(r.ultVP)+'</td><td style="text-align:right">'+fmtD(r.ultPed)+'</td><td style="text-align:right;font-weight:600;color:var(--d)">'+r.totalVP+'</td></tr>');
+    d.slice().sort(function(a,b){return (b.mes||'').localeCompare(a.mes||'')||(b.valorPerdido||0)-(a.valorPerdido||0)}).forEach(function(r){
+        var vp=(r.valorPerdido||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+        h.push('<tr><td>'+fmtM(r.mes)+'</td><td><b>'+r.empresa+'</b> <span style="color:var(--g);font-size:10px">#'+r.domainId+'</span></td><td>'+r.cs+'</td><td style="text-align:right">'+fmtD(r.ultVP)+'</td><td style="text-align:right">'+fmtD(r.ultPed)+'</td><td style="text-align:right;font-weight:600;color:var(--d)">'+r.totalVP+'</td><td style="text-align:right;font-weight:600;color:var(--s)">R$ '+vp+'</td></tr>');
     });
-    tb.innerHTML=h.join('')||'<tr><td colspan="6" style="text-align:center;color:#999;padding:16px">Sem dados</td></tr>';
+    tb.innerHTML=h.join('')||'<tr><td colspan="7" style="text-align:center;color:#999;padding:16px">Sem dados</td></tr>';
     document.getElementById('ch-tbl-count').textContent=d.length+' empresa(s)';
 }
 function updateHomeChurn(){
     var total=CHURN_DATA.length;
-    var meses={};CHURN_DATA.forEach(function(r){meses[r.mes]=(meses[r.mes]||0)+1});
-    var mk=Object.keys(meses).sort();
-    var last=mk.length?mk[mk.length-1]:null;
+    var valor=CHURN_DATA.reduce(function(a,b){return a+(b.valorPerdido||0)},0);
     document.getElementById('home-churn-val').textContent=total.toLocaleString('pt-BR')+' empresas';
-    document.getElementById('home-churn-sub').textContent=last?(meses[last]+' em '+fmtM(last)):'--';
+    document.getElementById('home-churn-sub').textContent='R$ '+valor.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' perdidos';
 }
 
 function updateAll(){
