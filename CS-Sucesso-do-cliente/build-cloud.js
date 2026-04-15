@@ -2037,6 +2037,28 @@ async function main() {
     }
     console.log('  Invoices matched to empresas: ' + invoiceMatched + '/' + empresasList.length);
 
+    // ---------- 8c. Remove duplicatas inativas por CNPJ ----------
+    // Mesma empresa (CNPJ) pode aparecer em dominios diferentes quando migra de
+    // dominio (ex: Muna -> saiu do dominio Mixxon 66334 e criou o dominio 1516190).
+    // O dominio antigo continua em ODBC_Domains mas nao tem mais pedidos. Removemos
+    // entradas com pedidos=0 quando existe OUTRA entrada da mesma CNPJ com pedidos>0.
+    const cnpjAtivos = new Set();
+    for (const emp of empresasList) {
+        const c = (emp.cnpj || '').replace(/\D/g, '');
+        if (c && (emp.pedidos || 0) > 0) cnpjAtivos.add(c);
+    }
+    const antes = empresasList.length;
+    empresasList = empresasList.filter(emp => {
+        const c = (emp.cnpj || '').replace(/\D/g, '');
+        if (!c) return true;
+        if ((emp.pedidos || 0) > 0) return true;
+        return !cnpjAtivos.has(c);
+    });
+    if (antes !== empresasList.length) {
+        console.log('  Dedup CNPJ: ' + antes + ' -> ' + empresasList.length +
+            ' (' + (antes - empresasList.length) + ' duplicatas inativas removidas)');
+    }
+
     // Validacao cruzada MongoDB_Pedidos_Geral (lakehouse). Nao bloqueia o build.
     await validateAgainstMongoPedidos(sqlToken, empresasList);
 
