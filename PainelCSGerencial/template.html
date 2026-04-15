@@ -168,8 +168,6 @@ table.dt tr:hover td{background:#FAFAFA}
         <button class="f-btn" onclick="churnClearFilters()">Limpar</button>
         <span style="font-size:11px;color:var(--g);margin-left:auto">Empresas ativas que pararam VestiPago &middot; jan/2026 ate mes anterior (mes corrente excluido: payment_method populado com atraso)</span>
     </div>
-    <div class="chart-row full"><div class="ch"><h4>Evolucao Mensal &middot; Empresas que pararam o VestiPago</h4><div class="cw tall"><canvas id="ch1"></canvas></div></div></div>
-    <div class="chart-row full"><div class="ch"><h4>Churn VestiPago por CS</h4><div class="cw tall"><canvas id="ch3"></canvas></div></div></div>
     <div class="tbl-card">
         <h4>Detalhamento &middot; <span id="ch-tbl-count" style="color:var(--g);font-weight:500">--</span></h4>
         <div style="max-height:520px;overflow-y:auto">
@@ -688,17 +686,6 @@ function updateChurn(){
     if(csList.length){document.getElementById('ch-kcs').textContent=csList[0].c;document.getElementById('ch-kcs-s').textContent=csList[0].v+' empresas ('+(total?Math.round(csList[0].v/total*100):0)+'%)'}
     else{document.getElementById('ch-kcs').textContent='--';document.getElementById('ch-kcs-s').textContent=''}
     document.getElementById('ch-ktot-s').textContent=mesKeys.length+' mes(es)';
-    // ch1: barras por mes (unica serie)
-    kill('ch1');
-    if(mesKeys.length){
-        charts['ch1']=new Chart(document.getElementById('ch1'),{type:'bar',data:{labels:mesKeys.map(function(m){return fmtM(m)}),datasets:[{label:'Empresas que pararam VP',data:mesKeys.map(function(m){return byMes[m]}),backgroundColor:'#E17055',borderRadius:6,barPercentage:.55}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{display:true,anchor:'end',align:'top',color:'#2D3436',font:{weight:'bold',size:12}},tooltip:{callbacks:{label:function(c){return c.parsed.y+' empresa(s)'}}}},scales:{y:{title:{display:true,text:'Empresas que pararam VP'},ticks:{precision:0}}}},plugins:[ChartDataLabels]});
-    }
-    // ch3: top CS
-    kill('ch3');
-    var csTop=csList.slice(0,12);
-    if(csTop.length){
-        charts['ch3']=new Chart(document.getElementById('ch3'),{type:'bar',data:{labels:csTop.map(function(x){return x.c}),datasets:[{label:'Empresas',data:csTop.map(function(x){return x.v}),backgroundColor:csTop.map(function(x){return x.v>=8?'#E17055':x.v>=4?'#F39C12':'#6C5CE7'}),borderRadius:6,barPercentage:.7}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},datalabels:{display:true,anchor:'end',align:'right',font:{weight:'bold',size:11},color:'#2D3436'}},scales:{x:{ticks:{precision:0}}}},plugins:[ChartDataLabels]});
-    }
     // tabela
     var tb=document.querySelector('#tChurn tbody'),h=[];
     d.slice().sort(function(a,b){return (b.mes||'').localeCompare(a.mes||'')||(b.valorPerdido||0)-(a.valorPerdido||0)}).forEach(function(r){
