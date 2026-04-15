@@ -166,7 +166,7 @@ table.dt tr:hover td{background:#FAFAFA}
         <div class="filter-group"><label>Mes:</label><select class="f-select" id="chFMes" onchange="updateChurn()"><option value="">Todos</option></select></div>
         <div class="filter-group"><label>CS:</label><select class="f-select" id="chFCS" onchange="updateChurn()"><option value="">Todos</option></select></div>
         <button class="f-btn" onclick="churnClearFilters()">Limpar</button>
-        <span style="font-size:11px;color:var(--g);margin-left:auto">Empresas que continuam ativas na Vesti mas pararam de usar VestiPago &middot; a partir de jan/2026</span>
+        <span style="font-size:11px;color:var(--g);margin-left:auto">Empresas ativas que pararam VestiPago &middot; jan/2026 ate mes anterior (mes corrente excluido: payment_method populado com atraso)</span>
     </div>
     <div class="chart-row full"><div class="ch"><h4>Evolucao Mensal &middot; Empresas que pararam o VestiPago</h4><div class="cw tall"><canvas id="ch1"></canvas></div></div></div>
     <div class="chart-row full"><div class="ch"><h4>Churn VestiPago por CS</h4><div class="cw tall"><canvas id="ch3"></canvas></div></div></div>
@@ -644,6 +644,8 @@ function updateVp(){
 // === CHURN VESTIPAGO DATA ===
 // Empresas que continuam ativas na Vesti (fazendo pedidos) mas pararam de usar o VestiPago.
 // mes = mes em que pararam o VP (= mes do ultimo pedido VP + 1)
+// Obs: o mes corrente e excluido porque payment_method em dbo.MongoDB_Pedidos_Geral
+// e populado com atraso (pedidos VP recentes aparecem como NULL e viram falso churn).
 var CHURN_DATA=[
 {mes:'2026-01',cs:'Jennyfer Rabelo',empresa:'Viotto',domainId:'1482280',ultVP:'2025-12-11',ultPed:'2026-04-14',totalVP:77,totalPed:3530},
 {mes:'2026-01',cs:'Thamiris Ribeiro',empresa:'Muna',domainId:'1516190',ultVP:'2025-12-15',ultPed:'2026-04-15',totalVP:41,totalPed:1277},
@@ -653,29 +655,7 @@ var CHURN_DATA=[
 {mes:'2026-02',cs:'Thamiris Ribeiro',empresa:'Little Star',domainId:'1391220',ultVP:'2026-01-27',ultPed:'2026-03-28',totalVP:12,totalPed:54},
 {mes:'2026-03',cs:'Jennyfer Rabelo',empresa:'Sued T-Shirt',domainId:'1436061',ultVP:'2026-02-05',ultPed:'2026-03-27',totalVP:22,totalPed:42},
 {mes:'2026-03',cs:'Luana Coutinho',empresa:'Boise',domainId:'828876',ultVP:'2026-02-20',ultPed:'2026-04-15',totalVP:64,totalPed:12443},
-{mes:'2026-03',cs:'Shirley Silva',empresa:'Bem Me Quer',domainId:'166943',ultVP:'2026-02-10',ultPed:'2026-04-14',totalVP:14,totalPed:3968},
-{mes:'2026-04',cs:'Sem CS',empresa:'Elae',domainId:'218051',ultVP:'2026-03-13',ultPed:'2026-04-14',totalVP:100,totalPed:325},
-{mes:'2026-04',cs:'Sem CS',empresa:'Vida Vici',domainId:'257448',ultVP:'2026-03-12',ultPed:'2026-04-14',totalVP:16,totalPed:870},
-{mes:'2026-04',cs:'Gabriella Busto',empresa:'Martt',domainId:'965096',ultVP:'2026-03-31',ultPed:'2026-04-15',totalVP:264,totalPed:1481},
-{mes:'2026-04',cs:'Gabriella Busto',empresa:'Menina Gata',domainId:'812626',ultVP:'2026-03-11',ultPed:'2026-04-14',totalVP:69,totalPed:7402},
-{mes:'2026-04',cs:'Gabriella Busto',empresa:'Valentina Sirrah',domainId:'619088',ultVP:'2026-03-30',ultPed:'2026-04-14',totalVP:322,totalPed:2369},
-{mes:'2026-04',cs:'Jennyfer Rabelo',empresa:'DJIELE MODA BEB\u00ca',domainId:'787879',ultVP:'2026-03-27',ultPed:'2026-04-10',totalVP:156,totalPed:464},
-{mes:'2026-04',cs:'Luana Coutinho',empresa:'Esta\u00e7\u00e3o Fit integra\u00e7\u00e3o',domainId:'873969',ultVP:'2026-03-11',ultPed:'2026-04-14',totalVP:199,totalPed:5420},
-{mes:'2026-04',cs:'Luana Coutinho',empresa:'Florita',domainId:'1201385',ultVP:'2026-03-30',ultPed:'2026-04-14',totalVP:150,totalPed:1084},
-{mes:'2026-04',cs:'Luana Coutinho',empresa:'KINWAY MODA PRAIA',domainId:'1656666',ultVP:'2026-03-31',ultPed:'2026-04-13',totalVP:29,totalPed:596},
-{mes:'2026-04',cs:'Luana Coutinho',empresa:'Le Ricard',domainId:'157680',ultVP:'2026-03-18',ultPed:'2026-04-15',totalVP:105,totalPed:5413},
-{mes:'2026-04',cs:'Luana Coutinho',empresa:'Rosie Lingerie',domainId:'998275',ultVP:'2026-03-03',ultPed:'2026-04-13',totalVP:122,totalPed:1014},
-{mes:'2026-04',cs:'Sem CS',empresa:'Canoni',domainId:'21682',ultVP:'2026-03-06',ultPed:'2026-04-13',totalVP:3,totalPed:59},
-{mes:'2026-04',cs:'Sem CS',empresa:'Emili',domainId:'44756',ultVP:'2026-03-30',ultPed:'2026-04-14',totalVP:210,totalPed:1318},
-{mes:'2026-04',cs:'Sem CS',empresa:'I1 Modas',domainId:'45794',ultVP:'2026-03-31',ultPed:'2026-04-13',totalVP:88,totalPed:124},
-{mes:'2026-04',cs:'Sem CS',empresa:'Kanolly',domainId:'344642',ultVP:'2026-03-27',ultPed:'2026-04-14',totalVP:80,totalPed:402},
-{mes:'2026-04',cs:'Sem CS',empresa:'Moirai',domainId:'145165',ultVP:'2026-03-31',ultPed:'2026-04-14',totalVP:128,totalPed:3276},
-{mes:'2026-04',cs:'Sem CS',empresa:'Seiss & Deiss',domainId:'120695',ultVP:'2026-03-18',ultPed:'2026-04-14',totalVP:105,totalPed:2756},
-{mes:'2026-04',cs:'Shirley Silva',empresa:'ESSENCE FASHION',domainId:'1771336',ultVP:'2026-03-12',ultPed:'2026-04-09',totalVP:3,totalPed:10},
-{mes:'2026-04',cs:'Shirley Silva',empresa:'Miss Cigarrete',domainId:'1326489',ultVP:'2026-03-30',ultPed:'2026-04-14',totalVP:48,totalPed:607},
-{mes:'2026-04',cs:'Thamiris Ribeiro',empresa:'Aero Summer',domainId:'1213886',ultVP:'2026-03-09',ultPed:'2026-04-14',totalVP:27,totalPed:1287},
-{mes:'2026-04',cs:'Thamiris Ribeiro',empresa:'Lemier',domainId:'1574022',ultVP:'2026-03-13',ultPed:'2026-04-14',totalVP:4,totalPed:675},
-{mes:'2026-04',cs:'Thamiris Ribeiro',empresa:'Nicoboco Pedido',domainId:'1044170',ultVP:'2026-03-25',ultPed:'2026-04-15',totalVP:73,totalPed:1041}
+{mes:'2026-03',cs:'Shirley Silva',empresa:'Bem Me Quer',domainId:'166943',ultVP:'2026-02-10',ultPed:'2026-04-14',totalVP:14,totalPed:3968}
 ];
 var _churnInited=false;
 function churnInit(){
