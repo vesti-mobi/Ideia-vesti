@@ -516,13 +516,9 @@ function updateEmpresaDatalist(){
     let empresas=fA?DADOS.empresas.filter(e=>e.anjo===fA):DADOS.empresas;
     // Show only matrizes and companies without filiais (hide filiais from main dropdown)
     empresas=empresas.filter(e=>e.isMatriz||!e.matrizId);
-    empresas.forEach(e=>{
-        const o=document.createElement('option');o.value=e.nome;dl.appendChild(o);
-        const semAcc=stripAcc(e.nome);
-        if(semAcc&&semAcc!==e.nome.toLowerCase()){
-            const o2=document.createElement('option');o2.value=semAcc;o2.label=e.nome;dl.appendChild(o2);
-        }
-    });
+    const termo=stripAcc(document.getElementById('fEmpresa').value.trim());
+    const lista=termo?empresas.filter(e=>stripAcc(e.nome).includes(termo)):empresas;
+    lista.forEach(e=>{const o=document.createElement('option');o.value=e.nome;dl.appendChild(o);});
 }
 
 function clearFilters(){
@@ -1669,6 +1665,7 @@ function loadApp(){
                 const emp=DADOS.empresas.find(e=>e.id&&e.id.toLowerCase()===v.toLowerCase());
                 if(emp){this.value=emp.nome;}
             }
+            updateEmpresaDatalist();
             tablePage=1;applyFilters();
         });
         document.getElementById('tableSearch').addEventListener('input',()=>{tablePage=1;renderTable();});
