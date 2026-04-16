@@ -41,6 +41,14 @@ jobs:
             echo "FABRIC_REFRESH_TOKEN=$NEW_TOKEN" >> $GITHUB_ENV
           fi
 
+      - name: Patch Links e Cliques (fallback se build-cloud falhou)
+        continue-on-error: true
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+        run: node CS-Sucesso-do-cliente/patch-links.js
+
       - name: Patch Painel CS vendas mensais e invoices
         continue-on-error: true
         env:

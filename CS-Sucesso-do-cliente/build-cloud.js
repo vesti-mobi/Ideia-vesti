@@ -1403,19 +1403,29 @@ async function main() {
     console.log('  VestiPago monthly aplicados: ' + vpPorEmpresaMensal.size + ' empresas (' + (vpMonthlyRows2025 || []).length + ' rows 2025 + ' + (vpMonthlyRows2026 || []).length + ' rows 2026)');
 
     // 5d. Product - links per company
-    for (const row of productRows) {
-        const companyId = row['Cadastros Users ( Vendedores ).CompanyId'];
-        if (companyId && empresasMap[companyId]) {
-            empresasMap[companyId].linksEnviados = parseInt(row['LinksEnviados']) || 0;
+    if (productRows.length > 0) {
+        for (const row of productRows) {
+            const companyId = row['Cadastros Users ( Vendedores ).CompanyId'];
+            if (companyId && empresasMap[companyId]) {
+                empresasMap[companyId].linksEnviados = parseInt(row['LinksEnviados']) || 0;
+            }
         }
+        console.log('  Links aplicados: ' + productRows.length + ' empresas');
+    } else {
+        console.warn('  WARN: productRows vazio — links NAO atualizados (query pode ter falhado)');
     }
 
     // 5e. Rankings - cliques per company
-    for (const row of rankingsRows) {
-        const companyId = row['Cadastros Users ( Vendedores ).CompanyId'];
-        if (companyId && empresasMap[companyId]) {
-            empresasMap[companyId].cliques = parseInt(row['Cliques']) || 0;
+    if (rankingsRows.length > 0) {
+        for (const row of rankingsRows) {
+            const companyId = row['Cadastros Users ( Vendedores ).CompanyId'];
+            if (companyId && empresasMap[companyId]) {
+                empresasMap[companyId].cliques = parseInt(row['Cliques']) || 0;
+            }
         }
+        console.log('  Cliques aplicados: ' + rankingsRows.length + ' empresas');
+    } else {
+        console.warn('  WARN: rankingsRows vazio — cliques NAO atualizados (query pode ter falhado)');
     }
 
     // 5f. Marcas e Planos - by CNPJ (all plan breakdown fields)

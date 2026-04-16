@@ -16,8 +16,15 @@ const qs = require('querystring');
 
 const DIR = __dirname;
 const ENV = {};
-fs.readFileSync(path.join(DIR, '.env'), 'utf-8').split('\n').forEach(l => {
-    const m = l.match(/^([^#=]+)=(.*)$/); if (m) ENV[m[1].trim()] = m[2].trim();
+// Load from .env file if present (local), fallback to process.env (CI)
+const _envFile = path.join(DIR, '.env');
+if (fs.existsSync(_envFile)) {
+    fs.readFileSync(_envFile, 'utf-8').split('\n').forEach(l => {
+        const m = l.match(/^([^#=]+)=(.*)$/); if (m) ENV[m[1].trim()] = m[2].trim();
+    });
+}
+['FABRIC_REFRESH_TOKEN', 'FABRIC_TENANT_ID', 'FABRIC_CLIENT_ID'].forEach(k => {
+    if (!ENV[k] && process.env[k]) ENV[k] = process.env[k];
 });
 
 const WS = 'aced753a-0f0e-4bcf-9264-72f6496cf2cf';
