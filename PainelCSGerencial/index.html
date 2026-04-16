@@ -157,22 +157,22 @@ table.dt tr:hover td{background:#FAFAFA}
 <!-- ============ CHURN TAB ============ -->
 <div class="tab-panel" id="tab-churn">
     <div class="kpi-row">
-        <div class="kpi"><div class="ki" style="background:#FDEAEA">&#128201;</div><div class="kl">Total Churn VestiPago</div><div class="kv" style="color:var(--d)" id="ch-ktot">--</div><div class="ks" id="ch-ktot-s">no periodo</div></div>
-        <div class="kpi"><div class="ki" style="background:#FFF3E0">&#128197;</div><div class="kl">Mes de Pico</div><div class="kv" style="color:var(--w);font-size:20px" id="ch-kpeak">--</div><div class="ks" id="ch-kpeak-s"></div></div>
-        <div class="kpi"><div class="ki" style="background:#F0EFFF">&#128100;</div><div class="kl">CS Mais Impactado</div><div class="kv" style="color:var(--p);font-size:18px" id="ch-kcs">--</div><div class="ks" id="ch-kcs-s"></div></div>
-        <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128181;</div><div class="kl">Valor Perdido</div><div class="kv" style="color:var(--s);font-size:20px" id="ch-kvalor">R$ --</div><div class="ks">ultimo mes completo antes do churn</div></div>
+        <div class="kpi"><div class="ki" style="background:#F0EFFF">&#128100;</div><div class="kl">Empresas em churn</div><div class="kv" style="color:var(--p)" id="ch-ktot">--</div><div class="ks" id="ch-ktot-s">desde jan/2026</div></div>
+        <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128181;</div><div class="kl">Total perdido</div><div class="kv" style="color:var(--s);font-size:20px" id="ch-kvalor">R$ --</div></div>
+        <div class="kpi"><div class="ki" style="background:#E8EAF6">&#128178;</div><div class="kl">Total PIX perdido</div><div class="kv" style="color:#0984E3;font-size:20px" id="ch-kpix">R$ --</div></div>
+        <div class="kpi"><div class="ki" style="background:#FFF3E0">&#128179;</div><div class="kl">Total Cartao perdido</div><div class="kv" style="color:var(--w);font-size:20px" id="ch-kcar">R$ --</div></div>
     </div>
     <div class="filters">
-        <div class="filter-group"><label>Mes:</label><select class="f-select" id="chFMes" onchange="updateChurn()"><option value="">Todos</option></select></div>
+        <div class="filter-group"><label>Mes parou:</label><select class="f-select" id="chFMes" onchange="updateChurn()"><option value="">Todos</option></select></div>
         <div class="filter-group"><label>CS:</label><select class="f-select" id="chFCS" onchange="updateChurn()"><option value="">Todos</option></select></div>
         <button class="f-btn" onclick="churnClearFilters()">Limpar</button>
-        <span style="font-size:11px;color:var(--g);margin-left:auto">Empresas ativas que pararam VestiPago &middot; jan/2026 ate mes anterior (mes corrente excluido: payment_method populado com atraso)</span>
+        <span style="font-size:11px;color:var(--g);margin-left:auto">Os filtros globais de Empresa e CS (barra acima) tambem se aplicam aqui.</span>
     </div>
     <div class="tbl-card">
-        <h4>Detalhamento &middot; <span id="ch-tbl-count" style="color:var(--g);font-weight:500">--</span></h4>
-        <div style="max-height:520px;overflow-y:auto">
+        <h4 id="ch-tbl-title">Empresas &middot; <span id="ch-tbl-count" style="color:var(--g);font-weight:500">--</span></h4>
+        <div style="max-height:520px;overflow-y:auto;overflow-x:auto">
             <table class="dt" id="tChurn">
-                <thead><tr><th>Mes Parou</th><th>Empresa</th><th>CS</th><th style="text-align:right">Ult. Pedido VP</th><th style="text-align:right">Ult. Pedido</th><th style="text-align:right">Total VP</th><th style="text-align:right">Valor Perdido</th></tr></thead>
+                <thead><tr><th>CS</th><th>Empresa</th><th>Ult. Pedido VP</th><th>Mes Parou</th><th style="text-align:right">PIX</th><th style="text-align:right">Cartao</th><th style="text-align:right">Total</th><th style="text-align:right">Qtd</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
@@ -191,7 +191,6 @@ table.dt tr:hover td{background:#FAFAFA}
         <button class="f-btn" onclick="vpClearFilters()">Limpar</button>
         <span style="font-size:11px;color:var(--g);margin-left:auto">Os filtros globais de Empresa e CS (barra acima) tambem se aplicam aqui.</span>
     </div>
-    <div style="font-size:11px;color:var(--g);margin-bottom:12px;padding:0 2px"><b>Como ler:</b> o filtro "Mes completado" mostra clientes que completaram o 1o mes de VestiPago no mes selecionado (ex: Fev/26 = comecaram em Jan/26). Sem filtro = agregado total desde jan/2026.</div>
     <div class="tbl-card">
         <h4 id="vp-tbl-title">Clientes &middot; <span id="vp-tbl-count" style="color:var(--g);font-weight:500">--</span></h4>
         <div style="max-height:520px;overflow-y:auto;overflow-x:auto">
@@ -541,7 +540,7 @@ function updateCsatPlataforma(){
 
     // cp3: CSAT por implementador
     kill('cp3');var byImpl={};d.forEach(function(r){var i=(r.implementador||'Sem implementador').trim();if(!i)i='Sem implementador';if(!byImpl[i])byImpl[i]=[];byImpl[i].push(r.nota)});var implList=Object.keys(byImpl).map(function(i){var ns=byImpl[i];return{impl:i,avg:ns.reduce(function(a,b){return a+b},0)/ns.length,ct:ns.length}}).sort(function(a,b){return b.ct-a.ct});if(implList.length){var _il=implList;charts['cp3']=new Chart(document.getElementById('cp3'),{type:'bar',data:{labels:implList.map(function(x){return x.impl+' ('+x.ct+')'}),datasets:[{label:'CSAT',data:implList.map(function(x){return+x.avg.toFixed(2)}),backgroundColor:implList.map(function(x){return x.avg>=4.5?'#00B894':x.avg>=3.5?'#F39C12':'#E17055'}),borderRadius:6,barPercentage:.6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',onClick:function(e,els){if(els.length){var idx=els[0].index;if(_il[idx])setChartFilter('implementador',_il[idx].impl,'Implementador: '+_il[idx].impl)}},plugins:{legend:{display:false},datalabels:{display:true,anchor:'end',align:'right',font:{weight:'bold',size:11}}},scales:{x:{min:0,max:5}}},plugins:[ChartDataLabels]})}
-    var tb=document.querySelector('#tCsatPlat tbody'),h=[];d.slice().sort(function(a,b){return (b.data||'').localeCompare(a.data||'')}).forEach(function(r){h.push('<tr><td>'+(r.data||'-')+'</td><td>'+(r.empresa||'-')+'</td><td><b>'+r.nota+'</b></td><td>'+(r.comentario||'-')+'</td></tr>')});tb.innerHTML=h.join('')}
+    var tb=document.querySelector('#tCsatPlat tbody'),h=[];d.slice().sort(function(a,b){return (b.data||'').localeCompare(a.data||'')}).forEach(function(r){var empEsc=(r.empresa||'').replace(/'/g,"\\'");h.push('<tr><td>'+(r.data||'-')+'</td><td class="click" onclick="selectCo(\''+empEsc+'\')">'+(r.empresa||'-')+'</td><td><b>'+r.nota+'</b></td><td>'+(r.comentario||'-')+'</td></tr>')});tb.innerHTML=h.join('')}
 
 // === UPDATE: HOME (GERAL) ===
 function updateHome(){
@@ -627,9 +626,11 @@ function updateVp(){
     tb.innerHTML=rows.map(function(r){
         var e=eff(r);
         var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+        var csEsc=(r.cs||'-').replace(/'/g,"\\'");
+        var marcaEsc=(r.marca||'-').replace(/'/g,"\\'");
         return '<tr>'+
-            '<td><span class="badge sm">'+esc(r.cs||'-')+'</span></td>'+
-            '<td><b>'+esc(r.marca||'-')+'</b></td>'+
+            '<td><span class="badge sm click" onclick="filterByCS(\''+csEsc+'\')">'+esc(r.cs||'-')+'</span></td>'+
+            '<td class="click" onclick="selectCo(\''+marcaEsc+'\')"><b>'+esc(r.marca||'-')+'</b></td>'+
             '<td style="color:var(--g);white-space:nowrap">'+fmtVpD(r.primeiroPedidoVp)+'</td>'+
             '<td style="text-align:right;font-weight:600;color:'+(e.valPix>0?'#0984E3':'#B2BEC3')+'">'+(e.valPix>0?fmtVpC(e.valPix):'&mdash;')+'</td>'+
             '<td style="text-align:right;font-weight:600;color:'+(e.valCartao>0?'#F39C12':'#B2BEC3')+'">'+(e.valCartao>0?fmtVpC(e.valCartao):'&mdash;')+'</td>'+
@@ -644,19 +645,18 @@ function updateVp(){
 // mes = mes em que pararam o VP (= mes do ultimo pedido VP + 1)
 // Obs: o mes corrente e excluido porque payment_method em dbo.MongoDB_Pedidos_Geral
 // e populado com atraso (pedidos VP recentes aparecem como NULL e viram falso churn).
-// valorPerdido = soma dos pedidos VP (PIX/CREDIT_CARD) no ULTIMO MES COMPLETO
-// anterior ao mes do ultimo pedido VP (ex: ultVP 2026-02-10 -> ref = Janeiro inteiro).
-// valorPerdido = 0 significa que VP era esporadico, nao havia recorrencia mensal.
+// valorPerdido = soma dos pedidos VP (PIX/CREDIT_CARD) no ultimo mes COMPLETO antes do churn.
+// Se o mes anterior ao ultVP nao tinha transacoes, usa o proprio mes do ultVP (marcado com obs).
 var CHURN_DATA=[
-{mes:'2026-01',cs:'Jennyfer Rabelo',empresa:'Viotto',domainId:'1482280',ultVP:'2025-12-11',ultPed:'2026-04-14',totalVP:77,totalPed:3530,valorPerdido:0},
-{mes:'2026-01',cs:'Thamiris Ribeiro',empresa:'Muna',domainId:'1516190',ultVP:'2025-12-15',ultPed:'2026-04-15',totalVP:41,totalPed:1277,valorPerdido:0},
-{mes:'2026-02',cs:'Elisa Marques',empresa:'N-BLOOM',domainId:'1687315',ultVP:'2026-01-28',ultPed:'2026-03-29',totalVP:87,totalPed:192,valorPerdido:17696.28},
-{mes:'2026-02',cs:'Luana Coutinho',empresa:'G&B Bros',domainId:'1776270',ultVP:'2026-01-12',ultPed:'2026-04-14',totalVP:106,totalPed:213,valorPerdido:15934.00},
-{mes:'2026-02',cs:'Sem CS',empresa:'Bling Bling',domainId:'709790',ultVP:'2026-01-06',ultPed:'2026-03-25',totalVP:6,totalPed:108,valorPerdido:132.69},
-{mes:'2026-02',cs:'Thamiris Ribeiro',empresa:'Little Star',domainId:'1391220',ultVP:'2026-01-27',ultPed:'2026-03-28',totalVP:12,totalPed:54,valorPerdido:9192.36},
-{mes:'2026-03',cs:'Jennyfer Rabelo',empresa:'Sued T-Shirt',domainId:'1436061',ultVP:'2026-02-05',ultPed:'2026-03-27',totalVP:22,totalPed:42,valorPerdido:0},
-{mes:'2026-03',cs:'Luana Coutinho',empresa:'Boise',domainId:'828876',ultVP:'2026-02-20',ultPed:'2026-04-15',totalVP:64,totalPed:12443,valorPerdido:671.90},
-{mes:'2026-03',cs:'Shirley Silva',empresa:'Bem Me Quer',domainId:'166943',ultVP:'2026-02-10',ultPed:'2026-04-14',totalVP:14,totalPed:3968,valorPerdido:0}
+{mes:'2026-01',cs:'Jennyfer Rabelo',empresa:'Viotto',domainId:'1482280',ultVP:'2025-12-11',ultPed:'2026-04-14',totalVP:77,totalPed:3530,valPix:12515.08,valCartao:0,valorPerdido:12515.08,obs:'Valor ref. dez/25 - mes do ultimo pedido VP (sem atividade em nov/25)'},
+{mes:'2026-01',cs:'Thamiris Ribeiro',empresa:'Muna',domainId:'1516190',ultVP:'2025-12-15',ultPed:'2026-04-15',totalVP:41,totalPed:1277,valPix:0,valCartao:1549.10,valorPerdido:1549.10,obs:'Valor ref. dez/25 - mes do ultimo pedido VP (sem atividade em nov/25)'},
+{mes:'2026-02',cs:'Elisa Marques',empresa:'N-BLOOM',domainId:'1687315',ultVP:'2026-01-28',ultPed:'2026-03-29',totalVP:87,totalPed:192,valPix:4917.26,valCartao:12779.02,valorPerdido:17696.28},
+{mes:'2026-02',cs:'Luana Coutinho',empresa:'G&B Bros',domainId:'1776270',ultVP:'2026-01-12',ultPed:'2026-04-14',totalVP:106,totalPed:213,valPix:15934.00,valCartao:0,valorPerdido:15934.00},
+{mes:'2026-02',cs:'Sem CS',empresa:'Bling Bling',domainId:'709790',ultVP:'2026-01-06',ultPed:'2026-03-25',totalVP:6,totalPed:108,valPix:132.69,valCartao:0,valorPerdido:132.69},
+{mes:'2026-02',cs:'Thamiris Ribeiro',empresa:'Little Star',domainId:'1391220',ultVP:'2026-01-27',ultPed:'2026-03-28',totalVP:12,totalPed:54,valPix:3729.70,valCartao:5462.66,valorPerdido:9192.36},
+{mes:'2026-03',cs:'Jennyfer Rabelo',empresa:'Sued T-Shirt',domainId:'1436061',ultVP:'2026-02-05',ultPed:'2026-03-27',totalVP:22,totalPed:42,valPix:324.00,valCartao:0,valorPerdido:324.00,obs:'Valor ref. fev/26 - mes do ultimo pedido VP (sem atividade em jan/26)'},
+{mes:'2026-03',cs:'Luana Coutinho',empresa:'Boise',domainId:'828876',ultVP:'2026-02-20',ultPed:'2026-04-15',totalVP:64,totalPed:12443,valPix:517.94,valCartao:153.96,valorPerdido:671.90},
+{mes:'2026-03',cs:'Shirley Silva',empresa:'Bem Me Quer',domainId:'166943',ultVP:'2026-02-10',ultPed:'2026-04-14',totalVP:14,totalPed:3968,valPix:0,valCartao:2522.80,valorPerdido:2522.80,obs:'Valor ref. fev/26 - mes do ultimo pedido VP (sem atividade em jan/26)'}
 ];
 var _churnInited=false;
 function churnInit(){
@@ -681,28 +681,39 @@ function updateChurn(){
     var d=getfChurn();
     var total=d.length;
     document.getElementById('ch-ktot').textContent=total.toLocaleString('pt-BR');
-    // por mes
-    var byMes={};d.forEach(function(r){byMes[r.mes]=(byMes[r.mes]||0)+1});
-    var mesKeys=Object.keys(byMes).sort();
-    var peak=null;mesKeys.forEach(function(k){if(!peak||byMes[k]>peak.v)peak={k:k,v:byMes[k]}});
-    document.getElementById('ch-kpeak').textContent=peak?fmtM(peak.k):'--';
-    document.getElementById('ch-kpeak-s').textContent=peak?peak.v+' empresas':'';
-    var totalValor=d.reduce(function(a,b){return a+(b.valorPerdido||0)},0);
-    document.getElementById('ch-kvalor').textContent='R$ '+totalValor.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-    // por cs (top)
-    var byCs={};d.forEach(function(r){byCs[r.cs]=(byCs[r.cs]||0)+1});
-    var csList=Object.keys(byCs).map(function(c){return{c:c,v:byCs[c]}}).sort(function(a,b){return b.v-a.v});
-    if(csList.length){document.getElementById('ch-kcs').textContent=csList[0].c;document.getElementById('ch-kcs-s').textContent=csList[0].v+' empresas ('+(total?Math.round(csList[0].v/total*100):0)+'%)'}
-    else{document.getElementById('ch-kcs').textContent='--';document.getElementById('ch-kcs-s').textContent=''}
-    document.getElementById('ch-ktot-s').textContent=mesKeys.length+' mes(es)';
-    // tabela
+    document.getElementById('ch-ktot-s').textContent='desde jan/2026';
+    // totais (mesmo padrao do VP: total, pix, cartao)
+    var tT=0,tP=0,tC=0;
+    d.forEach(function(r){tT+=(r.valorPerdido||0);tP+=(r.valPix||0);tC+=(r.valCartao||0)});
+    document.getElementById('ch-kvalor').textContent=fmtVpC(tT);
+    document.getElementById('ch-kpix').textContent=fmtVpC(tP);
+    document.getElementById('ch-kcar').textContent=fmtVpC(tC);
+    // tabela (mesmo estilo da tab VP: badge para CS, bold para empresa, PIX/Cartao/Total/Qtd)
+    var mesLbl=document.getElementById('chFMes').value?(' em '+fmtM(document.getElementById('chFMes').value)):'';
+    document.getElementById('ch-tbl-count').textContent=d.length+' empresa(s)'+mesLbl;
     var tb=document.querySelector('#tChurn tbody'),h=[];
-    d.slice().sort(function(a,b){return (b.mes||'').localeCompare(a.mes||'')||(b.valorPerdido||0)-(a.valorPerdido||0)}).forEach(function(r){
-        var vp=(r.valorPerdido||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-        h.push('<tr><td>'+fmtM(r.mes)+'</td><td><b>'+r.empresa+'</b> <span style="color:var(--g);font-size:10px">#'+r.domainId+'</span></td><td>'+r.cs+'</td><td style="text-align:right">'+fmtD(r.ultVP)+'</td><td style="text-align:right">'+fmtD(r.ultPed)+'</td><td style="text-align:right;font-weight:600;color:var(--d)">'+r.totalVP+'</td><td style="text-align:right;font-weight:600;color:var(--s)">R$ '+vp+'</td></tr>');
+    var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+    d.slice().sort(function(a,b){return (b.valorPerdido||0)-(a.valorPerdido||0)||(b.mes||'').localeCompare(a.mes||'')}).forEach(function(r){
+        var csEsc=(r.cs||'-').replace(/'/g,"\\'");
+        var empEsc=(r.empresa||'-').replace(/'/g,"\\'");
+        var obsTag=r.obs?' <span title="'+esc(r.obs)+'" style="cursor:help;color:var(--w);font-size:10px;font-weight:700">*</span>':'';
+        h.push('<tr>'+
+            '<td><span class="badge sm click" onclick="filterByCS(\''+csEsc+'\')">'+esc(r.cs||'-')+'</span></td>'+
+            '<td class="click" onclick="selectCo(\''+empEsc+'\')"><b>'+esc(r.empresa||'-')+'</b>'+obsTag+'</td>'+
+            '<td style="color:var(--g);white-space:nowrap">'+fmtVpD(r.ultVP)+'</td>'+
+            '<td style="color:var(--g);white-space:nowrap">'+fmtM(r.mes)+'</td>'+
+            '<td style="text-align:right;font-weight:600;color:'+((r.valPix||0)>0?'#0984E3':'#B2BEC3')+'">'+((r.valPix||0)>0?fmtVpC(r.valPix):'&mdash;')+'</td>'+
+            '<td style="text-align:right;font-weight:600;color:'+((r.valCartao||0)>0?'#F39C12':'#B2BEC3')+'">'+((r.valCartao||0)>0?fmtVpC(r.valCartao):'&mdash;')+'</td>'+
+            '<td style="text-align:right;font-weight:700;color:var(--s)">'+fmtVpC(r.valorPerdido)+obsTag+'</td>'+
+            '<td style="text-align:right;color:var(--g)">'+(r.totalVP||0)+'</td>'+
+        '</tr>');
     });
-    tb.innerHTML=h.join('')||'<tr><td colspan="7" style="text-align:center;color:#999;padding:16px">Sem dados</td></tr>';
-    document.getElementById('ch-tbl-count').textContent=d.length+' empresa(s)';
+    tb.innerHTML=h.join('')||'<tr><td colspan="8" style="text-align:center;color:#999;padding:24px">Nenhuma empresa com os filtros atuais</td></tr>';
+    // nota de rodape se houver empresas com obs
+    var temObs=d.some(function(r){return !!r.obs});
+    var rodape=document.getElementById('ch-rodape');
+    if(!rodape){rodape=document.createElement('div');rodape.id='ch-rodape';rodape.style.cssText='font-size:10px;color:var(--g);margin-top:8px;padding:0 4px';tb.closest('.tbl-card').appendChild(rodape)}
+    rodape.innerHTML=temObs?'<span style="color:var(--w);font-weight:700">*</span> Empresas sem atividade VP recorrente no mes anterior ao churn — valor referente ao mes do ultimo pedido VP (pode ser parcial).':'';
 }
 function updateHomeChurn(){
     var total=CHURN_DATA.length;
@@ -719,7 +730,8 @@ function updateAll(){
     else if(currentTab==='vp')updateVp();
     else if(currentTab==='churn')updateChurn();
 }
-window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;window.updateVp=updateVp;window.vpClearFilters=vpClearFilters;window.goBack=goBack;window.updateChurn=updateChurn;window.churnClearFilters=churnClearFilters;
+function filterByCS(name){fCS.value=name;document.getElementById('fClear').style.display='inline-block';updateAll()}
+window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;window.updateVp=updateVp;window.vpClearFilters=vpClearFilters;window.goBack=goBack;window.updateChurn=updateChurn;window.churnClearFilters=churnClearFilters;window.filterByCS=filterByCS;
 // Inicializacao: Home e default; filtros globais visiveis, KPIs globais ocultos
 document.querySelector('.filters').style.display='flex';
 document.getElementById('globalKpiRow').style.display='none';
