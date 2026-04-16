@@ -180,6 +180,11 @@ def main() -> None:
 
             last_any = _to_date(r.get("last_any_at"))
 
+            # Filtro: so inclui se a empresa continua fazendo pedidos (nao-VP) apos o ultimo VP
+            # Ou seja, ultPed > ultVP. Se parou tudo, e churn geral, nao so VP.
+            if last_any is None or last_any <= last_vp:
+                continue
+
             churn_rows.append({
                 "mes": f"{cy:04d}-{cm:02d}",
                 "cs": (r.get("cs_name") or "Sem CS").strip(),
