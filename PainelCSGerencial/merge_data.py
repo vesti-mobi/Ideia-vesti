@@ -10,6 +10,7 @@ Consts gerados:
   VP_DATA              -> ../NovosVestiPago/dados.js (node build.js) [pode ser {}]
   USERS_DATA           -> users_data.json (fetch_users)
   CS_NAMES             -> derivado de COMPANIES_DATA.anjo + NPS_DATA.anjo
+  CHURN_DATA           -> churn_vestipago_data.json (fetch_churn_vestipago) [pode ser []]
 """
 
 import json
@@ -155,6 +156,7 @@ def main() -> None:
     users = load("users_data.json", [])
     hubspot = load("hubspot_data.json", [])
     vp = load_vp()
+    churn = load("churn_vestipago_data.json", [])
 
     nps = build_nps(sheets)
     csat_oraculo = build_csat_oraculo(sheets)
@@ -174,6 +176,7 @@ def main() -> None:
         + dump("USERS_DATA", users)
         + dump("CS_NAMES", cs_names)
         + dump("VP_DATA", vp)
+        + dump("CHURN_DATA", churn)
     )
     OUT.write_text(content, encoding="utf-8")
     print(f"[merge] {OUT.name} escrito")
@@ -185,6 +188,7 @@ def main() -> None:
     print(f"  USERS_DATA:           {len(users)}")
     print(f"  CS_NAMES:             {len(cs_names)}")
     print(f"  VP_DATA.clientes:     {len(vp.get('clientes', [])) if isinstance(vp, dict) else 0}")
+    print(f"  CHURN_DATA:           {len(churn)}")
 
 
 if __name__ == "__main__":

@@ -75,6 +75,7 @@ jobs:
           python fetch_sheets.py || echo "WARN: fetch_sheets falhou"
           python fetch_users.py || echo "WARN: fetch_users falhou"
           python fetch_hubspot.py || echo "WARN: fetch_hubspot falhou"
+          python fetch_churn_vestipago.py || echo "WARN: fetch_churn_vestipago falhou"
           python merge_data.py
           python build_html.py
 

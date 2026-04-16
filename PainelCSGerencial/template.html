@@ -633,23 +633,9 @@ function updateVp(){
 }
 
 // === CHURN VESTIPAGO DATA ===
-// Empresas que continuam ativas na Vesti (fazendo pedidos) mas pararam de usar o VestiPago.
-// mes = mes em que pararam o VP (= mes do ultimo pedido VP + 1)
-// Obs: o mes corrente e excluido porque payment_method em dbo.MongoDB_Pedidos_Geral
-// e populado com atraso (pedidos VP recentes aparecem como NULL e viram falso churn).
-// valorPerdido = soma dos pedidos VP (PIX/CREDIT_CARD) no ultimo mes COMPLETO antes do churn.
-// Se o mes anterior ao ultVP nao tinha transacoes, usa o proprio mes do ultVP (marcado com obs).
-var CHURN_DATA=[
-{mes:'2026-01',cs:'Jennyfer Rabelo',empresa:'Viotto',domainId:'1482280',ultVP:'2025-12-11',ultPed:'2026-04-14',totalVP:77,totalPed:3530,valPix:12515.08,valCartao:0,valorPerdido:12515.08,obs:'Valor ref. dez/25 - mes do ultimo pedido VP (sem atividade em nov/25)'},
-{mes:'2026-01',cs:'Thamiris Ribeiro',empresa:'Muna',domainId:'1516190',ultVP:'2025-12-15',ultPed:'2026-04-15',totalVP:41,totalPed:1277,valPix:0,valCartao:1549.10,valorPerdido:1549.10,obs:'Valor ref. dez/25 - mes do ultimo pedido VP (sem atividade em nov/25)'},
-{mes:'2026-02',cs:'Elisa Marques',empresa:'N-BLOOM',domainId:'1687315',ultVP:'2026-01-28',ultPed:'2026-03-29',totalVP:87,totalPed:192,valPix:4917.26,valCartao:12779.02,valorPerdido:17696.28},
-{mes:'2026-02',cs:'Luana Coutinho',empresa:'G&B Bros',domainId:'1776270',ultVP:'2026-01-12',ultPed:'2026-04-14',totalVP:106,totalPed:213,valPix:15934.00,valCartao:0,valorPerdido:15934.00},
-{mes:'2026-02',cs:'Sem CS',empresa:'Bling Bling',domainId:'709790',ultVP:'2026-01-06',ultPed:'2026-03-25',totalVP:6,totalPed:108,valPix:132.69,valCartao:0,valorPerdido:132.69},
-{mes:'2026-02',cs:'Thamiris Ribeiro',empresa:'Little Star',domainId:'1391220',ultVP:'2026-01-27',ultPed:'2026-03-28',totalVP:12,totalPed:54,valPix:3729.70,valCartao:5462.66,valorPerdido:9192.36},
-{mes:'2026-03',cs:'Jennyfer Rabelo',empresa:'Sued T-Shirt',domainId:'1436061',ultVP:'2026-02-05',ultPed:'2026-03-27',totalVP:22,totalPed:42,valPix:324.00,valCartao:0,valorPerdido:324.00,obs:'Valor ref. fev/26 - mes do ultimo pedido VP (sem atividade em jan/26)'},
-{mes:'2026-03',cs:'Luana Coutinho',empresa:'Boise',domainId:'828876',ultVP:'2026-02-20',ultPed:'2026-04-15',totalVP:64,totalPed:12443,valPix:517.94,valCartao:153.96,valorPerdido:671.90},
-{mes:'2026-03',cs:'Shirley Silva',empresa:'Bem Me Quer',domainId:'166943',ultVP:'2026-02-10',ultPed:'2026-04-14',totalVP:14,totalPed:3968,valPix:0,valCartao:2522.80,valorPerdido:2522.80,obs:'Valor ref. fev/26 - mes do ultimo pedido VP (sem atividade em jan/26)'}
-];
+// CHURN_DATA e injetado pelo merge_data.py via INLINE_DATA (fetch_churn_vestipago.py -> churn_vestipago_data.json)
+// Fallback: se CHURN_DATA nao existir (build antigo), usa array vazio
+if(typeof CHURN_DATA==='undefined')window.CHURN_DATA=[];
 var _churnInited=false;
 function churnInit(){
     if(_churnInited)return;_churnInited=true;
