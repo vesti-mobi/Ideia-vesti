@@ -89,6 +89,10 @@ jobs:
           FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
         run: node CS-Sucesso-do-cliente/patch-invoices.js
 
+      - name: Patch fabricCounts (matriz/filial/total do PainelCSGerencial)
+        continue-on-error: true
+        run: node CS-Sucesso-do-cliente/patch-empresas.js
+
       - name: Atualizar refresh token antes de Pedidos por Marca
         continue-on-error: true
         env:
