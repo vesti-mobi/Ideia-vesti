@@ -174,12 +174,23 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
 
 <script>
 // carrega dados.js com cache-bust agressivo — evita browser servir versao velha
+window._dadosError=null;
 (function(){
     var s=document.createElement('script');
     s.src='dados.js?v='+Date.now()+'_'+Math.random().toString(36).substring(2,8);
     s.onload=function(){window._dadosLoaded=true};
+    s.onerror=function(){window._dadosError='falha ao carregar dados.js'};
     document.head.appendChild(s);
 })();
+// captura qualquer erro de JS pra nao ficar silencioso
+window.addEventListener('error',function(e){
+    if(window._dadosError)return;
+    window._dadosError='JS error: '+(e.message||'desconhecido');
+    try{
+        var el=document.getElementById('tbody');
+        if(el)el.innerHTML='<tr><td colspan="11" class="empty" style="color:#E17055">ERRO: '+(e.message||e.filename||'')+' (linha '+(e.lineno||'?')+')</td></tr>';
+    }catch(_){}
+});
 
 function doLogin(){
     var p=document.getElementById('loginPass').value;
@@ -195,9 +206,25 @@ function doLogout(){sessionStorage.removeItem('stark_auth');location.reload()}
 function showApp(){
     document.getElementById('loginScreen').style.display='none';
     document.getElementById('appContent').style.display='block';
+    var tries=0;
     (function wait(){
-        if(window._dadosLoaded&&typeof window.DADOS!=='undefined'&&window.DADOS){init()}
-        else{setTimeout(wait,60)}
+        tries++;
+        if(window._dadosError){
+            var el=document.getElementById('tbody');
+            if(el)el.innerHTML='<tr><td colspan="11" class="empty" style="color:#E17055">ERRO: '+window._dadosError+'</td></tr>';
+            return;
+        }
+        if(window._dadosLoaded&&typeof window.DADOS!=='undefined'&&window.DADOS){
+            try{init()}catch(e){
+                var el=document.getElementById('tbody');
+                if(el)el.innerHTML='<tr><td colspan="11" class="empty" style="color:#E17055">ERRO init: '+(e&&e.message)+'</td></tr>';
+            }
+        } else if(tries>80){
+            var el=document.getElementById('tbody');
+            if(el)el.innerHTML='<tr><td colspan="11" class="empty" style="color:#E17055">Timeout: dados.js nao carregou em 5s. Verifique o console (F12)</td></tr>';
+        } else {
+            setTimeout(wait,60);
+        }
     })();
 }
 if(sessionStorage.getItem('stark_auth')==='1')showApp();
