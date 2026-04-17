@@ -1,12 +1,13 @@
 """
-Clientes Vesti (todos) que atingiram a marca de 80+ pedidos num mesmo mes
-em 2026. Cada empresa aparece 1x APENAS no primeiro mes (em 2026) que
-bateu a marca — se bate em jan e fev, so conta jan.
+Clientes Vesti que bateram o marco de 80+ pedidos num unico mes civil
+PELA PRIMEIRA VEZ EM 2026 (janeiro, fevereiro, marco ou abril).
+
+Quem ja havia batido 80+ em algum mes antes de 2026 e EXCLUIDO —
+queremos so a primeira conquista historica que aconteceu no ano corrente.
 
 Adicionalmente traz:
   - dataBateu: data/hora do 80o pedido do mes qualificado
-  - totalPedidos: total historico de pedidos da empresa (lifetime, todos
-    os anos no lakehouse)
+  - totalPedidos: total historico de pedidos da empresa (lifetime)
 
 Output: top80_data.json
 
@@ -21,12 +22,12 @@ Formato (consumido pelo template.html via merge_data -> TOP80_DATA):
             "cs": "...",
             "canal": "...",
             "cnpj": "...",
-            "mes": "2026-02",                  # primeiro mes 80+
+            "mes": "2026-02",                  # 1o mes 80+ na historia
             "dataBateu": "2026-02-18",         # dia do 80o pedido
             "qtTotal": 120,                    # pedidos no mes qualificado
             "qtPix": 30, "qtCartao": 15,
             "valTotal": 45123.45, "valPix": 15000, "valCartao": 7500,
-            "totalPedidos": 4523                # historico da empresa
+            "totalPedidos": 4523                # lifetime da empresa
         }
     ],
     "mesesList": ["2026-01", "2026-02", ...],
@@ -47,20 +48,19 @@ COMPANIES_JSON = ROOT / "companies_data.json"
 OUT_JSON = ROOT / "top80_data.json"
 
 THRESHOLD = 80
-START_DATE = "2026-01-01"
-END_DATE = "2027-01-01"
+YEAR_START = "2026-01-01"
+YEAR_END = "2027-01-01"
 
 SQL_TOP80 = f"""
-WITH orders_2026 AS (
+WITH orders_clean AS (
     SELECT domainId, settings_createdAt_TIMESTAMP, summary_total, payment_method
     FROM dbo.MongoDB_Pedidos_Geral
     WHERE domainId IS NOT NULL
       AND TRY_CAST(domainId AS BIGINT) IS NOT NULL
       AND summary_total IS NOT NULL AND summary_total > 0 AND summary_total < 50000
-      AND settings_createdAt_TIMESTAMP >= '{START_DATE}'
-      AND settings_createdAt_TIMESTAMP < '{END_DATE}'
+      AND settings_createdAt_TIMESTAMP IS NOT NULL
 ),
-monthly AS (
+monthly_2026 AS (
     SELECT domainId,
            FORMAT(settings_createdAt_TIMESTAMP, 'yyyy-MM') AS mes,
            COUNT(*) AS qt_total,
@@ -69,13 +69,35 @@ monthly AS (
            SUM(summary_total) AS val_total,
            SUM(CASE WHEN payment_method = 'PIX' THEN summary_total ELSE 0 END) AS val_pix,
            SUM(CASE WHEN payment_method = 'CREDIT_CARD' THEN summary_total ELSE 0 END) AS val_cartao
-    FROM orders_2026
+    FROM orders_clean
+    WHERE settings_createdAt_TIMESTAMP >= '{YEAR_START}'
+      AND settings_createdAt_TIMESTAMP < '{YEAR_END}'
     GROUP BY domainId, FORMAT(settings_createdAt_TIMESTAMP, 'yyyy-MM')
-    HAVING COUNT(*) >= {THRESHOLD}
 ),
-first_month AS (
+candidates AS (
+    SELECT DISTINCT domainId
+    FROM monthly_2026
+    WHERE qt_total >= {THRESHOLD}
+),
+pre_2026_monthly AS (
+    SELECT domainId,
+           FORMAT(settings_createdAt_TIMESTAMP, 'yyyy-MM') AS mes,
+           COUNT(*) AS qt_total
+    FROM orders_clean
+    WHERE settings_createdAt_TIMESTAMP < '{YEAR_START}'
+      AND domainId IN (SELECT domainId FROM candidates)
+    GROUP BY domainId, FORMAT(settings_createdAt_TIMESTAMP, 'yyyy-MM')
+),
+already_80_before AS (
+    SELECT DISTINCT domainId
+    FROM pre_2026_monthly
+    WHERE qt_total >= {THRESHOLD}
+),
+first_80_in_2026 AS (
     SELECT domainId, MIN(mes) AS first_mes
-    FROM monthly
+    FROM monthly_2026
+    WHERE qt_total >= {THRESHOLD}
+      AND domainId NOT IN (SELECT domainId FROM already_80_before)
     GROUP BY domainId
 ),
 ranked AS (
@@ -86,7 +108,10 @@ ranked AS (
                PARTITION BY domainId, FORMAT(settings_createdAt_TIMESTAMP, 'yyyy-MM')
                ORDER BY settings_createdAt_TIMESTAMP ASC
            ) AS rn
-    FROM orders_2026
+    FROM orders_clean
+    WHERE settings_createdAt_TIMESTAMP >= '{YEAR_START}'
+      AND settings_createdAt_TIMESTAMP < '{YEAR_END}'
+      AND domainId IN (SELECT domainId FROM first_80_in_2026)
 ),
 order_80th AS (
     SELECT domainId, mes, data_bateu
@@ -95,23 +120,20 @@ order_80th AS (
 ),
 lifetime AS (
     SELECT domainId, COUNT(*) AS total_lifetime
-    FROM dbo.MongoDB_Pedidos_Geral
-    WHERE domainId IS NOT NULL
-      AND TRY_CAST(domainId AS BIGINT) IS NOT NULL
-      AND summary_total IS NOT NULL AND summary_total > 0 AND summary_total < 50000
-      AND domainId IN (SELECT domainId FROM first_month)
+    FROM orders_clean
+    WHERE domainId IN (SELECT domainId FROM first_80_in_2026)
     GROUP BY domainId
 )
-SELECT m.domainId, m.mes,
+SELECT f.domainId, f.first_mes AS mes,
        m.qt_total, m.qt_pix, m.qt_cartao,
        m.val_total, m.val_pix, m.val_cartao,
        o.data_bateu,
        l.total_lifetime
-FROM monthly m
-JOIN first_month fm ON fm.domainId = m.domainId AND fm.first_mes = m.mes
-LEFT JOIN order_80th o ON o.domainId = m.domainId AND o.mes = m.mes
-LEFT JOIN lifetime   l ON l.domainId = m.domainId
-ORDER BY m.mes DESC, m.qt_total DESC
+FROM first_80_in_2026 f
+JOIN monthly_2026 m ON m.domainId = f.domainId AND m.mes = f.first_mes
+LEFT JOIN order_80th o ON o.domainId = f.domainId AND o.mes = f.first_mes
+LEFT JOIN lifetime   l ON l.domainId = f.domainId
+ORDER BY f.first_mes DESC, m.qt_total DESC
 """
 
 
@@ -133,13 +155,12 @@ def load_companies() -> dict[str, dict]:
 
 
 def fetch_rows(conn) -> list[dict]:
-    print(f"[fabric] rodando query (1o mes com {THRESHOLD}+ pedidos em 2026, "
-          f"com dataBateu + totalPedidos)")
+    print(f"[fabric] rodando query (1a conquista 80+ historica — deve ter acontecido em 2026)")
     cur = conn.cursor()
     cur.execute(SQL_TOP80)
     cols = [d[0] for d in cur.description]
     rows = [dict(zip(cols, r)) for r in cur.fetchall()]
-    print(f"[fabric] {len(rows)} empresas no primeiro mes qualificado")
+    print(f"[fabric] {len(rows)} empresas (1a vez 80+ foi em 2026)")
     return rows
 
 
@@ -196,10 +217,11 @@ def build(rows: list[dict], companies: dict[str, dict]) -> dict:
     meses_list = sorted(meses_set)
     cs_list = sorted(cs_set, key=lambda s: s.lower())
 
-    print(f"[build] {len(linhas)} empresas (1o mes 80+), sem match em companies: {sem_match}")
+    print(f"[build] {len(linhas)} empresas (1a conquista 80+ historica em 2026), "
+          f"sem match em companies: {sem_match}")
     total_valor = sum(l["valTotal"] for l in linhas)
-    print(f"[build] GMV no 1o mes qualificado: R$ {total_valor:,.2f}")
-    print(f"[build] Meses distintos de primeira conquista: {meses_list}")
+    print(f"[build] GMV no mes de conquista: R$ {total_valor:,.2f}")
+    print(f"[build] Distribuicao por mes de conquista: {meses_list}")
 
     return {
         "geradoEm": datetime.now(timezone.utc).isoformat(),

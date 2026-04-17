@@ -184,8 +184,8 @@ table.dt tr:hover td{background:#FAFAFA}
             <div class="hl-icon">&#127942;</div>
             <div class="hl-label">Clientes 80+ pedidos/mes</div>
             <div class="hl-cargo" id="home-top80-val">--</div>
-            <div class="hl-score" style="font-size:22px;margin-top:8px" id="home-top80-sub">-- meses</div>
-            <div class="hl-meta" style="margin-top:10px">Empresas que bateram 80 ou mais pedidos em algum mes de 2026 &rarr;</div>
+            <div class="hl-score" style="font-size:22px;margin-top:8px" id="home-top80-sub">--</div>
+            <div class="hl-meta" style="margin-top:10px">Empresas que atingiram 80+ pedidos num mes pela 1a vez na historia, em 2026 &rarr;</div>
         </div>
     </div>
 </div>
@@ -359,7 +359,7 @@ table.dt tr:hover td{background:#FAFAFA}
 <!-- ============ TOP 80 PEDIDOS/MES TAB ============ -->
 <div class="tab-panel" id="tab-top80">
     <div class="kpi-row">
-        <div class="kpi"><div class="ki" style="background:#FFF3E0">&#127970;</div><div class="kl">Empresas 80+</div><div class="kv" style="color:var(--w)" id="t80-kemp">--</div><div class="ks">1a vez que bateram em 2026</div></div>
+        <div class="kpi"><div class="ki" style="background:#FFF3E0">&#127970;</div><div class="kl">Empresas 80+</div><div class="kv" style="color:var(--w)" id="t80-kemp">--</div><div class="ks">1a vez 80+ na historia foi em 2026</div></div>
         <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128181;</div><div class="kl">GMV no mes qualificado</div><div class="kv" style="color:var(--s);font-size:20px" id="t80-ktot">R$ --</div></div>
         <div class="kpi"><div class="ki" style="background:#E8EAF6">&#128230;</div><div class="kl">Pedidos no mes</div><div class="kv" style="color:#0984E3" id="t80-kqt">--</div></div>
         <div class="kpi"><div class="ki" style="background:#F0EFFF">&#128200;</div><div class="kl">Pedidos historicos</div><div class="kv" style="color:var(--p)" id="t80-klife">--</div><div class="ks">total das empresas 80+</div></div>
@@ -385,18 +385,19 @@ table.dt tr:hover td{background:#FAFAFA}
         <button class="close-btn" onclick="document.getElementById('helpTop80').classList.remove('show')">&times;</button>
         <h3>Clientes 80+ pedidos/mes - Como funciona</h3>
         <p><b>O que e?</b></p>
-        <p>Empresas que atingiram a marca de <b>80 ou mais pedidos</b> num mesmo mes civil de 2026. Considera qualquer cliente Vesti (nao so os novos), todos os meios de pagamento.</p>
+        <p>Empresas que bateram a marca de <b>80 ou mais pedidos num mesmo mes civil PELA PRIMEIRA VEZ NA HISTORIA</b> e essa primeira vez foi em 2026. Considera qualquer cliente Vesti, todos os meios de pagamento.</p>
         <ul>
-            <li>Cada empresa aparece <b>uma unica vez</b>, na <b>primeira vez</b> que bateu 80+ em 2026. Se bateu em jan e depois de novo em fev, so conta jan</li>
-            <li><b>Empresas 80+</b> = empresas que entraram para o clube</li>
-            <li><b>GMV no mes qualificado</b> = soma do valor transacionado no mes em que bateram 80+</li>
-            <li><b>Pedidos no mes</b> = pedidos do mes qualificado</li>
-            <li><b>Pedidos historicos</b> = soma do total de pedidos (lifetime) das empresas da lista</li>
+            <li>Quem ja tinha batido 80+ em qualquer mes antes de 2026 <b>e excluido</b> — so conta quem estreou o marco em 2026</li>
+            <li>Cada empresa aparece <b>uma unica vez</b>, no mes da conquista</li>
+            <li><b>Empresas 80+</b> = empresas que estrearam na marca em 2026</li>
+            <li><b>GMV no mes qualificado</b> = valor transacionado no mes da conquista</li>
+            <li><b>Pedidos no mes</b> = pedidos do mes da conquista</li>
+            <li><b>Pedidos historicos</b> = soma do total lifetime das empresas da lista</li>
         </ul>
         <p><b>Filtro "Mes":</b></p>
         <ul>
-            <li>Seleciona apenas empresas cujo <b>1o mes 80+</b> foi aquele mes</li>
-            <li>Ex: jan/26 = empresas que bateram 80+ pela 1a vez em jan/2026 (nao reaparecerao em fev/mar)</li>
+            <li>Seleciona apenas empresas cuja 1a conquista 80+ foi naquele mes</li>
+            <li>Ex: jan/26 = empresas que bateram 80+ pela 1a vez na historia em jan/2026 (nao reaparecem em fev/mar)</li>
         </ul>
         <p><b>Tabela:</b></p>
         <ul>
@@ -796,7 +797,7 @@ function updateHome(){
         });
     }
     document.getElementById('home-top80-val').textContent=Object.keys(tEmp).length.toLocaleString('pt-BR')+' empresa(s)';
-    document.getElementById('home-top80-sub').textContent=tMes.toLocaleString('pt-BR')+' mes(es) qualificados';
+    document.getElementById('home-top80-sub').textContent='1a conquista 80+ em 2026';
 }
 
 // === UPDATE: NOVOS VESTIPAGO ===
