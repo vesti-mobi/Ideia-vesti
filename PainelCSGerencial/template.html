@@ -359,10 +359,10 @@ table.dt tr:hover td{background:#FAFAFA}
 <!-- ============ TOP 80 PEDIDOS/MES TAB ============ -->
 <div class="tab-panel" id="tab-top80">
     <div class="kpi-row">
-        <div class="kpi"><div class="ki" style="background:#FFF3E0">&#127970;</div><div class="kl">Empresas 80+</div><div class="kv" style="color:var(--w)" id="t80-kemp">--</div><div class="ks">em 2026</div></div>
-        <div class="kpi"><div class="ki" style="background:#F0EFFF">&#128197;</div><div class="kl">Meses qualificados</div><div class="kv" style="color:var(--p)" id="t80-kmes">--</div><div class="ks">(empresa, mes)</div></div>
-        <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128181;</div><div class="kl">GMV nos meses</div><div class="kv" style="color:var(--s);font-size:20px" id="t80-ktot">R$ --</div></div>
-        <div class="kpi"><div class="ki" style="background:#E8EAF6">&#128230;</div><div class="kl">Total pedidos</div><div class="kv" style="color:#0984E3" id="t80-kqt">--</div></div>
+        <div class="kpi"><div class="ki" style="background:#FFF3E0">&#127970;</div><div class="kl">Empresas 80+</div><div class="kv" style="color:var(--w)" id="t80-kemp">--</div><div class="ks">1a vez que bateram em 2026</div></div>
+        <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128181;</div><div class="kl">GMV no mes qualificado</div><div class="kv" style="color:var(--s);font-size:20px" id="t80-ktot">R$ --</div></div>
+        <div class="kpi"><div class="ki" style="background:#E8EAF6">&#128230;</div><div class="kl">Pedidos no mes</div><div class="kv" style="color:#0984E3" id="t80-kqt">--</div></div>
+        <div class="kpi"><div class="ki" style="background:#F0EFFF">&#128200;</div><div class="kl">Pedidos historicos</div><div class="kv" style="color:var(--p)" id="t80-klife">--</div><div class="ks">total das empresas 80+</div></div>
     </div>
     <div class="filters">
         <div class="filter-group"><label>Mes:</label><select class="f-select" id="t80FMes" onchange="updateTop80()"><option value="">Todos</option></select></div>
@@ -370,10 +370,10 @@ table.dt tr:hover td{background:#FAFAFA}
         <button class="help-btn" onclick="document.getElementById('helpTop80').classList.add('show')" title="Como funciona">?</button>
     </div>
     <div class="tbl-card">
-        <h4 id="t80-tbl-title">Meses com 80+ pedidos &middot; <span id="t80-tbl-count" style="color:var(--g);font-weight:500">--</span></h4>
+        <h4 id="t80-tbl-title">Empresas 80+ &middot; <span id="t80-tbl-count" style="color:var(--g);font-weight:500">--</span></h4>
         <div style="max-height:520px;overflow-y:auto;overflow-x:auto">
             <table class="dt" id="tTop80">
-                <thead><tr><th>CS</th><th>Marca</th><th>Mes</th><th style="text-align:right">Qtd pedidos</th><th style="text-align:right">PIX</th><th style="text-align:right">Cartao</th><th style="text-align:right">Total GMV</th></tr></thead>
+                <thead><tr><th>CS</th><th>Marca</th><th>Mes 80+</th><th>Data bateu 80+</th><th style="text-align:right">Qtd no mes</th><th style="text-align:right">Hist. pedidos</th><th style="text-align:right">PIX</th><th style="text-align:right">Cartao</th><th style="text-align:right">Total GMV</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
@@ -387,24 +387,25 @@ table.dt tr:hover td{background:#FAFAFA}
         <p><b>O que e?</b></p>
         <p>Empresas que atingiram a marca de <b>80 ou mais pedidos</b> num mesmo mes civil de 2026. Considera qualquer cliente Vesti (nao so os novos), todos os meios de pagamento.</p>
         <ul>
-            <li>Cada linha = um par <b>(empresa, mes)</b> que bateu o gatilho. Uma empresa que fez 80+ em jan e fev aparece 2x</li>
-            <li><b>Empresas 80+</b> = total de empresas distintas que bateram o gatilho ao menos 1 vez</li>
-            <li><b>Meses qualificados</b> = total de (empresa, mes) que bateram o gatilho</li>
-            <li><b>GMV nos meses</b> = soma do valor transacionado apenas nos meses qualificados</li>
+            <li>Cada empresa aparece <b>uma unica vez</b>, na <b>primeira vez</b> que bateu 80+ em 2026. Se bateu em jan e depois de novo em fev, so conta jan</li>
+            <li><b>Empresas 80+</b> = empresas que entraram para o clube</li>
+            <li><b>GMV no mes qualificado</b> = soma do valor transacionado no mes em que bateram 80+</li>
+            <li><b>Pedidos no mes</b> = pedidos do mes qualificado</li>
+            <li><b>Pedidos historicos</b> = soma do total de pedidos (lifetime) das empresas da lista</li>
         </ul>
         <p><b>Filtro "Mes":</b></p>
         <ul>
-            <li>Selecione um mes para ver apenas as empresas que bateram 80+ naquele mes</li>
-            <li>Sem filtro = todas as ocorrencias do ano</li>
+            <li>Seleciona apenas empresas cujo <b>1o mes 80+</b> foi aquele mes</li>
+            <li>Ex: jan/26 = empresas que bateram 80+ pela 1a vez em jan/2026 (nao reaparecerao em fev/mar)</li>
         </ul>
         <p><b>Tabela:</b></p>
         <ul>
-            <li><b>CS</b> = Customer Success responsavel (clique para filtrar)</li>
-            <li><b>Marca</b> = nome da empresa (clique para filtrar)</li>
-            <li><b>Mes</b> = mes em que bateu o gatilho</li>
-            <li><b>Qtd pedidos</b> = quantidade total de pedidos naquele mes</li>
-            <li><b>PIX / Cartao</b> = valor VestiPago no mes</li>
-            <li><b>Total GMV</b> = valor bruto no mes (todos os meios)</li>
+            <li><b>CS / Marca</b> = responsavel e empresa (clique para filtrar)</li>
+            <li><b>Mes 80+</b> = mes civil da 1a conquista</li>
+            <li><b>Data bateu 80+</b> = dia em que o 80o pedido do mes foi feito</li>
+            <li><b>Qtd no mes</b> = pedidos do mes qualificado (>= 80)</li>
+            <li><b>Hist. pedidos</b> = total de pedidos da empresa no historico (lifetime)</li>
+            <li><b>PIX / Cartao / Total GMV</b> = valores do mes qualificado</li>
         </ul>
         <p>Os filtros globais de <b>Empresa</b> e <b>CS</b> (barra superior) tambem se aplicam aqui.</p>
     </div>
@@ -964,25 +965,25 @@ function updateTop80(){
     var tb=document.querySelector('#tTop80 tbody');
     if(!td||!td.linhas||!td.linhas.length){
         document.getElementById('t80-kemp').textContent='0';
-        document.getElementById('t80-kmes').textContent='0';
         document.getElementById('t80-ktot').textContent='R$ 0,00';
         document.getElementById('t80-kqt').textContent='0';
-        document.getElementById('t80-tbl-count').textContent='0 meses';
-        tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#999;padding:24px">Sem dados (TOP80_DATA vazio). Rode python fetch_top80.py</td></tr>';
+        document.getElementById('t80-klife').textContent='0';
+        document.getElementById('t80-tbl-count').textContent='0 empresas';
+        tb.innerHTML='<tr><td colspan="9" style="text-align:center;color:#999;padding:24px">Sem dados (TOP80_DATA vazio). Rode python fetch_top80.py</td></tr>';
         return;
     }
     var rows=_top80FilterRows(td);
     rows.sort(function(a,b){return (b.qtTotal||0)-(a.qtTotal||0)});
-    var empSet={};var tVal=0,tPix=0,tCar=0,tQt=0;
-    rows.forEach(function(r){empSet[r.dominioId]=1;tVal+=(r.valTotal||0);tPix+=(r.valPix||0);tCar+=(r.valCartao||0);tQt+=(r.qtTotal||0)});
-    document.getElementById('t80-kemp').textContent=Object.keys(empSet).length.toLocaleString('pt-BR');
-    document.getElementById('t80-kmes').textContent=rows.length.toLocaleString('pt-BR');
+    var tVal=0,tPix=0,tCar=0,tQt=0,tLife=0;
+    rows.forEach(function(r){tVal+=(r.valTotal||0);tPix+=(r.valPix||0);tCar+=(r.valCartao||0);tQt+=(r.qtTotal||0);tLife+=(r.totalPedidos||0)});
+    document.getElementById('t80-kemp').textContent=rows.length.toLocaleString('pt-BR');
     document.getElementById('t80-ktot').textContent=fmtVpC(tVal);
     document.getElementById('t80-kqt').textContent=tQt.toLocaleString('pt-BR');
+    document.getElementById('t80-klife').textContent=tLife.toLocaleString('pt-BR');
     var fmes=document.getElementById('t80FMes').value;
-    var mesLbl=fmes?(' em '+fmtM(fmes)):' (todos os meses de 2026)';
-    document.getElementById('t80-tbl-count').textContent=rows.length+' (empresa, mes)'+mesLbl;
-    if(!rows.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#999;padding:24px">Nenhuma empresa com os filtros atuais</td></tr>';return}
+    var mesLbl=fmes?(' (1o mes 80+ em '+fmtM(fmes)+')'):' (1o mes 80+ em 2026)';
+    document.getElementById('t80-tbl-count').textContent=rows.length+' empresa(s)'+mesLbl;
+    if(!rows.length){tb.innerHTML='<tr><td colspan="9" style="text-align:center;color:#999;padding:24px">Nenhuma empresa com os filtros atuais</td></tr>';return}
     var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
     tb.innerHTML=rows.map(function(r){
         var csEsc=(r.cs||'-').replace(/'/g,"\\'");
@@ -991,7 +992,9 @@ function updateTop80(){
             '<td><span class="badge sm click" onclick="filterByCS(\''+csEsc+'\')">'+esc(r.cs||'-')+'</span></td>'+
             '<td class="click" onclick="selectCo(\''+marcaEsc+'\')"><b>'+esc(r.marca||'-')+'</b></td>'+
             '<td style="color:var(--g);white-space:nowrap">'+fmtM(r.mes)+'</td>'+
+            '<td style="color:var(--g);white-space:nowrap">'+fmtVpD(r.dataBateu||'')+'</td>'+
             '<td style="text-align:right;font-weight:700;color:var(--w)">'+(r.qtTotal||0).toLocaleString('pt-BR')+'</td>'+
+            '<td style="text-align:right;color:var(--g)">'+(r.totalPedidos||0).toLocaleString('pt-BR')+'</td>'+
             '<td style="text-align:right;font-weight:600;color:'+((r.valPix||0)>0?'#0984E3':'#B2BEC3')+'">'+((r.valPix||0)>0?fmtVpC(r.valPix):'&mdash;')+'</td>'+
             '<td style="text-align:right;font-weight:600;color:'+((r.valCartao||0)>0?'#F39C12':'#B2BEC3')+'">'+((r.valCartao||0)>0?fmtVpC(r.valCartao):'&mdash;')+'</td>'+
             '<td style="text-align:right;font-weight:700;color:var(--s)">'+fmtVpC(r.valTotal||0)+'</td>'+
