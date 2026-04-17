@@ -230,80 +230,116 @@ def fetch_rows(conn) -> list[dict]:
     cur.execute(SQL)
     cols = [d[0] for d in cur.description]
     raw = [dict(zip(cols, r)) for r in cur.fetchall()]
-    print(f"[fabric] {len(raw)} linhas STARKBANK")
+    print(f"[fabric] {len(raw)} linhas brutas (uma por parcela)")
+    return raw
 
-    rows: list[dict] = []
+
+def build(raw: list[dict]) -> dict:
+    """Agrupa por orderId; cada pedido e uma dict com `parcelas` aninhadas."""
+    by_order: dict[str, dict] = {}
     for r in raw:
-        rows.append({
-            "orderId": r.get("order_id") or "",
-            "orderNumber": r.get("order_number"),
-            "companyId": r.get("company_id") or "",
-            "domainId": r.get("domain_id") or "",
-            "customerName": r.get("customer_name") or "",
-            "customerDoc": r.get("customer_doc") or "",
-            "orderDate": _iso_or_empty(r.get("order_date")),
-            "paymentMethod": r.get("payment_method") or "",
-            "provider": r.get("provider") or "",
-            "isPaid": bool(r.get("is_paid")) if r.get("is_paid") is not None else None,
-            "paidAt": _iso_or_empty(r.get("paid_at")),
-            "installmentsTotal": int(r.get("installments_total") or 0),
-            "txNetValue": float(r.get("tx_net_value") or 0),
-            "summaryTotal": float(r.get("summary_total") or 0),
+        oid = r.get("order_id") or ""
+        if not oid:
+            continue
+        parcela = {
             "recId": r.get("rec_id") or "",
-            "recInstallment": int(r.get("rec_installment") or 0),
-            "recDueAt": _iso_or_empty(r.get("rec_due_at")),
-            "recPaidAt": _iso_or_empty(r.get("rec_paid_at")),
-            "recStatus": r.get("rec_status") or "",
-            "recNetValue": float(r.get("rec_net_value") or 0),
-            "recGrossValue": float(r.get("rec_gross_value") or 0),
-            "recVpValue": float(r.get("rec_vp_value") or 0),
-            "recAntifraudValue": float(r.get("rec_antifraud_value") or 0),
-            "recAntecipationValue": str(r.get("rec_antecipation_value") or ""),
-            "recAdvanced": bool(r.get("rec_advanced")) if r.get("rec_advanced") is not None else None,
-            "recInvoiceUrl": r.get("rec_invoice_url") or "",
-            "recTransactionId": r.get("rec_transaction_id") or "",
-        })
-    return rows
+            "installment": int(r.get("rec_installment") or 0),
+            "dueAt": _iso_or_empty(r.get("rec_due_at")),
+            "paidAt": _iso_or_empty(r.get("rec_paid_at")),
+            "status": r.get("rec_status") or "",
+            "netValue": float(r.get("rec_net_value") or 0),
+            "grossValue": float(r.get("rec_gross_value") or 0),
+            "vpValue": float(r.get("rec_vp_value") or 0),
+            "antifraudValue": float(r.get("rec_antifraud_value") or 0),
+            "antecipationValue": str(r.get("rec_antecipation_value") or ""),
+            "advanced": bool(r.get("rec_advanced")) if r.get("rec_advanced") is not None else None,
+            "invoiceUrl": r.get("rec_invoice_url") or "",
+            "transactionId": r.get("rec_transaction_id") or "",
+        }
+        ped = by_order.get(oid)
+        if ped is None:
+            ped = {
+                "orderId": oid,
+                "orderNumber": r.get("order_number"),
+                "companyId": r.get("company_id") or "",
+                "domainId": r.get("domain_id") or "",
+                "customerName": r.get("customer_name") or "",
+                "customerDoc": r.get("customer_doc") or "",
+                "orderDate": _iso_or_empty(r.get("order_date")),
+                "paymentMethod": r.get("payment_method") or "",
+                "provider": r.get("provider") or "",
+                "isPaid": bool(r.get("is_paid")) if r.get("is_paid") is not None else None,
+                "paidAt": _iso_or_empty(r.get("paid_at")),
+                "installmentsTotal": int(r.get("installments_total") or 0),
+                "txNetValue": float(r.get("tx_net_value") or 0),
+                "summaryTotal": float(r.get("summary_total") or 0),
+                "parcelas": [],
+            }
+            by_order[oid] = ped
+        ped["parcelas"].append(parcela)
 
+    # Pos-processa cada pedido — stats das parcelas
+    pedidos: list[dict] = []
+    for ped in by_order.values():
+        parcelas = sorted(ped["parcelas"], key=lambda p: p["installment"])
+        ped["parcelas"] = parcelas
+        ped["nParcelas"] = len(parcelas)
+        due_dates = [p["dueAt"] for p in parcelas if p["dueAt"]]
+        ped["firstDueAt"] = min(due_dates) if due_dates else ""
+        ped["lastDueAt"] = max(due_dates) if due_dates else ""
+        # Proxima parcela = menor dueAt entre as nao pagas
+        unpaid = [p for p in parcelas if not p["paidAt"]]
+        ped["nextDueAt"] = min([p["dueAt"] for p in unpaid if p["dueAt"]], default="")
+        ped["nPagas"] = sum(1 for p in parcelas if p["paidAt"])
+        ped["nPendentes"] = sum(1 for p in parcelas if not p["paidAt"])
+        ped["totalNet"] = round(sum(p["netValue"] for p in parcelas), 2)
+        ped["totalGross"] = round(sum(p["grossValue"] for p in parcelas), 2)
+        ped["totalVp"] = round(sum(p["vpValue"] for p in parcelas), 2)
+        ped["allPaid"] = ped["nPendentes"] == 0 and ped["nPagas"] > 0
+        pedidos.append(ped)
 
-def build(rows: list[dict]) -> dict:
-    methods = sorted({r["paymentMethod"] for r in rows if r["paymentMethod"]})
-    statuses = sorted({r["recStatus"] for r in rows if r["recStatus"]})
-    companies = sorted({r["companyId"] for r in rows if r["companyId"]})
+    pedidos.sort(key=lambda p: p.get("orderDate") or "", reverse=True)
 
-    total_net = sum(r["recNetValue"] for r in rows)
-    total_gross = sum(r["recGrossValue"] for r in rows)
-    total_vp = sum(r["recVpValue"] for r in rows)
-    pagas = sum(1 for r in rows if r["recPaidAt"])
-    pendentes = len(rows) - pagas
+    methods = sorted({p["paymentMethod"] for p in pedidos if p["paymentMethod"]})
+    statuses = sorted({pc["status"] for p in pedidos for pc in p["parcelas"] if pc["status"]})
+    companies = sorted({p["companyId"] for p in pedidos if p["companyId"]})
+
+    total_net = sum(p["totalNet"] for p in pedidos)
+    total_gross = sum(p["totalGross"] for p in pedidos)
+    total_vp = sum(p["totalVp"] for p in pedidos)
+    total_parcelas = sum(p["nParcelas"] for p in pedidos)
+    total_pagas = sum(p["nPagas"] for p in pedidos)
+    total_pendentes = sum(p["nPendentes"] for p in pedidos)
 
     return {
         "geradoEm": datetime.now(timezone.utc).isoformat(),
-        "rows": rows,
+        "pedidos": pedidos,
         "paymentMethods": methods,
         "statuses": statuses,
         "companies": companies,
         "resumo": {
-            "nRows": len(rows),
+            "nPedidos": len(pedidos),
+            "nParcelas": total_parcelas,
             "totalNet": round(total_net, 2),
             "totalGross": round(total_gross, 2),
             "totalVpValue": round(total_vp, 2),
-            "nPagas": pagas,
-            "nPendentes": pendentes,
+            "nPagas": total_pagas,
+            "nPendentes": total_pendentes,
         },
     }
 
 
 def main() -> None:
     with connect() as conn:
-        rows = fetch_rows(conn)
-    data = build(rows)
+        raw = fetch_rows(conn)
+    data = build(raw)
     OUT_JS.write_text(
         "window.DADOS = " + json.dumps(data, ensure_ascii=False) + ";\n",
         encoding="utf-8",
     )
     size_kb = OUT_JS.stat().st_size / 1024
-    print(f"[write] {OUT_JS.name} ({len(rows)} linhas, {size_kb:.1f}KB)")
+    print(f"[write] {OUT_JS.name} ({data['resumo']['nPedidos']} pedidos, "
+          f"{data['resumo']['nParcelas']} parcelas, {size_kb:.1f}KB)")
 
 
 if __name__ == "__main__":
