@@ -114,37 +114,102 @@ def connect():
 # ---------- query ----------
 
 SQL = """
+-- Fonte principal: mongodb_pedidos_recebiveis (1 linha por parcela do recebivel)
+-- Enriquecemos com MongoDB_Pedidos_Geral (orderNumber, customer_name, data do
+-- pedido, summary_total — campos nivel-pedido que faltam na tabela de
+-- recebiveis). Pedidos STARKBANK que existem so em Pedidos_Geral (ainda nao
+-- copiados pra recebiveis) sao incluidos via UNION pra nao perder nada.
+WITH rec AS (
+    SELECT
+        r._id                                    AS order_id,
+        r.companyId                              AS company_id,
+        r.domainId                               AS domain_id,
+        r.payment_method                         AS payment_method,
+        r.payment_transaction_provider           AS provider,
+        r.payment_isPaid                         AS is_paid,
+        r.payment_paidAt                         AS paid_at,
+        r.payment_transaction_installments       AS installments_total,
+        r.payment_transaction_netValue           AS tx_net_value,
+        r.payment_receivables__id                AS rec_id,
+        r.payment_receivables_installment        AS rec_installment,
+        r.payment_receivables_dueAt              AS rec_due_at,
+        r.payment_receivables_paidAt             AS rec_paid_at,
+        r.payment_receivables_status             AS rec_status,
+        r.payment_receivables_netValue           AS rec_net_value,
+        r.payment_receivables_grossValue         AS rec_gross_value,
+        r.payment_receivables_vestiPagoValue     AS rec_vp_value,
+        r.payment_receivables_antifraudValue     AS rec_antifraud_value,
+        r.payment_receivables_antecipationValue  AS rec_antecipation_value,
+        r.payment_receivables_advanced           AS rec_advanced,
+        r.payment_receivables_invoiceUrl         AS rec_invoice_url,
+        r.payment_receivables_transactionId      AS rec_transaction_id
+    FROM dbo.mongodb_pedidos_recebiveis r
+    WHERE r.payment_transaction_provider = 'STARKBANK'
+),
+pedidos AS (
+    SELECT
+        _id                             AS order_id,
+        MAX(orderNumber)                AS order_number,
+        MAX(customer_name)              AS customer_name,
+        MAX(customer_doc)               AS customer_doc,
+        MAX(settings_createdAt_TIMESTAMP) AS order_date,
+        MAX(summary_total)              AS summary_total
+    FROM dbo.MongoDB_Pedidos_Geral
+    WHERE payment_transaction_provider = 'STARKBANK'
+    GROUP BY _id
+),
+only_pedidos AS (
+    -- Pedidos que existem em Pedidos_Geral mas nao em recebiveis ainda:
+    -- monta 1 linha "parcela 1" a partir dos campos de receivable que
+    -- Pedidos_Geral traz (installment 1 normalmente)
+    SELECT
+        p._id                                    AS order_id,
+        p.companyId                              AS company_id,
+        p.domainId                               AS domain_id,
+        p.payment_method                         AS payment_method,
+        p.payment_transaction_provider           AS provider,
+        p.payment_isPaid                         AS is_paid,
+        p.payment_paidAt                         AS paid_at,
+        p.payment_transaction_installments       AS installments_total,
+        p.payment_transaction_netValue           AS tx_net_value,
+        p.payment_receivables__id                AS rec_id,
+        p.payment_receivables_installment        AS rec_installment,
+        p.payment_receivables_dueAt              AS rec_due_at,
+        p.payment_receivables_paidAt             AS rec_paid_at,
+        p.payment_receivables_status             AS rec_status,
+        p.payment_receivables_netValue           AS rec_net_value,
+        p.payment_receivables_grossValue         AS rec_gross_value,
+        p.payment_receivables_vestiPagoValue     AS rec_vp_value,
+        p.payment_receivables_antifraudValue     AS rec_antifraud_value,
+        p.payment_receivables_antecipationValue  AS rec_antecipation_value,
+        p.payment_receivables_advanced           AS rec_advanced,
+        p.payment_receivables_invoiceUrl         AS rec_invoice_url,
+        p.payment_receivables_transactionId      AS rec_transaction_id
+    FROM dbo.MongoDB_Pedidos_Geral p
+    WHERE p.payment_transaction_provider = 'STARKBANK'
+      AND p._id NOT IN (SELECT DISTINCT order_id FROM rec)
+)
 SELECT
-    _id                                    AS order_id,
-    orderNumber                            AS order_number,
-    companyId                              AS company_id,
-    domainId                               AS domain_id,
-    customer_name                          AS customer_name,
-    customer_doc                           AS customer_doc,
-    settings_createdAt_TIMESTAMP           AS order_date,
-    payment_method                         AS payment_method,
-    payment_transaction_provider           AS provider,
-    payment_isPaid                         AS is_paid,
-    payment_paidAt                         AS paid_at,
-    payment_transaction_installments       AS installments_total,
-    payment_transaction_netValue           AS tx_net_value,
-    summary_total                          AS summary_total,
-    payment_receivables__id                AS rec_id,
-    payment_receivables_installment        AS rec_installment,
-    payment_receivables_dueAt              AS rec_due_at,
-    payment_receivables_paidAt             AS rec_paid_at,
-    payment_receivables_status             AS rec_status,
-    payment_receivables_netValue           AS rec_net_value,
-    payment_receivables_grossValue         AS rec_gross_value,
-    payment_receivables_vestiPagoValue     AS rec_vp_value,
-    payment_receivables_antifraudValue     AS rec_antifraud_value,
-    payment_receivables_antecipationValue  AS rec_antecipation_value,
-    payment_receivables_advanced           AS rec_advanced,
-    payment_receivables_invoiceUrl         AS rec_invoice_url,
-    payment_receivables_transactionId      AS rec_transaction_id
-FROM dbo.MongoDB_Pedidos_Geral
-WHERE payment_transaction_provider = 'STARKBANK'
-ORDER BY settings_createdAt_TIMESTAMP DESC, payment_receivables_installment
+    u.order_id,
+    p.order_number,
+    u.company_id, u.domain_id,
+    p.customer_name, p.customer_doc,
+    p.order_date,
+    u.payment_method, u.provider,
+    u.is_paid, u.paid_at,
+    u.installments_total, u.tx_net_value,
+    p.summary_total,
+    u.rec_id, u.rec_installment, u.rec_due_at, u.rec_paid_at,
+    u.rec_status, u.rec_net_value, u.rec_gross_value, u.rec_vp_value,
+    u.rec_antifraud_value, u.rec_antecipation_value, u.rec_advanced,
+    u.rec_invoice_url, u.rec_transaction_id
+FROM (
+    SELECT * FROM rec
+    UNION ALL
+    SELECT * FROM only_pedidos
+) u
+LEFT JOIN pedidos p ON p.order_id = u.order_id
+ORDER BY p.order_date DESC, u.order_id, u.rec_installment
 """
 
 
