@@ -185,7 +185,7 @@ table.dt tr:hover td{background:#FAFAFA}
             <div class="hl-label">Clientes 80+ pedidos/mes</div>
             <div class="hl-cargo" id="home-top80-val">--</div>
             <div class="hl-score" style="font-size:22px;margin-top:8px" id="home-top80-sub">--</div>
-            <div class="hl-meta" style="margin-top:10px">Empresas que atingiram 80+ pedidos num mes pela 1a vez na historia, em 2026 &rarr;</div>
+            <div class="hl-meta" style="margin-top:10px">Empresas que tiveram 80+ pedidos num mesmo mes civil em 2026 &rarr;</div>
         </div>
     </div>
 </div>
@@ -359,10 +359,10 @@ table.dt tr:hover td{background:#FAFAFA}
 <!-- ============ TOP 80 PEDIDOS/MES TAB ============ -->
 <div class="tab-panel" id="tab-top80">
     <div class="kpi-row">
-        <div class="kpi"><div class="ki" style="background:#FFF3E0">&#127970;</div><div class="kl">Empresas 80+</div><div class="kv" style="color:var(--w)" id="t80-kemp">--</div><div class="ks">1a vez 80+ na historia foi em 2026</div></div>
-        <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128181;</div><div class="kl">GMV no mes qualificado</div><div class="kv" style="color:var(--s);font-size:20px" id="t80-ktot">R$ --</div></div>
-        <div class="kpi"><div class="ki" style="background:#E8EAF6">&#128230;</div><div class="kl">Pedidos no mes</div><div class="kv" style="color:#0984E3" id="t80-kqt">--</div></div>
-        <div class="kpi"><div class="ki" style="background:#F0EFFF">&#128200;</div><div class="kl">Pedidos historicos</div><div class="kv" style="color:var(--p)" id="t80-klife">--</div><div class="ks">total das empresas 80+</div></div>
+        <div class="kpi"><div class="ki" style="background:#FFF3E0">&#127970;</div><div class="kl">Empresas distintas 80+</div><div class="kv" style="color:var(--w)" id="t80-kemp">--</div><div class="ks">em 2026</div></div>
+        <div class="kpi"><div class="ki" style="background:#F0EFFF">&#128197;</div><div class="kl">Meses qualificados</div><div class="kv" style="color:var(--p)" id="t80-kmes">--</div><div class="ks">(empresa, mes) 80+</div></div>
+        <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128181;</div><div class="kl">GMV nos meses</div><div class="kv" style="color:var(--s);font-size:20px" id="t80-ktot">R$ --</div></div>
+        <div class="kpi"><div class="ki" style="background:#E8EAF6">&#128230;</div><div class="kl">Pedidos nos meses</div><div class="kv" style="color:#0984E3" id="t80-kqt">--</div></div>
     </div>
     <div class="filters">
         <div class="filter-group"><label>Mes:</label><select class="f-select" id="t80FMes" onchange="updateTop80()"><option value="">Todos</option></select></div>
@@ -385,30 +385,48 @@ table.dt tr:hover td{background:#FAFAFA}
         <button class="close-btn" onclick="document.getElementById('helpTop80').classList.remove('show')">&times;</button>
         <h3>Clientes 80+ pedidos/mes - Como funciona</h3>
         <p><b>O que e?</b></p>
-        <p>Empresas que bateram a marca de <b>80 ou mais pedidos num mesmo mes civil PELA PRIMEIRA VEZ NA HISTORIA</b> e essa primeira vez foi em 2026. Considera qualquer cliente Vesti, todos os meios de pagamento.</p>
+        <p>Empresas que tiveram <b>80 ou mais pedidos num mesmo mes civil de 2026</b>. Considera qualquer cliente Vesti, todos os meios de pagamento.</p>
         <ul>
-            <li>Quem ja tinha batido 80+ em qualquer mes antes de 2026 <b>e excluido</b> — so conta quem estreou o marco em 2026</li>
-            <li>Cada empresa aparece <b>uma unica vez</b>, no mes da conquista</li>
-            <li><b>Empresas 80+</b> = empresas que estrearam na marca em 2026</li>
-            <li><b>GMV no mes qualificado</b> = valor transacionado no mes da conquista</li>
-            <li><b>Pedidos no mes</b> = pedidos do mes da conquista</li>
-            <li><b>Pedidos historicos</b> = soma do total lifetime das empresas da lista</li>
+            <li>Cada linha = um par <b>(empresa, mes)</b>. Empresa que bateu em jan e fev aparece <b>2x</b>, uma pra cada mes</li>
+            <li><b>Empresas distintas 80+</b> = empresas unicas com pelo menos 1 mes 80+</li>
+            <li><b>Meses qualificados</b> = total de (empresa, mes) na lista</li>
+            <li><b>GMV nos meses</b> = valor transacionado nos meses qualificados</li>
+            <li><b>Pedidos nos meses</b> = soma de pedidos dos meses qualificados</li>
         </ul>
         <p><b>Filtro "Mes":</b></p>
         <ul>
-            <li>Seleciona apenas empresas cuja 1a conquista 80+ foi naquele mes</li>
-            <li>Ex: jan/26 = empresas que bateram 80+ pela 1a vez na historia em jan/2026 (nao reaparecem em fev/mar)</li>
+            <li>Seleciona apenas os meses qualificados no mes escolhido</li>
+            <li>Ex: jan/26 = empresas que bateram 80+ em jan/2026 (podem reaparecer em outros meses se tambem bateram la)</li>
         </ul>
         <p><b>Tabela:</b></p>
         <ul>
-            <li><b>CS / Marca</b> = responsavel e empresa (clique para filtrar)</li>
-            <li><b>Mes 80+</b> = mes civil da 1a conquista</li>
-            <li><b>Data bateu 80+</b> = dia em que o 80o pedido do mes foi feito</li>
-            <li><b>Qtd no mes</b> = pedidos do mes qualificado (>= 80)</li>
+            <li><b>CS / Marca</b> = responsavel e empresa (<b>clique no nome</b> pra ver todos os meses 2026 que a empresa bateu 80+)</li>
+            <li><b>Mes</b> = mes qualificado desta linha</li>
+            <li><b>Data bateu 80+</b> = dia em que o 80o pedido desse mes foi feito</li>
+            <li><b>Qtd no mes</b> = pedidos do mes (>= 80)</li>
             <li><b>Hist. pedidos</b> = total de pedidos da empresa no historico (lifetime)</li>
             <li><b>PIX / Cartao / Total GMV</b> = valores do mes qualificado</li>
         </ul>
         <p>Os filtros globais de <b>Empresa</b> e <b>CS</b> (barra superior) tambem se aplicam aqui.</p>
+    </div>
+</div>
+<!-- MODAL DETALHE TOP80 -->
+<div class="modal-overlay" id="top80Detail" onclick="if(event.target===this)this.classList.remove('show')">
+    <div class="modal-box" style="max-width:640px">
+        <button class="close-btn" onclick="document.getElementById('top80Detail').classList.remove('show')">&times;</button>
+        <h3 id="t80d-nome">--</h3>
+        <div class="d-grid" style="margin:10px 0 18px">
+            <div class="d-item"><div class="dl">CS</div><div class="dv" id="t80d-cs">-</div></div>
+            <div class="d-item"><div class="dl">Meses 80+ em 2026</div><div class="dv" id="t80d-count" style="color:var(--w)">-</div></div>
+            <div class="d-item"><div class="dl">Historico de pedidos</div><div class="dv" id="t80d-hist">-</div></div>
+        </div>
+        <h4 style="font-size:13px;margin-bottom:8px;color:var(--dk)">Meses em que bateu a meta de 80+ pedidos:</h4>
+        <div style="max-height:320px;overflow-y:auto">
+            <table class="dt" id="tT80d">
+                <thead><tr><th>Mes</th><th style="text-align:right">Qtd pedidos</th><th>Data bateu 80</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 </div>
 <!-- ============ NPS TAB ============ -->
@@ -797,7 +815,7 @@ function updateHome(){
         });
     }
     document.getElementById('home-top80-val').textContent=Object.keys(tEmp).length.toLocaleString('pt-BR')+' empresa(s)';
-    document.getElementById('home-top80-sub').textContent='1a conquista 80+ em 2026';
+    document.getElementById('home-top80-sub').textContent=tMes.toLocaleString('pt-BR')+' mes(es) qualificado(s)';
 }
 
 // === UPDATE: NOVOS VESTIPAGO ===
@@ -966,32 +984,31 @@ function updateTop80(){
     var tb=document.querySelector('#tTop80 tbody');
     if(!td||!td.linhas||!td.linhas.length){
         document.getElementById('t80-kemp').textContent='0';
+        document.getElementById('t80-kmes').textContent='0';
         document.getElementById('t80-ktot').textContent='R$ 0,00';
         document.getElementById('t80-kqt').textContent='0';
-        document.getElementById('t80-klife').textContent='0';
-        document.getElementById('t80-tbl-count').textContent='0 empresas';
+        document.getElementById('t80-tbl-count').textContent='0 meses';
         tb.innerHTML='<tr><td colspan="9" style="text-align:center;color:#999;padding:24px">Sem dados (TOP80_DATA vazio). Rode python fetch_top80.py</td></tr>';
         return;
     }
     var rows=_top80FilterRows(td);
     rows.sort(function(a,b){return (b.qtTotal||0)-(a.qtTotal||0)});
-    var tVal=0,tPix=0,tCar=0,tQt=0,tLife=0;
-    rows.forEach(function(r){tVal+=(r.valTotal||0);tPix+=(r.valPix||0);tCar+=(r.valCartao||0);tQt+=(r.qtTotal||0);tLife+=(r.totalPedidos||0)});
-    document.getElementById('t80-kemp').textContent=rows.length.toLocaleString('pt-BR');
+    var empSet={};var tVal=0,tPix=0,tCar=0,tQt=0;
+    rows.forEach(function(r){empSet[r.dominioId]=1;tVal+=(r.valTotal||0);tPix+=(r.valPix||0);tCar+=(r.valCartao||0);tQt+=(r.qtTotal||0)});
+    document.getElementById('t80-kemp').textContent=Object.keys(empSet).length.toLocaleString('pt-BR');
+    document.getElementById('t80-kmes').textContent=rows.length.toLocaleString('pt-BR');
     document.getElementById('t80-ktot').textContent=fmtVpC(tVal);
     document.getElementById('t80-kqt').textContent=tQt.toLocaleString('pt-BR');
-    document.getElementById('t80-klife').textContent=tLife.toLocaleString('pt-BR');
     var fmes=document.getElementById('t80FMes').value;
-    var mesLbl=fmes?(' (1o mes 80+ em '+fmtM(fmes)+')'):' (1o mes 80+ em 2026)';
-    document.getElementById('t80-tbl-count').textContent=rows.length+' empresa(s)'+mesLbl;
+    var mesLbl=fmes?(' em '+fmtM(fmes)):' (todos os meses de 2026)';
+    document.getElementById('t80-tbl-count').textContent=rows.length+' (empresa, mes)'+mesLbl;
     if(!rows.length){tb.innerHTML='<tr><td colspan="9" style="text-align:center;color:#999;padding:24px">Nenhuma empresa com os filtros atuais</td></tr>';return}
     var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
     tb.innerHTML=rows.map(function(r){
         var csEsc=(r.cs||'-').replace(/'/g,"\\'");
-        var marcaEsc=(r.marca||'-').replace(/'/g,"\\'");
         return '<tr>'+
             '<td><span class="badge sm click" onclick="filterByCS(\''+csEsc+'\')">'+esc(r.cs||'-')+'</span></td>'+
-            '<td class="click" onclick="selectCo(\''+marcaEsc+'\')"><b>'+esc(r.marca||'-')+'</b></td>'+
+            '<td class="click" onclick="openTop80Detail(\''+esc(r.dominioId)+'\')" title="Clique para ver todos os meses 80+"><b>'+esc(r.marca||'-')+'</b></td>'+
             '<td style="color:var(--g);white-space:nowrap">'+fmtM(r.mes)+'</td>'+
             '<td style="color:var(--g);white-space:nowrap">'+fmtVpD(r.dataBateu||'')+'</td>'+
             '<td style="text-align:right;font-weight:700;color:var(--w)">'+(r.qtTotal||0).toLocaleString('pt-BR')+'</td>'+
@@ -1001,6 +1018,29 @@ function updateTop80(){
             '<td style="text-align:right;font-weight:700;color:var(--s)">'+fmtVpC(r.valTotal||0)+'</td>'+
         '</tr>'
     }).join('');
+}
+function openTop80Detail(domainId){
+    var td=(typeof TOP80_DATA!=='undefined'?TOP80_DATA:null);if(!td||!td.linhas)return;
+    var r=td.linhas.filter(function(x){return String(x.dominioId)===String(domainId)})[0];
+    if(!r)return;
+    var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+    document.getElementById('t80d-nome').textContent=r.marca||'-';
+    document.getElementById('t80d-cs').textContent=r.cs||'-';
+    var mb=r.mesesBatidos||[];
+    document.getElementById('t80d-count').textContent=mb.length.toLocaleString('pt-BR')+' mes(es)';
+    document.getElementById('t80d-hist').textContent=(r.totalPedidos||0).toLocaleString('pt-BR')+' pedidos';
+    var tb=document.querySelector('#tT80d tbody');
+    if(!mb.length){tb.innerHTML='<tr><td colspan="3" style="text-align:center;color:#999">Sem meses registrados</td></tr>'}
+    else{
+        tb.innerHTML=mb.map(function(m){
+            return '<tr>'+
+                '<td style="white-space:nowrap">'+fmtM(m.mes)+'</td>'+
+                '<td style="text-align:right;font-weight:700;color:var(--w)">'+(m.qtTotal||0).toLocaleString('pt-BR')+'</td>'+
+                '<td style="color:var(--g);white-space:nowrap">'+fmtVpD(m.dataBateu||'')+'</td>'+
+            '</tr>'
+        }).join('');
+    }
+    document.getElementById('top80Detail').classList.add('show');
 }
 
 // === CHURN VESTIPAGO DATA ===
@@ -1114,7 +1154,7 @@ function updateAll(){
     else if(currentTab==='top80')updateTop80();
 }
 function filterByCS(name){fCS.value=name;document.getElementById('fClear').style.display='inline-block';updateAll()}
-window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;window.updateVp=updateVp;window.vpClearFilters=vpClearFilters;window.goBack=goBack;window.updateChurn=updateChurn;window.churnClearFilters=churnClearFilters;window.filterByCS=filterByCS;window.openChurnDetail=openChurnDetail;window.closeChurnDetail=closeChurnDetail;window.updateGmv=updateGmv;window.gmvClearFilters=gmvClearFilters;window.updateTop80=updateTop80;window.top80ClearFilters=top80ClearFilters;
+window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;window.updateVp=updateVp;window.vpClearFilters=vpClearFilters;window.goBack=goBack;window.updateChurn=updateChurn;window.churnClearFilters=churnClearFilters;window.filterByCS=filterByCS;window.openChurnDetail=openChurnDetail;window.closeChurnDetail=closeChurnDetail;window.updateGmv=updateGmv;window.gmvClearFilters=gmvClearFilters;window.updateTop80=updateTop80;window.top80ClearFilters=top80ClearFilters;window.openTop80Detail=openTop80Detail;
 // Inicializacao: Home e default; filtros globais visiveis, KPIs globais ocultos
 document.querySelector('.filters').style.display='flex';
 document.getElementById('globalKpiRow').style.display='none';

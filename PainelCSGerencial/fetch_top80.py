@@ -1,13 +1,13 @@
 """
-Clientes Vesti que bateram o marco de 80+ pedidos num unico mes civil
-PELA PRIMEIRA VEZ EM 2026 (janeiro, fevereiro, marco ou abril).
+Clientes Vesti que atingiram 80+ pedidos num mesmo mes civil em 2026.
+Uma linha por (domainId, mes) qualificado — empresa que bateu em jan e
+fev aparece 2x. Pre-2026 nao e considerado.
 
-Quem ja havia batido 80+ em algum mes antes de 2026 e EXCLUIDO —
-queremos so a primeira conquista historica que aconteceu no ano corrente.
-
-Adicionalmente traz:
+Cada linha tem:
   - dataBateu: data/hora do 80o pedido do mes qualificado
-  - totalPedidos: total historico de pedidos da empresa (lifetime)
+  - totalPedidos: total historico da empresa (lifetime, todos os anos)
+  - mesesBatidos: lista de meses 2026 em que a empresa bateu 80+ (pra
+                  exibir no modal de detalhe ao clicar na linha)
 
 Output: top80_data.json
 
@@ -18,21 +18,21 @@ Formato (consumido pelo template.html via merge_data -> TOP80_DATA):
     "linhas": [
         {
             "dominioId": "...",
-            "marca": "...",
-            "cs": "...",
-            "canal": "...",
-            "cnpj": "...",
-            "mes": "2026-02",                  # 1o mes 80+ na historia
-            "dataBateu": "2026-02-18",         # dia do 80o pedido
-            "qtTotal": 120,                    # pedidos no mes qualificado
-            "qtPix": 30, "qtCartao": 15,
-            "valTotal": 45123.45, "valPix": 15000, "valCartao": 7500,
-            "totalPedidos": 4523                # lifetime da empresa
+            "marca": "...", "cs": "...", "canal": "...", "cnpj": "...",
+            "mes": "2026-02",
+            "dataBateu": "2026-02-18",
+            "qtTotal": 120, "qtPix": 30, "qtCartao": 15,
+            "valTotal": ..., "valPix": ..., "valCartao": ...,
+            "totalPedidos": 4523,
+            "mesesBatidos": [
+                {"mes": "2026-01", "qtTotal": 95, "dataBateu": "2026-01-20"},
+                {"mes": "2026-02", "qtTotal": 120, "dataBateu": "2026-02-18"}
+            ]
         }
     ],
     "mesesList": ["2026-01", "2026-02", ...],
     "csList": [...],
-    "resumo": {"nEmpresas": 100, ...}
+    "resumo": {...}
 }
 """
 
@@ -73,32 +73,7 @@ monthly_2026 AS (
     WHERE settings_createdAt_TIMESTAMP >= '{YEAR_START}'
       AND settings_createdAt_TIMESTAMP < '{YEAR_END}'
     GROUP BY domainId, FORMAT(settings_createdAt_TIMESTAMP, 'yyyy-MM')
-),
-candidates AS (
-    SELECT DISTINCT domainId
-    FROM monthly_2026
-    WHERE qt_total >= {THRESHOLD}
-),
-pre_2026_monthly AS (
-    SELECT domainId,
-           FORMAT(settings_createdAt_TIMESTAMP, 'yyyy-MM') AS mes,
-           COUNT(*) AS qt_total
-    FROM orders_clean
-    WHERE settings_createdAt_TIMESTAMP < '{YEAR_START}'
-      AND domainId IN (SELECT domainId FROM candidates)
-    GROUP BY domainId, FORMAT(settings_createdAt_TIMESTAMP, 'yyyy-MM')
-),
-already_80_before AS (
-    SELECT DISTINCT domainId
-    FROM pre_2026_monthly
-    WHERE qt_total >= {THRESHOLD}
-),
-first_80_in_2026 AS (
-    SELECT domainId, MIN(mes) AS first_mes
-    FROM monthly_2026
-    WHERE qt_total >= {THRESHOLD}
-      AND domainId NOT IN (SELECT domainId FROM already_80_before)
-    GROUP BY domainId
+    HAVING COUNT(*) >= {THRESHOLD}
 ),
 ranked AS (
     SELECT domainId,
@@ -111,7 +86,7 @@ ranked AS (
     FROM orders_clean
     WHERE settings_createdAt_TIMESTAMP >= '{YEAR_START}'
       AND settings_createdAt_TIMESTAMP < '{YEAR_END}'
-      AND domainId IN (SELECT domainId FROM first_80_in_2026)
+      AND domainId IN (SELECT DISTINCT domainId FROM monthly_2026)
 ),
 order_80th AS (
     SELECT domainId, mes, data_bateu
@@ -121,19 +96,18 @@ order_80th AS (
 lifetime AS (
     SELECT domainId, COUNT(*) AS total_lifetime
     FROM orders_clean
-    WHERE domainId IN (SELECT domainId FROM first_80_in_2026)
+    WHERE domainId IN (SELECT DISTINCT domainId FROM monthly_2026)
     GROUP BY domainId
 )
-SELECT f.domainId, f.first_mes AS mes,
+SELECT m.domainId, m.mes,
        m.qt_total, m.qt_pix, m.qt_cartao,
        m.val_total, m.val_pix, m.val_cartao,
        o.data_bateu,
        l.total_lifetime
-FROM first_80_in_2026 f
-JOIN monthly_2026 m ON m.domainId = f.domainId AND m.mes = f.first_mes
-LEFT JOIN order_80th o ON o.domainId = f.domainId AND o.mes = f.first_mes
-LEFT JOIN lifetime   l ON l.domainId = f.domainId
-ORDER BY f.first_mes DESC, m.qt_total DESC
+FROM monthly_2026 m
+LEFT JOIN order_80th o ON o.domainId = m.domainId AND o.mes = m.mes
+LEFT JOIN lifetime   l ON l.domainId = m.domainId
+ORDER BY m.mes DESC, m.qt_total DESC
 """
 
 
@@ -155,20 +129,20 @@ def load_companies() -> dict[str, dict]:
 
 
 def fetch_rows(conn) -> list[dict]:
-    print(f"[fabric] rodando query (1a conquista 80+ historica — deve ter acontecido em 2026)")
+    print(f"[fabric] rodando query (mesess 80+ em 2026, flat)")
     cur = conn.cursor()
     cur.execute(SQL_TOP80)
     cols = [d[0] for d in cur.description]
     rows = [dict(zip(cols, r)) for r in cur.fetchall()]
-    print(f"[fabric] {len(rows)} empresas (1a vez 80+ foi em 2026)")
+    print(f"[fabric] {len(rows)} pares (dominio, mes) com 80+ pedidos")
     return rows
 
 
 def build(rows: list[dict], companies: dict[str, dict]) -> dict:
-    linhas: list[dict] = []
+    # Primeiro passo: agrupa por dominio pra construir mesesBatidos
+    meses_por_dom: dict[str, list[dict]] = {}
+    raw: list[dict] = []
     sem_match = 0
-    meses_set: set[str] = set()
-    cs_set: set[str] = set()
 
     for r in rows:
         dom = str(r.get("domainId") or "").strip()
@@ -178,14 +152,9 @@ def build(rows: list[dict], companies: dict[str, dict]) -> dict:
             dom = str(int(dom))
         except (TypeError, ValueError):
             pass
-        c = companies.get(dom)
-        if c is None:
-            sem_match += 1
-            continue
         mes = r.get("mes") or ""
         if not mes:
             continue
-        cs = c.get("anjo") or ""
         data_bateu = r.get("data_bateu")
         data_bateu_str = ""
         if data_bateu is not None:
@@ -193,35 +162,76 @@ def build(rows: list[dict], companies: dict[str, dict]) -> dict:
                 data_bateu_str = data_bateu.isoformat()
             else:
                 data_bateu_str = str(data_bateu)
-        linhas.append({
-            "dominioId": dom,
-            "marca": c.get("nome_fantasia") or c.get("name") or "",
-            "cs": cs,
-            "canal": c.get("canal") or "",
-            "cnpj": c.get("cnpj") or "",
+        data_bateu_str = data_bateu_str[:19] if data_bateu_str else ""
+
+        qt_total = int(r.get("qt_total") or 0)
+        meses_por_dom.setdefault(dom, []).append({
             "mes": mes,
-            "dataBateu": data_bateu_str[:19] if data_bateu_str else "",
-            "qtTotal": int(r.get("qt_total") or 0),
+            "qtTotal": qt_total,
+            "dataBateu": data_bateu_str,
+        })
+
+        c = companies.get(dom)
+        if c is None:
+            sem_match += 1
+            continue
+        raw.append({
+            "dom": dom,
+            "mes": mes,
+            "dataBateu": data_bateu_str,
+            "qtTotal": qt_total,
             "qtPix": int(r.get("qt_pix") or 0),
             "qtCartao": int(r.get("qt_cartao") or 0),
             "valTotal": round(float(r.get("val_total") or 0), 2),
             "valPix": round(float(r.get("val_pix") or 0), 2),
             "valCartao": round(float(r.get("val_cartao") or 0), 2),
             "totalPedidos": int(r.get("total_lifetime") or 0),
+            "company": c,
         })
-        meses_set.add(mes)
+
+    # Ordena mesesBatidos por mes ASC pra exibir cronologicamente no modal
+    for dom, lst in meses_por_dom.items():
+        lst.sort(key=lambda x: x["mes"])
+
+    linhas: list[dict] = []
+    meses_set: set[str] = set()
+    cs_set: set[str] = set()
+    dominios_unicos: set[str] = set()
+
+    for x in raw:
+        c = x["company"]
+        cs = c.get("anjo") or ""
+        linhas.append({
+            "dominioId": x["dom"],
+            "marca": c.get("nome_fantasia") or c.get("name") or "",
+            "cs": cs,
+            "canal": c.get("canal") or "",
+            "cnpj": c.get("cnpj") or "",
+            "mes": x["mes"],
+            "dataBateu": x["dataBateu"],
+            "qtTotal": x["qtTotal"],
+            "qtPix": x["qtPix"],
+            "qtCartao": x["qtCartao"],
+            "valTotal": x["valTotal"],
+            "valPix": x["valPix"],
+            "valCartao": x["valCartao"],
+            "totalPedidos": x["totalPedidos"],
+            "mesesBatidos": meses_por_dom.get(x["dom"], []),
+        })
+        meses_set.add(x["mes"])
+        dominios_unicos.add(x["dom"])
         if cs:
             cs_set.add(cs)
 
+    # Sort final: mes DESC, qtTotal DESC
     linhas.sort(key=lambda r: (r["mes"], -r["qtTotal"]), reverse=True)
     meses_list = sorted(meses_set)
     cs_list = sorted(cs_set, key=lambda s: s.lower())
 
-    print(f"[build] {len(linhas)} empresas (1a conquista 80+ historica em 2026), "
-          f"sem match em companies: {sem_match}")
+    print(f"[build] {len(linhas)} linhas (empresa, mes) qualificadas, "
+          f"{len(dominios_unicos)} empresas distintas. Sem match: {sem_match}")
     total_valor = sum(l["valTotal"] for l in linhas)
-    print(f"[build] GMV no mes de conquista: R$ {total_valor:,.2f}")
-    print(f"[build] Distribuicao por mes de conquista: {meses_list}")
+    print(f"[build] GMV nos meses qualificados: R$ {total_valor:,.2f}")
 
     return {
         "geradoEm": datetime.now(timezone.utc).isoformat(),
@@ -230,12 +240,12 @@ def build(rows: list[dict], companies: dict[str, dict]) -> dict:
         "mesesList": meses_list,
         "csList": cs_list,
         "resumo": {
-            "nEmpresas": len(linhas),
+            "nEmpresas": len(dominios_unicos),
+            "nLinhas": len(linhas),
             "totalValor": round(total_valor, 2),
             "totalPix": round(sum(l["valPix"] for l in linhas), 2),
             "totalCartao": round(sum(l["valCartao"] for l in linhas), 2),
             "totalPedidos": sum(l["qtTotal"] for l in linhas),
-            "totalPedidosLifetime": sum(l["totalPedidos"] for l in linhas),
         },
     }
 
