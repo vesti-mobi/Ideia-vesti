@@ -33,3 +33,17 @@ jobs:
 
       - name: Instalar dependencias Python
         run: pip install pyodbc openpyxl google-auth requests
+
+      - name: Preparar secrets
+        working-directory: PainelCSGerencial
+        env:
+          GOOGLE_SA_JSON: ${{ secrets.GOOGLE_SA_JSON }}
+          HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
+        run: |
+          if [ -z "$GOOGLE_SA_JSON" ]; then
+            echo "ERRO: secret GOOGLE_SA_JSON nao configurado"
+            exit 1
+          fi
+          echo "$GOOGLE_SA_JSON" > google_sa.json
+          echo "HUBSPOT_TOKEN=$HUBSPOT_TOKEN" > .env.local
+          printf '{"sql_endpoint":"7sowj2vsfd6efgf3phzgjfmvaq-nrdsskmspnteherwztit766zc4.datawarehouse.fabric.microsoft.com","database":"VestiHouse"}\n' > fabric_config.json
