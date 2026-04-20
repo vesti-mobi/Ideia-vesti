@@ -21,6 +21,7 @@ STEPS = [
     ("fetch_users.py", True),
     ("fetch_hubspot.py", False),  # opcional: nao bloqueia se falhar
     ("fetch_churn_vestipago.py", True),
+    ("fetch_onlog.py", False),  # opcional: nao bloqueia se falhar
     ("merge_data.py", True),
     ("build_html.py", True),
 ]

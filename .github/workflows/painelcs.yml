@@ -71,6 +71,7 @@ jobs:
           python fetch_churn_vestipago.py || echo "WARN: fetch_churn_vestipago falhou"
           python fetch_gmv.py || echo "WARN: fetch_gmv falhou"
           python fetch_top80.py || echo "WARN: fetch_top80 falhou"
+          python fetch_onlog.py || echo "WARN: fetch_onlog falhou"
           python merge_data.py
           python build_html.py
 

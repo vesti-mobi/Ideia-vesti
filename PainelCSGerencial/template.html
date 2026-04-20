@@ -187,6 +187,13 @@ table.dt tr:hover td{background:#FAFAFA}
             <div class="hl-score" style="font-size:22px;margin-top:8px" id="home-top80-sub">--</div>
             <div class="hl-meta" style="margin-top:10px">Empresas que tiveram 80+ pedidos num mesmo mes civil em 2026 &rarr;</div>
         </div>
+        <div class="hl-card" style="background:linear-gradient(135deg,#00B894,#55D3B0);cursor:pointer" onclick="switchTab('onlog')">
+            <div class="hl-icon">&#128230;</div>
+            <div class="hl-label">Frete Onlog</div>
+            <div class="hl-cargo" id="home-onlog-val">--</div>
+            <div class="hl-score" style="font-size:22px;margin-top:8px" id="home-onlog-sub">--</div>
+            <div class="hl-meta" style="margin-top:10px">Pedidos enviados pela Onlog com e sem etiqueta gerada &rarr;</div>
+        </div>
     </div>
 </div>
 <!-- ============ CHURN TAB ============ -->
@@ -429,6 +436,68 @@ table.dt tr:hover td{background:#FAFAFA}
         </div>
     </div>
 </div>
+<!-- ============ ONLOG TAB ============ -->
+<div class="tab-panel" id="tab-onlog">
+    <div class="kpi-row">
+        <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128230;</div><div class="kl">Total Pedidos Onlog</div><div class="kv" style="color:var(--s)" id="ol-ktot">--</div><div class="ks" id="ol-ktot-s"></div></div>
+        <div class="kpi"><div class="ki" style="background:#E8EAF6">&#127991;</div><div class="kl">Com Etiqueta</div><div class="kv" style="color:#0984E3" id="ol-ketiq">--</div><div class="ks" id="ol-ketiq-s"></div></div>
+        <div class="kpi"><div class="ki" style="background:#FFF3E0">&#9888;</div><div class="kl">Sem Etiqueta</div><div class="kv" style="color:var(--w)" id="ol-ksem">--</div><div class="ks" id="ol-ksem-s"></div></div>
+        <div class="kpi"><div class="ki" style="background:#F0EFFF">&#128181;</div><div class="kl">GMV Onlog</div><div class="kv" style="color:var(--p);font-size:20px" id="ol-kval">R$ --</div><div class="ks" id="ol-kval-s"></div></div>
+    </div>
+    <div class="filters">
+        <div class="filter-group"><label>De:</label><input type="date" class="f-input" id="olFDe" onchange="updateOnlog()" style="width:150px"></div>
+        <div class="filter-group"><label>Ate:</label><input type="date" class="f-input" id="olFAte" onchange="updateOnlog()" style="width:150px"></div>
+        <div class="filter-group"><label>Dia unico:</label><input type="date" class="f-input" id="olFDia" onchange="onlogSetDia()" style="width:150px" title="Seleciona um dia especifico"></div>
+        <div class="filter-group"><label>Etiqueta:</label><select class="f-select" id="olFEtiq" onchange="updateOnlog()"><option value="">Todos</option><option value="com">Com etiqueta</option><option value="sem">Sem etiqueta</option></select></div>
+        <button class="f-btn" onclick="onlogClearFilters()">Limpar</button>
+        <button class="help-btn" onclick="document.getElementById('helpOnlog').classList.add('show')" title="Como funciona">?</button>
+    </div>
+    <div class="tbl-card">
+        <h4 id="ol-tbl-title">Pedidos Onlog &middot; <span id="ol-tbl-count" style="color:var(--g);font-weight:500">--</span></h4>
+        <div style="max-height:560px;overflow-y:auto;overflow-x:auto">
+            <table class="dt" id="tOnlog">
+                <thead><tr>
+                    <th>Data</th>
+                    <th>CS</th>
+                    <th>Marca</th>
+                    <th>Pedido #</th>
+                    <th>Cliente</th>
+                    <th>Destino</th>
+                    <th>Servico</th>
+                    <th>Status</th>
+                    <th>Etiqueta</th>
+                    <th style="text-align:right">Valor</th>
+                </tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- MODAL AJUDA ONLOG -->
+<div class="modal-overlay" id="helpOnlog" onclick="if(event.target===this)this.classList.remove('show')">
+    <div class="modal-box">
+        <button class="close-btn" onclick="document.getElementById('helpOnlog').classList.remove('show')">&times;</button>
+        <h3>Frete Onlog - Como funciona</h3>
+        <p><b>O que e?</b></p>
+        <p>Todos os pedidos enviados com a transportadora <b>Onlog</b> (delivery_provider_name com "OnLog"). Uma linha por pedido.</p>
+        <ul>
+            <li><b>Com etiqueta</b> = pedido tem URL de etiqueta (PDF) gerada. Clique em "Ver" pra abrir a etiqueta.</li>
+            <li><b>Sem etiqueta</b> = pedido foi feito com Onlog mas ainda nao teve etiqueta gerada.</li>
+        </ul>
+        <p><b>Filtros de data:</b></p>
+        <ul>
+            <li><b>De / Ate</b> = intervalo de datas do pedido.</li>
+            <li><b>Dia unico</b> = atalho pra filtrar apenas um dia especifico (preenche De e Ate com a mesma data).</li>
+        </ul>
+        <p><b>Filtro "Etiqueta":</b></p>
+        <ul>
+            <li><b>Todos</b> - mostra todos os pedidos.</li>
+            <li><b>Com etiqueta</b> - apenas pedidos com etiqueta PDF gerada.</li>
+            <li><b>Sem etiqueta</b> - apenas pedidos sem etiqueta (acao pendente).</li>
+        </ul>
+        <p>Os filtros globais de <b>Empresa</b> e <b>CS</b> (barra superior) tambem se aplicam aqui.</p>
+    </div>
+</div>
 <!-- ============ NPS TAB ============ -->
 <div class="tab-panel" id="tab-nps">
     <div class="kpi-row" id="npsKpiNormal">
@@ -600,7 +669,7 @@ function switchTab(t,skipPush){
     if(prev && prev!==t && !skipPush){navStack.push(prev)}
     currentTab=t;
     if(typeof closeChurnDetail==='function')closeChurnDetail();
-    var tabs=['home','csat','nps','vp','churn','gmv','top80'];
+    var tabs=['home','csat','nps','vp','churn','gmv','top80','onlog'];
     tabs.forEach(function(x){
         var pan=document.getElementById('tab-'+x);if(pan)pan.classList.toggle('active',x===t);
     });
@@ -614,11 +683,11 @@ function switchTab(t,skipPush){
     // Back nav aparece fora da home
     var bn=document.getElementById('backNav');
     bn.style.display=t==='home'?'none':'block';
-    var labels={'csat':'Satisfacao (CSAT)','nps':'Satisfacao (NPS)','vp':'Novos VestiPago','churn':'Churn de Clientes','gmv':'GMV Mensal','top80':'Clientes 80+ pedidos/mes','home':'Geral'};
+    var labels={'csat':'Satisfacao (CSAT)','nps':'Satisfacao (NPS)','vp':'Novos VestiPago','churn':'Churn de Clientes','gmv':'GMV Mensal','top80':'Clientes 80+ pedidos/mes','onlog':'Frete Onlog','home':'Geral'};
     document.getElementById('breadcrumb').textContent='Voce esta em: '+(labels[t]||t);
     // Filtros globais (empresa/CS) visiveis em TODAS as paginas; KPIs globais so fora de vp/gmv/churn/home
     document.querySelector('.filters').style.display='flex';
-    var hideKpi=(t==='vp'||t==='home'||t==='churn'||t==='gmv'||t==='top80');
+    var hideKpi=(t==='vp'||t==='home'||t==='churn'||t==='gmv'||t==='top80'||t==='onlog');
     document.getElementById('globalKpiRow').style.display=hideKpi?'none':'grid';
     var cd=document.getElementById('coDetail');if(cd)cd.style.display=hideKpi?'none':'';
     updateAll();
@@ -816,6 +885,21 @@ function updateHome(){
     }
     document.getElementById('home-top80-val').textContent=Object.keys(tEmp).length.toLocaleString('pt-BR')+' empresa(s)';
     document.getElementById('home-top80-sub').textContent=tMes.toLocaleString('pt-BR')+' mes(es) qualificado(s)';
+    // ONLOG respeita filtros globais (CS, empresa)
+    var od=(typeof ONLOG_DATA!=='undefined'?ONLOG_DATA:null);
+    var oTot=0,oSem=0;
+    if(od&&od.pedidos){
+        var fcsG=(fCS&&fCS.value)||'';
+        var selCoLow2=selCo?selCo.toLowerCase():'';
+        od.pedidos.forEach(function(p){
+            if(fcsG&&(p.cs||'')!==fcsG)return;
+            if(selCoLow2&&(p.marca||'').toLowerCase().indexOf(selCoLow2)<0)return;
+            oTot++;
+            if(!p.comEtiqueta)oSem++;
+        });
+    }
+    document.getElementById('home-onlog-val').textContent=oTot.toLocaleString('pt-BR')+' pedido(s)';
+    document.getElementById('home-onlog-sub').textContent=oSem?(oSem.toLocaleString('pt-BR')+' sem etiqueta pendente'):'todas etiquetas geradas';
 }
 
 // === UPDATE: NOVOS VESTIPAGO ===
@@ -1043,6 +1127,83 @@ function openTop80Detail(domainId){
     document.getElementById('top80Detail').classList.add('show');
 }
 
+// === ONLOG (frete) ===
+// ONLOG_DATA injetado pelo merge_data.py (fetch_onlog.py). Fallback: {}
+if(typeof ONLOG_DATA==='undefined')window.ONLOG_DATA={pedidos:[],diasList:[]};
+function onlogSetDia(){
+    var d=document.getElementById('olFDia').value;
+    if(d){document.getElementById('olFDe').value=d;document.getElementById('olFAte').value=d}
+    updateOnlog();
+}
+function onlogClearFilters(){
+    document.getElementById('olFDe').value='';
+    document.getElementById('olFAte').value='';
+    document.getElementById('olFDia').value='';
+    document.getElementById('olFEtiq').value='';
+    updateOnlog();
+}
+function _onlogFilterRows(od){
+    var fcsGlobal=(fCS&&fCS.value)||'';
+    var selCoLow=selCo?selCo.toLowerCase():'';
+    var de=document.getElementById('olFDe').value;
+    var ate=document.getElementById('olFAte').value;
+    var etq=document.getElementById('olFEtiq').value;
+    var rows=(od.pedidos||[]).slice();
+    if(fcsGlobal)rows=rows.filter(function(p){return (p.cs||'')===fcsGlobal});
+    if(selCoLow)rows=rows.filter(function(p){return (p.marca||'').toLowerCase().indexOf(selCoLow)>=0});
+    if(de)rows=rows.filter(function(p){return (p.data||'')>=de});
+    if(ate)rows=rows.filter(function(p){return (p.data||'')<=ate});
+    if(etq==='com')rows=rows.filter(function(p){return p.comEtiqueta});
+    else if(etq==='sem')rows=rows.filter(function(p){return !p.comEtiqueta});
+    return rows;
+}
+function updateOnlog(){
+    var od=(typeof ONLOG_DATA!=='undefined'?ONLOG_DATA:null);
+    var tb=document.querySelector('#tOnlog tbody');
+    if(!od||!od.pedidos||!od.pedidos.length){
+        document.getElementById('ol-ktot').textContent='0';
+        document.getElementById('ol-ketiq').textContent='0';
+        document.getElementById('ol-ksem').textContent='0';
+        document.getElementById('ol-kval').textContent='R$ 0,00';
+        document.getElementById('ol-tbl-count').textContent='0 pedidos';
+        tb.innerHTML='<tr><td colspan="10" style="text-align:center;color:#999;padding:24px">Sem dados (ONLOG_DATA vazio). Rode python fetch_onlog.py</td></tr>';
+        return;
+    }
+    var rows=_onlogFilterRows(od);
+    rows.sort(function(a,b){return (b.data||'').localeCompare(a.data||'')||(b.orderNumber||0)-(a.orderNumber||0)});
+    var nCom=0,nSem=0,val=0;
+    rows.forEach(function(p){if(p.comEtiqueta)nCom++;else nSem++;val+=(p.valor||0)});
+    document.getElementById('ol-ktot').textContent=rows.length.toLocaleString('pt-BR');
+    document.getElementById('ol-ketiq').textContent=nCom.toLocaleString('pt-BR');
+    document.getElementById('ol-ksem').textContent=nSem.toLocaleString('pt-BR');
+    document.getElementById('ol-kval').textContent='R$ '+val.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    var de=document.getElementById('olFDe').value,ate=document.getElementById('olFAte').value;
+    var per=(de||ate)?(' de '+(de||'inicio')+' ate '+(ate||'hoje')):(od.diasList&&od.diasList.length?' ('+od.diasList[od.diasList.length-1]+' a '+od.diasList[0]+')':'');
+    document.getElementById('ol-tbl-count').textContent=rows.length+' pedido(s)'+per;
+    if(!rows.length){tb.innerHTML='<tr><td colspan="10" style="text-align:center;color:#999;padding:24px">Nenhum pedido com os filtros atuais</td></tr>';return}
+    var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+    tb.innerHTML=rows.map(function(p){
+        var csEsc=(p.cs||'-').replace(/'/g,"\\'");
+        var destino=esc((p.cidade||'-')+(p.uf?'/'+p.uf:''));
+        var etqCell=p.comEtiqueta
+            ? '<a href="'+esc(p.etiquetaUrl)+'" target="_blank" rel="noopener" style="color:#0984E3;font-weight:600;text-decoration:none">Ver PDF</a>'
+            : '<span style="color:var(--w);font-weight:600">Pendente</span>';
+        var statusColor=p.cancelado?'#E17055':(p.status==='SENT'?'var(--s)':(p.status==='SEPARATED'?'#0984E3':'var(--g)'));
+        return '<tr>'+
+            '<td style="white-space:nowrap;color:var(--g)">'+esc(p.data||'-')+'</td>'+
+            '<td><span class="badge sm click" onclick="filterByCS(\''+csEsc+'\')">'+esc(p.cs||'-')+'</span></td>'+
+            '<td class="click" onclick="selectCo(\''+esc(p.marca||'').replace(/'/g,"\\'")+'\')"><b>'+esc(p.marca||'-')+'</b></td>'+
+            '<td style="white-space:nowrap;font-family:monospace">#'+esc(p.orderNumber)+'</td>'+
+            '<td>'+esc(p.cliente||'-')+'</td>'+
+            '<td style="white-space:nowrap">'+destino+'</td>'+
+            '<td style="font-size:11px;color:var(--g)">'+esc(p.provider||'')+'</td>'+
+            '<td style="font-size:11px;color:'+statusColor+';font-weight:600">'+esc(p.cancelado?'CANCELADO':(p.status||'-'))+'</td>'+
+            '<td>'+etqCell+'</td>'+
+            '<td style="text-align:right;font-weight:700;color:var(--s);white-space:nowrap">R$ '+(p.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+        '</tr>'
+    }).join('');
+}
+
 // === CHURN VESTIPAGO DATA ===
 // CHURN_DATA e injetado pelo merge_data.py via INLINE_DATA (fetch_churn_vestipago.py -> churn_vestipago_data.json)
 // Fallback: se CHURN_DATA nao existir (build antigo), usa array vazio
@@ -1152,9 +1313,10 @@ function updateAll(){
     else if(currentTab==='churn')updateChurn();
     else if(currentTab==='gmv')updateGmv();
     else if(currentTab==='top80')updateTop80();
+    else if(currentTab==='onlog')updateOnlog();
 }
 function filterByCS(name){fCS.value=name;document.getElementById('fClear').style.display='inline-block';updateAll()}
-window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;window.updateVp=updateVp;window.vpClearFilters=vpClearFilters;window.goBack=goBack;window.updateChurn=updateChurn;window.churnClearFilters=churnClearFilters;window.filterByCS=filterByCS;window.openChurnDetail=openChurnDetail;window.closeChurnDetail=closeChurnDetail;window.updateGmv=updateGmv;window.gmvClearFilters=gmvClearFilters;window.updateTop80=updateTop80;window.top80ClearFilters=top80ClearFilters;window.openTop80Detail=openTop80Detail;
+window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;window.updateVp=updateVp;window.vpClearFilters=vpClearFilters;window.goBack=goBack;window.updateChurn=updateChurn;window.churnClearFilters=churnClearFilters;window.filterByCS=filterByCS;window.openChurnDetail=openChurnDetail;window.closeChurnDetail=closeChurnDetail;window.updateGmv=updateGmv;window.gmvClearFilters=gmvClearFilters;window.updateTop80=updateTop80;window.top80ClearFilters=top80ClearFilters;window.openTop80Detail=openTop80Detail;window.updateOnlog=updateOnlog;window.onlogClearFilters=onlogClearFilters;window.onlogSetDia=onlogSetDia;
 // Inicializacao: Home e default; filtros globais visiveis, KPIs globais ocultos
 document.querySelector('.filters').style.display='flex';
 document.getElementById('globalKpiRow').style.display='none';

@@ -13,6 +13,7 @@ Consts gerados:
   CHURN_DATA           -> churn_vestipago_data.json (fetch_churn_vestipago) [pode ser []]
   GMV_DATA             -> gmv_data.json (fetch_gmv) [pode ser {}]
   TOP80_DATA           -> top80_data.json (fetch_top80) [pode ser {}]
+  ONLOG_DATA           -> onlog_data.json (fetch_onlog) [pode ser {}]
 """
 
 import json
@@ -161,6 +162,7 @@ def main() -> None:
     churn = load("churn_vestipago_data.json", [])
     gmv = load("gmv_data.json", {})
     top80 = load("top80_data.json", {})
+    onlog = load("onlog_data.json", {})
 
     nps = build_nps(sheets)
     csat_oraculo = build_csat_oraculo(sheets)
@@ -183,6 +185,7 @@ def main() -> None:
         + dump("CHURN_DATA", churn)
         + dump("GMV_DATA", gmv)
         + dump("TOP80_DATA", top80)
+        + dump("ONLOG_DATA", onlog)
     )
     OUT.write_text(content, encoding="utf-8")
     print(f"[merge] {OUT.name} escrito")
@@ -197,6 +200,7 @@ def main() -> None:
     print(f"  CHURN_DATA:           {len(churn)}")
     print(f"  GMV_DATA.empresas:    {len(gmv.get('empresas', [])) if isinstance(gmv, dict) else 0}")
     print(f"  TOP80_DATA.linhas:    {len(top80.get('linhas', [])) if isinstance(top80, dict) else 0}")
+    print(f"  ONLOG_DATA.pedidos:   {len(onlog.get('pedidos', [])) if isinstance(onlog, dict) else 0}")
 
 
 if __name__ == "__main__":
