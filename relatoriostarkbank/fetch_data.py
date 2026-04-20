@@ -203,13 +203,17 @@ SELECT
     u.rec_id, u.rec_installment, u.rec_due_at, u.rec_paid_at,
     u.rec_status, u.rec_net_value, u.rec_gross_value, u.rec_vp_value,
     u.rec_antifraud_value, u.rec_antecipation_value, u.rec_advanced,
-    u.rec_invoice_url, u.rec_transaction_id
+    u.rec_invoice_url, u.rec_transaction_id,
+    c.paymentSettings_provider                         AS company_provider,
+    c.paymentSettings_customAntecipationFees_isEnabled AS antec_fee_enabled,
+    c.paymentSettings_customAntecipationFees_d1        AS antec_d1
 FROM (
     SELECT * FROM rec
     UNION ALL
     SELECT * FROM only_pedidos
 ) u
 LEFT JOIN pedidos p ON p.order_id = u.order_id
+LEFT JOIN dbo.mongodb_companies c ON c.companyId = u.company_id
 ORDER BY p.order_date DESC, u.order_id, u.rec_installment
 """
 
@@ -307,6 +311,9 @@ def build(raw: list[dict]) -> dict:
                 "installmentsTotal": int(r.get("installments_total") or 0),
                 "txNetValue": float(r.get("tx_net_value") or 0),
                 "summaryTotal": float(r.get("summary_total") or 0),
+                "companyProvider": r.get("company_provider") or "",
+                "antecipacaoEnabled": (r.get("company_provider") == "STARKBANK") or bool(r.get("antec_fee_enabled")),
+                "antecipacaoD1": float(r.get("antec_d1") or 0),
                 "parcelas": [],
             }
             by_order[oid] = ped
@@ -343,12 +350,26 @@ def build(raw: list[dict]) -> dict:
     # --- Agregacao de antecipacoes ---
     # Chave: (companyId, diaRecebido=paidAt, dueAt). Apenas parcelas advanced=True
     # e netValue > 0. Soma netValue. nomeFantasia anexado pra exibicao.
+    from datetime import date as _date
+    def _parse_day(s: str):
+        try:
+            return _date.fromisoformat(s[:10]) if s else None
+        except Exception:
+            return None
+
     antec_agg: dict[tuple, dict] = {}
     for p in pedidos:
+        if not p.get("antecipacaoEnabled"):
+            continue
         for pc in p["parcelas"]:
-            if not pc.get("advanced"):
-                continue
             if (pc.get("netValue") or 0) == 0:
+                continue
+            paid_d = _parse_day(pc.get("paidAt") or "")
+            due_d = _parse_day(pc.get("dueAt") or "")
+            # Empresa opera em antecipacao: inclui todas as parcelas. Se paga,
+            # valida que foi antes do dueAt (>= 2 dias). Se pendente, entra
+            # mesmo assim (sera antecipada quando liquidar).
+            if paid_d and due_d and (due_d - paid_d).days < 2:
                 continue
             dia_receb = (pc.get("paidAt") or "")[:10]
             due = (pc.get("dueAt") or "")[:10]
