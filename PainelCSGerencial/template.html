@@ -440,16 +440,15 @@ table.dt tr:hover td{background:#FAFAFA}
 <div class="tab-panel" id="tab-onlog">
     <div class="kpi-row">
         <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128230;</div><div class="kl">Total Pedidos Onlog</div><div class="kv" style="color:var(--s)" id="ol-ktot">--</div><div class="ks" id="ol-ktot-s"></div></div>
-        <div class="kpi"><div class="ki" style="background:#E8EAF6">&#127991;</div><div class="kl">Etiqueta Gerada</div><div class="kv" style="color:#0984E3" id="ol-kger">--</div><div class="ks" id="ol-kger-s"></div></div>
-        <div class="kpi"><div class="ki" style="background:#FFEBEE">&#9888;</div><div class="kl">Etiqueta Pendente</div><div class="kv" style="color:#E74C3C" id="ol-kpend">--</div><div class="ks" id="ol-kpend-s">precisa acao</div></div>
-        <div class="kpi"><div class="ki" style="background:#F4F4F4">&#128683;</div><div class="kl">Nao Aplicavel</div><div class="kv" style="color:var(--g)" id="ol-kna">--</div><div class="ks" id="ol-kna-s">cancelado/aguardando</div></div>
+        <div class="kpi"><div class="ki" style="background:#E8EAF6">&#127991;</div><div class="kl">Com Etiqueta</div><div class="kv" style="color:#0984E3" id="ol-ketiq">--</div><div class="ks" id="ol-ketiq-s"></div></div>
+        <div class="kpi"><div class="ki" style="background:#FFF3E0">&#9888;</div><div class="kl">Sem Etiqueta</div><div class="kv" style="color:var(--w)" id="ol-ksem">--</div><div class="ks" id="ol-ksem-s"></div></div>
         <div class="kpi"><div class="ki" style="background:#F0EFFF">&#128181;</div><div class="kl">GMV Onlog</div><div class="kv" style="color:var(--p);font-size:20px" id="ol-kval">R$ --</div><div class="ks" id="ol-kval-s"></div></div>
     </div>
     <div class="filters">
         <div class="filter-group"><label>De:</label><input type="date" class="f-input" id="olFDe" onchange="updateOnlog()" style="width:150px"></div>
         <div class="filter-group"><label>Ate:</label><input type="date" class="f-input" id="olFAte" onchange="updateOnlog()" style="width:150px"></div>
         <div class="filter-group"><label>Dia unico:</label><input type="date" class="f-input" id="olFDia" onchange="onlogSetDia()" style="width:150px" title="Seleciona um dia especifico"></div>
-        <div class="filter-group"><label>Etiqueta:</label><select class="f-select" id="olFEtiq" onchange="updateOnlog()"><option value="">Todos</option><option value="gerada">Gerada</option><option value="pendente">Pendente (precisa acao)</option><option value="na">Nao aplicavel</option></select></div>
+        <div class="filter-group"><label>Etiqueta:</label><select class="f-select" id="olFEtiq" onchange="updateOnlog()"><option value="">Todos</option><option value="com">Com etiqueta</option><option value="sem">Sem etiqueta</option></select></div>
         <div class="filter-group"><label>Status:</label><select class="f-select" id="olFStatus" onchange="updateOnlog()"><option value="">Todos</option></select></div>
         <button class="f-btn" onclick="onlogClearFilters()">Limpar</button>
         <button class="help-btn" onclick="document.getElementById('helpOnlog').classList.add('show')" title="Como funciona">?</button>
@@ -493,9 +492,8 @@ table.dt tr:hover td{background:#FAFAFA}
         </ul>
         <p><b>Filtro "Etiqueta":</b></p>
         <ul>
-            <li><b>Gerada</b> - tem URL do PDF salva.</li>
-            <li><b>Pendente (precisa acao)</b> - sem URL e status SEPARATED/SENT/DELIVERED/FINISHED/PAID/PROCESSING (deveria ja ter etiqueta).</li>
-            <li><b>Nao aplicavel</b> - sem URL porque o pedido esta CANCELED/WAITING/PENDING/REFUNDED/RETURNED (nao faz sentido cobrar etiqueta).</li>
+            <li><b>Com etiqueta</b> - pedidos com URL do PDF da etiqueta.</li>
+            <li><b>Sem etiqueta</b> - pedidos sem URL (inclui cancelados e aguardando pagamento).</li>
         </ul>
         <p>Os filtros globais de <b>Empresa</b> e <b>CS</b> (barra superior) tambem se aplicam aqui.</p>
     </div>
@@ -889,7 +887,7 @@ function updateHome(){
     document.getElementById('home-top80-sub').textContent=tMes.toLocaleString('pt-BR')+' mes(es) qualificado(s)';
     // ONLOG respeita filtros globais (CS, empresa)
     var od=(typeof ONLOG_DATA!=='undefined'?ONLOG_DATA:null);
-    var oTot=0,oPend=0;
+    var oTot=0,oSem=0;
     if(od&&od.pedidos){
         var fcsG=(fCS&&fCS.value)||'';
         var selCoLow2=selCo?selCo.toLowerCase():'';
@@ -897,12 +895,11 @@ function updateHome(){
             if(fcsG&&(p.cs||'')!==fcsG)return;
             if(selCoLow2&&(p.marca||'').toLowerCase().indexOf(selCoLow2)<0)return;
             oTot++;
-            var es=p.etiquetaStatus||(p.comEtiqueta?'gerada':'pendente');
-            if(es==='pendente')oPend++;
+            if(!p.comEtiqueta)oSem++;
         });
     }
     document.getElementById('home-onlog-val').textContent=oTot.toLocaleString('pt-BR')+' pedido(s)';
-    document.getElementById('home-onlog-sub').textContent=oPend?(oPend.toLocaleString('pt-BR')+' etiqueta(s) pendente(s)'):'todas etiquetas OK';
+    document.getElementById('home-onlog-sub').textContent=oSem?(oSem.toLocaleString('pt-BR')+' sem etiqueta'):'todas etiquetas geradas';
 }
 
 // === UPDATE: NOVOS VESTIPAGO ===
@@ -1181,9 +1178,8 @@ function _onlogFilterRows(od){
     if(selCoLow)rows=rows.filter(function(p){return (p.marca||'').toLowerCase().indexOf(selCoLow)>=0});
     if(de)rows=rows.filter(function(p){return (p.data||'')>=de});
     if(ate)rows=rows.filter(function(p){return (p.data||'')<=ate});
-    if(etq==='gerada')rows=rows.filter(function(p){return (p.etiquetaStatus||(p.comEtiqueta?'gerada':'pendente'))==='gerada'});
-    else if(etq==='pendente')rows=rows.filter(function(p){return (p.etiquetaStatus||(p.comEtiqueta?'gerada':'pendente'))==='pendente'});
-    else if(etq==='na')rows=rows.filter(function(p){return (p.etiquetaStatus||(p.comEtiqueta?'gerada':'pendente'))==='na'});
+    if(etq==='com')rows=rows.filter(function(p){return p.comEtiqueta});
+    else if(etq==='sem')rows=rows.filter(function(p){return !p.comEtiqueta});
     var st=document.getElementById('olFStatus').value;
     if(st==='__CANCELED__')rows=rows.filter(function(p){return p.cancelado});
     else if(st)rows=rows.filter(function(p){return !p.cancelado && (p.status||'').toUpperCase()===st});
@@ -1195,9 +1191,8 @@ function updateOnlog(){
     var tb=document.querySelector('#tOnlog tbody');
     if(!od||!od.pedidos||!od.pedidos.length){
         document.getElementById('ol-ktot').textContent='0';
-        document.getElementById('ol-kger').textContent='0';
-        document.getElementById('ol-kpend').textContent='0';
-        document.getElementById('ol-kna').textContent='0';
+        document.getElementById('ol-ketiq').textContent='0';
+        document.getElementById('ol-ksem').textContent='0';
         document.getElementById('ol-kval').textContent='R$ 0,00';
         document.getElementById('ol-tbl-count').textContent='0 pedidos';
         tb.innerHTML='<tr><td colspan="10" style="text-align:center;color:#999;padding:24px">Sem dados (ONLOG_DATA vazio). Rode python fetch_onlog.py</td></tr>';
@@ -1205,16 +1200,11 @@ function updateOnlog(){
     }
     var rows=_onlogFilterRows(od);
     rows.sort(function(a,b){return (b.data||'').localeCompare(a.data||'')||(b.orderNumber||0)-(a.orderNumber||0)});
-    var nGer=0,nPend=0,nNa=0,val=0;
-    rows.forEach(function(p){
-        var es=p.etiquetaStatus||(p.comEtiqueta?'gerada':'pendente');
-        if(es==='gerada')nGer++;else if(es==='pendente')nPend++;else nNa++;
-        val+=(p.valor||0);
-    });
+    var nCom=0,nSem=0,val=0;
+    rows.forEach(function(p){if(p.comEtiqueta)nCom++;else nSem++;val+=(p.valor||0)});
     document.getElementById('ol-ktot').textContent=rows.length.toLocaleString('pt-BR');
-    document.getElementById('ol-kger').textContent=nGer.toLocaleString('pt-BR');
-    document.getElementById('ol-kpend').textContent=nPend.toLocaleString('pt-BR');
-    document.getElementById('ol-kna').textContent=nNa.toLocaleString('pt-BR');
+    document.getElementById('ol-ketiq').textContent=nCom.toLocaleString('pt-BR');
+    document.getElementById('ol-ksem').textContent=nSem.toLocaleString('pt-BR');
     document.getElementById('ol-kval').textContent='R$ '+val.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
     var de=document.getElementById('olFDe').value,ate=document.getElementById('olFAte').value;
     var per=(de||ate)?(' de '+(de||'inicio')+' ate '+(ate||'hoje')):(od.diasList&&od.diasList.length?' ('+od.diasList[od.diasList.length-1]+' a '+od.diasList[0]+')':'');
@@ -1224,12 +1214,9 @@ function updateOnlog(){
     tb.innerHTML=rows.map(function(p){
         var csEsc=(p.cs||'-').replace(/'/g,"\\'");
         var destino=esc((p.cidade||'-')+(p.uf?'/'+p.uf:''));
-        var _es=p.etiquetaStatus||(p.comEtiqueta?'gerada':'pendente');
-        var etqCell=_es==='gerada'
+        var etqCell=p.comEtiqueta
             ? '<a href="'+esc(p.etiquetaUrl)+'" target="_blank" rel="noopener" style="color:#0984E3;font-weight:600;text-decoration:none">Ver PDF</a>'
-            : (_es==='pendente'
-                ? '<span style="color:#E74C3C;font-weight:600">Pendente</span>'
-                : '<span style="color:var(--g);font-weight:500">N/A</span>');
+            : '<span style="color:var(--w);font-weight:600">Sem etiqueta</span>';
         var statusColor=p.cancelado?'#E17055':(p.status==='SENT'?'var(--s)':(p.status==='SEPARATED'?'#0984E3':'var(--g)'));
         return '<tr>'+
             '<td style="white-space:nowrap;color:var(--g)">'+esc(p.data||'-')+'</td>'+
