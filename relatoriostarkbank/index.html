@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StarkBank VestiPago - Recebiveis</title>
+<title>StarkBank VestiPago - Recebíveis</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--p:#6C5CE7;--g:#00B894;--r:#E17055;--y:#F39C12;--b:#0984E3;--bg:#F5F6FA;--card:#fff;--tx:#2D3436;--mut:#636E72;--bd:#DFE6E9;--rd:14px}
@@ -90,7 +90,7 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
 <div id="loginScreen">
     <div class="box">
         <h2>StarkBank VestiPago</h2>
-        <div class="sub">Recebiveis · acesso restrito</div>
+        <div class="sub">Recebíveis · acesso restrito</div>
         <input type="password" id="loginPass" placeholder="Senha" onkeydown="if(event.key==='Enter')doLogin()">
         <div id="loginError">Senha incorreta</div>
         <button onclick="doLogin()">Entrar</button>
@@ -101,7 +101,7 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
 <div class="wrap">
     <div class="top">
         <div>
-            <h1>StarkBank VestiPago · Recebiveis</h1>
+            <h1>StarkBank VestiPago · Recebíveis</h1>
             <div class="sub">Pedidos processados via provider STARKBANK · clique no pedido para ver as parcelas</div>
         </div>
         <div class="info">Atualizado em <span id="dtGerado">--</span></div>
@@ -109,8 +109,8 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
     </div>
 
     <div class="tabs">
-        <div class="tab active" data-page="receb" onclick="switchTab('receb')">Recebiveis</div>
-        <div class="tab" data-page="antec" onclick="switchTab('antec')">Antecipacao</div>
+        <div class="tab active" data-page="receb" onclick="switchTab('receb')">Recebíveis</div>
+        <div class="tab" data-page="antec" onclick="switchTab('antec')">Antecipação</div>
     </div>
 
     <div class="filters" style="margin-bottom:16px">
@@ -125,10 +125,10 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
     <div class="page active" id="pageReceb">
     <div class="kpis">
         <div class="kpi"><div class="lbl">Pedidos</div><div class="val" id="kPed">--</div><div class="ks" id="kPed-s"></div></div>
-        <div class="kpi blue"><div class="lbl">Parcelas</div><div class="val" id="kParc">--</div><div class="ks" id="kParc-s">total de recebiveis</div></div>
+        <div class="kpi blue"><div class="lbl">Parcelas</div><div class="val" id="kParc">--</div><div class="ks" id="kParc-s">total de recebíveis</div></div>
         <div class="kpi green"><div class="lbl">Net value</div><div class="val" id="kNet">R$ --</div><div class="ks">soma receivables.netValue</div></div>
         <div class="kpi red"><div class="lbl">Parcelas pendentes</div><div class="val" id="kPend">--</div><div class="ks" id="kPend-s"></div></div>
-        <div class="kpi orange"><div class="lbl">Proxima parcela</div><div class="val" id="kProx" style="font-size:18px">--</div><div class="ks" id="kProx-s"></div></div>
+        <div class="kpi orange"><div class="lbl">Próxima parcela</div><div class="val" id="kProx" style="font-size:18px">--</div><div class="ks" id="kProx-s"></div></div>
     </div>
 
     <div class="filters">
@@ -137,19 +137,19 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
             <input type="date" id="fOrderDe">
         </div>
         <div class="fg">
-            <label>Data do pedido (ate)</label>
+            <label>Data do pedido (até)</label>
             <input type="date" id="fOrderAte">
         </div>
         <div class="fg">
-            <label>Prox. parcela (de)</label>
+            <label>Próx. parcela (de)</label>
             <input type="date" id="fDueDe">
         </div>
         <div class="fg">
-            <label>Prox. parcela (ate)</label>
+            <label>Próx. parcela (até)</label>
             <input type="date" id="fDueAte">
         </div>
         <div class="fg">
-            <label>Metodo</label>
+            <label>Método</label>
             <select id="fMethod"><option value="">Todos</option></select>
         </div>
         <div class="fg">
@@ -177,11 +177,11 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
                         <th>Empresa</th>
                         <th>CompanyId</th>
                         <th>Cliente</th>
-                        <th>Metodo</th>
+                        <th>Método</th>
                         <th class="r">Parcelas</th>
                         <th>Data pedido</th>
-                        <th>Prox. parcela</th>
-                        <th>Ultima parcela</th>
+                        <th>Próx. parcela</th>
+                        <th>Última parcela</th>
                         <th class="r">Total</th>
                         <th>Status</th>
                     </tr>
@@ -195,13 +195,32 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
     <div class="page" id="pageAntec">
         <div class="kpis">
             <div class="kpi"><div class="lbl">Valor bruto</div><div class="val" id="aGross">R$ --</div><div class="ks">soma grossValue</div></div>
-            <div class="kpi green"><div class="lbl">Valor liquido</div><div class="val" id="aNet">R$ --</div><div class="ks">apos todas as taxas</div></div>
-            <div class="kpi red"><div class="lbl">Taxas totais</div><div class="val" id="aFees">R$ --</div><div class="ks" id="aFeesPct">bruto - liquido</div></div>
+            <div class="kpi green"><div class="lbl">Valor líquido</div><div class="val" id="aNet">R$ --</div><div class="ks">após todas as taxas</div></div>
+            <div class="kpi red"><div class="lbl">Taxas totais</div><div class="val" id="aFees">R$ --</div><div class="ks" id="aFeesPct">bruto - líquido</div></div>
             <div class="kpi blue"><div class="lbl">Parcelas</div><div class="val" id="aParc">--</div><div class="ks" id="aLin">-- grupos</div></div>
-            <div class="kpi orange"><div class="lbl">Empresas</div><div class="val" id="aEmp">--</div><div class="ks">com antecipacao</div></div>
+            <div class="kpi orange"><div class="lbl">Empresas</div><div class="val" id="aEmp">--</div><div class="ks">com antecipação</div></div>
+        </div>
+        <div class="filters">
+            <div class="fg">
+                <label>Dia do recebido (de)</label>
+                <input type="date" id="fAntRecDe">
+            </div>
+            <div class="fg">
+                <label>Dia do recebido (até)</label>
+                <input type="date" id="fAntRecAte">
+            </div>
+            <div class="fg">
+                <label>Data do pedido (de)</label>
+                <input type="date" id="fAntDueDe">
+            </div>
+            <div class="fg">
+                <label>Data do pedido (até)</label>
+                <input type="date" id="fAntDueAte">
+            </div>
+            <button class="clear-btn" onclick="clearAntecFilters()">Limpar datas</button>
         </div>
         <div class="tbl-card">
-            <div class="tbl-head"><h3>Antecipacoes</h3><span class="count" id="antCount">--</span></div>
+            <div class="tbl-head"><h3>Antecipações</h3><span class="count" id="antCount">--</span></div>
             <div class="tbl-wrap">
                 <table>
                     <thead><tr>
@@ -212,7 +231,7 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
                         <th class="r">Parcelas</th>
                         <th class="r">Valor bruto</th>
                         <th class="r">Taxas</th>
-                        <th class="r">Valor liquido</th>
+                        <th class="r">Valor líquido</th>
                     </tr></thead>
                     <tbody id="antBody"></tbody>
                 </table>
@@ -236,6 +255,7 @@ window._dadosError=null;
 window.addEventListener('error',function(e){
     if(window._dadosError)return;
     window._dadosError='JS error: '+(e.message||'desconhecido');
+
     try{
         var el=document.getElementById('tbody');
         if(el)el.innerHTML='<tr><td colspan="12" class="empty" style="color:#E17055">ERRO: '+(e.message||e.filename||'')+' (linha '+(e.lineno||'?')+')</td></tr>';
@@ -271,7 +291,7 @@ function showApp(){
             }
         } else if(tries>80){
             var el=document.getElementById('tbody');
-            if(el)el.innerHTML='<tr><td colspan="12" class="empty" style="color:#E17055">Timeout: dados.js nao carregou em 5s. Verifique o console (F12)</td></tr>';
+            if(el)el.innerHTML='<tr><td colspan="12" class="empty" style="color:#E17055">Timeout: dados.js não carregou em 5s. Verifique o console (F12)</td></tr>';
         } else {
             setTimeout(wait,60);
         }
@@ -309,7 +329,15 @@ function init(){
         dl.appendChild(o);
     });
     document.getElementById('fEmpresa').addEventListener('input',function(){render();renderAntec();});
+    ['fAntRecDe','fAntRecAte','fAntDueDe','fAntDueAte'].forEach(function(id){
+        document.getElementById(id).addEventListener('change',renderAntec);
+    });
     render();
+    renderAntec();
+}
+
+function clearAntecFilters(){
+    ['fAntRecDe','fAntRecAte','fAntDueDe','fAntDueAte'].forEach(function(id){document.getElementById(id).value=''});
     renderAntec();
 }
 
@@ -459,10 +487,20 @@ function render(){
 
 function renderAntec(){
     var q=(document.getElementById('fEmpresa').value||'').toLowerCase().trim();
+    var rDe=document.getElementById('fAntRecDe').value;
+    var rAte=document.getElementById('fAntRecAte').value;
+    var dDe=document.getElementById('fAntDueDe').value;
+    var dAte=document.getElementById('fAntDueAte').value;
     var rows=(DADOS.antecipacoes||[]).filter(function(a){
         if((a.netValue||0)===0)return false;
-        if(!q)return true;
-        return ((a.nomeFantasia||'').toLowerCase().indexOf(q)>=0)||((a.companyId||'').toLowerCase().indexOf(q)>=0);
+        if(q && !(((a.nomeFantasia||'').toLowerCase().indexOf(q)>=0)||((a.companyId||'').toLowerCase().indexOf(q)>=0)))return false;
+        var rec=(a.diaRecebido||'').substring(0,10);
+        var due=(a.dueAt||'').substring(0,10);
+        if(rDe&&(!rec||rec<rDe))return false;
+        if(rAte&&(!rec||rec>rAte))return false;
+        if(dDe&&(!due||due<dDe))return false;
+        if(dAte&&(!due||due>dAte))return false;
+        return true;
     });
     document.getElementById('antCount').textContent=rows.length+' linha(s)';
     var totNet=0,totGross=0,totParc=0,emp={};
@@ -477,7 +515,7 @@ function renderAntec(){
     document.getElementById('aLin').textContent=fmtN(rows.length)+' grupos';
     document.getElementById('aEmp').textContent=fmtN(Object.keys(emp).length);
     var tb=document.getElementById('antBody');
-    if(!rows.length){tb.innerHTML='<tr><td colspan="8" class="empty">Nenhuma antecipacao com os filtros atuais</td></tr>';return}
+    if(!rows.length){tb.innerHTML='<tr><td colspan="8" class="empty">Nenhuma antecipação com os filtros atuais</td></tr>';return}
     var html=[];
     rows.forEach(function(a){
         html.push('<tr>'+
