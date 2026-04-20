@@ -494,7 +494,6 @@ function renderAntec(){
     var dDe=document.getElementById('fAntDueDe').value;
     var dAte=document.getElementById('fAntDueAte').value;
     var rows=(DADOS.antecipacoes||[]).filter(function(a){
-        if((a.netValue||0)===0)return false;
         if(q && !(((a.nomeFantasia||'').toLowerCase().indexOf(q)>=0)||((a.companyId||'').toLowerCase().indexOf(q)>=0)))return false;
         var rec=(a.diaRecebido||'').substring(0,10);
         var due=(a.dueAt||'').substring(0,10);
