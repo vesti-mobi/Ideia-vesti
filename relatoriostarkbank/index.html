@@ -126,11 +126,11 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
             <input type="date" id="fDataAte">
         </div>
         <div class="fg">
-            <label>Pago em (de)</label>
+            <label>Pago pelo cliente (de)</label>
             <input type="date" id="fPagoDe">
         </div>
         <div class="fg">
-            <label>Pago em (até)</label>
+            <label>Pago pelo cliente (até)</label>
             <input type="date" id="fPagoAte">
         </div>
         <div class="fg" style="flex:1;min-width:260px">
@@ -160,7 +160,7 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
                     <tr>
                         <th style="width:22px"></th>
                         <th>Data / Empresa / Pedido</th>
-                        <th>Pago em</th>
+                        <th>Pago pelo cliente</th>
                         <th class="r">Parcelas</th>
                         <th class="r">Valor total</th>
                         <th class="r">VestiPago</th>
@@ -296,7 +296,7 @@ function getFiltered(){
         var d=(p.payDate||'').substring(0,10);
         if(dDe&&(!d||d<dDe))return false;
         if(dAte&&(!d||d>dAte))return false;
-        var pg=(p.paidAt||'').substring(0,10);
+        var pg=(p.customerPaidAt||'').substring(0,10);
         if(pDe&&(!pg||pg<pDe))return false;
         if(pAte&&(!pg||pg>pAte))return false;
         if(q){
@@ -396,7 +396,7 @@ function render(){
                 html.push('<tr class="parc show" style="background:#FAFAFF">'+
                     '<td></td>'+
                     '<td style="padding-left:80px;color:var(--tx)">Pedido #'+esc((p.orderNumber||p.orderId||'').toString())+' · parcela '+p.installment+'/'+(p.installmentsTotal||'?')+' · <span style="color:var(--mut)">'+esc(p.customerName||'-')+'</span></td>'+
-                    '<td class="date">'+(p.paidAt?fmtD(p.paidAt):'-')+'</td>'+
+                    '<td class="date">'+(p.customerPaidAt?fmtD(p.customerPaidAt):'-')+'</td>'+
                     '<td class="money" style="color:var(--p)">1</td>'+
                     '<td class="money" style="color:var(--mut)">'+fmtC(p.grossValue)+'</td>'+
                     '<td class="money" style="color:var(--b)">'+fmtC(p.vpValue)+'</td>'+

@@ -378,6 +378,7 @@ def build(raw: list[dict]) -> dict:
     for p in pedidos:
         is_antec = bool(p.get("antecipacaoEnabled"))
         order_d = _parse_day(p.get("orderDate") or "")
+        customer_paid_at = (p.get("paidAt") or "")[:10]
         for pc in p["parcelas"]:
             paid = (pc.get("paidAt") or "")[:10]
             due = (pc.get("dueAt") or "")[:10]
@@ -398,6 +399,7 @@ def build(raw: list[dict]) -> dict:
                 "orderNumber": p.get("orderNumber"),
                 "customerName": p.get("customerName", ""),
                 "orderDate": p.get("orderDate", ""),
+                "customerPaidAt": customer_paid_at,
                 "installment": pc.get("installment", 0),
                 "installmentsTotal": p.get("installmentsTotal", 0),
                 "dueAt": due,
