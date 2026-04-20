@@ -49,12 +49,7 @@ jobs:
           fi
           echo "$GOOGLE_SA_JSON" > google_sa.json
           echo "HUBSPOT_TOKEN=$HUBSPOT_TOKEN" > .env.local
-          cat > fabric_config.json <<'EOF'
-          {
-            "sql_endpoint": "7sowj2vsfd6efgf3phzgjfmvaq-nrdsskmspnteherwztit766zc4.datawarehouse.fabric.microsoft.com",
-            "database": "VestiHouse"
-          }
-          EOF
+          printf '{"sql_endpoint":"7sowj2vsfd6efgf3phzgjfmvaq-nrdsskmspnteherwztit766zc4.datawarehouse.fabric.microsoft.com","database":"VestiHouse"}\n' > fabric_config.json
 
       - name: Rodar build NovosVestiPago
         working-directory: NovosVestiPago
