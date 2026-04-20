@@ -47,3 +47,28 @@ jobs:
           echo "$GOOGLE_SA_JSON" > google_sa.json
           echo "HUBSPOT_TOKEN=$HUBSPOT_TOKEN" > .env.local
           printf '{"sql_endpoint":"7sowj2vsfd6efgf3phzgjfmvaq-nrdsskmspnteherwztit766zc4.datawarehouse.fabric.microsoft.com","database":"VestiHouse"}\n' > fabric_config.json
+
+      - name: Rodar build NovosVestiPago
+        working-directory: NovosVestiPago
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+        run: node build.js || echo "WARN: NovosVestiPago build falhou"
+
+      - name: Rodar pipeline
+        working-directory: PainelCSGerencial
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+        run: |
+          python fetch_fabric.py || echo "WARN: fetch_fabric falhou"
+          python fetch_sheets.py || echo "WARN: fetch_sheets falhou"
+          python fetch_users.py || echo "WARN: fetch_users falhou"
+          python fetch_hubspot.py || echo "WARN: fetch_hubspot falhou"
+          python fetch_churn_vestipago.py || echo "WARN: fetch_churn_vestipago falhou"
+          python fetch_gmv.py || echo "WARN: fetch_gmv falhou"
+          python fetch_top80.py || echo "WARN: fetch_top80 falhou"
+          python merge_data.py
+          python build_html.py
