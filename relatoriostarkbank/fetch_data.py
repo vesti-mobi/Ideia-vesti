@@ -219,6 +219,15 @@ ORDER BY p.order_date DESC, u.order_id, u.rec_installment
 """
 
 
+def _to_float(v, default: float = 0.0) -> float:
+    if v is None or v == "":
+        return default
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return default
+
+
 def _iso_or_empty(v) -> str:
     if v is None:
         return ""
@@ -288,7 +297,7 @@ def build(raw: list[dict]) -> dict:
             "grossValue": float(r.get("rec_gross_value") or 0),
             "vpValue": float(r.get("rec_vp_value") or 0),
             "antifraudValue": float(r.get("rec_antifraud_value") or 0),
-            "antecipationValue": str(r.get("rec_antecipation_value") or ""),
+            "antecipationValue": _to_float(r.get("rec_antecipation_value")),
             "advanced": bool(r.get("rec_advanced")) if r.get("rec_advanced") is not None else None,
             "invoiceUrl": r.get("rec_invoice_url") or "",
             "transactionId": r.get("rec_transaction_id") or "",
@@ -354,67 +363,53 @@ def build(raw: list[dict]) -> dict:
     statuses = sorted({pc["status"] for p in pedidos for pc in p["parcelas"] if pc["status"]})
     companies = sorted({p["companyId"] for p in pedidos if p["companyId"]})
 
-    # --- Agregacao de antecipacoes ---
-    # Chave: (companyId, diaRecebido=paidAt, dueAt). Apenas parcelas advanced=True
-    # e netValue > 0. Soma netValue. nomeFantasia anexado pra exibicao.
-    from datetime import date as _date
+    # --- Lista flat de pagamentos (1 por parcela) pro financeiro ---
+    # payDate:
+    #   - Fluxo: paidAt se ja pago, senao dueAt (projecao — dia do vencimento)
+    #   - Antecipacao: paidAt se ja pago, senao orderDate + 1 dia (projecao D+1)
+    from datetime import date as _date, timedelta as _td
     def _parse_day(s: str):
         try:
             return _date.fromisoformat(s[:10]) if s else None
         except Exception:
             return None
 
-    antec_agg: dict[tuple, dict] = {}
+    pagamentos: list[dict] = []
     for p in pedidos:
-        if not p.get("antecipacaoEnabled"):
-            continue
+        is_antec = bool(p.get("antecipacaoEnabled"))
+        order_d = _parse_day(p.get("orderDate") or "")
         for pc in p["parcelas"]:
-            paid_d = _parse_day(pc.get("paidAt") or "")
-            due_d = _parse_day(pc.get("dueAt") or "")
-            # Empresa opera em antecipacao: inclui todas as parcelas. Se paga,
-            # valida que foi antes do dueAt (>= 2 dias). Se pendente, entra
-            # mesmo assim (sera antecipada quando liquidar).
-            if paid_d and due_d and (due_d - paid_d).days < 2:
-                continue
-            dia_receb = (pc.get("paidAt") or "")[:10]
+            paid = (pc.get("paidAt") or "")[:10]
             due = (pc.get("dueAt") or "")[:10]
-            key = (p["companyId"], dia_receb, due)
-            agg = antec_agg.get(key)
-            if agg is None:
-                agg = {
-                    "companyId": p["companyId"],
-                    "nomeFantasia": p.get("nomeFantasia", ""),
-                    "domainId": p.get("domainId", ""),
-                    "diaRecebido": dia_receb,
-                    "dueAt": due,
-                    "netValue": 0.0,
-                    "grossValue": 0.0,
-                    "vpValue": 0.0,
-                    "antifraudValue": 0.0,
-                    "nParcelas": 0,
-                    "orderNumbers": [],
-                }
-                antec_agg[key] = agg
-            agg["netValue"] += pc["netValue"] or 0
-            agg["grossValue"] += pc.get("grossValue") or 0
-            agg["vpValue"] += pc.get("vpValue") or 0
-            agg["antifraudValue"] += pc.get("antifraudValue") or 0
-            agg["nParcelas"] += 1
-            on = p.get("orderNumber")
-            if on is not None and on not in agg["orderNumbers"]:
-                agg["orderNumbers"].append(on)
-    antecipacoes = sorted(
-        [{
-            **v,
-            "netValue": round(v["netValue"], 2),
-            "grossValue": round(v["grossValue"], 2),
-            "vpValue": round(v["vpValue"], 2),
-            "antifraudValue": round(v["antifraudValue"], 2),
-            "totalFees": round(v["grossValue"] - v["netValue"], 2),
-        } for v in antec_agg.values()],
-        key=lambda x: (x["diaRecebido"] or "", x["nomeFantasia"] or ""),
-        reverse=True,
-    )
+            if paid:
+                pay_date = paid
+            elif is_antec:
+                pay_date = (order_d + _td(days=1)).isoformat() if order_d else ""
+            else:
+                pay_date = due
+            pagamentos.append({
+                "payDate": pay_date,
+                "isAntecipacao": is_antec,
+                "isPaid": bool(paid),
+                "companyId": p["companyId"],
+                "nomeFantasia": p.get("nomeFantasia", ""),
+                "domainId": p.get("domainId", ""),
+                "orderId": p["orderId"],
+                "orderNumber": p.get("orderNumber"),
+                "customerName": p.get("customerName", ""),
+                "orderDate": p.get("orderDate", ""),
+                "installment": pc.get("installment", 0),
+                "installmentsTotal": p.get("installmentsTotal", 0),
+                "dueAt": due,
+                "paidAt": paid,
+                "grossValue": round(pc.get("grossValue") or 0, 2),
+                "vpValue": round(pc.get("vpValue") or 0, 2),
+                "antifraudValue": round(pc.get("antifraudValue") or 0, 2),
+                "antecipationValue": round(pc.get("antecipationValue") or 0, 2),
+                "netValue": round(pc.get("netValue") or 0, 2),
+                "status": pc.get("status", ""),
+            })
+    pagamentos.sort(key=lambda x: (x["payDate"] or "", x["nomeFantasia"] or "", x.get("orderNumber") or 0))
 
     total_net = sum(p["totalNet"] for p in pedidos)
     total_gross = sum(p["totalGross"] for p in pedidos)
@@ -429,7 +424,7 @@ def build(raw: list[dict]) -> dict:
         "paymentMethods": methods,
         "statuses": statuses,
         "companies": companies,
-        "antecipacoes": antecipacoes,
+        "pagamentos": pagamentos,
         "resumo": {
             "nPedidos": len(pedidos),
             "nParcelas": total_parcelas,

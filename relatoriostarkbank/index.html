@@ -109,136 +109,58 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
     </div>
 
     <div class="tabs">
-        <div class="tab active" data-page="receb" onclick="switchTab('receb')">Fluxo</div>
-        <div class="tab" data-page="antec" onclick="switchTab('antec')">Antecipação</div>
-    </div>
-
-    <div class="filters" style="margin-bottom:16px">
-        <div class="fg" style="flex:1;min-width:260px">
-            <label>Empresa (aplica nas duas abas)</label>
-            <input type="text" id="fEmpresa" list="empresaList" placeholder="Digite o nome fantasia ou companyId...">
-            <datalist id="empresaList"></datalist>
-        </div>
-        <button class="clear-btn" onclick="document.getElementById('fEmpresa').value='';render();renderAntec();">Limpar empresa</button>
-    </div>
-
-    <div class="page active" id="pageReceb">
-    <div class="kpis">
-        <div class="kpi"><div class="lbl">Pedidos</div><div class="val" id="kPed">--</div><div class="ks" id="kPed-s"></div></div>
-        <div class="kpi blue"><div class="lbl">Parcelas</div><div class="val" id="kParc">--</div><div class="ks" id="kParc-s">total de recebíveis</div></div>
-        <div class="kpi green"><div class="lbl">Net value</div><div class="val" id="kNet">R$ --</div><div class="ks">soma receivables.netValue</div></div>
-        <div class="kpi red"><div class="lbl">Parcelas pendentes</div><div class="val" id="kPend">--</div><div class="ks" id="kPend-s"></div></div>
-        <div class="kpi orange"><div class="lbl">Próxima parcela</div><div class="val" id="kProx" style="font-size:18px">--</div><div class="ks" id="kProx-s"></div></div>
+        <div class="tab active" data-tab="fluxo" onclick="switchTab('fluxo')">Fluxo</div>
+        <div class="tab" data-tab="antec" onclick="switchTab('antec')">Antecipação</div>
     </div>
 
     <div class="filters">
         <div class="fg">
-            <label>Data do pedido (de)</label>
-            <input type="date" id="fOrderDe">
+            <label>Data a pagar (de)</label>
+            <input type="date" id="fDataDe">
         </div>
         <div class="fg">
-            <label>Data do pedido (até)</label>
-            <input type="date" id="fOrderAte">
+            <label>Data a pagar (até)</label>
+            <input type="date" id="fDataAte">
         </div>
-        <div class="fg">
-            <label>Próx. parcela (de)</label>
-            <input type="date" id="fDueDe">
+        <div class="fg" style="flex:1;min-width:260px">
+            <label>Empresa</label>
+            <input type="text" id="fEmpresa" list="empresaList" placeholder="Digite o nome fantasia ou companyId...">
+            <datalist id="empresaList"></datalist>
         </div>
-        <div class="fg">
-            <label>Próx. parcela (até)</label>
-            <input type="date" id="fDueAte">
-        </div>
-        <div class="fg">
-            <label>Método</label>
-            <select id="fMethod"><option value="">Todos</option></select>
-        </div>
-        <div class="fg">
-            <label>Pago?</label>
-            <select id="fPaid"><option value="">Todos</option><option value="1">Totalmente pago</option><option value="0">Com pendente</option></select>
-        </div>
-        <div class="fg" style="flex:1;min-width:200px">
-            <label>Busca (order / company / cliente)</label>
-            <input type="text" id="fBusca" placeholder="Filtro textual...">
-        </div>
-        <button class="clear-btn" onclick="clearFilters()">Limpar</button>
+        <button class="clear-btn" onclick="clearAllFilters()">Limpar</button>
+    </div>
+
+    <div class="kpis">
+        <div class="kpi"><div class="lbl">Dias a pagar</div><div class="val" id="kDays">--</div><div class="ks">datas distintas</div></div>
+        <div class="kpi orange"><div class="lbl">Empresas</div><div class="val" id="kEmp">--</div><div class="ks">a pagar no periodo</div></div>
+        <div class="kpi blue"><div class="lbl">Parcelas</div><div class="val" id="kParc">--</div><div class="ks">total no periodo</div></div>
+        <div class="kpi red"><div class="lbl">Taxas totais</div><div class="val" id="kFees">R$ --</div><div class="ks" id="kFeesPct">VP + antifraude + antec.</div></div>
+        <div class="kpi green"><div class="lbl">Total liquido a pagar</div><div class="val" id="kNet">R$ --</div><div class="ks">soma netValue</div></div>
     </div>
 
     <div class="tbl-card">
         <div class="tbl-head">
-            <h3>Pedidos em fluxo (STARKBANK)</h3>
+            <h3 id="hTbl">Pagamentos em fluxo</h3>
             <span class="count" id="tblCount">--</span>
         </div>
         <div class="tbl-wrap">
             <table>
                 <thead>
                     <tr>
-                        <th></th>
-                        <th>Pedido</th>
-                        <th>Empresa</th>
-                        <th>CompanyId</th>
-                        <th>Cliente</th>
-                        <th>Método</th>
+                        <th style="width:22px"></th>
+                        <th>Data / Empresa / Pedido</th>
                         <th class="r">Parcelas</th>
-                        <th>Data pedido</th>
-                        <th>Próx. parcela</th>
-                        <th>Última parcela</th>
-                        <th class="r">Total</th>
-                        <th>Status</th>
+                        <th class="r">Valor total</th>
+                        <th class="r">VestiPago</th>
+                        <th class="r">Antifraude</th>
+                        <th class="r">Antecipação</th>
+                        <th class="r">Valor líquido</th>
                     </tr>
                 </thead>
                 <tbody id="tbody"></tbody>
             </table>
         </div>
     </div>
-    </div><!-- /pageReceb -->
-
-    <div class="page" id="pageAntec">
-        <div class="kpis">
-            <div class="kpi"><div class="lbl">Valor bruto</div><div class="val" id="aGross">R$ --</div><div class="ks">soma grossValue</div></div>
-            <div class="kpi green"><div class="lbl">Valor líquido</div><div class="val" id="aNet">R$ --</div><div class="ks">após todas as taxas</div></div>
-            <div class="kpi red"><div class="lbl">Taxas totais</div><div class="val" id="aFees">R$ --</div><div class="ks" id="aFeesPct">bruto - líquido</div></div>
-            <div class="kpi blue"><div class="lbl">Parcelas</div><div class="val" id="aParc">--</div><div class="ks" id="aLin">-- grupos</div></div>
-            <div class="kpi orange"><div class="lbl">Empresas</div><div class="val" id="aEmp">--</div><div class="ks">com antecipação</div></div>
-        </div>
-        <div class="filters">
-            <div class="fg">
-                <label>Dia do recebido (de)</label>
-                <input type="date" id="fAntRecDe">
-            </div>
-            <div class="fg">
-                <label>Dia do recebido (até)</label>
-                <input type="date" id="fAntRecAte">
-            </div>
-            <div class="fg">
-                <label>Data do pedido (de)</label>
-                <input type="date" id="fAntDueDe">
-            </div>
-            <div class="fg">
-                <label>Data do pedido (até)</label>
-                <input type="date" id="fAntDueAte">
-            </div>
-            <button class="clear-btn" onclick="clearAntecFilters()">Limpar datas</button>
-        </div>
-        <div class="tbl-card">
-            <div class="tbl-head"><h3>Antecipações</h3><span class="count" id="antCount">--</span></div>
-            <div class="tbl-wrap">
-                <table>
-                    <thead><tr>
-                        <th>Empresa (nome fantasia)</th>
-                        <th>CompanyId</th>
-                        <th>Nº do pedido</th>
-                        <th>Dia do recebido</th>
-                        <th>Data do pedido</th>
-                        <th class="r">Parcelas</th>
-                        <th class="r">Valor bruto</th>
-                        <th class="r">Taxas</th>
-                        <th class="r">Valor líquido</th>
-                    </tr></thead>
-                    <tbody id="antBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </div><!-- /pageAntec -->
 </div>
 </div>
 
@@ -259,7 +181,7 @@ window.addEventListener('error',function(e){
 
     try{
         var el=document.getElementById('tbody');
-        if(el)el.innerHTML='<tr><td colspan="12" class="empty" style="color:#E17055">ERRO: '+(e.message||e.filename||'')+' (linha '+(e.lineno||'?')+')</td></tr>';
+        if(el)el.innerHTML='<tr><td colspan="8" class="empty" style="color:#E17055">ERRO: '+(e.message||e.filename||'')+' (linha '+(e.lineno||'?')+')</td></tr>';
     }catch(_){}
 });
 
@@ -282,17 +204,17 @@ function showApp(){
         tries++;
         if(window._dadosError){
             var el=document.getElementById('tbody');
-            if(el)el.innerHTML='<tr><td colspan="12" class="empty" style="color:#E17055">ERRO: '+window._dadosError+'</td></tr>';
+            if(el)el.innerHTML='<tr><td colspan="8" class="empty" style="color:#E17055">ERRO: '+window._dadosError+'</td></tr>';
             return;
         }
         if(window._dadosLoaded&&typeof window.DADOS!=='undefined'&&window.DADOS){
             try{init()}catch(e){
                 var el=document.getElementById('tbody');
-                if(el)el.innerHTML='<tr><td colspan="12" class="empty" style="color:#E17055">ERRO init: '+(e&&e.message)+'</td></tr>';
+                if(el)el.innerHTML='<tr><td colspan="8" class="empty" style="color:#E17055">ERRO init: '+(e&&e.message)+'</td></tr>';
             }
         } else if(tries>80){
             var el=document.getElementById('tbody');
-            if(el)el.innerHTML='<tr><td colspan="12" class="empty" style="color:#E17055">Timeout: dados.js não carregou em 5s. Verifique o console (F12)</td></tr>';
+            if(el)el.innerHTML='<tr><td colspan="8" class="empty" style="color:#E17055">Timeout: dados.js não carregou em 5s. Verifique o console (F12)</td></tr>';
         } else {
             setTimeout(wait,60);
         }
@@ -307,231 +229,154 @@ function fmtDT(s){if(!s)return '-';var d=String(s).substring(0,10);if(d.length<1
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 
 var DADOS=null;
-var openSet={};
+var TAB='fluxo';
+var openSet={}; // chaves: 'D:yyyy-mm-dd' (dia), 'C:yyyy-mm-dd|companyId' (empresa)
 
 function init(){
     DADOS=window.DADOS;
     var gd=DADOS.geradoEm?new Date(DADOS.geradoEm):null;
     document.getElementById('dtGerado').textContent=gd?gd.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'--';
-    var m=document.getElementById('fMethod');
-    (DADOS.paymentMethods||[]).forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v;m.appendChild(o)});
-    ['fOrderDe','fOrderAte','fDueDe','fDueAte','fMethod','fPaid','fBusca'].forEach(function(id){
-        document.getElementById(id).addEventListener(id==='fBusca'?'input':'change',render);
-    });
-    // datalist de empresas (nome fantasia unico + companyId)
+    // datalist de empresas
     var dl=document.getElementById('empresaList');
     var seen={};
-    (DADOS.pedidos||[]).forEach(function(p){
-        var key=p.nomeFantasia||p.companyId;
+    (DADOS.pagamentos||[]).forEach(function(p){
+        var key=(p.nomeFantasia||p.companyId);
         if(!key||seen[key])return;seen[key]=1;
         var o=document.createElement('option');
         o.value=p.nomeFantasia||p.companyId;
         if(p.nomeFantasia&&p.companyId)o.label=p.companyId;
         dl.appendChild(o);
     });
-    document.getElementById('fEmpresa').addEventListener('input',function(){render();renderAntec();});
-    ['fAntRecDe','fAntRecAte','fAntDueDe','fAntDueAte'].forEach(function(id){
-        document.getElementById(id).addEventListener('change',renderAntec);
-    });
+    ['fDataDe','fDataAte'].forEach(function(id){document.getElementById(id).addEventListener('change',render)});
+    document.getElementById('fEmpresa').addEventListener('input',render);
     render();
-    renderAntec();
 }
 
-function clearAntecFilters(){
-    ['fAntRecDe','fAntRecAte','fAntDueDe','fAntDueAte'].forEach(function(id){document.getElementById(id).value=''});
-    renderAntec();
+function clearAllFilters(){
+    ['fDataDe','fDataAte','fEmpresa'].forEach(function(id){document.getElementById(id).value=''});
+    render();
 }
 
 function switchTab(which){
-    document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.dataset.page===which)});
-    document.getElementById('pageReceb').classList.toggle('active',which==='receb');
-    document.getElementById('pageAntec').classList.toggle('active',which==='antec');
-}
-
-function empresaFiltroMatch(p){
-    var q=(document.getElementById('fEmpresa').value||'').toLowerCase().trim();
-    if(!q)return true;
-    return ((p.nomeFantasia||'').toLowerCase().indexOf(q)>=0)||((p.companyId||'').toLowerCase().indexOf(q)>=0);
-}
-
-function clearFilters(){
-    ['fOrderDe','fOrderAte','fDueDe','fDueAte','fMethod','fPaid','fBusca'].forEach(function(id){document.getElementById(id).value=''});
+    TAB=which;
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab===which)});
+    document.getElementById('hTbl').textContent = (which==='antec')?'Pagamentos de antecipação':'Pagamentos em fluxo';
+    openSet={};
     render();
 }
 
+function toggleKey(k){openSet[k]=!openSet[k];render();}
+
 function getFiltered(){
-    var oD=document.getElementById('fOrderDe').value;
-    var oA=document.getElementById('fOrderAte').value;
-    var dD=document.getElementById('fDueDe').value;
-    var dA=document.getElementById('fDueAte').value;
-    var m=document.getElementById('fMethod').value;
-    var pd=document.getElementById('fPaid').value;
-    var bq=(document.getElementById('fBusca').value||'').toLowerCase().trim();
-    return (DADOS.pedidos||[]).filter(function(p){
-        var od=(p.orderDate||'').substring(0,10);
-        var prox=(p.nextDueAt||p.lastDueAt||'').substring(0,10);
-        if(oD&&od<oD)return false;
-        if(oA&&od>oA)return false;
-        if(dD&&(!prox||prox<dD))return false;
-        if(dA&&(!prox||prox>dA))return false;
-        if(m&&p.paymentMethod!==m)return false;
-        if(pd==='1'&&!p.allPaid)return false;
-        if(pd==='0'&&p.allPaid)return false;
-        if(p.antecipacaoEnabled)return false; // aba Fluxo = pedidos SEM antecipacao
-        if(!empresaFiltroMatch(p))return false;
-        if(bq){
-            var hay=((p.orderId||'')+' '+(p.orderNumber||'')+' '+(p.companyId||'')+' '+(p.customerName||'')+' '+(p.customerDoc||'')).toLowerCase();
-            if(hay.indexOf(bq)<0)return false;
+    var isAntec = (TAB==='antec');
+    var dDe=document.getElementById('fDataDe').value;
+    var dAte=document.getElementById('fDataAte').value;
+    var q=(document.getElementById('fEmpresa').value||'').toLowerCase().trim();
+    return (DADOS.pagamentos||[]).filter(function(p){
+        if(!!p.isAntecipacao !== isAntec) return false;
+        var d=(p.payDate||'').substring(0,10);
+        if(dDe&&(!d||d<dDe))return false;
+        if(dAte&&(!d||d>dAte))return false;
+        if(q){
+            var hay=((p.nomeFantasia||'')+' '+(p.companyId||'')).toLowerCase();
+            if(hay.indexOf(q)<0)return false;
         }
         return true;
     });
 }
 
-function pedStatusBadge(p){
-    if(p.allPaid)return '<span class="badge paid">Totalmente pago</span>';
-    if(p.nPagas>0)return '<span class="badge pen">'+p.nPagas+'/'+p.nParcelas+' pagas</span>';
-    return '<span class="badge pen">Aguardando</span>';
-}
-function parcStatusBadge(pc){
-    if(pc.paidAt)return '<span class="badge paid">PAGA</span>';
-    if(pc.status==='PENDING')return '<span class="badge pen">PENDENTE</span>';
-    if(pc.status==='EXPIRED')return '<span class="badge exp">VENCIDA</span>';
-    if(pc.status)return '<span class="badge sm">'+esc(pc.status)+'</span>';
-    return '<span class="badge sm">--</span>';
-}
-
-function toggle(oid){
-    openSet[oid]=!openSet[oid];
-    render();
+function sumTotals(rows){
+    var t={gross:0,vp:0,af:0,antec:0,net:0,n:0,emp:{}};
+    rows.forEach(function(p){
+        t.gross+=p.grossValue||0;
+        t.vp+=p.vpValue||0;
+        t.af+=p.antifraudValue||0;
+        t.antec+=p.antecipationValue||0;
+        t.net+=p.netValue||0;
+        t.n+=1;
+        if(p.companyId)t.emp[p.companyId]=1;
+    });
+    t.empCount=Object.keys(t.emp).length;
+    return t;
 }
 
 function render(){
-    var pedidos=getFiltered();
-    document.getElementById('tblCount').textContent=pedidos.length+' pedido(s)';
+    var rows=getFiltered();
+    var tot=sumTotals(rows);
 
-    var tot=DADOS.pedidos.length;
-    var nParc=0,net=0,pend=0;
-    var proxMin=null,proxPed=null;
-    pedidos.forEach(function(p){
-        nParc+=p.nParcelas||0;
-        net+=p.totalNet||0;
-        pend+=p.nPendentes||0;
-        if(p.nextDueAt){
-            if(!proxMin||p.nextDueAt<proxMin){proxMin=p.nextDueAt;proxPed=p}
-        }
-    });
-    document.getElementById('kPed').textContent=fmtN(pedidos.length);
-    document.getElementById('kPed-s').textContent='de '+fmtN(tot)+' total';
-    document.getElementById('kParc').textContent=fmtN(nParc);
-    var totParc=DADOS.resumo?DADOS.resumo.nParcelas:'';
-    document.getElementById('kParc-s').textContent='de '+fmtN(totParc)+' total';
-    document.getElementById('kNet').textContent=fmtC(net);
-    document.getElementById('kPend').textContent=fmtN(pend);
-    document.getElementById('kPend-s').textContent=pend?'parcelas nao pagas':'tudo pago';
-    if(proxMin&&proxPed){
-        document.getElementById('kProx').textContent=fmtD(proxMin);
-        document.getElementById('kProx-s').textContent=(proxPed.customerName||proxPed.orderNumber||'?')+' · pedido #'+(proxPed.orderNumber||'-');
-    }else{
-        document.getElementById('kProx').textContent='--';
-        document.getElementById('kProx-s').textContent='sem parcelas pendentes';
-    }
+    // agrupa por payDate
+    var byDate={};
+    rows.forEach(function(p){var k=p.payDate||'';(byDate[k]=byDate[k]||[]).push(p)});
+    var dates=Object.keys(byDate).sort();
+
+    document.getElementById('kDays').textContent=fmtN(dates.length);
+    document.getElementById('kEmp').textContent=fmtN(tot.empCount);
+    document.getElementById('kParc').textContent=fmtN(tot.n);
+    document.getElementById('kFees').textContent=fmtC(tot.vp+tot.af+tot.antec);
+    var feesPct=tot.gross>0?((tot.vp+tot.af+tot.antec)/tot.gross*100):0;
+    document.getElementById('kFeesPct').textContent='VP + antifraude + antec. ('+feesPct.toFixed(2).replace('.',',')+'% do bruto)';
+    document.getElementById('kNet').textContent=fmtC(tot.net);
+    document.getElementById('tblCount').textContent=fmtN(tot.n)+' parcela(s) em '+fmtN(dates.length)+' dia(s)';
 
     var tb=document.getElementById('tbody');
-    if(!pedidos.length){
-        tb.innerHTML='<tr><td colspan="12" class="empty">Nenhum pedido com os filtros atuais</td></tr>';
-        return;
-    }
+    if(!rows.length){tb.innerHTML='<tr><td colspan="8" class="empty">Nenhum pagamento com os filtros atuais</td></tr>';return}
 
     var html=[];
-    pedidos.forEach(function(p){
-        var open=!!openSet[p.orderId];
-        var statusBadge=pedStatusBadge(p);
-        var proxTxt=p.nextDueAt?fmtD(p.nextDueAt):(p.allPaid?'todas pagas':'-');
-        var ultTxt=p.lastDueAt?fmtD(p.lastDueAt):'-';
-        html.push('<tr class="ped'+(open?' open':'')+'" onclick="toggle(\''+p.orderId+'\')" data-oid="'+p.orderId+'">'+
+    dates.forEach(function(date){
+        var pags=byDate[date];
+        var t=sumTotals(pags);
+        var dKey='D:'+date;
+        var dOpen=!!openSet[dKey];
+        var dLabel=date?fmtD(date):'(sem data)';
+        html.push('<tr class="ped'+(dOpen?' open':'')+'" onclick="toggleKey(\''+dKey+'\')">'+
             '<td class="chev">&rtrif;</td>'+
-            '<td class="mono">'+esc((p.orderNumber||p.orderId||'').toString().substring(0,16))+'</td>'+
-            '<td>'+esc(p.nomeFantasia||'-')+'</td>'+
-            '<td class="mono">'+esc((p.companyId||'').substring(0,12))+(p.companyId&&p.companyId.length>12?'...':'')+'</td>'+
-            '<td>'+esc(p.customerName||'-')+'</td>'+
-            '<td><span class="badge sm">'+esc(p.paymentMethod||'-')+'</span></td>'+
-            '<td class="money" style="color:var(--p)">'+(p.nParcelas||0)+'x</td>'+
-            '<td class="date">'+fmtD(p.orderDate)+'</td>'+
-            '<td class="date">'+proxTxt+'</td>'+
-            '<td class="date">'+ultTxt+'</td>'+
-            '<td class="money total">'+fmtC(p.totalNet)+'</td>'+
-            '<td>'+statusBadge+'</td>'+
+            '<td><strong>'+dLabel+'</strong> <span style="color:var(--mut);font-weight:400">· '+fmtN(t.empCount)+' empresa(s) · '+fmtN(t.n)+' parcela(s)</span></td>'+
+            '<td class="money" style="color:var(--p)">'+fmtN(t.n)+'</td>'+
+            '<td class="money" style="color:var(--mut)">'+fmtC(t.gross)+'</td>'+
+            '<td class="money" style="color:var(--b)">'+fmtC(t.vp)+'</td>'+
+            '<td class="money" style="color:var(--y)">'+fmtC(t.af)+'</td>'+
+            '<td class="money" style="color:var(--r)">'+fmtC(t.antec)+'</td>'+
+            '<td class="money total">'+fmtC(t.net)+'</td>'+
         '</tr>');
-        // Sub-linhas: uma por parcela, direto abaixo do pedido
-        var parcelas=p.parcelas||[];
-        parcelas.forEach(function(pc,idx){
-            var last=(idx===parcelas.length-1)?' last':'';
-            var advBadge=pc.advanced===true?' <span class="badge advanced">Antec.</span>':'';
-            var invoice=pc.invoiceUrl?'<a class="parc-link" href="'+esc(pc.invoiceUrl)+'" target="_blank" onclick="event.stopPropagation()">Invoice &rarr;</a>':'';
-            var statusCell=parcStatusBadge(pc)+advBadge+(invoice?' '+invoice:'');
-            html.push('<tr class="parc'+(open?' show':'')+last+'" data-parent="'+p.orderId+'">'+
-                '<td></td>'+
-                '<td class="ind">&#8627; Parcela '+pc.installment+'/'+(p.installmentsTotal||p.nParcelas)+'</td>'+
-                '<td></td>'+
-                '<td></td>'+
-                '<td class="money" style="color:var(--b);font-weight:500">VP '+fmtC(pc.vpValue)+'</td>'+
-                '<td class="money" style="color:var(--mut);font-weight:500">Gross '+fmtC(pc.grossValue)+'</td>'+
-                '<td></td>'+
-                '<td class="date" style="font-weight:600">'+fmtD(pc.dueAt)+'</td>'+
-                '<td class="date">'+(pc.paidAt?fmtD(pc.paidAt):'-')+'</td>'+
-                '<td class="money total">'+fmtC(pc.netValue)+'</td>'+
-                '<td>'+statusCell+'</td>'+
-            '</tr>');
+        if(!dOpen)return;
+        // agrupa por empresa dentro do dia
+        var byC={};
+        pags.forEach(function(p){(byC[p.companyId]=byC[p.companyId]||[]).push(p)});
+        var cids=Object.keys(byC).sort(function(a,b){
+            var na=(byC[a][0].nomeFantasia||'').toLowerCase();
+            var nb=(byC[b][0].nomeFantasia||'').toLowerCase();
+            return na<nb?-1:na>nb?1:0;
         });
-    });
-    tb.innerHTML=html.join('');
-}
-
-function renderAntec(){
-    var q=(document.getElementById('fEmpresa').value||'').toLowerCase().trim();
-    var rDe=document.getElementById('fAntRecDe').value;
-    var rAte=document.getElementById('fAntRecAte').value;
-    var dDe=document.getElementById('fAntDueDe').value;
-    var dAte=document.getElementById('fAntDueAte').value;
-    var rows=(DADOS.antecipacoes||[]).filter(function(a){
-        if(q && !(((a.nomeFantasia||'').toLowerCase().indexOf(q)>=0)||((a.companyId||'').toLowerCase().indexOf(q)>=0)))return false;
-        var rec=(a.diaRecebido||'').substring(0,10);
-        var due=(a.dueAt||'').substring(0,10);
-        if(rDe&&(!rec||rec<rDe))return false;
-        if(rAte&&(!rec||rec>rAte))return false;
-        if(dDe&&(!due||due<dDe))return false;
-        if(dAte&&(!due||due>dAte))return false;
-        return true;
-    });
-    document.getElementById('antCount').textContent=rows.length+' linha(s)';
-    var totNet=0,totGross=0,totParc=0,emp={};
-    rows.forEach(function(r){totNet+=r.netValue||0;totGross+=r.grossValue||0;totParc+=r.nParcelas||0;if(r.companyId)emp[r.companyId]=1});
-    var totFees=totGross-totNet;
-    var feesPct=totGross>0?(totFees/totGross*100):0;
-    document.getElementById('aGross').textContent=fmtC(totGross);
-    document.getElementById('aNet').textContent=fmtC(totNet);
-    document.getElementById('aFees').textContent=fmtC(totFees);
-    document.getElementById('aFeesPct').textContent=feesPct.toFixed(2).replace('.',',')+'% do bruto';
-    document.getElementById('aParc').textContent=fmtN(totParc);
-    document.getElementById('aLin').textContent=fmtN(rows.length)+' grupos';
-    document.getElementById('aEmp').textContent=fmtN(Object.keys(emp).length);
-    var tb=document.getElementById('antBody');
-    if(!rows.length){tb.innerHTML='<tr><td colspan="9" class="empty">Nenhuma antecipação com os filtros atuais</td></tr>';return}
-    var html=[];
-    rows.forEach(function(a){
-        var ons=a.orderNumbers||[];
-        var onTxt=ons.length?(ons.length>3?ons.slice(0,3).join(', ')+' +'+(ons.length-3):ons.join(', ')):'-';
-        html.push('<tr>'+
-            '<td>'+esc(a.nomeFantasia||'-')+'</td>'+
-            '<td class="mono">'+esc((a.companyId||'').substring(0,14))+(a.companyId&&a.companyId.length>14?'...':'')+'</td>'+
-            '<td class="mono" title="'+esc(ons.join(", "))+'">'+esc(onTxt)+'</td>'+
-            '<td class="date">'+(a.diaRecebido?fmtD(a.diaRecebido):'-')+'</td>'+
-            '<td class="date">'+(a.dueAt?fmtD(a.dueAt):'-')+'</td>'+
-            '<td class="money" style="color:var(--b)">'+fmtN(a.nParcelas)+'</td>'+
-            '<td class="money" style="color:var(--mut)">'+fmtC(a.grossValue)+'</td>'+
-            '<td class="money" style="color:var(--r)">'+fmtC(a.totalFees)+'</td>'+
-            '<td class="money total">'+fmtC(a.netValue)+'</td>'+
-        '</tr>');
+        cids.forEach(function(cid){
+            var cPags=byC[cid];
+            var ct=sumTotals(cPags);
+            var cKey='C:'+date+'|'+cid;
+            var cOpen=!!openSet[cKey];
+            var cLabel=cPags[0].nomeFantasia||cid;
+            html.push('<tr class="parc show" onclick="event.stopPropagation();toggleKey(\''+cKey+'\')" style="cursor:pointer;'+(cOpen?'background:#E8E4FF;font-weight:600':'')+'">'+
+                '<td></td>'+
+                '<td class="ind" style="padding-left:40px">'+(cOpen?'▾':'▸')+' '+esc(cLabel)+' <span class="mono" style="color:#8290a0;font-weight:400">'+esc(cid.substring(0,14))+(cid.length>14?'...':'')+'</span></td>'+
+                '<td class="money" style="color:var(--p)">'+fmtN(ct.n)+'</td>'+
+                '<td class="money" style="color:var(--mut)">'+fmtC(ct.gross)+'</td>'+
+                '<td class="money" style="color:var(--b)">'+fmtC(ct.vp)+'</td>'+
+                '<td class="money" style="color:var(--y)">'+fmtC(ct.af)+'</td>'+
+                '<td class="money" style="color:var(--r)">'+fmtC(ct.antec)+'</td>'+
+                '<td class="money total">'+fmtC(ct.net)+'</td>'+
+            '</tr>');
+            if(!cOpen)return;
+            cPags.forEach(function(p){
+                html.push('<tr class="parc show" style="background:#FAFAFF">'+
+                    '<td></td>'+
+                    '<td style="padding-left:80px;color:var(--tx)">Pedido #'+esc((p.orderNumber||p.orderId||'').toString())+' · parcela '+p.installment+'/'+(p.installmentsTotal||'?')+' · <span style="color:var(--mut)">'+esc(p.customerName||'-')+'</span></td>'+
+                    '<td class="money" style="color:var(--p)">1</td>'+
+                    '<td class="money" style="color:var(--mut)">'+fmtC(p.grossValue)+'</td>'+
+                    '<td class="money" style="color:var(--b)">'+fmtC(p.vpValue)+'</td>'+
+                    '<td class="money" style="color:var(--y)">'+fmtC(p.antifraudValue)+'</td>'+
+                    '<td class="money" style="color:var(--r)">'+fmtC(p.antecipationValue)+'</td>'+
+                    '<td class="money total">'+fmtC(p.netValue)+'</td>'+
+                '</tr>');
+            });
+        });
     });
     tb.innerHTML=html.join('');
 }
