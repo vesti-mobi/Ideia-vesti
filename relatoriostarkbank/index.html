@@ -125,6 +125,14 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
             <label>Data a pagar (até)</label>
             <input type="date" id="fDataAte">
         </div>
+        <div class="fg">
+            <label>Pago em (de)</label>
+            <input type="date" id="fPagoDe">
+        </div>
+        <div class="fg">
+            <label>Pago em (até)</label>
+            <input type="date" id="fPagoAte">
+        </div>
         <div class="fg" style="flex:1;min-width:260px">
             <label>Empresa</label>
             <input type="text" id="fEmpresa" list="empresaList" placeholder="Digite o nome fantasia ou companyId...">
@@ -152,6 +160,7 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
                     <tr>
                         <th style="width:22px"></th>
                         <th>Data / Empresa / Pedido</th>
+                        <th>Pago em</th>
                         <th class="r">Parcelas</th>
                         <th class="r">Valor total</th>
                         <th class="r">VestiPago</th>
@@ -255,13 +264,13 @@ function init(){
     var todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
     document.getElementById('fDataDe').value=todayStr;
     document.getElementById('fDataAte').value=todayStr;
-    ['fDataDe','fDataAte'].forEach(function(id){document.getElementById(id).addEventListener('change',render)});
+    ['fDataDe','fDataAte','fPagoDe','fPagoAte'].forEach(function(id){document.getElementById(id).addEventListener('change',render)});
     document.getElementById('fEmpresa').addEventListener('input',render);
     render();
 }
 
 function clearAllFilters(){
-    ['fDataDe','fDataAte','fEmpresa'].forEach(function(id){document.getElementById(id).value=''});
+    ['fDataDe','fDataAte','fPagoDe','fPagoAte','fEmpresa'].forEach(function(id){document.getElementById(id).value=''});
     render();
 }
 
@@ -279,12 +288,17 @@ function getFiltered(){
     var isAntec = (TAB==='antec');
     var dDe=document.getElementById('fDataDe').value;
     var dAte=document.getElementById('fDataAte').value;
+    var pDe=document.getElementById('fPagoDe').value;
+    var pAte=document.getElementById('fPagoAte').value;
     var q=(document.getElementById('fEmpresa').value||'').toLowerCase().trim();
     return (DADOS.pagamentos||[]).filter(function(p){
         if(!!p.isAntecipacao !== isAntec) return false;
         var d=(p.payDate||'').substring(0,10);
         if(dDe&&(!d||d<dDe))return false;
         if(dAte&&(!d||d>dAte))return false;
+        var pg=(p.paidAt||'').substring(0,10);
+        if(pDe&&(!pg||pg<pDe))return false;
+        if(pAte&&(!pg||pg>pAte))return false;
         if(q){
             var hay=((p.nomeFantasia||'')+' '+(p.companyId||'')).toLowerCase();
             if(hay.indexOf(q)<0)return false;
@@ -315,7 +329,7 @@ function render(){
     // agrupa por payDate
     var byDate={};
     rows.forEach(function(p){var k=p.payDate||'';(byDate[k]=byDate[k]||[]).push(p)});
-    var dates=Object.keys(byDate).sort().reverse();
+    var dates=Object.keys(byDate).sort();
 
     document.getElementById('kDays').textContent=fmtN(dates.length);
     document.getElementById('kEmp').textContent=fmtN(tot.empCount);
@@ -327,7 +341,7 @@ function render(){
     document.getElementById('tblCount').textContent=fmtN(tot.n)+' parcela(s) em '+fmtN(dates.length)+' dia(s)';
 
     var tb=document.getElementById('tbody');
-    if(!rows.length){tb.innerHTML='<tr><td colspan="8" class="empty">Nenhum pagamento com os filtros atuais</td></tr>';return}
+    if(!rows.length){tb.innerHTML='<tr><td colspan="9" class="empty">Nenhum pagamento com os filtros atuais</td></tr>';return}
 
     var html=[];
     dates.forEach(function(date){
@@ -336,9 +350,12 @@ function render(){
         var dKey='D:'+date;
         var dOpen=!!openSet[dKey];
         var dLabel=date?fmtD(date):'(sem data)';
+        var nPagas=pags.filter(function(x){return x.isPaid}).length;
+        var pagoTxt=nPagas===pags.length?'<span class="badge paid">Todas pagas</span>':(nPagas>0?'<span class="badge pen">'+nPagas+'/'+pags.length+'</span>':'<span class="badge pen">Pendente</span>');
         html.push('<tr class="ped'+(dOpen?' open':'')+'" onclick="toggleKey(\''+dKey+'\')">'+
             '<td class="chev">&rtrif;</td>'+
             '<td><strong>'+dLabel+'</strong> <span style="color:var(--mut);font-weight:400">· '+fmtN(t.empCount)+' empresa(s) · '+fmtN(t.n)+' parcela(s)</span></td>'+
+            '<td>'+pagoTxt+'</td>'+
             '<td class="money" style="color:var(--p)">'+fmtN(t.n)+'</td>'+
             '<td class="money" style="color:var(--mut)">'+fmtC(t.gross)+'</td>'+
             '<td class="money" style="color:var(--b)">'+fmtC(t.vp)+'</td>'+
@@ -361,9 +378,12 @@ function render(){
             var cKey='C:'+date+'|'+cid;
             var cOpen=!!openSet[cKey];
             var cLabel=cPags[0].nomeFantasia||cid;
+            var cNPagas=cPags.filter(function(x){return x.isPaid}).length;
+            var cPagoTxt=cNPagas===cPags.length?'<span class="badge paid">Todas pagas</span>':(cNPagas>0?'<span class="badge pen">'+cNPagas+'/'+cPags.length+'</span>':'<span class="badge pen">Pendente</span>');
             html.push('<tr class="parc show" onclick="event.stopPropagation();toggleKey(\''+cKey+'\')" style="cursor:pointer;'+(cOpen?'background:#E8E4FF;font-weight:600':'')+'">'+
                 '<td></td>'+
                 '<td class="ind" style="padding-left:40px">'+(cOpen?'▾':'▸')+' '+esc(cLabel)+' <span class="mono" style="color:#8290a0;font-weight:400">'+esc(cid.substring(0,14))+(cid.length>14?'...':'')+'</span></td>'+
+                '<td>'+cPagoTxt+'</td>'+
                 '<td class="money" style="color:var(--p)">'+fmtN(ct.n)+'</td>'+
                 '<td class="money" style="color:var(--mut)">'+fmtC(ct.gross)+'</td>'+
                 '<td class="money" style="color:var(--b)">'+fmtC(ct.vp)+'</td>'+
@@ -376,6 +396,7 @@ function render(){
                 html.push('<tr class="parc show" style="background:#FAFAFF">'+
                     '<td></td>'+
                     '<td style="padding-left:80px;color:var(--tx)">Pedido #'+esc((p.orderNumber||p.orderId||'').toString())+' · parcela '+p.installment+'/'+(p.installmentsTotal||'?')+' · <span style="color:var(--mut)">'+esc(p.customerName||'-')+'</span></td>'+
+                    '<td class="date">'+(p.paidAt?fmtD(p.paidAt):'-')+'</td>'+
                     '<td class="money" style="color:var(--p)">1</td>'+
                     '<td class="money" style="color:var(--mut)">'+fmtC(p.grossValue)+'</td>'+
                     '<td class="money" style="color:var(--b)">'+fmtC(p.vpValue)+'</td>'+
