@@ -247,6 +247,11 @@ function init(){
         if(p.nomeFantasia&&p.companyId)o.label=p.companyId;
         dl.appendChild(o);
     });
+    // Abre filtrando no dia atual
+    var today=new Date();
+    var todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+    document.getElementById('fDataDe').value=todayStr;
+    document.getElementById('fDataAte').value=todayStr;
     ['fDataDe','fDataAte'].forEach(function(id){document.getElementById(id).addEventListener('change',render)});
     document.getElementById('fEmpresa').addEventListener('input',render);
     render();
@@ -307,7 +312,7 @@ function render(){
     // agrupa por payDate
     var byDate={};
     rows.forEach(function(p){var k=p.payDate||'';(byDate[k]=byDate[k]||[]).push(p)});
-    var dates=Object.keys(byDate).sort();
+    var dates=Object.keys(byDate).sort().reverse();
 
     document.getElementById('kDays').textContent=fmtN(dates.length);
     document.getElementById('kEmp').textContent=fmtN(tot.empCount);
