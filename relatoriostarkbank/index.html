@@ -165,9 +165,9 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
         <div class="kpi blue"><div class="lbl">Pedidos</div><div class="val" id="crPed">--</div><div class="ks">total</div></div>
         <div class="kpi green"><div class="lbl">Pedidos pagos</div><div class="val" id="crPedPg">--</div><div class="ks">cliente quitou</div></div>
         <div class="kpi red"><div class="lbl">Pedidos a receber</div><div class="val" id="crPedAr">--</div><div class="ks">cliente pendente</div></div>
-        <div class="kpi green"><div class="lbl">Total recebido</div><div class="val" id="crRec">R$ --</div><div class="ks">grossValue pago</div></div>
-        <div class="kpi red"><div class="lbl">Total a receber</div><div class="val" id="crAr">R$ --</div><div class="ks">grossValue pendente</div></div>
-        <div class="kpi purple"><div class="lbl">Total geral</div><div class="val" id="crTot">R$ --</div><div class="ks">soma bruto</div></div>
+        <div class="kpi green"><div class="lbl">Recebido na conta</div><div class="val" id="crRec">R$ --</div><div class="ks">liquido ja caiu</div></div>
+        <div class="kpi red"><div class="lbl">A receber</div><div class="val" id="crAr">R$ --</div><div class="ks">liquido pendente</div></div>
+        <div class="kpi purple"><div class="lbl">Total geral</div><div class="val" id="crTot">R$ --</div><div class="ks">soma liquido</div></div>
     </div>
 
     <div class="tbl-card" id="cardCp">
@@ -211,9 +211,9 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
                         <th class="r">Parcelas</th>
                         <th class="r">Pagas</th>
                         <th class="r">A receber</th>
-                        <th class="r">Valor recebido</th>
-                        <th class="r">Valor a receber</th>
-                        <th class="r">Total bruto</th>
+                        <th class="r">Valor recebido (líq.)</th>
+                        <th class="r">Valor a receber (líq.)</th>
+                        <th class="r">Total líquido</th>
                     </tr>
                 </thead>
                 <tbody id="tbodyCr"></tbody>
@@ -508,17 +508,17 @@ function renderCr(){
             return true;
         });
     }
-    // stats por parcela. "Paga" = parcela ja liquidada pela StarkBank
-    // para a empresa (status=PAID ou paidAt preenchido). "A receber" =
-    // parcela ainda nao liquidada (status=PENDING/vazio).
+    // stats por parcela. Valor = netValue (liquido que cai na conta
+    // StarkBank da empresa). "Paga" = parcela ja liquidada (status=PAID
+    // ou paidAt preenchido). "A receber" = ainda nao liquidada.
     function pcStats(pedido,parcelas){
         var s={n:0,nPg:0,nAr:0,vRec:0,vAr:0};
         parcelas.forEach(function(pc){
             s.n++;
-            var g=pc.grossValue||0;
+            var v=pc.netValue||0;
             var pago=(pc.status==='PAID')||!!pc.paidAt;
-            if(pago){s.nPg++;s.vRec+=g}
-            else{s.nAr++;s.vAr+=g}
+            if(pago){s.nPg++;s.vRec+=v}
+            else{s.nAr++;s.vAr+=v}
         });
         return s;
     }
@@ -583,7 +583,7 @@ function renderCr(){
             if(!oOpen)return;
             item.pcs.forEach(function(pc){
                 var pago=(pc.status==='PAID')||!!pc.paidAt;
-                var g=pc.grossValue||0;
+                var g=pc.netValue||0;
                 html.push('<tr class="parc show" style="background:#FAFAFF">'+
                     '<td></td>'+
                     '<td style="padding-left:80px;color:var(--tx)">Parcela '+pc.installment+'/'+(p.installmentsTotal||'?')+' '+(pago?'<span class="badge paid">PAGA</span>':'<span class="badge pen">A RECEBER</span>')+'</td>'+
