@@ -540,6 +540,35 @@ table.dt tr:hover td{background:#FAFAFA}
         </div>
     </div>
 </div>
+<!-- MODAL DETALHE EMPRESA T3+ -->
+<div class="modal-overlay" id="t3Detail" onclick="if(event.target===this)this.classList.remove('show')">
+    <div class="modal-box" style="max-width:900px">
+        <button class="close-btn" onclick="document.getElementById('t3Detail').classList.remove('show')">&times;</button>
+        <h3 id="t3d-nome">--</h3>
+        <div style="display:flex;gap:18px;flex-wrap:wrap;margin:8px 0 16px 0;font-size:13px;color:var(--g)">
+            <div>Canal: <b id="t3d-canal" style="color:var(--dk)">--</b></div>
+            <div>CS: <b id="t3d-cs" style="color:var(--dk)">--</b></div>
+            <div>Invoices: <b id="t3d-ninv" style="color:var(--dk)">--</b></div>
+            <div>Total acumulado: <b id="t3d-total" style="color:var(--p)">R$ --</b></div>
+        </div>
+        <div style="max-height:480px;overflow-y:auto">
+            <table class="dt" id="tT3Detail">
+                <thead><tr>
+                    <th>Mes</th>
+                    <th style="text-align:right">Plano</th>
+                    <th style="text-align:right">Filial</th>
+                    <th style="text-align:right">Assistente</th>
+                    <th style="text-align:right">Integracao</th>
+                    <th style="text-align:right">Outros</th>
+                    <th style="text-align:right">Desconto</th>
+                    <th style="text-align:right"><b>Total no mes</b></th>
+                </tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <p style="font-size:11px;color:var(--g);margin-top:10px"><b>Total no mes</b> = Plano + Filial + Assistente + Integracao + Outros - Desconto. E o que a empresa pagou naquele mes.</p>
+    </div>
+</div>
 <!-- MODAL AJUDA T3+ -->
 <div class="modal-overlay" id="helpT3" onclick="if(event.target===this)this.classList.remove('show')">
     <div class="modal-box">
@@ -1495,6 +1524,32 @@ function t3Init(){
 function t3ClearFilters(){document.getElementById('t3FMes').value='';document.getElementById('t3FCanal').value='';document.getElementById('t3FCS').value='';updateT3()}
 function _t3FmtR(v){return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function _t3Net(o){return (o.plano||0)+(o.filial||0)+(o.assistente||0)+(o.integracao||0)+(o.outros||0)-(o.desconto||0)}
+function openT3Detail(domainId){
+    var t3=(typeof T3PLUS_DATA!=='undefined'?T3PLUS_DATA:null);
+    if(!t3||!t3.empresas)return;
+    var e=t3.empresas.filter(function(x){return String(x.domainId)===String(domainId)})[0];
+    if(!e)return;
+    var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+    document.getElementById('t3d-nome').textContent=e.empresa||'-';
+    document.getElementById('t3d-canal').textContent=e.canal||'-';
+    document.getElementById('t3d-cs').textContent=e.cs||'-';
+    document.getElementById('t3d-ninv').textContent=(e.nInvoices||0).toLocaleString('pt-BR');
+    document.getElementById('t3d-total').textContent=_t3FmtR(e.total);
+    var meses=Object.keys(e.porMes||{}).sort().reverse();
+    var tb=document.querySelector('#tT3Detail tbody');
+    tb.innerHTML=meses.map(function(m){
+        var c=e.porMes[m]||{};
+        var total=_t3Net(c);
+        var td=function(v){return '<td style="text-align:right">'+(v>0?_t3FmtR(v):'<span style="color:#B2BEC3">&mdash;</span>')+'</td>'};
+        return '<tr>'+
+            '<td><b>'+fmtM(m)+'</b></td>'+
+            td(c.plano)+td(c.filial)+td(c.assistente)+td(c.integracao)+td(c.outros)+
+            '<td style="text-align:right;color:#E17055">'+((c.desconto||0)>0?'-'+_t3FmtR(c.desconto):'<span style="color:#B2BEC3">&mdash;</span>')+'</td>'+
+            '<td style="text-align:right;font-weight:700;color:var(--p)">'+_t3FmtR(total)+'</td>'+
+        '</tr>';
+    }).join('')||'<tr><td colspan="8" style="text-align:center;color:#999;padding:16px">Sem dados mensais</td></tr>';
+    document.getElementById('t3Detail').classList.add('show');
+}
 function _t3EmptyCat(){return {plano:0,filial:0,assistente:0,integracao:0,outros:0,desconto:0}}
 function updateT3(){
     t3Init();
@@ -1578,7 +1633,7 @@ function updateT3(){
         var csEsc=(e.cs||'-').replace(/'/g,"\\'");
         var cell=function(v){return '<td style="text-align:right">'+(v>0?_t3FmtR(v):'<span style="color:#B2BEC3">&mdash;</span>')+'</td>'};
         return '<tr>'+
-            '<td class="click" onclick="selectCo(\''+esc(e.empresa||'').replace(/'/g,"\\'")+'\')"><b>'+esc(e.empresa||'-')+'</b></td>'+
+            '<td class="click" onclick="openT3Detail(\''+esc(e.domainId)+'\')" title="Ver detalhamento mensal"><b>'+esc(e.empresa||'-')+'</b></td>'+
             '<td>'+esc(e.canal||'-')+'</td>'+
             '<td><span class="badge sm click" onclick="filterByCS(\''+csEsc+'\')">'+esc(e.cs||'-')+'</span></td>'+
             cell(x.plano)+cell(x.filial)+cell(x.assistente)+cell(x.integracao)+cell(x.outros)+
@@ -1588,7 +1643,7 @@ function updateT3(){
     }).join('')||'<tr><td colspan="10" style="text-align:center;color:#999;padding:16px">Nenhuma empresa no filtro</td></tr>';
 }
 function filterByCS(name){fCS.value=name;document.getElementById('fClear').style.display='inline-block';updateAll()}
-window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;window.updateVp=updateVp;window.vpClearFilters=vpClearFilters;window.goBack=goBack;window.updateChurn=updateChurn;window.churnClearFilters=churnClearFilters;window.filterByCS=filterByCS;window.openChurnDetail=openChurnDetail;window.closeChurnDetail=closeChurnDetail;window.updateGmv=updateGmv;window.gmvClearFilters=gmvClearFilters;window.updateTop80=updateTop80;window.top80ClearFilters=top80ClearFilters;window.openTop80Detail=openTop80Detail;window.updateOnlog=updateOnlog;window.onlogClearFilters=onlogClearFilters;window.onlogSetDia=onlogSetDia;window.updateT3=updateT3;window.t3ClearFilters=t3ClearFilters;
+window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;window.updateVp=updateVp;window.vpClearFilters=vpClearFilters;window.goBack=goBack;window.updateChurn=updateChurn;window.churnClearFilters=churnClearFilters;window.filterByCS=filterByCS;window.openChurnDetail=openChurnDetail;window.closeChurnDetail=closeChurnDetail;window.updateGmv=updateGmv;window.gmvClearFilters=gmvClearFilters;window.updateTop80=updateTop80;window.top80ClearFilters=top80ClearFilters;window.openTop80Detail=openTop80Detail;window.updateOnlog=updateOnlog;window.onlogClearFilters=onlogClearFilters;window.onlogSetDia=onlogSetDia;window.updateT3=updateT3;window.t3ClearFilters=t3ClearFilters;window.openT3Detail=openT3Detail;
 // Inicializacao: Home e default; filtros globais visiveis, KPIs globais ocultos
 document.querySelector('.filters').style.display='flex';
 document.getElementById('globalKpiRow').style.display='none';
