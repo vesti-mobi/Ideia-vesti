@@ -497,16 +497,15 @@ function renderCr(){
         }
         return true;
     });
-    // stats por parcela. "Pago pelo cliente" = pedido.isPaid (credito:
-    // cliente quita upfront) OU parcela com paidAt proprio (boleto
-    // parcela-a-parcela). Senao, a receber.
+    // stats por parcela. "Paga" = parcela ja liquidada pela StarkBank
+    // para a empresa (status=PAID ou paidAt preenchido). "A receber" =
+    // parcela ainda nao liquidada (status=PENDING/vazio).
     function pcStats(pedido,parcelas){
-        var ordPaid=!!pedido.isPaid;
         var s={n:0,nPg:0,nAr:0,vRec:0,vAr:0};
         parcelas.forEach(function(pc){
             s.n++;
             var g=pc.grossValue||0;
-            var pago=ordPaid||!!pc.paidAt;
+            var pago=(pc.status==='PAID')||!!pc.paidAt;
             if(pago){s.nPg++;s.vRec+=g}
             else{s.nAr++;s.vAr+=g}
         });
@@ -570,7 +569,7 @@ function renderCr(){
             '</tr>');
             if(!oOpen)return;
             (p.parcelas||[]).forEach(function(pc){
-                var pago=!!p.isPaid||!!pc.paidAt;
+                var pago=(pc.status==='PAID')||!!pc.paidAt;
                 var g=pc.grossValue||0;
                 html.push('<tr class="parc show" style="background:#FAFAFF">'+
                     '<td></td>'+
