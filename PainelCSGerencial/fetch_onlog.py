@@ -52,6 +52,16 @@ WITH fechamento_agg AS (
     FROM dbo.sheets_onlog_fechamento
     WHERE CodigoVolume IS NOT NULL AND CodigoVolume <> ''
     GROUP BY CodigoVolume
+),
+descritivo_agg AS (
+    -- Fallback: sheets_onlog_descritivo tem Valor_Onlog por pedido (key: domainId+orderNumber).
+    -- Usado quando o fechamento nao tem a linha do pedido.
+    SELECT
+        CONCAT(CAST(domainId AS VARCHAR), CAST(orderNumber AS VARCHAR)) AS key_dom_order,
+        MAX(Valor_Onlog) AS valor_onlog_descr
+    FROM dbo.sheets_onlog_descritivo
+    WHERE domainId > 0 AND orderNumber > 0
+    GROUP BY CONCAT(CAST(domainId AS VARCHAR), CAST(orderNumber AS VARCHAR))
 )
 SELECT
     p.orderNumber,
@@ -70,10 +80,13 @@ SELECT
     p.delivery_provider_value AS cotacao_bia,
     f.postagem_onlog,
     f.operador_fech,
-    f.modalidade_fech
+    f.modalidade_fech,
+    d.valor_onlog_descr
 FROM dbo.MongoDB_Pedidos_Geral p
 LEFT JOIN fechamento_agg f
     ON f.CodigoVolume = CONCAT(p.domainId, '_', p.orderNumber)
+LEFT JOIN descritivo_agg d
+    ON d.key_dom_order = CONCAT(CAST(p.domainId AS VARCHAR), CAST(p.orderNumber AS VARCHAR))
 WHERE LOWER(p.delivery_provider_provider) = 'onlog'
   AND p.settings_createdAt_TIMESTAMP IS NOT NULL
 ORDER BY p.settings_createdAt_TIMESTAMP DESC, p.orderNumber DESC
@@ -152,23 +165,19 @@ def build(rows: list[dict], companies: dict[str, dict]) -> dict:
         val_total += valor
         cs = (c.get("anjo") or "") if c else ""
 
-        # Metricas financeiras do painel frete:
-        #   Cotacao BIA = delivery_provider_value (valor do frete no pedido)
-        #   Postagem Onlog = SUM(ValorPostagem) das linhas em sheets_onlog_fechamento
-        #   ANA FINAL = IF(BIA > Postagem*1.10, BIA, Postagem*1.10) -- medida DAX do painel frete
-        #   Margem = BIA - Postagem (formula preliminar, confirmar com o time)
+        # Colunas do painel Onlog Descritivo:
+        #   Cotacao BIA    = delivery_provider_value
+        #   Valor Onlog    = sheets_onlog_descritivo.Valor_Onlog (o que a Onlog cobra)
+        #   Valor Postagem = SUM(sheets_onlog_fechamento.ValorPostagem) (custo de postagem real)
+        #   Margem Onlog   = Valor Onlog - Valor Postagem
         bia = r.get("cotacao_bia")
         bia_f = float(bia) if bia is not None else None
         post = r.get("postagem_onlog")
         post_f = float(post) if post is not None else None
-        ana_final = None
-        if bia_f is not None and post_f is not None:
-            ana_final = max(bia_f, post_f * 1.10)
-        elif bia_f is not None:
-            ana_final = bia_f
-        elif post_f is not None:
-            ana_final = post_f * 1.10
-        margem = (bia_f - post_f) if (bia_f is not None and post_f is not None) else None
+        post_fonte = "fechamento" if post_f is not None else ""
+        vo = r.get("valor_onlog_descr")
+        valor_onlog = float(vo) if vo is not None else None
+        margem_onlog = (valor_onlog - post_f) if (valor_onlog is not None and post_f is not None) else None
 
         pedidos.append({
             "orderNumber": int(r.get("orderNumber") or 0),
@@ -188,10 +197,11 @@ def build(rows: list[dict], companies: dict[str, dict]) -> dict:
             "cliente": r.get("cliente") or "",
             "cancelado": bool(r.get("cancelado")),
             "cotacaoBia": round(bia_f, 2) if bia_f is not None else None,
-            "postagemOnlog": round(post_f, 2) if post_f is not None else None,
-            "anaFinal": round(ana_final, 2) if ana_final is not None else None,
-            "margem": round(margem, 2) if margem is not None else None,
+            "valorOnlog": round(valor_onlog, 2) if valor_onlog is not None else None,
+            "valorPostagem": round(post_f, 2) if post_f is not None else None,
+            "margemOnlog": round(margem_onlog, 2) if margem_onlog is not None else None,
             "operadorReal": r.get("operador_fech") or "",
+            "postagemFonte": post_fonte,
         })
         dias_set.add(data_str)
         empresas_set.add(dom)

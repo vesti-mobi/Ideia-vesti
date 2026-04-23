@@ -22,6 +22,7 @@ STEPS = [
     ("fetch_hubspot.py", False),  # opcional: nao bloqueia se falhar
     ("fetch_churn_vestipago.py", True),
     ("fetch_onlog.py", False),  # opcional: nao bloqueia se falhar
+    ("fetch_t3plus.py", False),  # opcional: receita mensalidade nao-Starter
     ("merge_data.py", True),
     ("build_html.py", True),
 ]

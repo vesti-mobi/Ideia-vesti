@@ -163,6 +163,7 @@ def main() -> None:
     gmv = load("gmv_data.json", {})
     top80 = load("top80_data.json", {})
     onlog = load("onlog_data.json", {})
+    t3plus = load("t3plus_data.json", {})
 
     nps = build_nps(sheets)
     csat_oraculo = build_csat_oraculo(sheets)
@@ -186,6 +187,7 @@ def main() -> None:
         + dump("GMV_DATA", gmv)
         + dump("TOP80_DATA", top80)
         + dump("ONLOG_DATA", onlog)
+        + dump("T3PLUS_DATA", t3plus)
     )
     OUT.write_text(content, encoding="utf-8")
     print(f"[merge] {OUT.name} escrito")
@@ -201,6 +203,7 @@ def main() -> None:
     print(f"  GMV_DATA.empresas:    {len(gmv.get('empresas', [])) if isinstance(gmv, dict) else 0}")
     print(f"  TOP80_DATA.linhas:    {len(top80.get('linhas', [])) if isinstance(top80, dict) else 0}")
     print(f"  ONLOG_DATA.pedidos:   {len(onlog.get('pedidos', [])) if isinstance(onlog, dict) else 0}")
+    print(f"  T3PLUS_DATA.empresas: {len(t3plus.get('empresas', [])) if isinstance(t3plus, dict) else 0}")
 
 
 if __name__ == "__main__":

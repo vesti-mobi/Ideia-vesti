@@ -194,6 +194,13 @@ table.dt tr:hover td{background:#FAFAFA}
             <div class="hl-score" style="font-size:22px;margin-top:8px" id="home-onlog-sub">--</div>
             <div class="hl-meta" style="margin-top:10px">Pedidos enviados pela Onlog com e sem etiqueta gerada &rarr;</div>
         </div>
+        <div class="hl-card" style="background:linear-gradient(135deg,#2D3436,#636E72);cursor:pointer" onclick="switchTab('t3plus')">
+            <div class="hl-icon">&#128176;</div>
+            <div class="hl-label">Receita T3+</div>
+            <div class="hl-cargo" id="home-t3-val">R$ --</div>
+            <div class="hl-score" style="font-size:22px;margin-top:8px" id="home-t3-sub">--</div>
+            <div class="hl-meta" style="margin-top:10px">Mensalidade Iugu dos clientes nao-Starter (mes atual) &rarr;</div>
+        </div>
     </div>
 </div>
 <!-- ============ CHURN TAB ============ -->
@@ -469,13 +476,75 @@ table.dt tr:hover td{background:#FAFAFA}
                     <th>Etiqueta</th>
                     <th style="text-align:right">Valor Pedido</th>
                     <th style="text-align:right" title="delivery_provider_value">Cotacao BIA</th>
-                    <th style="text-align:right" title="MAX(BIA, Postagem*1.10)">ANA Final</th>
-                    <th style="text-align:right" title="SUM(ValorPostagem) do fechamento">Postagem Onlog</th>
-                    <th style="text-align:right" title="BIA - Postagem (preliminar)">Margem</th>
+                    <th style="text-align:right" title="sheets_onlog_descritivo.Valor_Onlog">Valor Onlog</th>
+                    <th style="text-align:right" title="SUM(ValorPostagem) do fechamento">Valor Postagem</th>
+                    <th style="text-align:right" title="Valor Onlog - Valor Postagem">Margem Onlog</th>
                 </tr></thead>
                 <tbody></tbody>
             </table>
         </div>
+    </div>
+</div>
+<!-- ============ T3+ TAB ============ -->
+<div class="tab-panel" id="tab-t3plus">
+    <div class="kpi-row">
+        <div class="kpi"><div class="ki" style="background:#E8EAF6">&#128176;</div><div class="kl">Receita mes atual</div><div class="kv" style="color:var(--p);font-size:20px" id="t3-kmes">R$ --</div><div class="ks" id="t3-kmes-s"></div></div>
+        <div class="kpi"><div class="ki" style="background:#E0F7F0">&#128200;</div><div class="kl">Mes anterior</div><div class="kv" style="color:var(--s);font-size:20px" id="t3-kprev">R$ --</div><div class="ks" id="t3-kprev-s"></div></div>
+        <div class="kpi"><div class="ki" style="background:#FFF3E0">&#127970;</div><div class="kl">Empresas no mes</div><div class="kv" style="color:var(--w)" id="t3-kemp">--</div><div class="ks">clientes nao-Starter</div></div>
+        <div class="kpi"><div class="ki" style="background:#F0EFFF">&#128202;</div><div class="kl">Total acumulado</div><div class="kv" style="color:var(--dk);font-size:20px" id="t3-ktotal">R$ --</div><div class="ks" id="t3-ktotal-s"></div></div>
+    </div>
+    <div class="filters">
+        <div class="filter-group"><label>Mes:</label><select class="f-select" id="t3FMes" onchange="updateT3()"><option value="">Todos</option></select></div>
+        <div class="filter-group"><label>Canal:</label><select class="f-select" id="t3FCanal" onchange="updateT3()"><option value="">Todos</option></select></div>
+        <div class="filter-group"><label>CS:</label><select class="f-select" id="t3FCS" onchange="updateT3()"><option value="">Todos</option></select></div>
+        <button class="f-btn" onclick="t3ClearFilters()">Limpar</button>
+        <button class="help-btn" onclick="document.getElementById('helpT3').classList.add('show')" title="Como funciona">?</button>
+    </div>
+    <div class="tbl-card">
+        <h4>Receita mensal &middot; <span id="t3-serie-count" style="color:var(--g);font-weight:500">--</span></h4>
+        <div style="max-height:260px;overflow-y:auto">
+            <table class="dt" id="tT3Serie">
+                <thead><tr>
+                    <th>Mes</th>
+                    <th style="text-align:right">Receita</th>
+                    <th style="text-align:right">Empresas</th>
+                    <th style="text-align:right">Invoices</th>
+                </tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tbl-card" style="margin-top:16px">
+        <h4>Empresas T3+ &middot; <span id="t3-tbl-count" style="color:var(--g);font-weight:500">--</span></h4>
+        <div style="max-height:520px;overflow-y:auto">
+            <table class="dt" id="tT3Emp">
+                <thead><tr>
+                    <th>Empresa</th>
+                    <th>Canal</th>
+                    <th>CS</th>
+                    <th style="text-align:right">Invoices</th>
+                    <th style="text-align:right">Receita total</th>
+                    <th style="text-align:right">No mes</th>
+                </tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- MODAL AJUDA T3+ -->
+<div class="modal-overlay" id="helpT3" onclick="if(event.target===this)this.classList.remove('show')">
+    <div class="modal-box">
+        <button class="close-btn" onclick="document.getElementById('helpT3').classList.remove('show')">&times;</button>
+        <h3>T3+ - Como funciona</h3>
+        <p><b>O que e?</b></p>
+        <p>Receita de <b>mensalidade Iugu</b> dos clientes cujo <b>Canal</b> (partner) <b>nao</b> seja <b>Starter</b>. Espelha a aba Faturamento do Painel CS no Fabric (Vestilake &gt; Paineis).</p>
+        <p><b>Fonte:</b></p>
+        <ul>
+            <li><code>dbo.iugu_invoices</code> (status = <code>paid</code>) ligadas ao dominio via <code>silver_companiesativos_iugu</code>.</li>
+            <li>Filtro: <code>ODBC_Domains.partner_id</code> diferente de <b>Starter</b>, Trial e Treino; nome sem "teste".</li>
+            <li>Agregado por mes da <code>created_at_iso_TIMESTAMP</code> da invoice (competencia).</li>
+        </ul>
+        <p>Serie comeca em jan/2025. O mes corrente pode estar parcial (invoices ainda nao emitidas).</p>
     </div>
 </div>
 <!-- MODAL AJUDA ONLOG -->
@@ -499,12 +568,12 @@ table.dt tr:hover td{background:#FAFAFA}
             <li><b>Com etiqueta</b> - pedidos com URL do PDF da etiqueta.</li>
             <li><b>Sem etiqueta</b> - pedidos sem URL (inclui cancelados e aguardando pagamento).</li>
         </ul>
-        <p><b>Colunas financeiras (espelham o Painel Frete):</b></p>
+        <p><b>Colunas financeiras (espelham o Painel Onlog Descritivo):</b></p>
         <ul>
             <li><b>Cotacao BIA</b> = <code>delivery_provider_value</code> (valor do frete no pedido do cliente).</li>
-            <li><b>ANA Final</b> = <code>MAX(BIA, Postagem * 1.10)</code> - medida DAX do painel frete.</li>
-            <li><b>Postagem Onlog</b> = <code>SUM(ValorPostagem)</code> das linhas em <code>sheets_onlog_fechamento</code> (CodigoVolume = domainId_orderNumber). Um pedido pode ter N volumes - soma.</li>
-            <li><b>Margem</b> = <code>BIA - Postagem</code> (preliminar, aguardando formula oficial). Verde = positiva, vermelho = negativa.</li>
+            <li><b>Valor Onlog</b> = <code>Valor_Onlog</code> de <code>sheets_onlog_descritivo</code> (o que a Onlog cobra pelo frete).</li>
+            <li><b>Valor Postagem</b> = <code>SUM(ValorPostagem)</code> das linhas em <code>sheets_onlog_fechamento</code> (CodigoVolume = domainId_orderNumber). Um pedido pode ter N volumes - soma.</li>
+            <li><b>Margem Onlog</b> = <code>Valor Onlog - Valor Postagem</code>. Verde = positiva, vermelho = negativa.</li>
         </ul>
         <p>&mdash; significa sem dado (pedido ainda nao foi postado no fechamento Onlog).</p>
         <p>Os filtros globais de <b>Empresa</b> e <b>CS</b> (barra superior) tambem se aplicam aqui.</p>
@@ -681,7 +750,7 @@ function switchTab(t,skipPush){
     if(prev && prev!==t && !skipPush){navStack.push(prev)}
     currentTab=t;
     if(typeof closeChurnDetail==='function')closeChurnDetail();
-    var tabs=['home','csat','nps','vp','churn','gmv','top80','onlog'];
+    var tabs=['home','csat','nps','vp','churn','gmv','top80','onlog','t3plus'];
     tabs.forEach(function(x){
         var pan=document.getElementById('tab-'+x);if(pan)pan.classList.toggle('active',x===t);
     });
@@ -695,11 +764,11 @@ function switchTab(t,skipPush){
     // Back nav aparece fora da home
     var bn=document.getElementById('backNav');
     bn.style.display=t==='home'?'none':'block';
-    var labels={'csat':'Satisfacao (CSAT)','nps':'Satisfacao (NPS)','vp':'Novos VestiPago','churn':'Churn de Clientes','gmv':'GMV Mensal','top80':'Clientes 80+ pedidos/mes','onlog':'Frete Onlog','home':'Geral'};
+    var labels={'csat':'Satisfacao (CSAT)','nps':'Satisfacao (NPS)','vp':'Novos VestiPago','churn':'Churn de Clientes','gmv':'GMV Mensal','top80':'Clientes 80+ pedidos/mes','onlog':'Frete Onlog','t3plus':'Receita T3+','home':'Geral'};
     document.getElementById('breadcrumb').textContent='Voce esta em: '+(labels[t]||t);
     // Filtros globais (empresa/CS) visiveis em TODAS as paginas; KPIs globais so fora de vp/gmv/churn/home
     document.querySelector('.filters').style.display='flex';
-    var hideKpi=(t==='vp'||t==='home'||t==='churn'||t==='gmv'||t==='top80'||t==='onlog');
+    var hideKpi=(t==='vp'||t==='home'||t==='churn'||t==='gmv'||t==='top80'||t==='onlog'||t==='t3plus');
     document.getElementById('globalKpiRow').style.display=hideKpi?'none':'grid';
     var cd=document.getElementById('coDetail');if(cd)cd.style.display=hideKpi?'none':'';
     updateAll();
@@ -912,6 +981,17 @@ function updateHome(){
     }
     document.getElementById('home-onlog-val').textContent=oTot.toLocaleString('pt-BR')+' pedido(s)';
     document.getElementById('home-onlog-sub').textContent=oSem?(oSem.toLocaleString('pt-BR')+' sem etiqueta'):'todas etiquetas geradas';
+    // Home card T3+ (receita mes atual)
+    var t3=(typeof T3PLUS_DATA!=='undefined'?T3PLUS_DATA:null);
+    var t3v=document.getElementById('home-t3-val'),t3s=document.getElementById('home-t3-sub');
+    if(t3v&&t3s){
+        if(t3&&t3.resumo){
+            t3v.textContent='R$ '+(t3.resumo.receitaMesAtual||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+            var prev=t3.resumo.receitaMesAnterior||0,cur=t3.resumo.receitaMesAtual||0;
+            var pct=prev>0?((cur-prev)/prev*100):null;
+            t3s.textContent=(t3.resumo.mesAtual?fmtM(t3.resumo.mesAtual):'--')+(pct!=null?(' ('+(pct>=0?'+':'')+pct.toFixed(1)+'% vs mes ant.)'):'');
+        } else {t3v.textContent='R$ --';t3s.textContent='sem dados';}
+    }
 }
 
 // === UPDATE: NOVOS VESTIPAGO ===
@@ -1242,9 +1322,9 @@ function updateOnlog(){
             '<td>'+etqCell+'</td>'+
             '<td style="text-align:right;font-weight:700;color:var(--s);white-space:nowrap">R$ '+(p.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
             '<td style="text-align:right;color:var(--dk);white-space:nowrap">'+_olFmt(p.cotacaoBia)+'</td>'+
-            '<td style="text-align:right;color:var(--p);white-space:nowrap">'+_olFmt(p.anaFinal)+'</td>'+
-            '<td style="text-align:right;color:#0984E3;white-space:nowrap">'+_olFmt(p.postagemOnlog)+'</td>'+
-            '<td style="text-align:right;white-space:nowrap;font-weight:600;color:'+((p.margem==null)?'#B2BEC3':(p.margem>=0?'var(--s)':'#E17055'))+'">'+_olFmt(p.margem)+'</td>'+
+            '<td style="text-align:right;color:var(--p);white-space:nowrap">'+_olFmt(p.valorOnlog)+'</td>'+
+            '<td style="text-align:right;color:#0984E3;white-space:nowrap">'+_olFmt(p.valorPostagem)+'</td>'+
+            '<td style="text-align:right;white-space:nowrap;font-weight:600;color:'+((p.margemOnlog==null)?'#B2BEC3':(p.margemOnlog>=0?'var(--s)':'#E17055'))+'">'+_olFmt(p.margemOnlog)+'</td>'+
         '</tr>'
     }).join('');
 }
@@ -1363,9 +1443,98 @@ function updateAll(){
     else if(currentTab==='gmv')updateGmv();
     else if(currentTab==='top80')updateTop80();
     else if(currentTab==='onlog')updateOnlog();
+    else if(currentTab==='t3plus')updateT3();
+}
+
+// === UPDATE: T3+ (receita mensalidade nao-Starter) ===
+var _t3Inited=false;
+function t3Init(){
+    if(_t3Inited)return;_t3Inited=true;
+    var t3=(typeof T3PLUS_DATA!=='undefined'?T3PLUS_DATA:null);
+    if(!t3)return;
+    var mSel=document.getElementById('t3FMes');
+    (t3.serie||[]).slice().reverse().forEach(function(r){var o=document.createElement('option');o.value=r.mes;o.textContent=fmtM(r.mes);mSel.appendChild(o)});
+    var canais={},css={};
+    (t3.empresas||[]).forEach(function(e){if(e.canal)canais[e.canal]=1;if(e.cs)css[e.cs]=1});
+    var cSel=document.getElementById('t3FCanal');
+    Object.keys(canais).sort().forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;cSel.appendChild(o)});
+    var csSel=document.getElementById('t3FCS');
+    Object.keys(css).sort().forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;csSel.appendChild(o)});
+}
+function t3ClearFilters(){document.getElementById('t3FMes').value='';document.getElementById('t3FCanal').value='';document.getElementById('t3FCS').value='';updateT3()}
+function _t3FmtR(v){return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function updateT3(){
+    t3Init();
+    var t3=(typeof T3PLUS_DATA!=='undefined'?T3PLUS_DATA:null);
+    var tbS=document.querySelector('#tT3Serie tbody'),tbE=document.querySelector('#tT3Emp tbody');
+    if(!t3||!t3.serie){
+        if(tbS)tbS.innerHTML='<tr><td colspan="4" style="text-align:center;color:#999;padding:24px">Sem dados T3+. Rode python fetch_t3plus.py</td></tr>';
+        if(tbE)tbE.innerHTML='';
+        return;
+    }
+    var mesF=document.getElementById('t3FMes').value;
+    var canalF=document.getElementById('t3FCanal').value;
+    var csF=document.getElementById('t3FCS').value;
+    // Empresas filtradas
+    var emps=(t3.empresas||[]).filter(function(e){
+        if(canalF && e.canal!==canalF)return false;
+        if(csF && e.cs!==csF)return false;
+        if(mesF && !(e.porMes&&e.porMes[mesF]>0))return false;
+        return true;
+    });
+    // Serie: se houver filtro de canal/cs, recalcular da base filtrada; senao usar serie pre-calc
+    var serie;
+    if(canalF||csF){
+        var acc={};
+        emps.forEach(function(e){Object.keys(e.porMes||{}).forEach(function(m){acc[m]=(acc[m]||{r:0,n:0,emps:{}});acc[m].r+=e.porMes[m];acc[m].n+=1;acc[m].emps[e.domainId]=1})});
+        serie=Object.keys(acc).sort().map(function(m){return {mes:m,receita:acc[m].r,nEmpresas:Object.keys(acc[m].emps).length,nInvoices:null}});
+    } else {
+        serie=(t3.serie||[]).slice();
+    }
+    if(mesF)serie=serie.filter(function(r){return r.mes===mesF});
+    // KPIs
+    var last=serie[serie.length-1]||{};
+    var prev=serie.length>=2?serie[serie.length-2]:null;
+    var total=serie.reduce(function(a,b){return a+(b.receita||0)},0);
+    document.getElementById('t3-kmes').textContent=_t3FmtR(last.receita);
+    document.getElementById('t3-kmes-s').textContent=last.mes?fmtM(last.mes):'--';
+    document.getElementById('t3-kprev').textContent=prev?_t3FmtR(prev.receita):'--';
+    document.getElementById('t3-kprev-s').textContent=prev?fmtM(prev.mes):'';
+    document.getElementById('t3-kemp').textContent=(last.nEmpresas||0).toLocaleString('pt-BR');
+    document.getElementById('t3-ktotal').textContent=_t3FmtR(total);
+    document.getElementById('t3-ktotal-s').textContent=serie.length+' mes(es)';
+    // Tabela serie
+    document.getElementById('t3-serie-count').textContent=serie.length+' mes(es)';
+    var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+    tbS.innerHTML=serie.slice().reverse().map(function(r){
+        return '<tr>'+
+            '<td>'+fmtM(r.mes)+'</td>'+
+            '<td style="text-align:right;font-weight:700;color:var(--p)">'+_t3FmtR(r.receita)+'</td>'+
+            '<td style="text-align:right">'+(r.nEmpresas||0).toLocaleString('pt-BR')+'</td>'+
+            '<td style="text-align:right;color:var(--g)">'+(r.nInvoices==null?'&mdash;':(r.nInvoices||0).toLocaleString('pt-BR'))+'</td>'+
+        '</tr>';
+    }).join('')||'<tr><td colspan="4" style="text-align:center;color:#999;padding:16px">Sem dados no filtro</td></tr>';
+    // Tabela empresas (ordenar por receita no mes filtrado se houver, senao total)
+    var empOrdered=emps.slice().sort(function(a,b){
+        if(mesF)return ((b.porMes||{})[mesF]||0)-((a.porMes||{})[mesF]||0);
+        return (b.total||0)-(a.total||0);
+    });
+    document.getElementById('t3-tbl-count').textContent=empOrdered.length+' empresa(s)';
+    tbE.innerHTML=empOrdered.map(function(e){
+        var csEsc=(e.cs||'-').replace(/'/g,"\\'");
+        var noMes=mesF?((e.porMes||{})[mesF]||0):null;
+        return '<tr>'+
+            '<td class="click" onclick="selectCo(\''+esc(e.empresa||'').replace(/'/g,"\\'")+'\')"><b>'+esc(e.empresa||'-')+'</b></td>'+
+            '<td>'+esc(e.canal||'-')+'</td>'+
+            '<td><span class="badge sm click" onclick="filterByCS(\''+csEsc+'\')">'+esc(e.cs||'-')+'</span></td>'+
+            '<td style="text-align:right;color:var(--g)">'+(e.nInvoices||0)+'</td>'+
+            '<td style="text-align:right;font-weight:700;color:var(--s)">'+_t3FmtR(e.total)+'</td>'+
+            '<td style="text-align:right;color:var(--p);font-weight:600">'+(noMes==null?'&mdash;':_t3FmtR(noMes))+'</td>'+
+        '</tr>';
+    }).join('')||'<tr><td colspan="6" style="text-align:center;color:#999;padding:16px">Nenhuma empresa no filtro</td></tr>';
 }
 function filterByCS(name){fCS.value=name;document.getElementById('fClear').style.display='inline-block';updateAll()}
-window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;window.updateVp=updateVp;window.vpClearFilters=vpClearFilters;window.goBack=goBack;window.updateChurn=updateChurn;window.churnClearFilters=churnClearFilters;window.filterByCS=filterByCS;window.openChurnDetail=openChurnDetail;window.closeChurnDetail=closeChurnDetail;window.updateGmv=updateGmv;window.gmvClearFilters=gmvClearFilters;window.updateTop80=updateTop80;window.top80ClearFilters=top80ClearFilters;window.openTop80Detail=openTop80Detail;window.updateOnlog=updateOnlog;window.onlogClearFilters=onlogClearFilters;window.onlogSetDia=onlogSetDia;
+window.selectCo=selectCo;window.clearEmpresa=clearEmpresa;window.clearAll=clearAll;window.updateAll=updateAll;window.clearChartFilter=clearChartFilter;window.setChartFilter=setChartFilter;window.switchTab=switchTab;window.switchCsat=switchCsat;window.updateVp=updateVp;window.vpClearFilters=vpClearFilters;window.goBack=goBack;window.updateChurn=updateChurn;window.churnClearFilters=churnClearFilters;window.filterByCS=filterByCS;window.openChurnDetail=openChurnDetail;window.closeChurnDetail=closeChurnDetail;window.updateGmv=updateGmv;window.gmvClearFilters=gmvClearFilters;window.updateTop80=updateTop80;window.top80ClearFilters=top80ClearFilters;window.openTop80Detail=openTop80Detail;window.updateOnlog=updateOnlog;window.onlogClearFilters=onlogClearFilters;window.onlogSetDia=onlogSetDia;window.updateT3=updateT3;window.t3ClearFilters=t3ClearFilters;
 // Inicializacao: Home e default; filtros globais visiveis, KPIs globais ocultos
 document.querySelector('.filters').style.display='flex';
 document.getElementById('globalKpiRow').style.display='none';
