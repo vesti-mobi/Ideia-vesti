@@ -204,13 +204,16 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
             <table>
                 <thead>
                     <tr>
-                        <th>Empresa</th>
-                        <th class="r">Pedidos</th>
-                        <th class="r">Pagos</th>
+                        <th style="width:22px"></th>
+                        <th>Empresa / Pedido / Parcela</th>
+                        <th>Vencimento</th>
+                        <th>Pago em</th>
+                        <th class="r">Parcelas</th>
+                        <th class="r">Pagas</th>
                         <th class="r">A receber</th>
                         <th class="r">Valor recebido</th>
                         <th class="r">Valor a receber</th>
-                        <th class="r">Total</th>
+                        <th class="r">Total bruto</th>
                     </tr>
                 </thead>
                 <tbody id="tbodyCr"></tbody>
@@ -477,9 +480,10 @@ function renderCp(){
 }
 
 function renderCr(){
-    // Contas a receber: agrupa pedidos por empresa; separa pagos (cliente
-    // ja quitou) vs a receber (cliente ainda nao pagou o pedido). Usa os
-    // mesmos filtros de empresa e de "data da compra" da barra.
+    // Contas a receber: parcela-level. Agrupa por empresa (linha pai,
+    // clicavel) -> pedido (linha filho, clicavel) -> parcelas individuais.
+    // "Paga" = parcela tem paidAt (liquidada pela StarkBank para a empresa);
+    // "A receber" = parcela ainda sem paidAt.
     var pDe=document.getElementById('fPagoDe').value;
     var pAte=document.getElementById('fPagoAte').value;
     var q=(document.getElementById('fEmpresa').value||'').toLowerCase().trim();
@@ -493,38 +497,93 @@ function renderCr(){
         }
         return true;
     });
+    // stats por parcela: pc.paidAt -> pago; senao a receber
+    function pcStats(parcelas){
+        var s={n:0,nPg:0,nAr:0,vRec:0,vAr:0};
+        parcelas.forEach(function(pc){
+            s.n++;
+            var g=pc.grossValue||0;
+            if(pc.paidAt){s.nPg++;s.vRec+=g}
+            else{s.nAr++;s.vAr+=g}
+        });
+        return s;
+    }
+    // aggrega por empresa
     var byEmp={};
     peds.forEach(function(p){
         var cid=p.companyId||'(sem)';
-        var e=byEmp[cid]||(byEmp[cid]={cid:cid,nome:p.nomeFantasia||cid,nPed:0,nPg:0,nAr:0,vRec:0,vAr:0});
-        e.nPed++;
-        if(p.isPaid){e.nPg++;e.vRec+=p.totalGross||0}
-        else{e.nAr++;e.vAr+=p.totalGross||0}
+        var e=byEmp[cid]||(byEmp[cid]={cid:cid,nome:p.nomeFantasia||cid,peds:[],n:0,nPg:0,nAr:0,vRec:0,vAr:0});
+        var s=pcStats(p.parcelas||[]);
+        e.peds.push({p:p,s:s});
+        e.n+=s.n;e.nPg+=s.nPg;e.nAr+=s.nAr;e.vRec+=s.vRec;e.vAr+=s.vAr;
     });
     var list=Object.values(byEmp).sort(function(a,b){return (b.vAr+b.vRec)-(a.vAr+a.vRec)});
-    var tot={nPed:0,nPg:0,nAr:0,vRec:0,vAr:0};
-    list.forEach(function(e){tot.nPed+=e.nPed;tot.nPg+=e.nPg;tot.nAr+=e.nAr;tot.vRec+=e.vRec;tot.vAr+=e.vAr});
+    var tot={nPed:0,n:0,nPg:0,nAr:0,vRec:0,vAr:0};
+    list.forEach(function(e){tot.nPed+=e.peds.length;tot.n+=e.n;tot.nPg+=e.nPg;tot.nAr+=e.nAr;tot.vRec+=e.vRec;tot.vAr+=e.vAr});
     document.getElementById('crEmp').textContent=fmtN(list.length);
-    document.getElementById('crPed').textContent=fmtN(tot.nPed);
+    document.getElementById('crPed').textContent=fmtN(tot.n);
     document.getElementById('crPedPg').textContent=fmtN(tot.nPg);
     document.getElementById('crPedAr').textContent=fmtN(tot.nAr);
     document.getElementById('crRec').textContent=fmtC(tot.vRec);
     document.getElementById('crAr').textContent=fmtC(tot.vAr);
     document.getElementById('crTot').textContent=fmtC(tot.vRec+tot.vAr);
-    document.getElementById('crCount').textContent=fmtN(list.length)+' empresa(s) · '+fmtN(tot.nPed)+' pedido(s)';
+    document.getElementById('crCount').textContent=fmtN(list.length)+' empresa(s) · '+fmtN(tot.nPed)+' pedido(s) · '+fmtN(tot.n)+' parcela(s)';
     var tb=document.getElementById('tbodyCr');
-    if(!list.length){tb.innerHTML='<tr><td colspan="7" class="empty">Nenhum pedido com os filtros atuais</td></tr>';return}
-    tb.innerHTML=list.map(function(e){
-        return '<tr>'+
-            '<td><strong>'+esc(e.nome)+'</strong> <span class="mono" style="color:#8290a0">'+esc(e.cid.substring(0,14))+(e.cid.length>14?'...':'')+'</span></td>'+
-            '<td class="money" style="color:var(--p)">'+fmtN(e.nPed)+'</td>'+
+    if(!list.length){tb.innerHTML='<tr><td colspan="10" class="empty">Nenhum pedido com os filtros atuais</td></tr>';return}
+    var html=[];
+    list.forEach(function(e){
+        var eKey='E:'+e.cid;
+        var eOpen=!!openSet[eKey];
+        html.push('<tr class="ped'+(eOpen?' open':'')+'" onclick="toggleKey(\''+eKey+'\')">'+
+            '<td class="chev">&rtrif;</td>'+
+            '<td><strong>'+esc(e.nome)+'</strong> <span class="mono" style="color:#8290a0;font-weight:400">'+esc(e.cid.substring(0,14))+(e.cid.length>14?'...':'')+'</span></td>'+
+            '<td>-</td><td>-</td>'+
+            '<td class="money" style="color:var(--p)">'+fmtN(e.n)+'</td>'+
             '<td class="money" style="color:var(--g)">'+fmtN(e.nPg)+'</td>'+
             '<td class="money" style="color:var(--r)">'+fmtN(e.nAr)+'</td>'+
             '<td class="money" style="color:var(--g)">'+fmtC(e.vRec)+'</td>'+
             '<td class="money" style="color:var(--r)">'+fmtC(e.vAr)+'</td>'+
             '<td class="money total">'+fmtC(e.vRec+e.vAr)+'</td>'+
-        '</tr>';
-    }).join('');
+        '</tr>');
+        if(!eOpen)return;
+        // pedidos dentro da empresa
+        e.peds.sort(function(a,b){return (b.p.orderDate||'').localeCompare(a.p.orderDate||'')});
+        e.peds.forEach(function(item){
+            var p=item.p,s=item.s;
+            var oKey='O:'+p.orderId;
+            var oOpen=!!openSet[oKey];
+            html.push('<tr class="parc show" onclick="event.stopPropagation();toggleKey(\''+oKey+'\')" style="cursor:pointer;'+(oOpen?'background:#E8E4FF;font-weight:600':'')+'">'+
+                '<td></td>'+
+                '<td class="ind" style="padding-left:40px">'+(oOpen?'▾':'▸')+' Pedido #'+esc((p.orderNumber||p.orderId||'').toString())+' · <span style="color:var(--mut);font-weight:400">'+esc(p.customerName||'-')+'</span></td>'+
+                '<td>-</td>'+
+                '<td>'+(p.paidAt?fmtD(p.paidAt):'-')+'</td>'+
+                '<td class="money" style="color:var(--p)">'+fmtN(s.n)+'</td>'+
+                '<td class="money" style="color:var(--g)">'+fmtN(s.nPg)+'</td>'+
+                '<td class="money" style="color:var(--r)">'+fmtN(s.nAr)+'</td>'+
+                '<td class="money" style="color:var(--g)">'+fmtC(s.vRec)+'</td>'+
+                '<td class="money" style="color:var(--r)">'+fmtC(s.vAr)+'</td>'+
+                '<td class="money total">'+fmtC(s.vRec+s.vAr)+'</td>'+
+            '</tr>');
+            if(!oOpen)return;
+            (p.parcelas||[]).forEach(function(pc){
+                var pago=!!pc.paidAt;
+                var g=pc.grossValue||0;
+                html.push('<tr class="parc show" style="background:#FAFAFF">'+
+                    '<td></td>'+
+                    '<td style="padding-left:80px;color:var(--tx)">Parcela '+pc.installment+'/'+(p.installmentsTotal||'?')+' '+(pago?'<span class="badge paid">PAGA</span>':'<span class="badge pen">A RECEBER</span>')+'</td>'+
+                    '<td class="date">'+(pc.dueAt?fmtD(pc.dueAt):'-')+'</td>'+
+                    '<td class="date">'+(pc.paidAt?fmtD(pc.paidAt):'-')+'</td>'+
+                    '<td class="money" style="color:var(--p)">1</td>'+
+                    '<td class="money" style="color:var(--g)">'+(pago?1:0)+'</td>'+
+                    '<td class="money" style="color:var(--r)">'+(pago?0:1)+'</td>'+
+                    '<td class="money" style="color:var(--g)">'+fmtC(pago?g:0)+'</td>'+
+                    '<td class="money" style="color:var(--r)">'+fmtC(pago?0:g)+'</td>'+
+                    '<td class="money total">'+fmtC(g)+'</td>'+
+                '</tr>');
+            });
+        });
+    });
+    tb.innerHTML=html.join('');
 }
 </script>
 </body>
