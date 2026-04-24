@@ -184,18 +184,25 @@ df_p = spark.createDataFrame(_norm(purchases,    SCHEMA_P), schema=SCHEMA_P)
 df_i = spark.createDataFrame(_norm(installments, SCHEMA_I), schema=SCHEMA_I)
 
 # casts de data/timestamp (feitos agora que o DF ja esta tipado)
+# Os timestamps da API Starkbank vem em UTC (T03:00:00+00:00).
+# Converte para America/Sao_Paulo (BRT) pra que CAST(due AS DATE) em queries
+# no Lakehouse retorne a data correta em BRT (nao em UTC).
+_BR = "America/Sao_Paulo"
+def _to_brt(col):
+    return F.from_utc_timestamp(F.to_timestamp(col), _BR)
+
 df_p = (df_p
-        .withColumn("created",     F.to_timestamp("created"))
-        .withColumn("api_created", F.to_timestamp("api_created"))
-        .withColumn("api_updated", F.to_timestamp("api_updated"))
+        .withColumn("created",     _to_brt("created"))
+        .withColumn("api_created", _to_brt("api_created"))
+        .withColumn("api_updated", _to_brt("api_updated"))
         .withColumn("order_date",  F.to_date("order_date"))
-        .withColumn("gerado_em",   F.to_timestamp("gerado_em")))
+        .withColumn("gerado_em",   _to_brt("gerado_em")))
 df_i = (df_i
-        .withColumn("due",         F.to_timestamp("due"))
-        .withColumn("nominal_due", F.to_timestamp("nominal_due"))
-        .withColumn("api_created", F.to_timestamp("api_created"))
-        .withColumn("api_updated", F.to_timestamp("api_updated"))
-        .withColumn("gerado_em",   F.to_timestamp("gerado_em")))
+        .withColumn("due",         _to_brt("due"))
+        .withColumn("nominal_due", _to_brt("nominal_due"))
+        .withColumn("api_created", _to_brt("api_created"))
+        .withColumn("api_updated", _to_brt("api_updated"))
+        .withColumn("gerado_em",   _to_brt("gerado_em")))
 
 # -------- 3) tabelas ----------
 # OBS: o schema `starkbank` precisa ser criado antes, pela UI do Lakehouse

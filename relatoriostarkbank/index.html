@@ -290,8 +290,23 @@ if(sessionStorage.getItem('stark_auth')==='1')showApp();
 
 function fmtC(v){return 'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function fmtN(v){return (v||0).toLocaleString('pt-BR')}
-function fmtD(s){if(!s)return '-';var d=String(s).substring(0,10);if(d.length<10)return s;var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
-function fmtDT(s){if(!s)return '-';var d=String(s).substring(0,10);if(d.length<10)return s;var p=d.split('-');var t=String(s).length>=16?' '+String(s).substring(11,16):'';return p[2]+'/'+p[1]+'/'+p[0]+t}
+// ISO UTC ("...T03:00:00+00:00" ou "...Z") => YYYY-MM-DD em BRT (UTC-3).
+// Strings ja sem TZ (naive, ex: "2026-04-24") passam sem conversao.
+function isoBRTDate(s){
+    if(!s)return '';
+    var str=String(s);
+    // so converte se tiver timezone explicito (Z ou +hh:mm)
+    if(/[zZ]$|[+\-]\d{2}:?\d{2}$/.test(str.substring(10))){
+        var d=new Date(str);
+        if(!isNaN(d)){
+            var brt=new Date(d.getTime()-3*3600000);
+            return brt.toISOString().substring(0,10);
+        }
+    }
+    return str.substring(0,10);
+}
+function fmtD(s){if(!s)return '-';var d=isoBRTDate(s);if(d.length<10)return s;var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+function fmtDT(s){if(!s)return '-';var d=isoBRTDate(s);if(d.length<10)return s;var p=d.split('-');var t=String(s).length>=16?' '+String(s).substring(11,16):'';return p[2]+'/'+p[1]+'/'+p[0]+t}
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 
 var DADOS=null;
@@ -525,7 +540,7 @@ function renderCr(){
     function filtParc(insts){
         if(!dDe&&!dAte)return insts;
         return insts.filter(function(i){
-            var due=(i.due||'').substring(0,10);
+            var due=isoBRTDate(i.due);
             if(dDe&&(!due||due<dDe))return false;
             if(dAte&&(!due||due>dAte))return false;
             return true;
@@ -537,7 +552,7 @@ function renderCr(){
     faturas.forEach(function(f){
         var insts=filtParc((f.purchase&&f.purchase.installments)||[]);
         insts.forEach(function(i){
-            var d=(i.due||'').substring(0,10)||'(sem)';
+            var d=isoBRTDate(i.due)||'(sem)';
             var cid=f.companyId||'(sem)';
             empSet[cid]=1;
             var db=byDate[d]||(byDate[d]={date:d,byEmp:{}});
