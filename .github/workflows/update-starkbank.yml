@@ -2,7 +2,7 @@ name: Atualizar Relatorio StarkBank VestiPago
 
 on:
   schedule:
-    - cron: '30 8 * * *'  # 5:30 BRT (8:30 UTC) - stagger apos update-painelcs (8:00)
+    - cron: '0 * * * *'  # de hora em hora
   workflow_dispatch:
     inputs:
       reason:
