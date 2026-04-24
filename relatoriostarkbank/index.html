@@ -483,18 +483,44 @@ function renderCp(){
                 '<td class="money total">'+fmtC(ct.net)+'</td>'+
             '</tr>');
             if(!cOpen)return;
-            cPags.forEach(function(p){
-                html.push('<tr class="parc show" style="background:#FAFAFF">'+
+            // agrupa parcelas por pedido dentro da empresa
+            var byOrd={};
+            cPags.forEach(function(p){(byOrd[p.orderId]=byOrd[p.orderId]||[]).push(p)});
+            var oids=Object.keys(byOrd).sort(function(a,b){
+                var oa=byOrd[a][0].orderNumber||0, ob=byOrd[b][0].orderNumber||0;
+                return ob-oa;
+            });
+            oids.forEach(function(oid){
+                var oPags=byOrd[oid];
+                var ot=sumTotals(oPags);
+                var first=oPags[0];
+                var pKey='CP:'+date+'|'+cid+'|'+oid;
+                var pOpen=!!openSet[pKey];
+                html.push('<tr class="parc show" onclick="event.stopPropagation();toggleKey(\''+pKey+'\')" style="cursor:pointer;background:'+(pOpen?'#F0ECFF':'#FAFAFF')+';'+(pOpen?'font-weight:600':'')+'">'+
                     '<td></td>'+
-                    '<td style="padding-left:80px;color:var(--tx)">Pedido #'+esc((p.orderNumber||p.orderId||'').toString())+' · parcela '+p.installment+'/'+(p.installmentsTotal||'?')+' · <span style="color:var(--mut)">'+esc(p.customerName||'-')+'</span></td>'+
-                    '<td class="date">'+(p.customerPaidAt?fmtD(p.customerPaidAt):'-')+'</td>'+
-                    '<td class="money" style="color:var(--p)">1</td>'+
-                    '<td class="money" style="color:var(--mut)">'+fmtC(p.grossValue)+'</td>'+
-                    '<td class="money" style="color:var(--b)">'+fmtC(p.vpValue)+'</td>'+
-                    '<td class="money" style="color:var(--y)">'+fmtC(p.antifraudValue)+'</td>'+
-                    '<td class="money" style="color:var(--r)">'+fmtC(p.antecipationValue)+'</td>'+
-                    '<td class="money total">'+fmtC(p.netValue)+'</td>'+
+                    '<td style="padding-left:80px;color:var(--tx)">'+(pOpen?'▾':'▸')+' Pedido #'+esc((first.orderNumber||oid||'').toString())+' · <span style="color:var(--mut);font-weight:400">'+esc(first.customerName||'-')+' · '+fmtN(ot.n)+'/'+fmtN(first.installmentsTotal||ot.n)+' parcela(s)</span></td>'+
+                    '<td class="date">'+(first.customerPaidAt?fmtD(first.customerPaidAt):'-')+'</td>'+
+                    '<td class="money" style="color:var(--p)">'+fmtN(ot.n)+'</td>'+
+                    '<td class="money" style="color:var(--mut)">'+fmtC(ot.gross)+'</td>'+
+                    '<td class="money" style="color:var(--b)">'+fmtC(ot.vp)+'</td>'+
+                    '<td class="money" style="color:var(--y)">'+fmtC(ot.af)+'</td>'+
+                    '<td class="money" style="color:var(--r)">'+fmtC(ot.antec)+'</td>'+
+                    '<td class="money total">'+fmtC(ot.net)+'</td>'+
                 '</tr>');
+                if(!pOpen)return;
+                oPags.forEach(function(p){
+                    html.push('<tr class="parc show" style="background:#FAFAFF">'+
+                        '<td></td>'+
+                        '<td style="padding-left:120px;color:var(--tx)">parcela '+p.installment+'/'+(p.installmentsTotal||'?')+'</td>'+
+                        '<td class="date">'+(p.customerPaidAt?fmtD(p.customerPaidAt):'-')+'</td>'+
+                        '<td class="money" style="color:var(--p)">1</td>'+
+                        '<td class="money" style="color:var(--mut)">'+fmtC(p.grossValue)+'</td>'+
+                        '<td class="money" style="color:var(--b)">'+fmtC(p.vpValue)+'</td>'+
+                        '<td class="money" style="color:var(--y)">'+fmtC(p.antifraudValue)+'</td>'+
+                        '<td class="money" style="color:var(--r)">'+fmtC(p.antecipationValue)+'</td>'+
+                        '<td class="money total">'+fmtC(p.netValue)+'</td>'+
+                    '</tr>');
+                });
             });
         });
     });
