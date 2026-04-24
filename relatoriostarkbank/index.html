@@ -651,11 +651,27 @@ function renderCr(){
                 '<td class="money total">'+fmtC(es.liq)+'</td>'+
             '</tr>');
             if(!cOpen)return;
-            // installments (agrupadas por pedido pra deixar legivel)
+            // pedidos dentro da empresa (nivel intermediario; clique expande parcelas)
             var ops=Object.values(e.pedsMap).sort(function(a,b){return (b.f.orderDate||'').localeCompare(a.f.orderDate||'')});
             ops.forEach(function(op){
                 var f=op.f,total=op.instTotal||op.insts.length;
-                // ordena installments por due
+                var os=sumInsts(op.insts);
+                var pKey='CRP:'+date+'|'+cid+'|'+f.orderId;
+                var pOpen=!!openSet[pKey];
+                html.push('<tr class="parc show" onclick="event.stopPropagation();toggleKey(\''+pKey+'\')" style="cursor:pointer;background:'+(pOpen?'#F0ECFF':'#FAFAFF')+';'+(pOpen?'font-weight:600':'')+'">'+
+                    '<td></td>'+
+                    '<td style="padding-left:80px;color:var(--tx)">'+(pOpen?'▾':'▸')+' Pedido #'+esc((f.orderNumber||f.orderId||'').toString())+' · <span style="color:var(--mut);font-weight:400">'+esc(f.customerName||'-')+' · '+fmtN(os.n)+'/'+fmtN(total)+' parcelas ('+fmtN(os.nPg)+' pagas, '+fmtN(os.nAr)+' a receber)</span></td>'+
+                    '<td>-</td>'+
+                    '<td class="date">'+(f.orderDate?fmtD(f.orderDate):'-')+'</td>'+
+                    '<td class="money" style="color:var(--p)">'+fmtN(os.n)+'</td>'+
+                    '<td class="money" style="color:var(--g)">'+fmtN(os.nPg)+'</td>'+
+                    '<td class="money" style="color:var(--r)">'+fmtN(os.nAr)+'</td>'+
+                    '<td class="money" style="color:var(--mut)">'+fmtC(os.vRec+os.vAr)+'</td>'+
+                    '<td class="money" style="color:var(--y)">'+fmtC(os.fee)+'</td>'+
+                    '<td class="money total">'+fmtC(os.liq)+'</td>'+
+                '</tr>');
+                if(!pOpen)return;
+                // parcelas do pedido
                 var sorted=op.insts.slice().sort(function(a,b){return (a.due||'').localeCompare(b.due||'')});
                 sorted.forEach(function(i,idx){
                     var pago=(i.status==='paid');
@@ -663,7 +679,7 @@ function renderCr(){
                     var fee=(i.fee||0)/100;
                     html.push('<tr class="parc show" style="background:#FAFAFF">'+
                         '<td></td>'+
-                        '<td style="padding-left:80px;color:var(--tx)">Pedido #'+esc((f.orderNumber||f.orderId||'').toString())+' · parcela '+(idx+1)+'/'+total+' '+(pago?'<span class="badge paid">PAGA</span>':'<span class="badge pen">A RECEBER</span>')+' · <span style="color:var(--mut)">'+esc(f.customerName||'-')+'</span></td>'+
+                        '<td style="padding-left:120px;color:var(--tx)">parcela '+(idx+1)+'/'+total+' '+(pago?'<span class="badge paid">PAGA</span>':'<span class="badge pen">A RECEBER</span>')+'</td>'+
                         '<td class="date">'+(i.due?fmtD(i.due):'-')+'</td>'+
                         '<td class="date">'+(f.orderDate?fmtD(f.orderDate):'-')+'</td>'+
                         '<td class="money" style="color:var(--p)">1</td>'+
