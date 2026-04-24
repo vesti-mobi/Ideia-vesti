@@ -418,20 +418,35 @@ def build(raw: list[dict]) -> dict:
         except Exception:
             return None
 
+    def _next_business_day(d):
+        """Avanca enquanto cair em sab/dom (weekday 5 ou 6)."""
+        while d.weekday() >= 5:
+            d = d + _td(days=1)
+        return d
+
     pagamentos: list[dict] = []
     for p in pedidos:
         is_antec = bool(p.get("antecipacaoEnabled"))
         order_d = _parse_day(p.get("orderDate") or "")
         customer_paid_at = (p.get("paidAt") or "")[:10]
+        cpa_d = _parse_day(customer_paid_at)
         for pc in p["parcelas"]:
             paid = (pc.get("paidAt") or "")[:10]
             due = (pc.get("dueAt") or "")[:10]
-            if paid:
+            if is_antec:
+                # Antecipacao: liquidacao pro marca e D+1 do pagamento do cliente,
+                # pulando fim de semana. Usa customer_paid_at (ja em BRT via SQL).
+                base = cpa_d or _parse_day(paid) or order_d
+                if base:
+                    pay_date = _next_business_day(base + _td(days=1)).isoformat()
+                elif due:
+                    pay_date = due
+                else:
+                    pay_date = ""
+            elif paid:
                 pay_date = paid
             elif due:
                 pay_date = due
-            elif is_antec and order_d:
-                pay_date = (order_d + _td(days=1)).isoformat()
             else:
                 pay_date = ""
             pagamentos.append({
