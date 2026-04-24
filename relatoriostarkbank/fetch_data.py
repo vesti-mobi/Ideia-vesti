@@ -232,27 +232,44 @@ def _to_float(v, default: float = 0.0) -> float:
         return default
 
 
-from datetime import timezone as _tz, timedelta as _td2
+from datetime import timezone as _tz, timedelta as _td2, datetime as _dt2
 _BRT = _tz(_td2(hours=-3))
 
 
 def _iso_or_empty(v) -> str:
+    """Retorna timestamp ISO truncado em segundos, convertido UTC -> BRT.
+
+    Fabric armazena os paid_at/due_at como VARCHAR ISO em UTC (ex:
+    '2026-04-24T02:30:00Z'). Sem conversao, o truncamento [:10] joga pagamentos
+    feitos a noite BRT pro dia seguinte. Esta funcao detecta datetime-like
+    (objeto ou string com 'T') e converte. Strings date-only ('2026-04-24')
+    passam intactas.
+    """
     if v is None:
         return ""
+    dt = None
+    # objeto datetime/date
     if hasattr(v, "isoformat"):
-        # Fabric armazena timestamps em UTC (naive). Converte pra America/Sao_Paulo
-        # (BRT, -03:00) antes de truncar pra que parcelas pagas a noite nao pulem
-        # pro dia seguinte no dashboard.
         try:
-            if getattr(v, "tzinfo", None) is None:
-                v = v.replace(tzinfo=_tz.utc)
-            v = v.astimezone(_BRT)
+            if getattr(v, "tzinfo", None) is None and hasattr(v, "hour"):
+                dt = v.replace(tzinfo=_tz.utc)
+            else:
+                dt = v
+            dt = dt.astimezone(_BRT) if hasattr(dt, "hour") else dt
         except Exception:
-            pass
-        s = v.isoformat()
+            dt = v
+        s = dt.isoformat()
     else:
         s = str(v)
-    # Aceita strings tipo "2026-05-18T03:00:00Z" e datas simples "2026-04-16"
+        # string ISO com timezone (ex: "2026-04-24T02:30:00Z"): parse + converte
+        if "T" in s and len(s) >= 11:
+            try:
+                parsed = _dt2.fromisoformat(s.replace("Z", "+00:00"))
+                if parsed.tzinfo is None:
+                    parsed = parsed.replace(tzinfo=_tz.utc)
+                s = parsed.astimezone(_BRT).isoformat()
+            except Exception:
+                pass
     return s[:19] if len(s) >= 19 else s
 
 
