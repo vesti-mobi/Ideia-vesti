@@ -1624,7 +1624,17 @@ function _onlogFilterRows(od){
         });
         rows=synPa;
     } else {
-        // Todos: Vesti + sinteticos so-na-planilha
+        // Todos: Vesti + sinteticos so-na-planilha.
+        // Quando o range visivel cai DENTRO de uma planilha do Diogo ingerida,
+        // filtra pedidos Vesti pra mostrar so os que estao na planilha (patcheados).
+        // Resultado: o total bate com custoDiogo da planilha (14.720,37 etc).
+        // Fora de planilha ingerida, mantem comportamento "todos" antigo.
+        var dentroPlanilha=de&&ate&&idx.rangesCobertos.some(function(r){
+            return de>=r.de&&ate<=r.ate;
+        });
+        if(dentroPlanilha){
+            rows=rows.filter(function(p){return p.postagemFonte==='planilha-diogo'});
+        }
         var syn2=idx.soPlanilha.slice();
         if(de)syn2=syn2.filter(function(p){return (p.data||'')>=de});
         if(ate)syn2=syn2.filter(function(p){return (p.data||'')<=ate});
