@@ -1923,6 +1923,7 @@ async function main() {
                 pix: e.pixImpl ? 'Sim' : 'Não',
                 cnpj: e.cnpj,
                 temVestiPago,
+                vestiPagoTransacionando: temVestiPago && (e.transCartao + e.transPix) > 0,
                 transCartao: e.transCartao,
                 transPix: e.transPix,
                 transTotal: e.transTotal,
