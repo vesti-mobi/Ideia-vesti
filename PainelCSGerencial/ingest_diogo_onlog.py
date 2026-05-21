@@ -136,7 +136,9 @@ def detect_diogo_total(rows: list[dict]) -> float | None:
             continue
         if r.get("Remetente") or r.get("NumeroPedido") or r.get("NumeroNF"):
             continue
-        v = parse_val_br(r.get("ValorPostagem"))
+        v = parse_val_br(r.get("ValorCusto"))
+        if v is None:
+            v = parse_val_br(r.get("ValorPostagem"))
         if v is not None and v > 100:  # totalizador sempre tem valor alto
             return v
     return None
@@ -162,7 +164,11 @@ def aggregate_planilha(rows: list[dict], de: str, ate: str) -> tuple[dict, list]
             continue
         if ate and d_str and d_str > ate:
             continue
-        v = parse_val_br(r.get("ValorPostagem"))
+        # Prefere ValorCusto (custo real do Diogo, sem markup) quando a planilha
+        # tiver essa coluna; fallback p/ ValorPostagem nas planilhas antigas.
+        v = parse_val_br(r.get("ValorCusto"))
+        if v is None:
+            v = parse_val_br(r.get("ValorPostagem"))
         if not cv or "_" not in cv:
             # PA VESTI - postagem avulsa sem pedido vinculado
             if v is not None and (r.get("Destinatario") or r.get("CodigoInterno")):
