@@ -884,7 +884,8 @@ function clearChartFilter(){chartFilter=null;document.getElementById('chartFilte
 
 function getFilteredList(){var list=activeList,cs=fCS.value,tipo=document.getElementById('fTipo').value;if(cs)list=list.filter(function(c){return c.anjo===cs});if(tipo==='nps')list=list.filter(function(c){return c.hasNps});else if(tipo==='csat')list=list.filter(function(c){return c.hasCsat});else if(tipo==='both')list=list.filter(function(c){return c.hasNps&&c.hasCsat});return list}
 
-function _stripAcc(s){return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase()}
+function _stripAcc(s){return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim()}
+function _selCoDom(){if(!selCo)return '';var c=coMap[selCo];return c&&c.domain_id?String(c.domain_id):''}
 function renderDropdown(q){var qn=_stripAcc(q);var qd=(q||'').replace(/\D/g,'');var list=getFilteredList(),f=list.filter(function(c){return _stripAcc(c.name).indexOf(qn)>=0||(c.cnpj&&qd&&c.cnpj.indexOf(qd)>=0)||(c.nome_fantasia&&_stripAcc(c.nome_fantasia).indexOf(qn)>=0)});fDropdown.innerHTML='';if(!f.length)fDropdown.innerHTML='<div class="f-opt" style="color:#999">Nenhuma encontrada</div>';else f.slice(0,200).forEach(function(c){var div=document.createElement('div');div.className='f-opt';var meta='Anjo: '+(c.anjo||'-')+' | Canal: '+(c.canal||'-');if(c.is_filial)meta='<span class="badge fi">Filial de '+(c.matriz_name||'?')+'</span> '+meta;div.innerHTML='<div class="fn">'+c.name+'</div><div class="fm">'+meta+'</div>';div.onclick=function(){selectCo(c.name)};fDropdown.appendChild(div)});fDropdown.classList.add('show')}
 fEmpresa.addEventListener('focus',function(){renderDropdown(fEmpresa.value)});
 fEmpresa.addEventListener('input',function(){renderDropdown(fEmpresa.value)});
@@ -1565,6 +1566,12 @@ function _onlogDivergsFor(p,idx){
 function _onlogFilterRows(od){
     var fcsGlobal=(fCS&&fCS.value)||'';
     var selCoLow=_stripAcc(selCo);
+    var selCoDom=_selCoDom();
+    var _matchEmp=function(p){
+        if(!selCoLow)return true;
+        if(selCoDom&&String(p.dominioId||'')===selCoDom)return true;
+        return _stripAcc(p.marca).indexOf(selCoLow)>=0;
+    };
     var de=document.getElementById('olFDe').value;
     var ate=document.getElementById('olFAte').value;
     var etq=document.getElementById('olFEtiq').value;
@@ -1572,7 +1579,7 @@ function _onlogFilterRows(od){
     var idx=_onlogBuildDiogoIdx();
     var rows=(od.pedidos||[]).slice();
     if(fcsGlobal)rows=rows.filter(function(p){return (p.cs||'')===fcsGlobal});
-    if(selCoLow)rows=rows.filter(function(p){return _stripAcc(p.marca).indexOf(selCoLow)>=0});
+    if(selCoLow)rows=rows.filter(_matchEmp);
     if(de)rows=rows.filter(function(p){return (p.data||'')>=de});
     if(ate)rows=rows.filter(function(p){return (p.data||'')<=ate});
     if(etq==='com')rows=rows.filter(function(p){return p.comEtiqueta});
@@ -1602,7 +1609,7 @@ function _onlogFilterRows(od){
         if(!fcsGlobal&&!selCoLow)rows=rows.concat(syn);
         else {
             // Aplica filtro de marca aos sinteticos (que ja tem remetente)
-            if(selCoLow)syn=syn.filter(function(p){return _stripAcc(p.marca).indexOf(selCoLow)>=0});
+            if(selCoLow)syn=syn.filter(_matchEmp);
             rows=rows.concat(syn);
         }
     } else if(orig==='vesti'){
@@ -1629,8 +1636,8 @@ function _onlogFilterRows(od){
         if(ate)synPa=synPa.filter(function(p){return (p.data||'')<=ate});
         if(fcli)synPa=synPa.filter(_matchCli);
         if(selCoLow)synPa=synPa.filter(function(p){
-            if(_stripAcc(p.marca).indexOf(selCoLow)>=0)return true;
-            return (p.marcasInferidas||[]).some(function(m){return _stripAcc(m.marca).indexOf(selCoLow)>=0});
+            if(_matchEmp(p))return true;
+            return (p.marcasInferidas||[]).some(function(m){return _stripAcc(m.marca).indexOf(selCoLow)>=0||(selCoDom&&String(m.dominioId||'')===selCoDom)});
         });
         rows=synPa;
     } else {
@@ -1639,7 +1646,7 @@ function _onlogFilterRows(od){
         if(de)syn2=syn2.filter(function(p){return (p.data||'')>=de});
         if(ate)syn2=syn2.filter(function(p){return (p.data||'')<=ate});
         if(fcli)syn2=syn2.filter(_matchCli);
-        if(!fcsGlobal)rows=rows.concat(selCoLow?syn2.filter(function(p){return _stripAcc(p.marca).indexOf(selCoLow)>=0}):syn2);
+        if(!fcsGlobal)rows=rows.concat(selCoLow?syn2.filter(_matchEmp):syn2);
     }
     return rows;
 }
