@@ -774,8 +774,6 @@ function updateEmpresaPanel(){
             if(show.pix==='Sim')metodos.push('PIX');
             const sufixo=metodos.length?' <span style="color:var(--text-muted);font-size:11px;font-weight:500;">('+metodos.join(' + ')+')</span>':'';
             vpEl.innerHTML='<span style="color:var(--success);font-weight:700;">Sim</span>'+sufixo;
-        } else if(show.temVestiPago){
-            vpEl.innerHTML='<span style="color:var(--warning,#f59e0b);font-weight:700;">Cadastrada</span> <span style="color:var(--text-muted);font-size:11px;font-weight:500;">(sem transação)</span>';
         } else {
             vpEl.innerHTML='<span style="color:var(--text-muted);">Não</span>';
         }
@@ -1261,8 +1259,6 @@ function openOpDrawer(id){
         if(e.pix==='Sim')metodos.push('PIX');
         const sufixo=metodos.length?' <span style="color:var(--text-muted);font-size:11px;font-weight:500;">('+metodos.join(' + ')+')</span>':'';
         vpBadge='<strong style="color:var(--success);">Sim</strong>'+sufixo;
-    } else if(e.temVestiPago){
-        vpBadge='<strong style="color:var(--warning,#f59e0b);">Cadastrada</strong> <span style="color:var(--text-muted);font-size:11px;">(sem transação)</span>';
     } else {
         vpBadge='<strong style="color:var(--text-muted);">Não</strong>';
     }
