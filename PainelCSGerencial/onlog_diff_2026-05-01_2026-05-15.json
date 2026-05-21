@@ -5,27 +5,27 @@
   },
   "rangeCoberto": {
     "de": "2026-05-01",
-    "ate": "2026-05-12"
+    "ate": "2026-05-15"
   },
-  "geradoEm": "2026-05-20T12:00:03.170392",
-  "planilhaArquivo": "2026-05-12-15-56_AnalisarPostagens-544407-20260512.xlsx",
+  "geradoEm": "2026-05-21T08:45:25.234982",
+  "planilhaArquivo": "13 - 17  vesti.xlsx",
   "resumo": {
-    "ok": 132,
+    "ok": 166,
     "divergencias": 6,
     "divergenciasPedidos": 5,
     "soPlanilha": 0,
-    "soFabric": 9,
-    "nPlanilha": 138,
-    "nFabric": 180,
-    "totalPedidosPostagem": 6227.07,
+    "soFabric": 10,
+    "nPlanilha": 172,
+    "nFabric": 230,
+    "totalPedidosPostagem": 7315.0,
     "totalPaVesti": 325.84,
-    "totalGeralPostagem": 6552.91,
-    "totalCobrarPedidos": 6849.78,
+    "totalGeralPostagem": 7640.84,
+    "totalCobrarPedidos": 8046.5,
     "totalCobrarPa": 358.42,
-    "totalCobrarMarcas": 7208.2,
-    "custoDiogo": 6552.91,
+    "totalCobrarMarcas": 8404.92,
+    "custoDiogo": 7640.84,
     "diogoDetectado": false,
-    "margemVesti": 655.29,
+    "margemVesti": 764.08,
     "nPaVesti": 4
   },
   "paVesti": [
@@ -97,23 +97,23 @@
     {
       "domainId": "1355848",
       "marca": "Arary",
-      "nPedidos": 27,
-      "postagem": 1559.43,
-      "cobrar": 1715.37
+      "nPedidos": 37,
+      "postagem": 1972.46,
+      "cobrar": 2169.71
     },
     {
       "domainId": "1737229",
       "marca": "KAESSI",
-      "nPedidos": 18,
-      "postagem": 1021.83,
-      "cobrar": 1124.01
+      "nPedidos": 24,
+      "postagem": 1222.81,
+      "cobrar": 1345.09
     },
     {
       "domainId": "268016",
       "marca": "Chocolate Doce",
-      "nPedidos": 9,
-      "postagem": 452.99,
-      "cobrar": 498.29
+      "nPedidos": 12,
+      "postagem": 511.65,
+      "cobrar": 562.82
     },
     {
       "domainId": "15",
@@ -125,9 +125,9 @@
     {
       "domainId": "1956465",
       "marca": "Porã",
-      "nPedidos": 8,
-      "postagem": 172.95,
-      "cobrar": 190.25
+      "nPedidos": 15,
+      "postagem": 316.68,
+      "cobrar": 348.35
     },
     {
       "domainId": "1514922",
@@ -137,6 +137,20 @@
       "cobrar": 160.49
     },
     {
+      "domainId": "1805647",
+      "marca": "CVL Moda - CD Nova Friburgo",
+      "nPedidos": 3,
+      "postagem": 115.44,
+      "cobrar": 126.98
+    },
+    {
+      "domainId": "2016411",
+      "marca": "SKYLER ACESSORIOS",
+      "nPedidos": 2,
+      "postagem": 87.28,
+      "cobrar": 96.01
+    },
+    {
       "domainId": "1703736",
       "marca": "FIRE",
       "nPedidos": 1,
@@ -144,18 +158,25 @@
       "cobrar": 77.48
     },
     {
-      "domainId": "1805647",
-      "marca": "CVL Moda - CD Nova Friburgo",
-      "nPedidos": 2,
-      "postagem": 61.14,
-      "cobrar": 67.25
-    },
-    {
       "domainId": "1439966",
       "marca": "Liberô Style",
       "nPedidos": 2,
       "postagem": 58.33,
       "cobrar": 64.16
+    },
+    {
+      "domainId": "1840960",
+      "marca": " July Modas",
+      "nPedidos": 1,
+      "postagem": 52.34,
+      "cobrar": 57.57
+    },
+    {
+      "domainId": "1570446",
+      "marca": "Shalen Modas",
+      "nPedidos": 2,
+      "postagem": 43.27,
+      "cobrar": 47.6
     },
     {
       "domainId": "2032548",
@@ -212,6 +233,20 @@
       "nPedidos": 1,
       "postagem": 26.03,
       "cobrar": 28.63
+    },
+    {
+      "domainId": "2005999",
+      "marca": "Issa Modas",
+      "nPedidos": 1,
+      "postagem": 19.19,
+      "cobrar": 21.11
+    },
+    {
+      "domainId": "2018729",
+      "marca": "LF ACESSORIOS EM GERAL",
+      "nPedidos": 1,
+      "postagem": 15.15,
+      "cobrar": 16.67
     }
   ],
   "auditStatus": [
@@ -263,33 +298,26 @@
       "cliente": "Odília Marques",
       "statusMongo": "WAITING",
       "statusOnlog": "OBJETO CRIADO"
+    },
+    {
+      "orderNumber": 6,
+      "marca": "LF ACESSORIOS EM GERAL",
+      "cliente": "Luana Muniz Lima Vieira",
+      "statusMongo": "WAITING",
+      "statusOnlog": "ENCAMINHADO PARA O OPERADOR LOGÍSTICO"
     }
   ],
   "auditEtiqueta": [],
   "auditFrete": [],
   "auditResumo": {
-    "statusAtrasado": 7,
+    "statusAtrasado": 8,
     "semEtiqueta": 0,
     "freteDivergente": 0
   },
   "divergencias": [
     {
-      "orderNumber": 15,
-      "marca": "",
-      "campo": "Cancelado",
-      "planilha": "(postado pela Onlog)",
-      "fabric": "CANCELADO no Vesti"
-    },
-    {
       "orderNumber": 2,
       "marca": "",
-      "campo": "Cancelado",
-      "planilha": "(postado pela Onlog)",
-      "fabric": "CANCELADO no Vesti"
-    },
-    {
-      "orderNumber": 4,
-      "marca": "Asha Plus",
       "campo": "Cancelado",
       "planilha": "(postado pela Onlog)",
       "fabric": "CANCELADO no Vesti"
@@ -309,8 +337,22 @@
       "fabric": "CANCELADO no Vesti"
     },
     {
+      "orderNumber": 15,
+      "marca": "",
+      "campo": "Cancelado",
+      "planilha": "(postado pela Onlog)",
+      "fabric": "CANCELADO no Vesti"
+    },
+    {
       "orderNumber": 3,
       "marca": "",
+      "campo": "Cancelado",
+      "planilha": "(postado pela Onlog)",
+      "fabric": "CANCELADO no Vesti"
+    },
+    {
+      "orderNumber": 4,
+      "marca": "Asha Plus",
       "campo": "Cancelado",
       "planilha": "(postado pela Onlog)",
       "fabric": "CANCELADO no Vesti"
@@ -318,17 +360,6 @@
   ],
   "soPlanilha": [],
   "soFabric": [
-    {
-      "data": "2026-05-04",
-      "orderNumber": 4174,
-      "marca": "Arary",
-      "cliente": "ENI DA COSTA",
-      "cidade": "Contagem",
-      "uf": "MG",
-      "cancelado": false,
-      "status": "DELIVERED",
-      "valor": 1137.13
-    },
     {
       "data": "2026-05-07",
       "orderNumber": 4197,
@@ -341,15 +372,15 @@
       "valor": 1433.15
     },
     {
-      "data": "2026-05-12",
-      "orderNumber": 4224,
+      "data": "2026-05-15",
+      "orderNumber": 4252,
       "marca": "Arary",
-      "cliente": "Simone Francisca Da Silva",
-      "cidade": "Várzea Grande",
-      "uf": "MT",
+      "cliente": "Michelle Carolina Oliveira Alves",
+      "cidade": "Bocaiúva",
+      "uf": "MG",
       "cancelado": false,
       "status": "SENT",
-      "valor": 1496.56
+      "valor": 617.36
     },
     {
       "data": "2026-05-06",
@@ -361,39 +392,6 @@
       "cancelado": false,
       "status": "WAITING",
       "valor": 788.35
-    },
-    {
-      "data": "2026-05-03",
-      "orderNumber": 4163,
-      "marca": "Arary",
-      "cliente": "Marcely Eduarda da Silva Amorim",
-      "cidade": "Jundiaí",
-      "uf": "SP",
-      "cancelado": false,
-      "status": "SENT",
-      "valor": 1129.0
-    },
-    {
-      "data": "2026-05-12",
-      "orderNumber": 65,
-      "marca": "Shalen Modas",
-      "cliente": "Ester Baldini",
-      "cidade": "Cajuru",
-      "uf": "SP",
-      "cancelado": false,
-      "status": "SENT",
-      "valor": 408.8
-    },
-    {
-      "data": "2026-05-12",
-      "orderNumber": 13,
-      "marca": "UNBRAND",
-      "cliente": "Lucimar Santos",
-      "cidade": "Aiuruoca",
-      "uf": "MG",
-      "cancelado": false,
-      "status": "WAITING",
-      "valor": 305.26
     },
     {
       "data": "2026-05-11",
@@ -408,6 +406,50 @@
     },
     {
       "data": "2026-05-12",
+      "orderNumber": 65,
+      "marca": "Shalen Modas",
+      "cliente": "Ester Baldini",
+      "cidade": "Cajuru",
+      "uf": "SP",
+      "cancelado": false,
+      "status": "SENT",
+      "valor": 408.8
+    },
+    {
+      "data": "2026-05-03",
+      "orderNumber": 4163,
+      "marca": "Arary",
+      "cliente": "Marcely Eduarda da Silva Amorim",
+      "cidade": "Jundiaí",
+      "uf": "SP",
+      "cancelado": false,
+      "status": "SENT",
+      "valor": 1129.0
+    },
+    {
+      "data": "2026-05-15",
+      "orderNumber": 4250,
+      "marca": "Arary",
+      "cliente": "Silmara Gerbi",
+      "cidade": "Amparo",
+      "uf": "SP",
+      "cancelado": false,
+      "status": "SENT",
+      "valor": 407.71
+    },
+    {
+      "data": "2026-05-04",
+      "orderNumber": 4174,
+      "marca": "Arary",
+      "cliente": "ENI DA COSTA",
+      "cidade": "Contagem",
+      "uf": "MG",
+      "cancelado": false,
+      "status": "DELIVERED",
+      "valor": 1137.13
+    },
+    {
+      "data": "2026-05-12",
       "orderNumber": 4221,
       "marca": "Arary",
       "cliente": "Ana Luiza Pessanha ",
@@ -416,6 +458,17 @@
       "cancelado": false,
       "status": "SENT",
       "valor": 910.67
+    },
+    {
+      "data": "2026-05-15",
+      "orderNumber": 1366,
+      "marca": "CVL Moda - CD Nova Friburgo",
+      "cliente": "Rafael Dias",
+      "cidade": "Lagoa da Prata",
+      "uf": "MG",
+      "cancelado": false,
+      "status": "DELIVERED",
+      "valor": 1037.69
     }
   ],
   "_planilhaSnapshot": {
@@ -2351,6 +2404,482 @@
         "postagem": 25.36,
         "remetente": "PORE3",
         "valorDeclarado": 372.0
+      },
+      "268016_6764": {
+        "codigoVolume": "268016_6764",
+        "orderNumber": "6764",
+        "domainId": "268016",
+        "cliente": "GIOVANNA YARZON",
+        "clienteDoc": "55335196000167",
+        "cidade": "CAMPO GRANDE",
+        "uf": "MS",
+        "status": "BIPE DE SAÍDA PARA ENTREGA",
+        "data": "2026-05-13",
+        "postagem": 25.74,
+        "remetente": "CHOCOLATE DOCE",
+        "valorDeclarado": 930.0
+      },
+      "268016_6765": {
+        "codigoVolume": "268016_6765",
+        "orderNumber": "6765",
+        "domainId": "268016",
+        "cliente": "CAROLINE OLIVEIRA",
+        "clienteDoc": "10869539671",
+        "cidade": "CONTAGEM",
+        "uf": "MG",
+        "status": "ASSINATURA DE ENCOMENDA",
+        "data": "2026-05-13",
+        "postagem": 17.45,
+        "remetente": "CHOCOLATE DOCE",
+        "valorDeclarado": 410.0
+      },
+      "1355848_4224": {
+        "codigoVolume": "1355848_4224",
+        "orderNumber": "4224",
+        "domainId": "1355848",
+        "cliente": "SIMONE FRANCISCA DA SILVA",
+        "clienteDoc": "02126377113",
+        "cidade": "VE1RZEA GRANDE",
+        "uf": "MT",
+        "status": "ENTREGUE",
+        "data": "2026-05-13",
+        "postagem": 65.05,
+        "remetente": "ARARY",
+        "valorDeclarado": 1425.0
+      },
+      "1956465_262": {
+        "codigoVolume": "1956465_262",
+        "orderNumber": "262",
+        "domainId": "1956465",
+        "cliente": "PAULA MEDEIRA",
+        "clienteDoc": "03681144060",
+        "cidade": "ROLANTE",
+        "uf": "RS",
+        "status": "BIPE DE SAÍDA PARA ENTREGA",
+        "data": "2026-05-13",
+        "postagem": 22.04,
+        "remetente": "PORE3",
+        "valorDeclarado": 228.0
+      },
+      "1737229_912": {
+        "codigoVolume": "1737229_912",
+        "orderNumber": "912",
+        "domainId": "1737229",
+        "cliente": "EDINA MONTEIRO",
+        "clienteDoc": "36995336000189",
+        "cidade": "UMUARAMA",
+        "uf": "PR",
+        "status": "TRANSFERENCIA",
+        "data": "2026-05-13",
+        "postagem": 62.14,
+        "remetente": "KAESSI",
+        "valorDeclarado": 670.0
+      },
+      "1956465_264": {
+        "codigoVolume": "1956465_264",
+        "orderNumber": "264",
+        "domainId": "1956465",
+        "cliente": "ANELISA VIEIRA DE MIRANDA",
+        "clienteDoc": "36146385883",
+        "cidade": "SE3O PAULO",
+        "uf": "SP",
+        "status": "ASSINATURA DE ENCOMENDA",
+        "data": "2026-05-13",
+        "postagem": 13.6,
+        "remetente": "PORE3",
+        "valorDeclarado": 212.0
+      },
+      "1355848_4225": {
+        "codigoVolume": "1355848_4225",
+        "orderNumber": "4225",
+        "domainId": "1355848",
+        "cliente": "SELMA VAL GUILHERME BIANCHI",
+        "clienteDoc": "10217544800",
+        "cidade": "CONCHAL",
+        "uf": "SP",
+        "status": "ASSINATURA DE ENCOMENDA",
+        "data": "2026-05-13",
+        "postagem": 18.86,
+        "remetente": "ARARY",
+        "valorDeclarado": 790.0
+      },
+      "1355848_4230": {
+        "codigoVolume": "1355848_4230",
+        "orderNumber": "4230",
+        "domainId": "1355848",
+        "cliente": "LARISSA VILHENA MACHADO",
+        "clienteDoc": "01178497232",
+        "cidade": "MACAPE1",
+        "uf": "AP",
+        "status": "OBJETO EM TRANSFERÊNCIA - POR FAVOR AGUARDE",
+        "data": "2026-05-13",
+        "postagem": 76.82,
+        "remetente": "ARARY",
+        "valorDeclarado": 1797.0
+      },
+      "1840960_5": {
+        "codigoVolume": "1840960_5",
+        "orderNumber": "5",
+        "domainId": "1840960",
+        "cliente": "LEILA SANTOS BRITO SENA",
+        "clienteDoc": "53419428000130",
+        "cidade": "PARAMIRIM",
+        "uf": "BA",
+        "status": "COLETA DE ENCOMENDA",
+        "data": "2026-05-13",
+        "postagem": 52.34,
+        "remetente": "JULY MODAS",
+        "valorDeclarado": 851.0
+      },
+      "1956465_267": {
+        "codigoVolume": "1956465_267",
+        "orderNumber": "267",
+        "domainId": "1956465",
+        "cliente": "TATIANE",
+        "clienteDoc": "20462458000170",
+        "cidade": "CARAGUATATUBA",
+        "uf": "SP",
+        "status": "BIPE DE EXPEDIÇÃO",
+        "data": "2026-05-13",
+        "postagem": 16.89,
+        "remetente": "PORE3",
+        "valorDeclarado": 386.0
+      },
+      "2018729_6": {
+        "codigoVolume": "2018729_6",
+        "orderNumber": "6",
+        "domainId": "2018729",
+        "cliente": "LUANA MUNIZ LIMA VIEIRA",
+        "clienteDoc": "62676814000106",
+        "cidade": "SE3O JOSE9 DO RIO PRETO",
+        "uf": "SP",
+        "status": "ENCAMINHADO PARA O OPERADOR LOGÍSTICO",
+        "data": "2026-05-13",
+        "postagem": 15.15,
+        "remetente": "LF ACESSORIOS EM GERAL",
+        "valorDeclarado": 304.0
+      },
+      "1570446_66": {
+        "codigoVolume": "1570446_66",
+        "orderNumber": "66",
+        "domainId": "1570446",
+        "cliente": "ANGELA MONTECELLO",
+        "clienteDoc": "01296855007",
+        "cidade": "AJURICABA",
+        "uf": "RS",
+        "status": "COLETA DE ENCOMENDA",
+        "data": "2026-05-13",
+        "postagem": 26.66,
+        "remetente": "SHALEN MODAS",
+        "valorDeclarado": 430.0
+      },
+      "1737229_914": {
+        "codigoVolume": "1737229_914",
+        "orderNumber": "914",
+        "domainId": "1737229",
+        "cliente": "JULIANA JACOB VAZ",
+        "clienteDoc": "26363228840",
+        "cidade": "LIMEIRA",
+        "uf": "SP",
+        "status": "COLETA DE ENCOMENDA",
+        "data": "2026-05-13",
+        "postagem": 15.23,
+        "remetente": "KAESSI",
+        "valorDeclarado": 386.0
+      },
+      "1956465_271": {
+        "codigoVolume": "1956465_271",
+        "orderNumber": "271",
+        "domainId": "1956465",
+        "cliente": "FRANCIELE ROSAN",
+        "clienteDoc": "03201869031",
+        "cidade": "SANTA MARIA",
+        "uf": "RS",
+        "status": "OBJETO CRIADO",
+        "data": "2026-05-14",
+        "postagem": 49.62,
+        "remetente": "PORE3",
+        "valorDeclarado": 341.0
+      },
+      "1355848_4236": {
+        "codigoVolume": "1355848_4236",
+        "orderNumber": "4236",
+        "domainId": "1355848",
+        "cliente": "MARILIA ARRUDA",
+        "clienteDoc": "06389742401",
+        "cidade": "RECIFE",
+        "uf": "PE",
+        "status": "OBJETO EM TRANSFERÊNCIA - POR FAVOR AGUARDE",
+        "data": "2026-05-14",
+        "postagem": 78.2,
+        "remetente": "ARARY",
+        "valorDeclarado": 2102.0
+      },
+      "1355848_4231": {
+        "codigoVolume": "1355848_4231",
+        "orderNumber": "4231",
+        "domainId": "1355848",
+        "cliente": "TALITA DE CARVALHO LEITE",
+        "clienteDoc": "07281967608",
+        "cidade": "ARUJE1",
+        "uf": "SP",
+        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+        "data": "2026-05-14",
+        "postagem": 24.66,
+        "remetente": "ARARY",
+        "valorDeclarado": 820.0
+      },
+      "1355848_4239": {
+        "codigoVolume": "1355848_4239",
+        "orderNumber": "4239",
+        "domainId": "1355848",
+        "cliente": "KEILA REZENDE",
+        "clienteDoc": "09735734737",
+        "cidade": "CORONEL FABRICIANO",
+        "uf": "MG",
+        "status": "ASSINATURA DE ENCOMENDA",
+        "data": "2026-05-14",
+        "postagem": 31.94,
+        "remetente": "ARARY",
+        "valorDeclarado": 955.0
+      },
+      "1355848_4232": {
+        "codigoVolume": "1355848_4232",
+        "orderNumber": "4232",
+        "domainId": "1355848",
+        "cliente": "PATRICIA ROBERTA SANDES",
+        "clienteDoc": "12482404000148",
+        "cidade": "MACEIF3",
+        "uf": "AL",
+        "status": "EM ANÁLISE NO POSTO FISCAL",
+        "data": "2026-05-14",
+        "postagem": 37.39,
+        "remetente": "ARARY",
+        "valorDeclarado": 675.0
+      },
+      "1355848_4240": {
+        "codigoVolume": "1355848_4240",
+        "orderNumber": "4240",
+        "domainId": "1355848",
+        "cliente": "EDILENE THOMAZ",
+        "clienteDoc": "16763913800",
+        "cidade": "MOCOCA",
+        "uf": "SP",
+        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+        "data": "2026-05-14",
+        "postagem": 25.93,
+        "remetente": "ARARY",
+        "valorDeclarado": 197.0
+      },
+      "1737229_915": {
+        "codigoVolume": "1737229_915",
+        "orderNumber": "915",
+        "domainId": "1737229",
+        "cliente": "JOSEFA ELIANE NASCIMENTO",
+        "clienteDoc": "13358028860",
+        "cidade": "RIO CLARO",
+        "uf": "SP",
+        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+        "data": "2026-05-14",
+        "postagem": 20.09,
+        "remetente": "KAESSI",
+        "valorDeclarado": 363.0
+      },
+      "2016411_7": {
+        "codigoVolume": "2016411_7",
+        "orderNumber": "7",
+        "domainId": "2016411",
+        "cliente": "SIMONE ALBUQUERQUE DOS SANTOS D AVILA",
+        "clienteDoc": "69557624191",
+        "cidade": "CAMPO GRANDE",
+        "uf": "MS",
+        "status": "ENCAMINHADO PARA O OPERADOR LOGÍSTICO",
+        "data": "2026-05-14",
+        "postagem": 28.25,
+        "remetente": "SKYLER ACESSORIOS",
+        "valorDeclarado": 263.0
+      },
+      "1570446_67": {
+        "codigoVolume": "1570446_67",
+        "orderNumber": "67",
+        "domainId": "1570446",
+        "cliente": "MARIA JOSE9 FERREIRA VICEANCIO SILVA FERREIRA",
+        "clienteDoc": "41213975000185",
+        "cidade": "SOROCABA",
+        "uf": "SP",
+        "status": "OBJETO CRIADO",
+        "data": "2026-05-14",
+        "postagem": 16.61,
+        "remetente": "SHALEN MODAS",
+        "valorDeclarado": 460.0
+      },
+      "2016411_8": {
+        "codigoVolume": "2016411_8",
+        "orderNumber": "8",
+        "domainId": "2016411",
+        "cliente": "ESTER",
+        "clienteDoc": "42973626000124",
+        "cidade": "AE7AILE2NDIA",
+        "uf": "MA",
+        "status": "BIPE DE EXPEDIÇÃO",
+        "data": "2026-05-14",
+        "postagem": 59.03,
+        "remetente": "SKYLER ACESSORIOS",
+        "valorDeclarado": 294.0
+      },
+      "2005999_11": {
+        "codigoVolume": "2005999_11",
+        "orderNumber": "11",
+        "domainId": "2005999",
+        "cliente": "JOYCE SANTOS",
+        "clienteDoc": "13297671602",
+        "cidade": "GOVERNADOR VALADARES",
+        "uf": "MG",
+        "status": "BIPE DE EXPEDIÇÃO",
+        "data": "2026-05-14",
+        "postagem": 19.19,
+        "remetente": "ISSA MODAS",
+        "valorDeclarado": 444.94
+      },
+      "1956465_278": {
+        "codigoVolume": "1956465_278",
+        "orderNumber": "278",
+        "domainId": "1956465",
+        "cliente": "MICHELE SANTANA ALVES FERNANDES",
+        "clienteDoc": "31454889888",
+        "cidade": "GUARULHOS",
+        "uf": "SP",
+        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+        "data": "2026-05-14",
+        "postagem": 13.71,
+        "remetente": "PORE3",
+        "valorDeclarado": 203.0
+      },
+      "268016_6766": {
+        "codigoVolume": "268016_6766",
+        "orderNumber": "6766",
+        "domainId": "268016",
+        "cliente": "MF4NICA BITENCOURT",
+        "clienteDoc": "05899803517",
+        "cidade": "SE3O PAULO",
+        "uf": "SP",
+        "status": "OBJETO CRIADO",
+        "data": "2026-05-14",
+        "postagem": 15.47,
+        "remetente": "CHOCOLATE DOCE",
+        "valorDeclarado": 550.0
+      },
+      "1355848_4234": {
+        "codigoVolume": "1355848_4234",
+        "orderNumber": "4234",
+        "domainId": "1355848",
+        "cliente": "NATHALIA LEONEL",
+        "clienteDoc": "13488595633",
+        "cidade": "SE3O PAULO",
+        "uf": "SP",
+        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+        "data": "2026-05-15",
+        "postagem": 26.49,
+        "remetente": "ARARY",
+        "valorDeclarado": 1003.0
+      },
+      "1956465_279": {
+        "codigoVolume": "1956465_279",
+        "orderNumber": "279",
+        "domainId": "1956465",
+        "cliente": "THAEDS FERRER NAGAHARA DE OLIVEIRA",
+        "clienteDoc": "29439038845",
+        "cidade": "CAMPINAS",
+        "uf": "SP",
+        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+        "data": "2026-05-15",
+        "postagem": 13.91,
+        "remetente": "PORE3",
+        "valorDeclarado": 223.0
+      },
+      "1355848_4235": {
+        "codigoVolume": "1355848_4235",
+        "orderNumber": "4235",
+        "domainId": "1355848",
+        "cliente": "FLE1VIA SOUZA",
+        "clienteDoc": "34573237000183",
+        "cidade": "SALVADOR",
+        "uf": "BA",
+        "status": "BIPE DE EXPEDIÇÃO",
+        "data": "2026-05-15",
+        "postagem": 27.69,
+        "remetente": "ARARY",
+        "valorDeclarado": 754.0
+      },
+      "1956465_281": {
+        "codigoVolume": "1956465_281",
+        "orderNumber": "281",
+        "domainId": "1956465",
+        "cliente": "MICHELE GUERRA",
+        "clienteDoc": "51405960000172",
+        "cidade": "JUNDIAED",
+        "uf": "SP",
+        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+        "data": "2026-05-15",
+        "postagem": 13.96,
+        "remetente": "PORE3",
+        "valorDeclarado": 228.0
+      },
+      "1737229_916": {
+        "codigoVolume": "1737229_916",
+        "orderNumber": "916",
+        "domainId": "1737229",
+        "cliente": "VESTIDARIASM ALUGUEL DE VESTUARIO LTDA",
+        "clienteDoc": "27908346000149",
+        "cidade": "SANTA MARIA",
+        "uf": "RS",
+        "status": "BIPE DE EXPEDIÇÃO",
+        "data": "2026-05-15",
+        "postagem": 42.45,
+        "remetente": "KAESSI",
+        "valorDeclarado": 569.0
+      },
+      "1805647_1370": {
+        "codigoVolume": "1805647_1370",
+        "orderNumber": "1370",
+        "domainId": "1805647",
+        "cliente": "LUYSA MARINHEIRO CALDERARO MACHADO",
+        "clienteDoc": "64562866000179",
+        "cidade": "JUIZ DE FORA",
+        "uf": "MG",
+        "status": "ENCAMINHADO PARA O OPERADOR LOGÍSTICO",
+        "data": "2026-05-15",
+        "postagem": 54.3,
+        "remetente": "CVL MODA - PLAZA POLO",
+        "valorDeclarado": 1817.2
+      },
+      "1737229_918": {
+        "codigoVolume": "1737229_918",
+        "orderNumber": "918",
+        "domainId": "1737229",
+        "cliente": "CARMENCITA SANTOS",
+        "clienteDoc": "60078605000127",
+        "cidade": "SANTA CRUZ DO SUL",
+        "uf": "RS",
+        "status": "ENCAMINHADO PARA O OPERADOR LOGÍSTICO",
+        "data": "2026-05-15",
+        "postagem": 31.94,
+        "remetente": "KAESSI",
+        "valorDeclarado": 360.0
+      },
+      "1737229_919": {
+        "codigoVolume": "1737229_919",
+        "orderNumber": "919",
+        "domainId": "1737229",
+        "cliente": "MARCIA BERTOCCO",
+        "clienteDoc": "03029730875",
+        "cidade": "PRAIA GRANDE",
+        "uf": "SP",
+        "status": "ENTREGUE",
+        "data": "2026-05-15",
+        "postagem": 29.13,
+        "remetente": "KAESSI",
+        "valorDeclarado": 435.0
       }
     },
     "paVesti": [
