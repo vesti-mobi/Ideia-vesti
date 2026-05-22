@@ -203,8 +203,11 @@ def aggregate_planilha(rows: list[dict], de: str, ate: str) -> tuple[dict, list]
                 "remetente": r.get("Remetente") or "",
                 "valorDeclarado": parse_val_br(r.get("ValorDeclarado")),
             }
-        if v is not None:
-            by[cv]["postagem"] += v
+        # 1 postagem por pedido (CodigoVolume): o Diogo as vezes lista o mesmo
+        # pedido em varias linhas (re-postagens com objetos diferentes, mas mesmo
+        # custo). NAO somamos - pegamos o custo unico (max) pra nao inflar o valor.
+        if v is not None and v > by[cv]["postagem"]:
+            by[cv]["postagem"] = v
     return by, pa
 
 
@@ -254,6 +257,12 @@ def fetch_vesti_keys(order_numbers: set[int]) -> set[str]:
         print(f"      [fabric] AVISO: nao deu p/ validar contra a base completa ({e}). "
               f"Seguindo sem essa validacao (pode haver falso 'so na planilha').")
         return set()
+
+
+def _is_zero_value(cliente) -> bool:
+    """Destinatarios de teste cujo frete nao deve ser cobrado (valor zerado no
+    painel, mas mantido visivel)."""
+    return norm_txt(cliente) == "USUARIO TESTE VESTI"
 
 
 def _is_no_postavel(p: dict) -> bool:
@@ -315,6 +324,12 @@ def patch_onlog_data(onlog_data: dict, planilha: dict, de: str, ate: str) -> tup
             p["valorAnaFinal"] = round(max(bia_f, post * 1.10), 2)
         else:
             p["valorAnaFinal"] = round(post * 1.10, 2)
+        # Regra geral: pedidos cancelados no Vesti ou enviados ao "Usuario Teste
+        # Vesti" aparecem no painel mas com valor ZERADO (Vesti nao cobra).
+        if p.get("cancelado") or _is_zero_value(p.get("cliente") or pl.get("cliente")):
+            p["valorPostagem"] = 0.0
+            p["valorAnaFinal"] = 0.0
+            p["margemOnlog"] = 0.0
         n_upd += 1
     return n_upd, n_skip
 
