@@ -7,26 +7,26 @@
     "de": "2026-04-16",
     "ate": "2026-04-30"
   },
-  "geradoEm": "2026-05-22T15:08:05.249677",
+  "geradoEm": "2026-05-22T16:18:55.599816",
   "planilhaArquivo": "VESTI ABRIL (4).xlsx",
   "resumo": {
-    "ok": 296,
-    "divergencias": 1,
-    "divergenciasPedidos": 1,
+    "ok": 286,
+    "divergencias": 0,
+    "divergenciasPedidos": 0,
     "soPlanilha": 0,
     "soFabric": 0,
-    "nPlanilha": 297,
-    "nFabric": 297,
-    "totalPedidosPostagem": 14463.45,
-    "totalPaVesti": 733.7,
-    "totalGeralPostagem": 15197.15,
-    "totalCobrarPedidos": 15909.8,
-    "totalCobrarPa": 807.07,
-    "totalCobrarMarcas": 16716.87,
-    "custoDiogo": 15197.15,
+    "nPlanilha": 286,
+    "nFabric": 286,
+    "totalPedidosPostagem": 13818.24,
+    "totalPaVesti": 795.63,
+    "totalGeralPostagem": 14613.87,
+    "totalCobrarPedidos": 15200.06,
+    "totalCobrarPa": 875.19,
+    "totalCobrarMarcas": 16075.26,
+    "custoDiogo": 14613.87,
     "diogoDetectado": false,
-    "margemVesti": 1519.72,
-    "nPaVesti": 16
+    "margemVesti": 1461.39,
+    "nPaVesti": 17
   },
   "paVesti": [
     {
@@ -170,6 +170,20 @@
       "postagem": 50.17
     },
     {
+      "data": "2026-04-23",
+      "operador": "ONLOG RED",
+      "modalidade": "ECONOPACK",
+      "codigoInterno": "AA0097226202",
+      "numeroNF": "004672906",
+      "remetente": "VESTI",
+      "cliente": "GLAUCIA MARIA COSTA ATTENE",
+      "clienteDoc": "90991702115",
+      "cidade": "BODOQUENA",
+      "uf": "MS",
+      "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+      "postagem": 61.93
+    },
+    {
       "data": "2026-04-24",
       "operador": "JADLOG",
       "modalidade": "PACKAGE",
@@ -258,37 +272,37 @@
     {
       "domainId": "14035",
       "marca": "Anne Blánc",
-      "nPedidos": 143,
-      "postagem": 6571.5,
-      "cobrar": 7228.65
+      "nPedidos": 140,
+      "postagem": 6459.16,
+      "cobrar": 7105.08
     },
     {
       "domainId": "1355848",
       "marca": "Arary",
-      "nPedidos": 57,
-      "postagem": 2723.36,
-      "cobrar": 2995.7
+      "nPedidos": 53,
+      "postagem": 2404.27,
+      "cobrar": 2644.7
     },
     {
       "domainId": "1942933",
       "marca": "Mi&co",
-      "nPedidos": 29,
-      "postagem": 1311.3,
-      "cobrar": 1442.43
+      "nPedidos": 28,
+      "postagem": 1281.68,
+      "cobrar": 1409.85
     },
     {
       "domainId": "1514922",
       "marca": " Era Uma Vez",
-      "nPedidos": 15,
-      "postagem": 1163.17,
-      "cobrar": 1279.49
+      "nPedidos": 14,
+      "postagem": 1101.24,
+      "cobrar": 1211.36
     },
     {
       "domainId": "268016",
       "marca": "Chocolate Doce",
-      "nPedidos": 16,
-      "postagem": 770.03,
-      "cobrar": 847.03
+      "nPedidos": 15,
+      "postagem": 712.54,
+      "cobrar": 783.79
     },
     {
       "domainId": "1737229",
@@ -307,9 +321,9 @@
     {
       "domainId": "1703736",
       "marca": "FIRE",
-      "nPedidos": 4,
-      "postagem": 232.62,
-      "cobrar": 255.88
+      "nPedidos": 3,
+      "postagem": 167.88,
+      "cobrar": 184.67
     },
     {
       "domainId": "15",
@@ -369,15 +383,7 @@
     "semEtiqueta": 0,
     "freteDivergente": 0
   },
-  "divergencias": [
-    {
-      "orderNumber": 5951,
-      "marca": "Anne Blánc",
-      "campo": "Cancelado",
-      "planilha": "(postado)",
-      "fabric": "CANCELADO no Vesti"
-    }
-  ],
+  "divergencias": [],
   "soPlanilha": [],
   "soFabric": [],
   "_planilhaSnapshot": {
@@ -550,20 +556,6 @@
         "remetente": "ANNE BLE1NC",
         "valorDeclarado": 226.0
       },
-      "1514922_995": {
-        "codigoVolume": "1514922_995",
-        "orderNumber": "995",
-        "domainId": "1514922",
-        "cliente": "GLAUCIA MARIA COSTA ATTENE",
-        "clienteDoc": "90991702115",
-        "cidade": "BODOQUENA",
-        "uf": "MS",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-16",
-        "postagem": 61.93,
-        "remetente": "ERA UMA VEZ",
-        "valorDeclarado": 700.75
-      },
       "1942933_274": {
         "codigoVolume": "1942933_274",
         "orderNumber": "274",
@@ -633,20 +625,6 @@
         "postagem": 66.84,
         "remetente": "MI&CO",
         "valorDeclarado": 576.0
-      },
-      "14035_5941": {
-        "codigoVolume": "14035_5941",
-        "orderNumber": "5941",
-        "domainId": "14035",
-        "cliente": "LUCIENE MF4NICA SOUZA DE OLIVEIRA",
-        "clienteDoc": "74235800906",
-        "cidade": "BRASEDLIA",
-        "uf": "DF",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-16",
-        "postagem": 33.68,
-        "remetente": "ANNE BLE1NC",
-        "valorDeclarado": 517.0
       },
       "14035_5942": {
         "codigoVolume": "14035_5942",
@@ -732,20 +710,6 @@
         "remetente": "KAESSI",
         "valorDeclarado": 715.0
       },
-      "14035_5951": {
-        "codigoVolume": "14035_5951",
-        "orderNumber": "5951",
-        "domainId": "14035",
-        "cliente": "PAULA DANIELA HERMANN CORRES",
-        "clienteDoc": "27035666893",
-        "cidade": "SALTO",
-        "uf": "SP",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-17",
-        "postagem": 40.57,
-        "remetente": "ANNE BLE1NC",
-        "valorDeclarado": 1676.0
-      },
       "1737229_857": {
         "codigoVolume": "1737229_857",
         "orderNumber": "857",
@@ -759,6 +723,20 @@
         "postagem": 57.73,
         "remetente": "KAESSI",
         "valorDeclarado": 1455.0
+      },
+      "14035_5941": {
+        "codigoVolume": "14035_5941",
+        "orderNumber": "5941",
+        "domainId": "14035",
+        "cliente": "LUCIENE MF4NICA SOUZA DE OLIVEIRA",
+        "clienteDoc": "74235800906",
+        "cidade": "BRASEDLIA",
+        "uf": "DF",
+        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+        "data": "2026-04-17",
+        "postagem": 33.68,
+        "remetente": "ANNE BLE1NC",
+        "valorDeclarado": 517.0
       },
       "157680_7950": {
         "codigoVolume": "157680_7950",
@@ -829,20 +807,6 @@
         "postagem": 89.42,
         "remetente": "MI&CO",
         "valorDeclarado": 1055.0
-      },
-      "1355848_4040": {
-        "codigoVolume": "1355848_4040",
-        "orderNumber": "4040",
-        "domainId": "1355848",
-        "cliente": "TATIANE DOS SANTOS SILVA",
-        "clienteDoc": "00607454520",
-        "cidade": "ALCOBAE7A",
-        "uf": "BA",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-17",
-        "postagem": 48.56,
-        "remetente": "ARARY",
-        "valorDeclarado": 720.0
       },
       "1942933_285": {
         "codigoVolume": "1942933_285",
@@ -1053,20 +1017,6 @@
         "postagem": 19.87,
         "remetente": "MI&CO",
         "valorDeclarado": 173.0
-      },
-      "268016_6700": {
-        "codigoVolume": "268016_6700",
-        "orderNumber": "6700",
-        "domainId": "268016",
-        "cliente": "LORENA ALVES",
-        "clienteDoc": "60876785000192",
-        "cidade": "RIO DE JANEIRO",
-        "uf": "RJ",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-17",
-        "postagem": 57.49,
-        "remetente": "CHOCOLATE DOCE",
-        "valorDeclarado": 1374.0
       },
       "1942933_287": {
         "codigoVolume": "1942933_287",
@@ -1460,20 +1410,6 @@
         "remetente": "ANNE BLE1NC",
         "valorDeclarado": 908.0
       },
-      "1355848_4052": {
-        "codigoVolume": "1355848_4052",
-        "orderNumber": "4052",
-        "domainId": "1355848",
-        "cliente": "CARMELLA MODAS",
-        "clienteDoc": "07902069000150",
-        "cidade": "CAMPINAS",
-        "uf": "SP",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-20",
-        "postagem": 47.36,
-        "remetente": "ARARY",
-        "valorDeclarado": 2431.0
-      },
       "14035_5993": {
         "codigoVolume": "14035_5993",
         "orderNumber": "5993",
@@ -1544,20 +1480,6 @@
         "remetente": "ARARY",
         "valorDeclarado": 1500.0
       },
-      "1355848_4056": {
-        "codigoVolume": "1355848_4056",
-        "orderNumber": "4056",
-        "domainId": "1355848",
-        "cliente": "AYONARA C C SANTOS FERREIRA FERREIRA",
-        "clienteDoc": "00746034423",
-        "cidade": "RECIFE",
-        "uf": "PE",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-20",
-        "postagem": 118.85,
-        "remetente": "ARARY",
-        "valorDeclarado": 1329.0
-      },
       "1355848_4047": {
         "codigoVolume": "1355848_4047",
         "orderNumber": "4047",
@@ -1613,20 +1535,6 @@
         "postagem": 44.59,
         "remetente": "ANNE BLE1NC",
         "valorDeclarado": 574.0
-      },
-      "14035_6001": {
-        "codigoVolume": "14035_6001",
-        "orderNumber": "6001",
-        "domainId": "14035",
-        "cliente": "ALAIANY RODRIGUES",
-        "clienteDoc": "06168649140",
-        "cidade": "SINOP",
-        "uf": "MT",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-20",
-        "postagem": 38.2,
-        "remetente": "ANNE BLE1NC",
-        "valorDeclarado": 268.0
       },
       "1942933_297": {
         "codigoVolume": "1942933_297",
@@ -2398,34 +2306,6 @@
         "remetente": "ARARY",
         "valorDeclarado": 1098.0
       },
-      "14035_6052": {
-        "codigoVolume": "14035_6052",
-        "orderNumber": "6052",
-        "domainId": "14035",
-        "cliente": "CARLA PAES GOMES DE MATOS",
-        "clienteDoc": "22382469838",
-        "cidade": "JACAREED",
-        "uf": "SP",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-23",
-        "postagem": 20.48,
-        "remetente": "ANNE BLE1NC",
-        "valorDeclarado": 402.0
-      },
-      "1737229_869": {
-        "codigoVolume": "1737229_869",
-        "orderNumber": "869",
-        "domainId": "1737229",
-        "cliente": "MOURA",
-        "clienteDoc": "29331752822",
-        "cidade": "CAMPINAS",
-        "uf": "SP",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-23",
-        "postagem": 21.71,
-        "remetente": "KAESSI",
-        "valorDeclarado": 525.0
-      },
       "1355848_4079": {
         "codigoVolume": "1355848_4079",
         "orderNumber": "4079",
@@ -2439,34 +2319,6 @@
         "postagem": 92.83,
         "remetente": "ARARY",
         "valorDeclarado": 1500.0
-      },
-      "1942933_314": {
-        "codigoVolume": "1942933_314",
-        "orderNumber": "314",
-        "domainId": "1942933",
-        "cliente": "LESSANDRA",
-        "clienteDoc": "22856990851",
-        "cidade": "FRANCA",
-        "uf": "SP",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-23",
-        "postagem": 35.73,
-        "remetente": "MI&CO",
-        "valorDeclarado": 413.0
-      },
-      "14035_6058": {
-        "codigoVolume": "14035_6058",
-        "orderNumber": "6058",
-        "domainId": "14035",
-        "cliente": "ROSIMAR VIEIRA DOS SANTOS",
-        "clienteDoc": "47918096000135",
-        "cidade": "ITAMBE9 DO MATO DENTRO",
-        "uf": "MG",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-23",
-        "postagem": 92.85,
-        "remetente": "ANNE BLE1NC",
-        "valorDeclarado": 1497.98
       },
       "1737229_870": {
         "codigoVolume": "1737229_870",
@@ -2552,6 +2404,20 @@
         "remetente": "ALINE CONFECE7F5ES",
         "valorDeclarado": 470.0
       },
+      "1737229_869": {
+        "codigoVolume": "1737229_869",
+        "orderNumber": "869",
+        "domainId": "1737229",
+        "cliente": "MOURA",
+        "clienteDoc": "29331752822",
+        "cidade": "CAMPINAS",
+        "uf": "SP",
+        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+        "data": "2026-04-24",
+        "postagem": 21.71,
+        "remetente": "KAESSI",
+        "valorDeclarado": 525.0
+      },
       "1355848_4084": {
         "codigoVolume": "1355848_4084",
         "orderNumber": "4084",
@@ -2593,6 +2459,20 @@
         "postagem": 28.06,
         "remetente": "ANNE BLE1NC",
         "valorDeclarado": 515.0
+      },
+      "14035_6058": {
+        "codigoVolume": "14035_6058",
+        "orderNumber": "6058",
+        "domainId": "14035",
+        "cliente": "ROSIMAR VIEIRA DOS SANTOS",
+        "clienteDoc": "47918096000135",
+        "cidade": "ITAMBE9 DO MATO DENTRO",
+        "uf": "MG",
+        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+        "data": "2026-04-24",
+        "postagem": 92.85,
+        "remetente": "ANNE BLE1NC",
+        "valorDeclarado": 1497.98
       },
       "14035_6057": {
         "codigoVolume": "14035_6057",
@@ -2720,6 +2600,20 @@
         "remetente": "ANNE BLE1NC",
         "valorDeclarado": 384.99
       },
+      "14035_6052": {
+        "codigoVolume": "14035_6052",
+        "orderNumber": "6052",
+        "domainId": "14035",
+        "cliente": "CARLA PAES GOMES DE MATOS",
+        "clienteDoc": "22382469838",
+        "cidade": "JACAREED",
+        "uf": "SP",
+        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+        "data": "2026-04-24",
+        "postagem": 20.48,
+        "remetente": "ANNE BLE1NC",
+        "valorDeclarado": 402.0
+      },
       "14035_6053": {
         "codigoVolume": "14035_6053",
         "orderNumber": "6053",
@@ -2761,20 +2655,6 @@
         "postagem": 24.79,
         "remetente": "ARARY",
         "valorDeclarado": 833.0
-      },
-      "1355848_4092": {
-        "codigoVolume": "1355848_4092",
-        "orderNumber": "4092",
-        "domainId": "1355848",
-        "cliente": "MARIA APARECIDA SANTANA LIMA",
-        "clienteDoc": "22982386000117",
-        "cidade": "ILHEUS",
-        "uf": "BA",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-24",
-        "postagem": 104.32,
-        "remetente": "ARARY",
-        "valorDeclarado": 1934.0
       },
       "1355848_4080": {
         "codigoVolume": "1355848_4080",
@@ -3308,20 +3188,6 @@
         "remetente": "ANNE BLE1NC",
         "valorDeclarado": 1002.0
       },
-      "1942933_332": {
-        "codigoVolume": "1942933_332",
-        "orderNumber": "332",
-        "domainId": "1942933",
-        "cliente": "MORGHANA MIRANDA",
-        "clienteDoc": "63914647000149",
-        "cidade": "CAMPINAS",
-        "uf": "SP",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-27",
-        "postagem": 29.62,
-        "remetente": "MI&CO",
-        "valorDeclarado": 657.0
-      },
       "1355848_4103": {
         "codigoVolume": "1355848_4103",
         "orderNumber": "4103",
@@ -3503,6 +3369,20 @@
         "postagem": 95.62,
         "remetente": "ANNE BLE1NC",
         "valorDeclarado": 1064.0
+      },
+      "1942933_314": {
+        "codigoVolume": "1942933_314",
+        "orderNumber": "314",
+        "domainId": "1942933",
+        "cliente": "LESSANDRA",
+        "clienteDoc": "22856990851",
+        "cidade": "FRANCA",
+        "uf": "SP",
+        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+        "data": "2026-04-27",
+        "postagem": 35.73,
+        "remetente": "MI&CO",
+        "valorDeclarado": 413.0
       },
       "14035_6134": {
         "codigoVolume": "14035_6134",
@@ -4092,20 +3972,6 @@
         "remetente": "ANNE BLE1NC",
         "valorDeclarado": 324.8
       },
-      "14035_6189": {
-        "codigoVolume": "14035_6189",
-        "orderNumber": "6189",
-        "domainId": "14035",
-        "cliente": "SIMONE ALBUQUERQUE DOS SANTOS D AVILA",
-        "clienteDoc": "69557624191",
-        "cidade": "CAMPO GRANDE",
-        "uf": "MS",
-        "status": "ETIQUETA EXPIRADA",
-        "data": "2026-04-29",
-        "postagem": 33.57,
-        "remetente": "ANNE BLE1NC",
-        "valorDeclarado": 310.0
-      },
       "14035_6193": {
         "codigoVolume": "14035_6193",
         "orderNumber": "6193",
@@ -4315,20 +4181,6 @@
         "postagem": 40.46,
         "remetente": "ARARY",
         "valorDeclarado": 1611.0
-      },
-      "1703736_703": {
-        "codigoVolume": "1703736_703",
-        "orderNumber": "703",
-        "domainId": "1703736",
-        "cliente": "JARDEL KOPIOLESKI DA SILVA",
-        "clienteDoc": "05481688069",
-        "cidade": "FREDERICO WESTPHALEN",
-        "uf": "RS",
-        "status": "ETIQUETA EMITIDA",
-        "data": "2026-04-30",
-        "postagem": 64.74,
-        "remetente": "FIRE",
-        "valorDeclarado": 479.6
       },
       "14035_6191": {
         "codigoVolume": "14035_6191",
@@ -4681,6 +4533,20 @@
         "uf": "RS",
         "status": "ENTREGUE",
         "postagem": 50.17
+      },
+      {
+        "data": "2026-04-23",
+        "operador": "ONLOG RED",
+        "modalidade": "ECONOPACK",
+        "codigoInterno": "AA0097226202",
+        "numeroNF": "004672906",
+        "remetente": "VESTI",
+        "cliente": "GLAUCIA MARIA COSTA ATTENE",
+        "clienteDoc": "90991702115",
+        "cidade": "BODOQUENA",
+        "uf": "MS",
+        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
+        "postagem": 61.93
       },
       {
         "data": "2026-04-24",
