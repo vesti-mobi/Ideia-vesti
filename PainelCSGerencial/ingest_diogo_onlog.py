@@ -153,6 +153,9 @@ def aggregate_planilha(rows: list[dict], de: str, ate: str) -> tuple[dict, list]
     by = {}
     pa = []
     for r in rows:
+        # "Usuario Teste Vesti": postagens de teste - nao entram no painel.
+        if _is_zero_value(r.get("Destinatario")):
+            continue
         cv = str(r.get("CodigoVolume") or "").strip()
         d = r.get("Data")
         d_str = ""
@@ -324,9 +327,9 @@ def patch_onlog_data(onlog_data: dict, planilha: dict, de: str, ate: str) -> tup
             p["valorAnaFinal"] = round(max(bia_f, post * 1.10), 2)
         else:
             p["valorAnaFinal"] = round(post * 1.10, 2)
-        # Regra geral: pedidos cancelados no Vesti ou enviados ao "Usuario Teste
-        # Vesti" aparecem no painel mas com valor ZERADO (Vesti nao cobra).
-        if p.get("cancelado") or _is_zero_value(p.get("cliente") or pl.get("cliente")):
+        # Regra geral: pedidos cancelados no Vesti aparecem no painel mas com
+        # valor ZERADO (Vesti nao cobra frete de pedido cancelado).
+        if p.get("cancelado"):
             p["valorPostagem"] = 0.0
             p["valorAnaFinal"] = 0.0
             p["margemOnlog"] = 0.0
