@@ -63,17 +63,39 @@ def parse_val_br(v):
         return None
 
 
-def read_planilha(xlsx_path: Path) -> list[dict]:
+def _norm_sheet(s) -> str:
+    n = "".join(c for c in unicodedata.normalize("NFD", str(s)) if unicodedata.category(c) != "Mn")
+    return n.upper().strip()
+
+
+def read_planilha(xlsx_path: Path) -> tuple[list[dict], set]:
+    """Le a planilha. Se houver aba "POSTADOS", usa ela (planilhas Vesti); senao
+    a primeira aba (planilhas do Diogo). Coleta os Objetos (etiquetas) da aba
+    "NAO POSTADOS" para depois ignorar essas linhas - sao postagens que nao
+    chegaram a ser feitas (etiqueta expirada/emitida)."""
     wb = openpyxl.load_workbook(xlsx_path, data_only=True)
-    ws = wb[wb.sheetnames[0]]
-    rows_raw = list(ws.iter_rows(values_only=True))
+    names = wb.sheetnames
+    post_name = next((n for n in names if _norm_sheet(n) == "POSTADOS"), names[0])
+    excl_obj: set = set()
+    for n in names:
+        if "NAO POSTAD" in _norm_sheet(n):
+            rr = list(wb[n].iter_rows(values_only=True))
+            if not rr:
+                continue
+            hh = [str(h).strip() if h else "" for h in rr[0]]
+            if "Objeto" in hh:
+                oi = hh.index("Objeto")
+                for r in rr[1:]:
+                    if oi < len(r) and r[oi]:
+                        excl_obj.add(str(r[oi]).strip())
+    rows_raw = list(wb[post_name].iter_rows(values_only=True))
     if not rows_raw:
-        return []
+        return [], excl_obj
     header = [str(h).strip() if h else "" for h in rows_raw[0]]
     out = []
     for r in rows_raw[1:]:
         out.append({header[i]: r[i] for i in range(len(header))})
-    return out
+    return out, excl_obj
 
 
 def detect_quinzenas(rows: list[dict]) -> list[tuple[str, str]]:
@@ -144,17 +166,22 @@ def detect_diogo_total(rows: list[dict]) -> float | None:
     return None
 
 
-def aggregate_planilha(rows: list[dict], de: str, ate: str) -> tuple[dict, list]:
+def aggregate_planilha(rows: list[dict], de: str, ate: str, excl_obj: set | None = None) -> tuple[dict, list]:
     """Retorna (pedidos_por_codigovolume, pa_vesti_avulsas).
 
     PA VESTI = linhas sem CodigoVolume (sem NumeroPedido) - postagens manuais
     geradas pela equipe Vesti direto no painel Onlog/Jadlog.
     """
+    excl_obj = excl_obj or set()
     by = {}
     pa = []
     for r in rows:
         # "Usuario Teste Vesti": postagens de teste - nao entram no painel.
         if _is_zero_value(r.get("Destinatario")):
+            continue
+        # Etiqueta que consta na aba "NAO POSTADOS": nao foi postada de fato.
+        obj = str(r.get("Objeto") or "").strip()
+        if obj and obj in excl_obj:
             continue
         cv = str(r.get("CodigoVolume") or "").strip()
         d = r.get("Data")
@@ -393,7 +420,7 @@ def compare(planilha: dict, fabric: dict, vesti_exists: set[str] | None = None) 
     return ok, dif, only_p, only_f
 
 
-def process_quinzena(raw: list[dict], de: str, ate: str, onlog_data: dict, xlsx_path: Path, diogo_total: float | None) -> dict:
+def process_quinzena(raw: list[dict], de: str, ate: str, onlog_data: dict, xlsx_path: Path, diogo_total: float | None, excl_obj: set | None = None) -> dict:
     """Processa UMA quinzena: aggregate -> merge com snapshot -> patch onlog_data ->
     compare -> escreve onlog_diff_<de>_<ate>.json. Retorna o dict de saida.
 
@@ -401,7 +428,7 @@ def process_quinzena(raw: list[dict], de: str, ate: str, onlog_data: dict, xlsx_
     """
     print(f"\n=== Quinzena {de} a {ate} ===")
     print(f"[2/4] Agregando planilha (CodigoVolume)")
-    planilha, pa_vesti = aggregate_planilha(raw, de, ate)
+    planilha, pa_vesti = aggregate_planilha(raw, de, ate, excl_obj)
     print(f"      {len(planilha)} pedidos novos com CodigoVolume; {len(pa_vesti)} PA VESTI novos")
 
     # Merge com snapshot anterior (se existir) - permite subir planilhas parciais (ex: 1 dia)
@@ -678,8 +705,9 @@ def main() -> None:
         sys.exit(1)
 
     print(f"[1/4] Lendo planilha: {xlsx_path.name}")
-    raw = read_planilha(xlsx_path)
-    print(f"      {len(raw)} linhas brutas")
+    raw, excl_obj = read_planilha(xlsx_path)
+    print(f"      {len(raw)} linhas brutas (aba postados)"
+          + (f"; {len(excl_obj)} etiquetas em NAO POSTADOS serao ignoradas" if excl_obj else ""))
     diogo_total = detect_diogo_total(raw)
     if diogo_total is not None:
         print(f"      [linha totalizadora detectada] Diogo cobra: R$ {diogo_total:,.2f}")
@@ -696,7 +724,7 @@ def main() -> None:
     onlog_data = json.loads(ONLOG_JSON.read_text(encoding="utf-8"))
     last_out = None
     for de, ate in ranges:
-        last_out = process_quinzena(raw, de, ate, onlog_data, xlsx_path, diogo_total)
+        last_out = process_quinzena(raw, de, ate, onlog_data, xlsx_path, diogo_total, excl_obj)
     # Escreve onlog_data uma vez no final (com patches acumulados de todas as quinzenas)
     ONLOG_JSON.write_text(json.dumps(onlog_data, ensure_ascii=False), encoding="utf-8")
     # Mantem onlog_diff.json como compat (ultima quinzena processada)
