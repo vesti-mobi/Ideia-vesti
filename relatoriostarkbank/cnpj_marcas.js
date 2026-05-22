@@ -1,8 +1,18 @@
 // CNPJ das marcas (fonte: PainelCSGerencial/companies_data.json).
 // Gerado automaticamente — para atualizar, rode o gerador no relatoriostarkbank.
 // Match feito pelo nomeFantasia (lowercase, trim, sem acento).
+// Complemento manual (aba "contas" do CC Starkbank - Walid) para marcas de
+// antecipacao que nao constam no companies_data.json.
 window.CNPJ_MARCAS = (function(){
     var raw = {
+        "be free": "09.121.974/0001-06",
+        "charisma filial": "11.759.407/0001-13",
+        "enfasy jeans": "22.534.629/0001-54",
+        "gissary": "52.337.840/0001-48",
+        "rcr clothing original": "22.924.965/0001-03",
+        "sedanbi filial": "49.591.774/0001-23",
+        "the lion confeccoes": "41.426.603/0001-37",
+        "zero um confeccoes": "47.516.113/0001-08",
         "2 wave": "60.447.090/0001-95",
         "3r lopes": "127.232.574-10",
         "a f aires de oliveira ltda": "30.425.190/0001-50",
