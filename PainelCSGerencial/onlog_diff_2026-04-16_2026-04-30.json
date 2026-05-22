@@ -18,15 +18,15 @@
     "nPlanilha": 297,
     "nFabric": 297,
     "totalPedidosPostagem": 14463.45,
-    "totalPaVesti": 795.63,
-    "totalGeralPostagem": 15259.08,
+    "totalPaVesti": 733.7,
+    "totalGeralPostagem": 15197.15,
     "totalCobrarPedidos": 15909.8,
-    "totalCobrarPa": 875.19,
-    "totalCobrarMarcas": 16784.99,
-    "custoDiogo": 15259.08,
+    "totalCobrarPa": 807.07,
+    "totalCobrarMarcas": 16716.87,
+    "custoDiogo": 15197.15,
     "diogoDetectado": false,
-    "margemVesti": 1525.91,
-    "nPaVesti": 17
+    "margemVesti": 1519.72,
+    "nPaVesti": 16
   },
   "paVesti": [
     {
@@ -168,20 +168,6 @@
       "uf": "RS",
       "status": "ENTREGUE",
       "postagem": 50.17
-    },
-    {
-      "data": "2026-04-23",
-      "operador": "ONLOG RED",
-      "modalidade": "ECONOPACK",
-      "codigoInterno": "AA0097226202",
-      "numeroNF": "004672906",
-      "remetente": "VESTI",
-      "cliente": "GLAUCIA MARIA COSTA ATTENE",
-      "clienteDoc": "90991702115",
-      "cidade": "BODOQUENA",
-      "uf": "MS",
-      "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
-      "postagem": 61.93
     },
     {
       "data": "2026-04-24",
@@ -4695,20 +4681,6 @@
         "uf": "RS",
         "status": "ENTREGUE",
         "postagem": 50.17
-      },
-      {
-        "data": "2026-04-23",
-        "operador": "ONLOG RED",
-        "modalidade": "ECONOPACK",
-        "codigoInterno": "AA0097226202",
-        "numeroNF": "004672906",
-        "remetente": "VESTI",
-        "cliente": "GLAUCIA MARIA COSTA ATTENE",
-        "clienteDoc": "90991702115",
-        "cidade": "BODOQUENA",
-        "uf": "MS",
-        "status": "OBJETO ENTREGUE AO DESTINATÁRIO",
-        "postagem": 61.93
       },
       {
         "data": "2026-04-24",
