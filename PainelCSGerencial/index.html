@@ -1665,7 +1665,11 @@ function updateOnlog(){
         return;
     }
     var rows=_onlogFilterRows(od);
-    rows.sort(function(a,b){return (b.data||'').localeCompare(a.data||'')||(b.orderNumber||0)-(a.orderNumber||0)});
+    rows.sort(function(a,b){
+        return (a.cliente||'').localeCompare(b.cliente||'','pt',{sensitivity:'base'})
+            || (b.data||'').localeCompare(a.data||'')
+            || (b.orderNumber||0)-(a.orderNumber||0);
+    });
     var nCom=0,nSem=0,val=0;
     rows.forEach(function(p){if(p.comEtiqueta)nCom++;else nSem++;val+=(p.valor||0)});
     document.getElementById('ol-ktot').textContent=rows.length.toLocaleString('pt-BR');
