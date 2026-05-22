@@ -1,6 +1,16 @@
 // Razão social das marcas (fonte: PainelCSGerencial/companies_data.json).
+// Complemento manual (aba "contas" do CC Starkbank - Walid) para marcas de
+// antecipacao que nao constam no companies_data.json.
 window.RAZAO_MARCAS = (function(){
     var raw = {
+        "be free": "KOKO JEANS CONFECCOES LTDA",
+        "charisma filial": "FASHION DIVINA CLARA - MODAS LTDA",
+        "enfasy jeans": "JHONATAN ROSA BATISTA",
+        "gissary": "DAVID MAXIMO ARCANI LOPEZ CONFECCOES",
+        "rcr clothing original": "RAFAEL CARDOSO RODRIGUES",
+        "sedanbi filial": "INDUSTRIA E COMERCIO DE ROUPAS SDB LTDA",
+        "the lion confeccoes": "CHRISTIAM RAISSA DOS SANTOS LTDA",
+        "zero um confeccoes": "ZERO UM CONFECCOES LTDA",
         "2 wave": "2wave Ltda",
         "3r lopes": "Rayanne Lopes",
         "a f aires de oliveira ltda": "A F Aires De Oliveira Ltda",
