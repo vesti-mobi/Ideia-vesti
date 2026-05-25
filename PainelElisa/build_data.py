@@ -73,6 +73,8 @@ def main():
     vp        = _load(ROOT / "vestipago_elisa.json")
     reativ_p  = ROOT / "reativacao_elisa.json"
     reativ    = _load(reativ_p) if reativ_p.exists() else {}
+    links_p   = ROOT / "links_elisa.json"
+    links     = _load(links_p) if links_p.exists() else {}
 
     enriched = []
     meses_set: set[str] = set()
@@ -105,9 +107,11 @@ def main():
             "alertas": _alertas(e, c, v, g),
             "reativacoesPorMes": (reativ.get(dom) or {}).get("reativacoesPorMes", {}),
             "totalReativ": (reativ.get(dom) or {}).get("totalReativ", 0),
-            # placeholders aguardando fonte:
-            "linkCompartilhado": "",
-            "clicksLink": 0,
+            "linksCompartilhados": (links.get(dom) or {}).get("linksCompartilhados", 0),
+            "cliquesTotal": (links.get(dom) or {}).get("cliquesTotal", 0),
+            "cliquesPorMes": (links.get(dom) or {}).get("cliquesPorMes", {}),
+            "linksPorMes": (links.get(dom) or {}).get("linksPorMes", {}),
+            "influenciadores": (links.get(dom) or {}).get("influenciadores", []),
         })
 
     dados = {

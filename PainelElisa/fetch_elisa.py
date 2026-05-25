@@ -27,6 +27,7 @@ OUT_GMV       = ROOT / "gmv_elisa.json"
 OUT_CADASTROS = ROOT / "cadastros_elisa.json"
 OUT_VP        = ROOT / "vestipago_elisa.json"
 OUT_REATIV    = ROOT / "reativacao_elisa.json"
+OUT_LINKS     = ROOT / "links_elisa.json"
 
 # CS alvo do painel
 CS_ALVO = ("Elisa", "Jennyfer")
@@ -251,6 +252,16 @@ GROUP BY p.domainId
 
 # Reativacao: fatura Iugu paga apos o vencimento (paid_at > due_date).
 # Conta uma reativacao por (dominio, mes do paid_at).
+SQL_LINKS = """
+SELECT
+    domain_id,
+    [Nome Influenciador] AS influenciador,
+    [Nome do dominio]    AS nome_dominio,
+    [Soma cliques]       AS cliques,
+    FORMAT(TRY_CAST(created_at AS DATE), 'yyyy-MM') AS mes
+FROM dbo.PedidosUTM_InserirClickdosprodutos
+"""
+
 SQL_REATIVACAO = """
 WITH inv AS (
     SELECT
@@ -352,6 +363,30 @@ def run_query(conn, sql: str, label: str) -> list[dict]:
     return rows
 
 
+def build_links(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
+    out: dict[str, dict] = {}
+    for r in rows:
+        dom = str(r.get("domain_id") or "").strip()
+        try: dom = str(int(dom))
+        except (TypeError, ValueError): pass
+        if dom not in empresas_by_dom:
+            continue
+        cliq = int(r.get("cliques") or 0)
+        mes = r.get("mes") or ""
+        slot = out.setdefault(dom, {"linksCompartilhados": 0, "cliquesTotal": 0,
+                                     "cliquesPorMes": {}, "linksPorMes": {},
+                                     "influenciadores": []})
+        slot["linksCompartilhados"] += 1
+        slot["cliquesTotal"] += cliq
+        if mes:
+            slot["cliquesPorMes"][mes] = slot["cliquesPorMes"].get(mes, 0) + cliq
+            slot["linksPorMes"][mes]   = slot["linksPorMes"].get(mes, 0) + 1
+        inf = (r.get("influenciador") or "").strip()
+        if inf and inf not in slot["influenciadores"]:
+            slot["influenciadores"].append(inf)
+    return out
+
+
 def build_reativacao(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
     out: dict[str, dict] = {}
     for r in rows:
@@ -377,6 +412,7 @@ def main() -> None:
         prod_rows   = run_query(conn, SQL_PRODUTOS, "qtd produtos por dominio")
         pp_rows     = run_query(conn, SQL_PRIMEIRO_PEDIDO, "primeiro pedido cadastrado")
         reativ_rows = run_query(conn, SQL_REATIVACAO, "reativacoes (fatura paga atrasada)")
+        links_rows  = run_query(conn, SQL_LINKS, "links/cliques compartilhados")
 
     empresas = build_empresas(emp_rows)
     OUT_COMPANIES.write_text(json.dumps(empresas, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -402,6 +438,10 @@ def main() -> None:
     reativ = build_reativacao(reativ_rows, empresas_by_dom)
     OUT_REATIV.write_text(json.dumps(reativ, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"[write] {OUT_REATIV.name} ({len(reativ)} dominios com reativacoes)")
+
+    links = build_links(links_rows, empresas_by_dom)
+    OUT_LINKS.write_text(json.dumps(links, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"[write] {OUT_LINKS.name} ({len(links)} dominios com links)")
     print("[ok] coleta concluida. Rode build_data.py em seguida.")
 
 

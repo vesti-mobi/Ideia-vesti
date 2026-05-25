@@ -118,6 +118,10 @@
         <div class="hl-icon">⚠️</div><div class="hl-label">Marcas travadas</div>
         <div class="hl-val" id="kpi-travadas">0</div><div class="hl-sub">implantação parada</div>
       </div>
+      <div class="hl-card" onclick="switchTab('links')" style="background:linear-gradient(135deg,#FDCB6E,#FFE08A)">
+        <div class="hl-icon">🔗</div><div class="hl-label">Links & Cliques</div>
+        <div class="hl-val" id="kpi-cliques">0</div><div class="hl-sub"><span id="kpi-links">0</span> links · <span id="kpi-marcas-link">0</span> marcas</div>
+      </div>
     </div>
   </div>
 
@@ -229,11 +233,27 @@
 
   <div id="tab-travadas" class="tab-panel">
     <h2 class="tab-title">⚠️ Marcas travadas na implantação</h2>
+    <p class="hint" style="margin-bottom:12px;color:var(--g);font-size:12px">
+      Critério: marca cadastrou pelo menos 1 pedido mas ainda não vendeu (>14d), ou cadastrou pedido sem nenhum produto cadastrado.
+      Coluna <strong>Dias travada</strong> = dias desde o 1º pedido cadastrado até hoje.
+    </p>
     <div class="chart-row">
       <div class="ch"><h4>Distribuição por dias travada</h4><div class="cw"><canvas id="chart-trav-dias"></canvas></div></div>
-      <div class="ch"><h4>Marcas travadas por CS</h4><div class="cw"><canvas id="chart-trav-cs"></canvas></div></div>
+      <div class="ch"><h4>Marcas travadas por canal</h4><div class="cw"><canvas id="chart-trav-canal"></canvas></div></div>
     </div>
     <div class="tbl-card"><h4>Marcas paradas (cadastraram pedido mas não venderam)</h4><div class="tbl-wrap"><table class="dt" id="tbl-travadas"></table></div></div>
+  </div>
+
+  <div id="tab-links" class="tab-panel">
+    <h2 class="tab-title">🔗 Links Compartilhados & Cliques</h2>
+    <p class="hint" style="margin-bottom:12px;color:var(--g);font-size:12px">
+      Fonte: <code>PedidosUTM_InserirClickdosprodutos</code>. Cada linha é um link de influenciador / domínio compartilhado, com soma de cliques.
+    </p>
+    <div class="chart-row">
+      <div class="ch"><h4>Cliques por mês (todas marcas)</h4><div class="cw"><canvas id="chart-links-evolucao"></canvas></div></div>
+      <div class="ch"><h4>TOP 10 marcas por cliques</h4><div class="cw"><canvas id="chart-links-top"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>Marcas com links compartilhados</h4><div class="tbl-wrap"><table class="dt" id="tbl-links"></table></div></div>
   </div>
 
 </div>

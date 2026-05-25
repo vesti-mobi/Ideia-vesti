@@ -89,6 +89,15 @@ function renderKpis() {
     return (ped && !venda && dias > 14) || (ped && (e.qtProdutos||0) === 0);
   });
   $("kpi-travadas").textContent = fmtInt(travadas.length);
+  let cliquesTot=0, linksTot=0, marcasLink=0;
+  for (const e of lista) {
+    cliquesTot += e.cliquesTotal||0;
+    linksTot   += e.linksCompartilhados||0;
+    if ((e.linksCompartilhados||0) > 0) marcasLink++;
+  }
+  $("kpi-cliques").textContent    = fmtInt(cliquesTot);
+  $("kpi-links").textContent      = fmtInt(linksTot);
+  $("kpi-marcas-link").textContent = fmtInt(marcasLink);
 }
 
 // ---------- TAB renderers ----------
@@ -436,21 +445,53 @@ function renderTabTravadas() {
     data:{labels:Object.keys(faixas), datasets:[{label:"marcas", data:Object.values(faixas), backgroundColor:COLORS[3]}]},
     options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
   });
-  const porCs = countBy(lista, e=>e.cs);
-  makeChart("chart-trav-cs", {
+  const porCanal = countBy(lista, e=>e.starter_interno?"Starter":isUemtel(e)?"Uemtel":"Parceiros");
+  makeChart("chart-trav-canal", {
     type:"bar",
-    data:{labels:Object.keys(porCs), datasets:[{label:"marcas", data:Object.values(porCs), backgroundColor:COLORS[8]}]},
+    data:{labels:Object.keys(porCanal), datasets:[{label:"marcas", data:Object.values(porCanal), backgroundColor:[COLORS[0],COLORS[4],COLORS[3]]}]},
     options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
   });
   renderTable("tbl-travadas", [
     {label:"Marca", fn:r=>r.name},
     {label:"CS", fn:r=>r.cs},
     {label:"Canal", fn:r=>r.canal},
-    {label:"1º pedido", fn:r=>(r.primeiroPedidoCadastrado||"—").slice(0,10)},
+    {label:"Data entrada", fn:r=>(r.dataEntrada||"—").slice(0,10)},
+    {label:"1º pedido cadastrado", fn:r=>(r.primeiroPedidoCadastrado||"—").slice(0,10)},
     {label:"1ª venda", fn:r=>(r.primeiraVenda||"—").slice(0,10)},
     {label:"Produtos", cls:"num", fn:r=>fmtInt(r.qtProdutos||0)},
-    {label:"Dias", cls:"num", fn:r=>r._dias??"—"},
+    {label:"Dias travada", cls:"num", fn:r=>r._dias??"—"},
   ], lista.map(e=>({...e,_alert:true})));
+}
+
+function renderTabLinks() {
+  const lista = empresasFiltradas();
+  // evolução mensal cliques
+  const porMes = {};
+  for (const e of lista) for (const [m,q] of Object.entries(e.cliquesPorMes||{})) {
+    porMes[m] = (porMes[m]||0) + q;
+  }
+  const meses = Object.keys(porMes).sort();
+  makeChart("chart-links-evolucao", {
+    type:"bar",
+    data:{labels:meses, datasets:[{label:"cliques", data:meses.map(m=>porMes[m]), backgroundColor:COLORS[10]}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
+  });
+  // top 10 por cliques
+  const ranked = lista.filter(e=>(e.cliquesTotal||0)>0).sort((a,b)=>b.cliquesTotal-a.cliquesTotal);
+  const top10 = ranked.slice(0,10);
+  makeChart("chart-links-top", {
+    type:"bar",
+    data:{labels:top10.map(e=>e.name), datasets:[{label:"cliques", data:top10.map(e=>e.cliquesTotal), backgroundColor:COLORS[10]}]},
+    options:{indexAxis:"y", responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
+  });
+  renderTable("tbl-links", [
+    {label:"Marca", fn:r=>r.name},
+    {label:"CS", fn:r=>r.cs},
+    {label:"Canal", fn:r=>r.canal},
+    {label:"Links compartilhados", cls:"num", fn:r=>fmtInt(r.linksCompartilhados||0)},
+    {label:"Cliques totais", cls:"num", fn:r=>fmtInt(r.cliquesTotal||0)},
+    {label:"Influenciadores", fn:r=>(r.influenciadores||[]).slice(0,3).join(", ") + ((r.influenciadores||[]).length>3?` +${r.influenciadores.length-3}`:"")},
+  ], ranked);
 }
 
 // ---------- Tab switching ----------
@@ -458,7 +499,8 @@ const TAB_LABELS = {
   gmv:"GMV", vpcartao:"VP Cartão", vppix:"VP PIX", cadastro:"Cadastro de Produtos",
   primeiras5:"Primeiras 5 Vendas", primeiras25:"Primeiras 25 Vendas",
   reativ:"Reativações", topstarter:"TOP 10 Starter", topparceiros:"TOP 10 Parceiros",
-  vpinativo:"Sem VP Ativo", freteinativo:"Sem Frete Ativo", travadas:"Marcas Travadas"
+  vpinativo:"Sem VP Ativo", freteinativo:"Sem Frete Ativo", travadas:"Marcas Travadas",
+  links:"Links & Cliques"
 };
 
 function switchTab(tab) {
@@ -491,6 +533,7 @@ function renderActiveTab() {
   else if (state.tab === "freteinativo") renderTabSemFrete();
   else if (state.tab === "travadas") renderTabTravadas();
   else if (state.tab === "reativ") renderTabReativ();
+  else if (state.tab === "links") renderTabLinks();
 }
 
 // ---------- Filtros ----------
