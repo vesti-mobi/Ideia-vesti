@@ -510,14 +510,27 @@ function renderTabLinks() {
   makeChart("chart-links-evolucao", {
     type:"line",
     data:{labels, datasets:[
-      {label:"Links Enviados", data:meses.map(m=>linksMes[m]||0),
-       borderColor:"#7C3AED", backgroundColor:"rgba(124,58,237,0.1)",
-       fill:true, tension:.4, pointRadius:3, pointBackgroundColor:"#7C3AED"},
       {label:"Cliques", data:meses.map(m=>cliquesMes[m]||0),
        borderColor:"#06B6D4", backgroundColor:"rgba(6,182,212,0.1)",
-       fill:true, tension:.4, pointRadius:3, pointBackgroundColor:"#06B6D4"},
+       fill:true, tension:.4, pointRadius:4, pointBackgroundColor:"#06B6D4", yAxisID:"y"},
+      {label:"Links Enviados", data:meses.map(m=>linksMes[m]||0),
+       borderColor:"#7C3AED", backgroundColor:"rgba(124,58,237,0.1)",
+       fill:true, tension:.4, pointRadius:5, pointBackgroundColor:"#7C3AED",
+       borderWidth:3, yAxisID:"y1"},
     ]},
-    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:"bottom"}}}
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:"bottom"},
+        tooltip:{callbacks:{label:(c)=>`${c.dataset.label}: ${c.raw.toLocaleString("pt-BR")}`}}
+      },
+      scales:{
+        y:  {type:"linear", position:"left",  title:{display:true, text:"Cliques", color:"#06B6D4"},
+             ticks:{color:"#06B6D4"}},
+        y1: {type:"linear", position:"right", title:{display:true, text:"Links Enviados", color:"#7C3AED"},
+             ticks:{color:"#7C3AED", precision:0}, grid:{drawOnChartArea:false}, beginAtZero:true},
+      }
+    }
   });
   // top 10 por cliques
   const ranked = lista.filter(e=>(e.cliquesTotal||0)>0).sort((a,b)=>b.cliquesTotal-a.cliquesTotal);
