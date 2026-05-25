@@ -79,10 +79,9 @@ function renderKpis() {
   }
   $("kpi-gmv").textContent = fmtBRL(gmv);
   $("kpi-gmv-sub").textContent = `${lista.length} marcas · ${state.chave||"—"}`;
+  $("kpi-vp").textContent = fmtBRL(cartao + pix);
   $("kpi-cartao").textContent = fmtBRL(cartao);
-  $("kpi-cartao-sub").textContent = `${cartaoMarcas} marcas ativas`;
   $("kpi-pix").textContent = fmtBRL(pix);
-  $("kpi-pix-sub").textContent = `${pixMarcas} marcas ativas`;
   $("kpi-cadastro").textContent = fmtInt(cadProds);
   $("kpi-cadastro-marcas").textContent = fmtInt(cadMarcas);
   $("kpi-p5").textContent = fmtInt(p5);
@@ -153,37 +152,52 @@ function renderTabGmv() {
   ], rows);
 }
 
-function renderTabVp(tipo) { // tipo: "Cartao" | "Pix"
+function renderTabVp() {
   const lista = empresasFiltradas();
-  const campoVal = "val"+tipo, campoQt = "qt"+tipo;
-  const { meses, vals } = evolMensal(lista, campoVal);
-  const colorIdx = tipo==="Cartao"?0:1;
-  makeChart(`chart-${tipo.toLowerCase()=='cartao'?'cartao':'pix'}-evolucao`, {
+  // evolução mensal: duas séries (Cartão e PIX) no mesmo gráfico
+  const cMes = {}, pMes = {};
+  for (const e of lista) for (const m of Object.keys(e.mensal||{})) {
+    cMes[m] = (cMes[m]||0) + (e.mensal[m].valCartao||0);
+    pMes[m] = (pMes[m]||0) + (e.mensal[m].valPix||0);
+  }
+  const meses = Object.keys({...cMes,...pMes}).sort();
+  makeChart("chart-vp-evolucao", {
     type:"line",
-    data:{labels:meses, datasets:[{label:tipo, data:vals, borderColor:COLORS[colorIdx], backgroundColor:"rgba(108,92,231,.15)", fill:true, tension:.3}]},
-    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{callback:v=>"R$"+(v/1000).toFixed(0)+"k"}}}}
+    data:{labels:meses, datasets:[
+      {label:"Cartão", data:meses.map(m=>cMes[m]||0),
+       borderColor:"#6C5CE7", backgroundColor:"rgba(108,92,231,.1)", fill:true, tension:.4, pointRadius:3, pointBackgroundColor:"#6C5CE7"},
+      {label:"PIX", data:meses.map(m=>pMes[m]||0),
+       borderColor:"#00B894", backgroundColor:"rgba(0,184,148,.1)", fill:true, tension:.4, pointRadius:3, pointBackgroundColor:"#00B894"},
+    ]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:"bottom"}},
+             scales:{y:{ticks:{callback:v=>"R$"+(v/1000).toFixed(0)+"k"}}}}
   });
-  const ranked = lista.map(e=>({...e,_v:bucket(e)[campoVal], _q:bucket(e)[campoQt]})).filter(e=>e._v>0).sort((a,b)=>b._v-a._v);
+  // TOP 10 por VP total (cartão+PIX) no período
+  const ranked = lista.map(e=>{
+    const b = bucket(e);
+    return {...e, _c:b.valCartao, _p:b.valPix, _qc:b.qtCartao, _qp:b.qtPix, _tot:b.valCartao+b.valPix, _qtot:b.qtCartao+b.qtPix};
+  }).filter(e=>e._tot>0).sort((a,b)=>b._tot-a._tot);
   const top10 = ranked.slice(0,10);
-  makeChart(`chart-${tipo.toLowerCase()=='cartao'?'cartao':'pix'}-top`, {
+  makeChart("chart-vp-top", {
     type:"bar",
-    data:{labels:top10.map(e=>e.name), datasets:[{label:tipo, data:top10.map(e=>e._v), backgroundColor:COLORS[colorIdx]}]},
-    options:{indexAxis:"y", responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{ticks:{callback:v=>"R$"+(v/1000).toFixed(0)+"k"}}}}
+    data:{labels:top10.map(e=>e.name), datasets:[
+      {label:"Cartão", data:top10.map(e=>e._c), backgroundColor:"#6C5CE7"},
+      {label:"PIX", data:top10.map(e=>e._p), backgroundColor:"#00B894"},
+    ]},
+    options:{indexAxis:"y", responsive:true, maintainAspectRatio:false,
+             plugins:{legend:{position:"bottom"}},
+             scales:{x:{stacked:true, ticks:{callback:v=>"R$"+(v/1000).toFixed(0)+"k"}}, y:{stacked:true}}}
   });
-  const tblId = tipo==="Cartao" ? "tbl-vpcartao" : "tbl-vppix";
-  // valores do outro metodo no mesmo periodo, pra mostrar lado a lado
-  const outroVal = tipo==="Cartao" ? "valPix" : "valCartao";
-  const outroQt  = tipo==="Cartao" ? "qtPix"  : "qtCartao";
-  const labelOutro = tipo==="Cartao" ? "PIX" : "Cartão";
-  renderTable(tblId, [
+  renderTable("tbl-vp", [
     {label:"Marca", fn:r=>r.name},
     {label:"CS", fn:r=>r.cs},
     {label:"Canal", fn:r=>r.canal},
     {label:"Status VP", fn:r=>vpBadge(r)},
-    {label:tipo, cls:"num", fn:r=>fmtBRL(r._v)},
-    {label:"Pedidos "+tipo, cls:"num", fn:r=>fmtInt(r._q)},
-    {label:labelOutro+" (mesmo período)", cls:"num", fn:r=>fmtBRL(bucket(r)[outroVal])},
-    {label:"Pedidos "+labelOutro, cls:"num", fn:r=>fmtInt(bucket(r)[outroQt])},
+    {label:"Cartão", cls:"num", fn:r=>fmtBRL(r._c)},
+    {label:"Pedidos Cartão", cls:"num", fn:r=>fmtInt(r._qc)},
+    {label:"PIX", cls:"num", fn:r=>fmtBRL(r._p)},
+    {label:"Pedidos PIX", cls:"num", fn:r=>fmtInt(r._qp)},
+    {label:"Total VP", cls:"num", fn:r=>fmtBRL(r._tot)},
   ], ranked);
 }
 
@@ -525,7 +539,7 @@ function renderTabLinks() {
 
 // ---------- Tab switching ----------
 const TAB_LABELS = {
-  gmv:"GMV", vpcartao:"VP Cartão", vppix:"VP PIX", cadastro:"Cadastro de Produtos",
+  gmv:"GMV", vp:"VestiPago (Cartão + PIX)", cadastro:"Cadastro de Produtos",
   primeiras5:"Primeiras 5 Vendas", primeiras25:"Primeiras 25 Vendas",
   reativ:"Reativações", topstarter:"TOP 10 Starter", topparceiros:"TOP 10 Parceiros",
   vpinativo:"Sem VP Ativo", freteinativo:"Sem Frete Ativo", travadas:"Marcas Travadas",
@@ -551,8 +565,7 @@ function renderActiveTab() {
   document.querySelectorAll(".periodo-label").forEach(el => el.textContent = state.chave || "—");
   if (state.tab === "home") { renderKpis(); return; }
   if (state.tab === "gmv") renderTabGmv();
-  else if (state.tab === "vpcartao") renderTabVp("Cartao");
-  else if (state.tab === "vppix") renderTabVp("Pix");
+  else if (state.tab === "vp") renderTabVp();
   else if (state.tab === "cadastro") renderTabCadastro();
   else if (state.tab === "primeiras5") renderTabPrimeiras(5);
   else if (state.tab === "primeiras25") renderTabPrimeiras(25);

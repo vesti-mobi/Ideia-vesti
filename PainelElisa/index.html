@@ -74,13 +74,12 @@
         <div class="hl-icon">💰</div><div class="hl-label">GMV Total</div>
         <div class="hl-val" id="kpi-gmv">R$ 0</div><div class="hl-sub" id="kpi-gmv-sub">— marcas</div>
       </div>
-      <div class="hl-card" onclick="switchTab('vpcartao')" style="background:linear-gradient(135deg,#6C5CE7,#8B7BF7)">
-        <div class="hl-icon">💳</div><div class="hl-label">VestiPago Cartão</div>
-        <div class="hl-val" id="kpi-cartao">R$ 0</div><div class="hl-sub" id="kpi-cartao-sub">— marcas ativas</div>
-      </div>
-      <div class="hl-card" onclick="switchTab('vppix')" style="background:linear-gradient(135deg,#00B894,#00D4A0)">
-        <div class="hl-icon">⚡</div><div class="hl-label">VestiPago PIX</div>
-        <div class="hl-val" id="kpi-pix">R$ 0</div><div class="hl-sub" id="kpi-pix-sub">— marcas ativas</div>
+      <div class="hl-card" onclick="switchTab('vp')" style="background:linear-gradient(135deg,#6C5CE7,#00B894)">
+        <div class="hl-icon">💳</div><div class="hl-label">VestiPago (Cartão + PIX)</div>
+        <div class="hl-val" id="kpi-vp">R$ 0</div>
+        <div class="hl-sub">
+          Cartão <span id="kpi-cartao">R$ 0</span> · PIX <span id="kpi-pix">R$ 0</span>
+        </div>
       </div>
       <div class="hl-card" onclick="switchTab('cadastro')" style="background:linear-gradient(135deg,#F39C12,#FFB94A)">
         <div class="hl-icon">📦</div><div class="hl-label">Cadastro de Produtos</div>
@@ -135,22 +134,13 @@
     <div class="tbl-card"><h4>GMV por marca no período</h4><div class="tbl-wrap"><table class="dt" id="tbl-gmv"></table></div></div>
   </div>
 
-  <div id="tab-vpcartao" class="tab-panel">
-    <h2 class="tab-title">💳 VestiPago Cartão · <span class="periodo-label"></span></h2>
+  <div id="tab-vp" class="tab-panel">
+    <h2 class="tab-title">💳 VestiPago Cartão + PIX · <span class="periodo-label"></span></h2>
     <div class="chart-row">
-      <div class="ch"><h4>Evolução mensal Cartão</h4><div class="cw"><canvas id="chart-cartao-evolucao"></canvas></div></div>
-      <div class="ch"><h4>TOP 10 marcas Cartão</h4><div class="cw"><canvas id="chart-cartao-top"></canvas></div></div>
+      <div class="ch"><h4>Evolução mensal — Cartão vs PIX</h4><div class="cw"><canvas id="chart-vp-evolucao"></canvas></div></div>
+      <div class="ch"><h4>TOP 10 marcas por VP total (Cartão + PIX)</h4><div class="cw"><canvas id="chart-vp-top"></canvas></div></div>
     </div>
-    <div class="tbl-card"><h4>Marcas com VP Cartão no período</h4><div class="tbl-wrap"><table class="dt" id="tbl-vpcartao"></table></div></div>
-  </div>
-
-  <div id="tab-vppix" class="tab-panel">
-    <h2 class="tab-title">⚡ VestiPago PIX · <span class="periodo-label"></span></h2>
-    <div class="chart-row">
-      <div class="ch"><h4>Evolução mensal PIX</h4><div class="cw"><canvas id="chart-pix-evolucao"></canvas></div></div>
-      <div class="ch"><h4>TOP 10 marcas PIX</h4><div class="cw"><canvas id="chart-pix-top"></canvas></div></div>
-    </div>
-    <div class="tbl-card"><h4>Marcas com VP PIX no período</h4><div class="tbl-wrap"><table class="dt" id="tbl-vppix"></table></div></div>
+    <div class="tbl-card"><h4>Marcas com VestiPago no período</h4><div class="tbl-wrap"><table class="dt" id="tbl-vp"></table></div></div>
   </div>
 
   <div id="tab-cadastro" class="tab-panel">
