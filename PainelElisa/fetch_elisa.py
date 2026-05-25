@@ -339,14 +339,16 @@ def build_vp(empresas_by_dom: dict[str, dict], gmv: dict) -> dict:
     vp: dict[str, dict] = {}
     for dom, emp in empresas_by_dom.items():
         bucket_gmv = gmv["empresas"].get(dom, {}).get("mensal", {})
-        tem_vp = any(
-            (bucket_gmv.get(m, {}).get("qtPix", 0) + bucket_gmv.get(m, {}).get("qtCartao", 0)) > 0
-            for m in janela
-        )
-        # frete: assumimos ativo se tem pedidos no periodo (proxy). Substituir por
-        # query real em mongodb_companies_logistics quando schema confirmado.
+        tem_pix = any(bucket_gmv.get(m, {}).get("qtPix", 0) > 0 for m in janela)
+        tem_cartao = any(bucket_gmv.get(m, {}).get("qtCartao", 0) > 0 for m in janela)
+        tem_vp = tem_pix or tem_cartao
         tem_frete = any(bucket_gmv.get(m, {}).get("qtTotal", 0) > 0 for m in janela)
-        vp[dom] = {"temVPAtivo": tem_vp, "temFreteAtivo": tem_frete}
+        vp[dom] = {
+            "temVPAtivo": tem_vp,
+            "temPixAtivo": tem_pix,
+            "temCartaoAtivo": tem_cartao,
+            "temFreteAtivo": tem_frete,
+        }
     return vp
 
 

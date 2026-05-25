@@ -103,6 +103,8 @@ def main():
             "mensal":   g.get("mensal", {}),
             "semanal":  g.get("semanal", {}),
             "temVPAtivo":     v.get("temVPAtivo", False),
+            "temPixAtivo":    v.get("temPixAtivo", False),
+            "temCartaoAtivo": v.get("temCartaoAtivo", False),
             "temFreteAtivo":  v.get("temFreteAtivo", False),
             "alertas": _alertas(e, c, v, g),
             "reativacoesPorMes": (reativ.get(dom) or {}).get("reativacoesPorMes", {}),

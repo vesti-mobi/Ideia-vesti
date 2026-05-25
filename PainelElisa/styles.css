@@ -77,6 +77,10 @@ table.dt tr.row-alert td{background:rgba(225,112,85,.08)}
 .pill-warn{background:#FFF3E0;color:var(--w)}
 .pill-alert{background:#FDEAEA;color:var(--d)}
 .pill-ok{background:#E8F5E9;color:var(--s)}
+.pill-pix{background:#E0F7F0;color:#00B894}
+.pill-cartao{background:#F0EFFF;color:#6C5CE7}
+.pill-ambos{background:linear-gradient(135deg,#E0F7F0,#F0EFFF);color:#5949d6}
+.pill-nenhum{background:#FDEAEA;color:#E17055}
 
 .sub-filter{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .sub-filter label{font-size:12px;font-weight:600;color:var(--dk)}

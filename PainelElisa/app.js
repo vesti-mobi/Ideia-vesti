@@ -26,6 +26,13 @@ function empresasFiltradas() {
     return true;
   });
 }
+function vpBadge(e) {
+  if (e.temPixAtivo && e.temCartaoAtivo) return `<span class="pill pill-ambos">PIX + Cartão</span>`;
+  if (e.temPixAtivo) return `<span class="pill pill-pix">só PIX</span>`;
+  if (e.temCartaoAtivo) return `<span class="pill pill-cartao">só Cartão</span>`;
+  return `<span class="pill pill-nenhum">sem VP</span>`;
+}
+
 function bucket(e) {
   const fonte = state.periodo === "mensal" ? e.mensal : e.semanal;
   return fonte[state.chave] || {valPix:0,valCartao:0,valTotal:0,qtPix:0,qtCartao:0,qtTotal:0};
@@ -164,12 +171,19 @@ function renderTabVp(tipo) { // tipo: "Cartao" | "Pix"
     options:{indexAxis:"y", responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{ticks:{callback:v=>"R$"+(v/1000).toFixed(0)+"k"}}}}
   });
   const tblId = tipo==="Cartao" ? "tbl-vpcartao" : "tbl-vppix";
+  // valores do outro metodo no mesmo periodo, pra mostrar lado a lado
+  const outroVal = tipo==="Cartao" ? "valPix" : "valCartao";
+  const outroQt  = tipo==="Cartao" ? "qtPix"  : "qtCartao";
+  const labelOutro = tipo==="Cartao" ? "PIX" : "Cartão";
   renderTable(tblId, [
     {label:"Marca", fn:r=>r.name},
     {label:"CS", fn:r=>r.cs},
     {label:"Canal", fn:r=>r.canal},
+    {label:"Status VP", fn:r=>vpBadge(r)},
     {label:tipo, cls:"num", fn:r=>fmtBRL(r._v)},
-    {label:"Pedidos", cls:"num", fn:r=>fmtInt(r._q)},
+    {label:"Pedidos "+tipo, cls:"num", fn:r=>fmtInt(r._q)},
+    {label:labelOutro+" (mesmo período)", cls:"num", fn:r=>fmtBRL(bucket(r)[outroVal])},
+    {label:"Pedidos "+labelOutro, cls:"num", fn:r=>fmtInt(bucket(r)[outroQt])},
   ], ranked);
 }
 
@@ -365,6 +379,7 @@ function renderTabSemVp(canalSemVp) { // canalSemVp ignored — render both char
     {label:"Marca", fn:r=>r.name},
     {label:"CS", fn:r=>r.cs},
     {label:"Canal", fn:r=>r.canal},
+    {label:"Status VP", fn:r=>vpBadge(r)},
     {label:"Mensalidade", cls:"num", fn:r=>fmtBRL(r.valor_mensal)},
     {label:"1ª venda", fn:r=>r.primeiraVenda||"—"},
   ], lista.sort((a,b)=>a.name.localeCompare(b.name)).map(e=>({...e,_alert:true})));
