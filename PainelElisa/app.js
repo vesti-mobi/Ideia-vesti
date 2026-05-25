@@ -477,20 +477,18 @@ function renderTabLinks() {
     for (const [m,q] of Object.entries(e.linksPorMes||{}))   linksMes[m]   = (linksMes[m]||0) + q;
   }
   const meses = Array.from(new Set([...Object.keys(cliquesMes), ...Object.keys(linksMes)])).sort();
+  const labels = meses.map(m => m.substring(5)+"/"+m.substring(2,4));
   makeChart("chart-links-evolucao", {
     type:"line",
-    data:{labels:meses, datasets:[
-      {label:"Cliques", data:meses.map(m=>cliquesMes[m]||0), borderColor:COLORS[10], backgroundColor:"rgba(255,185,74,.15)", fill:false, tension:.3, yAxisID:"y"},
-      {label:"Links compartilhados", data:meses.map(m=>linksMes[m]||0), borderColor:COLORS[0], backgroundColor:"rgba(108,92,231,.15)", fill:false, tension:.3, yAxisID:"y1"},
+    data:{labels, datasets:[
+      {label:"Links Enviados", data:meses.map(m=>linksMes[m]||0),
+       borderColor:"#7C3AED", backgroundColor:"rgba(124,58,237,0.1)",
+       fill:true, tension:.4, pointRadius:3, pointBackgroundColor:"#7C3AED"},
+      {label:"Cliques", data:meses.map(m=>cliquesMes[m]||0),
+       borderColor:"#06B6D4", backgroundColor:"rgba(6,182,212,0.1)",
+       fill:true, tension:.4, pointRadius:3, pointBackgroundColor:"#06B6D4"},
     ]},
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{display:true, position:"bottom"}},
-      scales:{
-        y: {type:"linear", position:"left", title:{display:true, text:"Cliques"}},
-        y1:{type:"linear", position:"right", title:{display:true, text:"Links"}, grid:{drawOnChartArea:false}},
-      }
-    }
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:"bottom"}}}
   });
   // top 10 por cliques
   const ranked = lista.filter(e=>(e.cliquesTotal||0)>0).sort((a,b)=>b.cliquesTotal-a.cliquesTotal);
