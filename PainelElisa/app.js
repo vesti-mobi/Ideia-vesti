@@ -470,16 +470,27 @@ function renderTabTravadas() {
 
 function renderTabLinks() {
   const lista = empresasFiltradas();
-  // evolução mensal cliques
-  const porMes = {};
-  for (const e of lista) for (const [m,q] of Object.entries(e.cliquesPorMes||{})) {
-    porMes[m] = (porMes[m]||0) + q;
+  // evolução mensal — duas linhas: cliques e links
+  const cliquesMes = {}, linksMes = {};
+  for (const e of lista) {
+    for (const [m,q] of Object.entries(e.cliquesPorMes||{})) cliquesMes[m] = (cliquesMes[m]||0) + q;
+    for (const [m,q] of Object.entries(e.linksPorMes||{}))   linksMes[m]   = (linksMes[m]||0) + q;
   }
-  const meses = Object.keys(porMes).sort();
+  const meses = Array.from(new Set([...Object.keys(cliquesMes), ...Object.keys(linksMes)])).sort();
   makeChart("chart-links-evolucao", {
-    type:"bar",
-    data:{labels:meses, datasets:[{label:"cliques", data:meses.map(m=>porMes[m]), backgroundColor:COLORS[10]}]},
-    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
+    type:"line",
+    data:{labels:meses, datasets:[
+      {label:"Cliques", data:meses.map(m=>cliquesMes[m]||0), borderColor:COLORS[10], backgroundColor:"rgba(255,185,74,.15)", fill:false, tension:.3, yAxisID:"y"},
+      {label:"Links compartilhados", data:meses.map(m=>linksMes[m]||0), borderColor:COLORS[0], backgroundColor:"rgba(108,92,231,.15)", fill:false, tension:.3, yAxisID:"y1"},
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:true, position:"bottom"}},
+      scales:{
+        y: {type:"linear", position:"left", title:{display:true, text:"Cliques"}},
+        y1:{type:"linear", position:"right", title:{display:true, text:"Links"}, grid:{drawOnChartArea:false}},
+      }
+    }
   });
   // top 10 por cliques
   const ranked = lista.filter(e=>(e.cliquesTotal||0)>0).sort((a,b)=>b.cliquesTotal-a.cliquesTotal);
