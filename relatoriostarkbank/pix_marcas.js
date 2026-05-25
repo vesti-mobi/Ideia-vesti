@@ -1,5 +1,7 @@
-// Chaves PIX das marcas. FONTE PRIMARIA: aba "Contas" da planilha Google.
-// FALLBACK: planilha "PIX Starkbank (1).xlsx". Atualize re-rodando _gen_pix_contas.py.
+// Chaves PIX das marcas. FONTE: edicao manual + planilha "PIX Starkbank (2).xlsx"
+// (aba "Contas" do Google foi descontinuada). NAO re-rodar _gen_pix_contas.py:
+// ele apaga as entradas manuais. Pra adicionar uma marca, edite este arquivo
+// direto (ou peca pra atualizar via planilha PIX Starkbank).
 // Match feito pelo nomeFantasia (lowercase, trim, sem acento) ou CNPJ.
 window.PIX_MARCAS = (function(){
     var raw = {
