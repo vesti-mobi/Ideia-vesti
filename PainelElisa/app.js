@@ -7,6 +7,7 @@ const state = { periodo:"mensal", chave:"", cs:"todas", canal:"todos", empresa:"
 const D = (typeof DADOS !== "undefined") ? DADOS : { empresas:[], mesesList:[], semanasList:[] };
 const PARC_EXCL = new Set(["atta","attasoft","onix","uemtel"]);
 const isUemtel = (e) => (e.partner_raw||"").toLowerCase() === "uemtel";
+const isAtta   = (e) => ["atta","attasoft"].includes((e.partner_raw||"").toLowerCase());
 const COLORS = ["#6C5CE7","#00B894","#F39C12","#E17055","#0984E3","#FD79A8","#00CEC9","#A29BFE","#D63031","#74B9FF","#FFB94A","#55EFC4"];
 const charts = {}; // canvas id -> Chart instance
 
@@ -16,7 +17,8 @@ function empresasFiltradas() {
     if (state.cs !== "todas" && e.cs !== state.cs) return false;
     if (state.canal === "Starter"   && !e.starter_interno) return false;
     if (state.canal === "Uemtel"    && !isUemtel(e)) return false;
-    if (state.canal === "Parceiros" && (e.starter_interno || isUemtel(e))) return false;
+    if (state.canal === "Atta"      && !isAtta(e)) return false;
+    if (state.canal === "Parceiros" && (e.starter_interno || isUemtel(e) || isAtta(e))) return false;
     if (state.empresa !== "todas" && e.name !== state.empresa) return false;
     return true;
   });
@@ -445,10 +447,10 @@ function renderTabTravadas() {
     data:{labels:Object.keys(faixas), datasets:[{label:"marcas", data:Object.values(faixas), backgroundColor:COLORS[3]}]},
     options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
   });
-  const porCanal = countBy(lista, e=>e.starter_interno?"Starter":isUemtel(e)?"Uemtel":"Parceiros");
+  const porCanal = countBy(lista, e=>e.starter_interno?"Starter":isUemtel(e)?"Uemtel":isAtta(e)?"Atta":"Parceiros");
   makeChart("chart-trav-canal", {
     type:"bar",
-    data:{labels:Object.keys(porCanal), datasets:[{label:"marcas", data:Object.values(porCanal), backgroundColor:[COLORS[0],COLORS[4],COLORS[3]]}]},
+    data:{labels:Object.keys(porCanal), datasets:[{label:"marcas", data:Object.values(porCanal), backgroundColor:[COLORS[0],COLORS[4],COLORS[8],COLORS[3]]}]},
     options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
   });
   renderTable("tbl-travadas", [
