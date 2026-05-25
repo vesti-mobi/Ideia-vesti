@@ -1,0 +1,4 @@
+__pycache__/
+_check_*.py
+.token
+.new_refresh_token
