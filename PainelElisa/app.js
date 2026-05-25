@@ -48,7 +48,7 @@ function renderTable(tableId, columns, rows) {
 // ---------- HOME KPIs ----------
 function renderKpis() {
   const lista = empresasFiltradas();
-  let gmv=0,cartao=0,pix=0,semVP=0,semFrete=0,cadProds=0,cadMarcas=0,p5=0,p25=0,cartaoMarcas=0,pixMarcas=0;
+  let gmv=0,cartao=0,pix=0,semVP=0,semFrete=0,cadProds=0,cadMarcas=0,p5=0,p25=0,cartaoMarcas=0,pixMarcas=0,reativ=0;
   const mesK = mesAtualChave();
   for (const e of lista) {
     const b = bucket(e);
@@ -61,6 +61,7 @@ function renderKpis() {
     if ((e.qtProdutos||0) > 0) cadMarcas++;
     if (e.mes5Vendas  && e.mes5Vendas  === mesK) p5++;
     if (e.mes25Vendas && e.mes25Vendas === mesK) p25++;
+    if (((e.reativacoesPorMes||{})[mesK]||0) > 0) reativ++;
   }
   $("kpi-gmv").textContent = fmtBRL(gmv);
   $("kpi-gmv-sub").textContent = `${lista.length} marcas · ${state.chave||"—"}`;
@@ -72,6 +73,8 @@ function renderKpis() {
   $("kpi-cadastro-marcas").textContent = fmtInt(cadMarcas);
   $("kpi-p5").textContent = fmtInt(p5);
   $("kpi-p25").textContent = fmtInt(p25);
+  $("kpi-reativ").textContent = fmtInt(reativ);
+  $("kpi-reativ-sub").textContent = `marcas reativaram em ${mesK||"—"}`;
   $("kpi-semvp").textContent = fmtInt(semVP);
   $("kpi-semfrete").textContent = fmtInt(semFrete);
   $("kpi-topstarter").textContent = fmtInt(lista.filter(e=>e.starter_interno).length);
@@ -357,6 +360,40 @@ function renderTabSemFrete() {
   ], lista.sort((a,b)=>a.name.localeCompare(b.name)).map(e=>({...e,_alert:true})));
 }
 
+function renderTabReativ() {
+  const lista = empresasFiltradas();
+  const mesK = mesAtualChave();
+  // evolução mensal: soma de reativações por mês acrosss lista
+  const porMes = {};
+  for (const e of lista) for (const [m,q] of Object.entries(e.reativacoesPorMes||{})) {
+    porMes[m] = (porMes[m]||0) + q;
+  }
+  const meses = Object.keys(porMes).sort();
+  makeChart("chart-reativ-evolucao", {
+    type:"bar",
+    data:{labels:meses, datasets:[{label:"reativações", data:meses.map(m=>porMes[m]), backgroundColor:COLORS[7]}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
+  });
+  // TOP 10 marcas acumulado
+  const ranked = lista.filter(e=>e.totalReativ>0).sort((a,b)=>b.totalReativ-a.totalReativ);
+  const top10 = ranked.slice(0,10);
+  makeChart("chart-reativ-top", {
+    type:"bar",
+    data:{labels:top10.map(e=>e.name), datasets:[{label:"reativações", data:top10.map(e=>e.totalReativ), backgroundColor:COLORS[7]}]},
+    options:{indexAxis:"y", responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
+  });
+  const rows = lista.filter(e=>((e.reativacoesPorMes||{})[mesK]||0) > 0)
+    .map(e=>({...e, _q: (e.reativacoesPorMes||{})[mesK]||0}))
+    .sort((a,b)=>b._q - a._q);
+  renderTable("tbl-reativ", [
+    {label:"Marca", fn:r=>r.name},
+    {label:"CS", fn:r=>r.cs},
+    {label:"Canal", fn:r=>r.canal},
+    {label:`Reativações em ${mesK||"—"}`, cls:"num", fn:r=>fmtInt(r._q)},
+    {label:"Total acumulado", cls:"num", fn:r=>fmtInt(r.totalReativ||0)},
+  ], rows);
+}
+
 function renderTabTravadas() {
   const hoje = new Date();
   const lista = empresasFiltradas().map(e => {
@@ -435,6 +472,7 @@ function renderActiveTab() {
   else if (state.tab === "vpinativo") renderTabSemVp();
   else if (state.tab === "freteinativo") renderTabSemFrete();
   else if (state.tab === "travadas") renderTabTravadas();
+  else if (state.tab === "reativ") renderTabReativ();
 }
 
 // ---------- Filtros ----------

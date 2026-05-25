@@ -71,6 +71,8 @@ def main():
     gmv       = _load(ROOT / "gmv_elisa.json")
     cadastros = _load(ROOT / "cadastros_elisa.json")
     vp        = _load(ROOT / "vestipago_elisa.json")
+    reativ_p  = ROOT / "reativacao_elisa.json"
+    reativ    = _load(reativ_p) if reativ_p.exists() else {}
 
     enriched = []
     meses_set: set[str] = set()
@@ -101,10 +103,11 @@ def main():
             "temVPAtivo":     v.get("temVPAtivo", False),
             "temFreteAtivo":  v.get("temFreteAtivo", False),
             "alertas": _alertas(e, c, v, g),
+            "reativacoesPorMes": (reativ.get(dom) or {}).get("reativacoesPorMes", {}),
+            "totalReativ": (reativ.get(dom) or {}).get("totalReativ", 0),
             # placeholders aguardando fonte:
             "linkCompartilhado": "",
             "clicksLink": 0,
-            "reativacao": False,
         })
 
     dados = {

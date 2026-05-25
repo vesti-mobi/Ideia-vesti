@@ -26,6 +26,7 @@ OUT_COMPANIES = ROOT / "companies_elisa.json"
 OUT_GMV       = ROOT / "gmv_elisa.json"
 OUT_CADASTROS = ROOT / "cadastros_elisa.json"
 OUT_VP        = ROOT / "vestipago_elisa.json"
+OUT_REATIV    = ROOT / "reativacao_elisa.json"
 
 # CS alvo do painel
 CS_ALVO = ("Elisa", "Jennyfer")
@@ -243,6 +244,31 @@ FROM dbo.MongoDB_Pedidos_Geral p
 GROUP BY p.domainId
 """
 
+# Reativacao: fatura Iugu paga apos o vencimento (paid_at > due_date).
+# Conta uma reativacao por (dominio, mes do paid_at).
+SQL_REATIVACAO = """
+WITH inv AS (
+    SELECT
+        i.customer_id,
+        TRY_CAST(LEFT(i.paid_at, 10) AS DATE) AS paid_dt,
+        TRY_CAST(i.due_date AS DATE)          AS due_dt,
+        LEFT(i.paid_at, 7)                    AS mes_pago
+    FROM dbo.iugu_invoices i
+    WHERE i.status = 'paid' AND i.paid_at IS NOT NULL AND i.due_date IS NOT NULL
+)
+SELECT
+    sc.domain_id                                AS domain_id,
+    inv.mes_pago                                AS mes_pago,
+    COUNT(*)                                    AS qt_reativ,
+    SUM(DATEDIFF(day, inv.due_dt, inv.paid_dt)) AS dias_atraso_total
+FROM inv
+JOIN dbo.silver_companiesativos_iugu sc ON sc.Customer_ID_Iugu = inv.customer_id
+WHERE inv.paid_dt IS NOT NULL
+  AND inv.due_dt IS NOT NULL
+  AND DATEDIFF(day, inv.due_dt, inv.paid_dt) >= 1
+GROUP BY sc.domain_id, inv.mes_pago
+"""
+
 
 def build_cadastros(prods: list[dict], primeiros: list[dict],
                     empresas_by_dom: dict[str, dict]) -> dict:
@@ -321,13 +347,31 @@ def run_query(conn, sql: str, label: str) -> list[dict]:
     return rows
 
 
+def build_reativacao(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
+    out: dict[str, dict] = {}
+    for r in rows:
+        dom = str(r.get("domain_id") or "").strip()
+        if dom not in empresas_by_dom:
+            continue
+        mes = r.get("mes_pago") or ""
+        qt = int(r.get("qt_reativ") or 0)
+        dias = int(r.get("dias_atraso_total") or 0)
+        slot = out.setdefault(dom, {"reativacoesPorMes": {}, "diasAtrasoTotal": 0, "totalReativ": 0})
+        if mes:
+            slot["reativacoesPorMes"][mes] = slot["reativacoesPorMes"].get(mes, 0) + qt
+        slot["diasAtrasoTotal"] += dias
+        slot["totalReativ"] += qt
+    return out
+
+
 def main() -> None:
     cfg = load_config()
     with connect(cfg) as conn:
-        emp_rows  = run_query(conn, SQL_EMPRESAS, "empresas Elisa/Jenny")
-        gmv_rows  = run_query(conn, SQL_GMV, "GMV diario")
-        prod_rows = run_query(conn, SQL_PRODUTOS, "qtd produtos por dominio")
-        pp_rows   = run_query(conn, SQL_PRIMEIRO_PEDIDO, "primeiro pedido cadastrado")
+        emp_rows    = run_query(conn, SQL_EMPRESAS, "empresas Elisa/Jenny")
+        gmv_rows    = run_query(conn, SQL_GMV, "GMV diario")
+        prod_rows   = run_query(conn, SQL_PRODUTOS, "qtd produtos por dominio")
+        pp_rows     = run_query(conn, SQL_PRIMEIRO_PEDIDO, "primeiro pedido cadastrado")
+        reativ_rows = run_query(conn, SQL_REATIVACAO, "reativacoes (fatura paga atrasada)")
 
     empresas = build_empresas(emp_rows)
     OUT_COMPANIES.write_text(json.dumps(empresas, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -349,6 +393,10 @@ def main() -> None:
     vp = build_vp(empresas_by_dom, gmv)
     OUT_VP.write_text(json.dumps(vp, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"[write] {OUT_VP.name} ({len(vp)} dominios)")
+
+    reativ = build_reativacao(reativ_rows, empresas_by_dom)
+    OUT_REATIV.write_text(json.dumps(reativ, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"[write] {OUT_REATIV.name} ({len(reativ)} dominios com reativacoes)")
     print("[ok] coleta concluida. Rode build_data.py em seguida.")
 
 
