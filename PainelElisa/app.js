@@ -220,6 +220,13 @@ function renderTabCadastro() {
   ], lista);
 }
 
+function diasEntre(d1, d2) {
+  if (!d1 || !d2) return null;
+  const a = new Date(d1), b = new Date(d2);
+  if (isNaN(a) || isNaN(b)) return null;
+  return Math.floor((b - a) / 86400000);
+}
+
 function renderTabPrimeiras(n) {
   const lista = empresasFiltradas();
   const campo = n===5 ? "mes5Vendas" : "mes25Vendas";
@@ -270,14 +277,24 @@ function renderTabPrimeiras(n) {
       options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
     });
   }
-  const rows = lista.filter(e=>e[campo] === mesK);
-  renderTable(n===5?"tbl-p5":"tbl-p25", [
+  const rows = lista.filter(e=>e[campo] === mesK).map(e => {
+    const ate1aVenda = diasEntre((e.dataEntrada||"").slice(0,10), e.primeiraVenda);
+    const ateNVendas = diasEntre((e.dataEntrada||"").slice(0,10), e[campo] ? e[campo]+"-15" : null);
+    const permanencia = diasEntre((e.dataEntrada||"").slice(0,10), new Date().toISOString().slice(0,10));
+    return {...e, _ate1aVenda:ate1aVenda, _ateN:ateNVendas, _perm:permanencia};
+  });
+  const cols = [
     {label:"Marca", fn:r=>r.name},
     {label:"CS", fn:r=>r.cs},
     {label:"Canal", fn:r=>r.canal},
+    {label:"Data entrada", fn:r=>(r.dataEntrada||"—").slice(0,10)},
+    {label:"Permanência (d)", cls:"num", fn:r=>r._perm??"—"},
     {label:"1ª venda", fn:r=>r.primeiraVenda||"—"},
+    {label:"Dias até 1ª venda", cls:"num", fn:r=>r._ate1aVenda??"—"},
     {label:`Mês ${n} vendas`, fn:r=>r[campo]||"—"},
-  ], rows);
+  ];
+  if (n === 25) cols.push({label:"Dias até 25 vendas", cls:"num", fn:r=>r._ateN??"—"});
+  renderTable(n===5?"tbl-p5":"tbl-p25", cols, rows);
 }
 
 function renderTabTop(kind) { // "starter" ou "parceiros"
@@ -304,7 +321,6 @@ function renderTabTop(kind) { // "starter" ou "parceiros"
   renderTable(tblId, [
     {label:"#", fn:r=>r._rank},
     {label:"Marca", fn:r=>r.name},
-    {label:"CS", fn:r=>r.cs},
     ...(kind==="parceiros"?[{label:"Parceiro", fn:r=>r.partner_raw||"—"}]:[]),
     {label:"GMV", cls:"num", fn:r=>fmtBRL(r._g.valTotal)},
     {label:"Pedidos", cls:"num", fn:r=>fmtInt(r._g.qtTotal)},

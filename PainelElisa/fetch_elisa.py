@@ -59,8 +59,9 @@ WITH active_domains AS (
     WHERE {FILTRO_DOMINIOS}
 ),
 elisa_domains AS (
-    SELECT ad.*
+    SELECT ad.*, d2.created_at AS domain_created_at
     FROM active_domains ad
+    JOIN dbo.ODBC_Domains d2 ON d2.id = ad.id
     JOIN dbo.ODBC_Angels a ON a.id = ad.angel_id
     WHERE a.name IN ('Elisa Marques', 'Jennyfer Rabelo')
 ),
@@ -74,6 +75,7 @@ ranked_companies AS (
 SELECT
     d.id                 AS domain_id,
     d.name               AS domain_name,
+    d.domain_created_at  AS domain_created_at,
     rc.tax_document      AS cnpj,
     rc.social_name       AS razao_social,
     rc.company_name      AS company_name,
@@ -142,9 +144,12 @@ def build_empresas(rows: list[dict]) -> list[dict]:
             name = domain_name or company_name
             matriz_name = ""
 
+        dca = r.get("domain_created_at")
+        data_entrada = dca.isoformat() if hasattr(dca, "isoformat") else (str(dca) if dca else "")
         out.append({
             "domain_id": str(r.get("domain_id") or ""),
             "name": name,
+            "dataEntrada": data_entrada,
             "nome_fantasia": company_name or domain_name,
             "cnpj": r.get("cnpj") or "",
             "razao_social": r.get("razao_social") or "",
