@@ -55,13 +55,12 @@
       </select>
     </div>
     <div class="filter-group"><label>Canal:</label>
-      <select class="f-select" id="filter-canal">
-        <option value="todos">Todos</option>
-        <option value="Starter">Starter (interno)</option>
-        <option value="Uemtel">Uemtel</option>
-        <option value="Atta">Atta</option>
-        <option value="Parceiros">Parceiros (demais)</option>
-      </select>
+      <div class="canal-checks" id="filter-canal">
+        <label class="chk"><input type="checkbox" value="Starter" checked> Starter</label>
+        <label class="chk"><input type="checkbox" value="Uemtel" checked> Uemtel</label>
+        <label class="chk"><input type="checkbox" value="Atta" checked> Atta</label>
+        <label class="chk"><input type="checkbox" value="Parceiros" checked> Parceiros</label>
+      </div>
     </div>
     <div class="filter-group"><label>Empresa:</label>
       <select class="f-select" id="filter-empresa"><option value="todas">Todas</option></select>

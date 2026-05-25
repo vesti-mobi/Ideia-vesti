@@ -3,7 +3,7 @@ const fmtBRL = (n) => Number(n||0).toLocaleString("pt-BR",{style:"currency",curr
 const fmtInt = (n) => Number(n||0).toLocaleString("pt-BR");
 const $ = (id) => document.getElementById(id);
 
-const state = { periodo:"mensal", chave:"", cs:"todas", canal:"todos", empresa:"todas", tab:"home", cadMes:"todos" };
+const state = { periodo:"mensal", chave:"", cs:"todas", canais:new Set(["Starter","Uemtel","Atta","Parceiros"]), empresa:"todas", tab:"home", cadMes:"todos" };
 const D = (typeof DADOS !== "undefined") ? DADOS : { empresas:[], mesesList:[], semanasList:[] };
 const PARC_EXCL = new Set(["atta","attasoft","onix","uemtel"]);
 const isUemtel = (e) => (e.partner_raw||"").toLowerCase() === "uemtel";
@@ -12,13 +12,16 @@ const COLORS = ["#6C5CE7","#00B894","#F39C12","#E17055","#0984E3","#FD79A8","#00
 const charts = {}; // canvas id -> Chart instance
 
 // ---------- helpers ----------
+function canalDe(e) {
+  if (e.starter_interno) return "Starter";
+  if (isUemtel(e)) return "Uemtel";
+  if (isAtta(e)) return "Atta";
+  return "Parceiros";
+}
 function empresasFiltradas() {
   return D.empresas.filter(e => {
     if (state.cs !== "todas" && e.cs !== state.cs) return false;
-    if (state.canal === "Starter"   && !e.starter_interno) return false;
-    if (state.canal === "Uemtel"    && !isUemtel(e)) return false;
-    if (state.canal === "Atta"      && !isAtta(e)) return false;
-    if (state.canal === "Parceiros" && (e.starter_interno || isUemtel(e) || isAtta(e))) return false;
+    if (!state.canais.has(canalDe(e))) return false;
     if (state.empresa !== "todas" && e.name !== state.empresa) return false;
     return true;
   });
@@ -561,7 +564,12 @@ function bind() {
   }));
   $("filter-periodo-valor").addEventListener("change", e=>{ state.chave=e.target.value; renderActiveTab(); });
   $("filter-cs").addEventListener("change", e=>{ state.cs=e.target.value; populaEmpresas(); renderActiveTab(); });
-  $("filter-canal").addEventListener("change", e=>{ state.canal=e.target.value; populaEmpresas(); renderActiveTab(); });
+  $("filter-canal").addEventListener("change", e=>{
+    const cb = e.target;
+    if (cb.tagName !== "INPUT") return;
+    if (cb.checked) state.canais.add(cb.value); else state.canais.delete(cb.value);
+    populaEmpresas(); renderActiveTab();
+  });
   $("filter-empresa").addEventListener("change", e=>{ state.empresa=e.target.value; renderActiveTab(); });
   $("filter-cad-mes").addEventListener("change", e=>{ state.cadMes=e.target.value; renderActiveTab(); });
 }
