@@ -5,6 +5,7 @@
 // Match feito pelo nomeFantasia (lowercase, trim, sem acento) ou CNPJ.
 window.PIX_MARCAS = (function(){
     var raw = {
+        "elice fitness": "c114571b-6c15-4363-ae39-22e9c180f05d",
         "nova versao": "10808886000158",
         "nick atacado": "44839916000105",
         "eriluz jeans": "32796225000192",
