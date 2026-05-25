@@ -1,0 +1,38 @@
+Reativação  - quando cliente paga uma fatura atrasada e volta a vesti depois de ficar inadimplente
+Cadastro de produtos - quando cada marca cadastrou os primeiros produtos e quantos produtos tem cadastrados. 
+Primeiras 5 Vendas - primeiras (se fez 4 em um mês, conta do mês seguinte) 
+Primeiras 25 - primeiras, mesma logica das primeiras 5 vendas
+GMV Total
+VestiPago Cartão, se a marca tem ou não e valor por periodo
+VestiPago PIX, se a marca tem ou não e valor por periodo
+TOP 10 marcas por canal considerando GMV (starter, uemtel) todos exceto atta e onix
+
+Canal: Starter, Parceiros ( Exceto Atta e Onix ) 
+CS: Jenny, Elisa 
+
+período: semanal e  mensal
+
+Valor da mensalidade 
+Link compartilhado
+Click no link 
+As marcas que não tem vestipago ativo 
+se não tem frete ativo mostrar tambem
+
+quando a marca começou a cadastrar pedidos e quando começou a ter vendas e quantidade de vendas por mês ou semanal. pra subir alertas de marcas que estão travadas na implantação por exemplo
+
+por abas que abrem ao clicar nos kpis igual o painel cs gerencial com filtros de mês, semana, canal e empresas 
+
+Agrupar como Starter Interno:
+Starter
+Ve Vantagens 
+ProRoi
+Up 
+Comfio 
+Glads 
+Tizzefy 
+Sete 
+Zoom 
+Renan
+
+
+colocar alerta em marcas vermelho 

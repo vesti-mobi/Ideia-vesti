@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<title>Elisa</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="top-bar">
+  <div class="logo-wrap">
+    <div class="logo">Elisa <span class="accent">CS</span></div>
+    <div class="sub">Painel Customer Success · Elisa & Jennyfer</div>
+  </div>
+  <div class="info" id="gerado-em">—</div>
+</div>
+
+<div class="container">
+  <!-- BACK NAV -->
+  <div id="backNav" class="back-nav hidden">
+    <button class="back-btn" onclick="goHome()">← Voltar para Home</button>
+    <span class="breadcrumb" id="breadcrumb"></span>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="filters">
+    <div class="filter-group">
+      <label>Período:</label>
+      <div class="period-toggle">
+        <button type="button" class="pt-btn active" data-period="mensal">Mensal</button>
+        <button type="button" class="pt-btn" data-period="semanal">Semanal</button>
+      </div>
+      <select class="f-select" id="filter-periodo-valor"></select>
+    </div>
+    <div class="filter-group"><label>CS:</label>
+      <select class="f-select" id="filter-cs">
+        <option value="todas">Todas</option>
+        <option value="Elisa Marques">Elisa</option>
+        <option value="Jennyfer Rabelo">Jennyfer</option>
+      </select>
+    </div>
+    <div class="filter-group"><label>Canal:</label>
+      <select class="f-select" id="filter-canal">
+        <option value="todos">Todos</option>
+        <option value="Starter">Starter (interno)</option>
+        <option value="Parceiros">Parceiros (excl. Atta/Onix)</option>
+      </select>
+    </div>
+    <div class="filter-group"><label>Empresa:</label>
+      <select class="f-select" id="filter-empresa"><option value="todas">Todas</option></select>
+    </div>
+  </div>
+
+  <!-- HOME: KPI cards coloridos -->
+  <div id="tab-home" class="tab-panel active">
+    <div class="kpi-grid">
+      <div class="hl-card" onclick="switchTab('gmv')" style="background:linear-gradient(135deg,#0984E3,#5AA9FF)">
+        <div class="hl-icon">💰</div><div class="hl-label">GMV Total</div>
+        <div class="hl-val" id="kpi-gmv">R$ 0</div><div class="hl-sub" id="kpi-gmv-sub">— marcas</div>
+      </div>
+      <div class="hl-card" onclick="switchTab('vpcartao')" style="background:linear-gradient(135deg,#6C5CE7,#8B7BF7)">
+        <div class="hl-icon">💳</div><div class="hl-label">VestiPago Cartão</div>
+        <div class="hl-val" id="kpi-cartao">R$ 0</div><div class="hl-sub" id="kpi-cartao-sub">— marcas ativas</div>
+      </div>
+      <div class="hl-card" onclick="switchTab('vppix')" style="background:linear-gradient(135deg,#00B894,#00D4A0)">
+        <div class="hl-icon">⚡</div><div class="hl-label">VestiPago PIX</div>
+        <div class="hl-val" id="kpi-pix">R$ 0</div><div class="hl-sub" id="kpi-pix-sub">— marcas ativas</div>
+      </div>
+      <div class="hl-card" onclick="switchTab('cadastro')" style="background:linear-gradient(135deg,#F39C12,#FFB94A)">
+        <div class="hl-icon">📦</div><div class="hl-label">Cadastro de Produtos</div>
+        <div class="hl-val" id="kpi-cadastro">0</div><div class="hl-sub"><span id="kpi-cadastro-marcas">0</span> marcas com produtos</div>
+      </div>
+      <div class="hl-card" onclick="switchTab('primeiras5')" style="background:linear-gradient(135deg,#00CEC9,#55EFC4)">
+        <div class="hl-icon">🚀</div><div class="hl-label">Primeiras 5 Vendas</div>
+        <div class="hl-val" id="kpi-p5">0</div><div class="hl-sub">marcas no período</div>
+      </div>
+      <div class="hl-card" onclick="switchTab('primeiras25')" style="background:linear-gradient(135deg,#FD79A8,#FFA8C8)">
+        <div class="hl-icon">🏆</div><div class="hl-label">Primeiras 25 Vendas</div>
+        <div class="hl-val" id="kpi-p25">0</div><div class="hl-sub">marcas no período</div>
+      </div>
+      <div class="hl-card" onclick="switchTab('reativ')" style="background:linear-gradient(135deg,#A29BFE,#C5BEFF)">
+        <div class="hl-icon">🔄</div><div class="hl-label">Reativações</div>
+        <div class="hl-val">—</div><div class="hl-sub">fonte pendente</div>
+      </div>
+      <div class="hl-card" onclick="switchTab('topstarter')" style="background:linear-gradient(135deg,#E17055,#FF8863)">
+        <div class="hl-icon">🥇</div><div class="hl-label">TOP 10 Starter</div>
+        <div class="hl-val" id="kpi-topstarter">0</div><div class="hl-sub">marcas no canal Starter</div>
+      </div>
+      <div class="hl-card" onclick="switchTab('topparceiros')" style="background:linear-gradient(135deg,#D63031,#FF6B6B)">
+        <div class="hl-icon">🥈</div><div class="hl-label">TOP 10 Parceiros</div>
+        <div class="hl-val" id="kpi-topparc">0</div><div class="hl-sub">excl. Atta/Onix</div>
+      </div>
+      <div class="hl-card" onclick="switchTab('vpinativo')" style="background:linear-gradient(135deg,#636E72,#B2BEC3)">
+        <div class="hl-icon">🚫</div><div class="hl-label">Sem VP Ativo</div>
+        <div class="hl-val" id="kpi-semvp">0</div><div class="hl-sub">marcas</div>
+      </div>
+      <div class="hl-card" onclick="switchTab('freteinativo')" style="background:linear-gradient(135deg,#74B9FF,#A0CDFF)">
+        <div class="hl-icon">📮</div><div class="hl-label">Sem Frete Ativo</div>
+        <div class="hl-val" id="kpi-semfrete">0</div><div class="hl-sub">marcas</div>
+      </div>
+      <div class="hl-card" onclick="switchTab('travadas')" style="background:linear-gradient(135deg,#2D3436,#636E72)">
+        <div class="hl-icon">⚠️</div><div class="hl-label">Marcas travadas</div>
+        <div class="hl-val" id="kpi-travadas">0</div><div class="hl-sub">implantação parada</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cada KPI vira uma tab-panel completa -->
+  <div id="tab-gmv" class="tab-panel">
+    <h2 class="tab-title">💰 GMV Total · <span class="periodo-label"></span></h2>
+    <div class="chart-row">
+      <div class="ch"><h4>Evolução mensal do GMV</h4><div class="cw"><canvas id="chart-gmv-evolucao"></canvas></div></div>
+      <div class="ch"><h4>GMV por canal</h4><div class="cw"><canvas id="chart-gmv-canal"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>GMV por marca no período</h4><div class="tbl-wrap"><table class="dt" id="tbl-gmv"></table></div></div>
+  </div>
+
+  <div id="tab-vpcartao" class="tab-panel">
+    <h2 class="tab-title">💳 VestiPago Cartão · <span class="periodo-label"></span></h2>
+    <div class="chart-row">
+      <div class="ch"><h4>Evolução mensal Cartão</h4><div class="cw"><canvas id="chart-cartao-evolucao"></canvas></div></div>
+      <div class="ch"><h4>TOP 10 marcas Cartão</h4><div class="cw"><canvas id="chart-cartao-top"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>Marcas com VP Cartão no período</h4><div class="tbl-wrap"><table class="dt" id="tbl-vpcartao"></table></div></div>
+  </div>
+
+  <div id="tab-vppix" class="tab-panel">
+    <h2 class="tab-title">⚡ VestiPago PIX · <span class="periodo-label"></span></h2>
+    <div class="chart-row">
+      <div class="ch"><h4>Evolução mensal PIX</h4><div class="cw"><canvas id="chart-pix-evolucao"></canvas></div></div>
+      <div class="ch"><h4>TOP 10 marcas PIX</h4><div class="cw"><canvas id="chart-pix-top"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>Marcas com VP PIX no período</h4><div class="tbl-wrap"><table class="dt" id="tbl-vppix"></table></div></div>
+  </div>
+
+  <div id="tab-cadastro" class="tab-panel">
+    <h2 class="tab-title">📦 Cadastro de Produtos</h2>
+    <div class="sub-filter">
+      <label>Mês de cadastro:</label>
+      <select class="f-select" id="filter-cad-mes"><option value="todos">Todos (total acumulado)</option></select>
+      <span class="hint" id="cad-mes-hint">Visão: total acumulado de produtos por marca</span>
+    </div>
+    <div class="chart-row">
+      <div class="ch"><h4>TOP 15 marcas</h4><div class="cw"><canvas id="chart-cad-top"></canvas></div></div>
+      <div class="ch"><h4>Distribuição por faixa de produtos</h4><div class="cw"><canvas id="chart-cad-faixa"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>Marcas e produtos cadastrados</h4><div class="tbl-wrap"><table class="dt" id="tbl-cadastro"></table></div></div>
+  </div>
+
+  <div id="tab-primeiras5" class="tab-panel">
+    <h2 class="tab-title">🚀 Primeiras 5 Vendas · <span class="periodo-label"></span></h2>
+    <div class="chart-row">
+      <div class="ch"><h4>Marcas atingindo 5 vendas por mês</h4><div class="cw"><canvas id="chart-p5-evolucao"></canvas></div></div>
+      <div class="ch"><h4>Distribuição por canal</h4><div class="cw"><canvas id="chart-p5-canal"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>Marcas que atingiram 5 vendas no período</h4><div class="tbl-wrap"><table class="dt" id="tbl-p5"></table></div></div>
+  </div>
+
+  <div id="tab-primeiras25" class="tab-panel">
+    <h2 class="tab-title">🏆 Primeiras 25 Vendas · <span class="periodo-label"></span></h2>
+    <div class="chart-row">
+      <div class="ch"><h4>Marcas atingindo 25 vendas por mês</h4><div class="cw"><canvas id="chart-p25-evolucao"></canvas></div></div>
+      <div class="ch"><h4>Tempo da 1ª venda até 25</h4><div class="cw"><canvas id="chart-p25-tempo"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>Marcas que atingiram 25 vendas no período</h4><div class="tbl-wrap"><table class="dt" id="tbl-p25"></table></div></div>
+  </div>
+
+  <div id="tab-reativ" class="tab-panel">
+    <h2 class="tab-title">🔄 Reativações</h2>
+    <div class="empty-state">
+      <p>Fonte ainda não conectada.</p>
+      <p>Para implementar, definir o critério com a Laura:</p>
+      <ul>
+        <li>Fatura Iugu paga após N dias de inadimplência?</li>
+        <li>Pedido após X dias sem pedido?</li>
+        <li>Retorno ao VP após churn?</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="tab-topstarter" class="tab-panel">
+    <h2 class="tab-title">🥇 TOP 10 Starter Interno · <span class="periodo-label"></span></h2>
+    <div class="chart-row">
+      <div class="ch"><h4>TOP 10 por GMV</h4><div class="cw"><canvas id="chart-tops-bar"></canvas></div></div>
+      <div class="ch"><h4>Participação no GMV Starter</h4><div class="cw"><canvas id="chart-tops-pie"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>TOP 10 marcas Starter Interno</h4><div class="tbl-wrap"><table class="dt" id="tbl-topstarter"></table></div></div>
+  </div>
+
+  <div id="tab-topparceiros" class="tab-panel">
+    <h2 class="tab-title">🥈 TOP 10 Parceiros · <span class="periodo-label"></span></h2>
+    <div class="chart-row">
+      <div class="ch"><h4>TOP 10 por GMV</h4><div class="cw"><canvas id="chart-topp-bar"></canvas></div></div>
+      <div class="ch"><h4>Participação no GMV Parceiros</h4><div class="cw"><canvas id="chart-topp-pie"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>TOP 10 marcas Parceiros (excl. Atta/Onix)</h4><div class="tbl-wrap"><table class="dt" id="tbl-topparc"></table></div></div>
+  </div>
+
+  <div id="tab-vpinativo" class="tab-panel">
+    <h2 class="tab-title">🚫 Marcas sem VP Ativo</h2>
+    <div class="chart-row">
+      <div class="ch"><h4>Marcas por CS</h4><div class="cw"><canvas id="chart-semvp-cs"></canvas></div></div>
+      <div class="ch"><h4>Marcas por canal</h4><div class="cw"><canvas id="chart-semvp-canal"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>Marcas sem pedidos VP nos últimos 30-60 dias</h4><div class="tbl-wrap"><table class="dt" id="tbl-semvp"></table></div></div>
+  </div>
+
+  <div id="tab-freteinativo" class="tab-panel">
+    <h2 class="tab-title">📮 Marcas sem Frete Ativo</h2>
+    <div class="chart-row">
+      <div class="ch"><h4>Marcas por CS</h4><div class="cw"><canvas id="chart-semfrete-cs"></canvas></div></div>
+      <div class="ch"><h4>Marcas por canal</h4><div class="cw"><canvas id="chart-semfrete-canal"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>Marcas sem envios recentes</h4><div class="tbl-wrap"><table class="dt" id="tbl-semfrete"></table></div></div>
+  </div>
+
+  <div id="tab-travadas" class="tab-panel">
+    <h2 class="tab-title">⚠️ Marcas travadas na implantação</h2>
+    <div class="chart-row">
+      <div class="ch"><h4>Distribuição por dias travada</h4><div class="cw"><canvas id="chart-trav-dias"></canvas></div></div>
+      <div class="ch"><h4>Marcas travadas por CS</h4><div class="cw"><canvas id="chart-trav-cs"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>Marcas paradas (cadastraram pedido mas não venderam)</h4><div class="tbl-wrap"><table class="dt" id="tbl-travadas"></table></div></div>
+  </div>
+
+</div>
+
+<script src="dashboard_data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
