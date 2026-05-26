@@ -546,7 +546,6 @@ function renderTabLinks() {
     {label:"Canal", fn:r=>r.canal},
     {label:"Links compartilhados", cls:"num", fn:r=>fmtInt(r.linksCompartilhados||0)},
     {label:"Cliques totais", cls:"num", fn:r=>fmtInt(r.cliquesTotal||0)},
-    {label:"Influenciadores", fn:r=>(r.influenciadores||[]).slice(0,3).join(", ") + ((r.influenciadores||[]).length>3?` +${r.influenciadores.length-3}`:"")},
   ], ranked);
 }
 
