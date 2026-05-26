@@ -542,10 +542,25 @@ function refreshSaldoLive(){
         });
 }
 
+function isValidCPF(d){
+    if(!d||d.length!==11)return false;
+    if(/^(\d)\1{10}$/.test(d))return false;
+    var sum=0,i,r;
+    for(i=0;i<9;i++)sum+=parseInt(d.charAt(i),10)*(10-i);
+    r=(sum*10)%11;if(r===10)r=0;
+    if(r!==parseInt(d.charAt(9),10))return false;
+    sum=0;
+    for(i=0;i<10;i++)sum+=parseInt(d.charAt(i),10)*(11-i);
+    r=(sum*10)%11;if(r===10)r=0;
+    return r===parseInt(d.charAt(10),10);
+}
 function fmtPixKey(v){
     if(!v)return'';
     var s=String(v);
     var d=s.replace(/\D/g,'');
+    // CPF (11 digitos com checksum valido) tem prioridade sobre celular
+    if(d.length===11&&isValidCPF(d))return d.substring(0,3)+'.'+d.substring(3,6)+'.'+d.substring(6,9)+'-'+d.substring(9);
+    if(d.length===14)return d.substring(0,2)+'.'+d.substring(2,5)+'.'+d.substring(5,8)+'/'+d.substring(8,12)+'-'+d.substring(12);
     if(d.length===13&&d.indexOf('55')===0)d=d.substring(2);
     if(d.length===11&&d.charAt(2)==='9')return'('+d.substring(0,2)+')'+d.substring(2,7)+'-'+d.substring(7);
     return s;
