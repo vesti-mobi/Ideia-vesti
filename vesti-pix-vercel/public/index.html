@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vesti — Pix Automático</title>
+<style>
+  :root { --brand:#7c3aed; --bg:#faf9fc; --ink:#1f1235; --muted:#6b6480; --line:#e6e1ee; --ok:#16a34a; --err:#dc2626; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); }
+  .wrap { max-width:520px; margin:0 auto; padding:24px 16px 48px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px; box-shadow:0 4px 16px rgba(31,18,53,.04); }
+  h1 { font-size:22px; margin:0 0 4px; }
+  .sub { color:var(--muted); font-size:14px; margin-bottom:20px; }
+  .plano { background:#f4f0fb; border:1px solid #e0d6f3; border-radius:12px; padding:16px; margin-bottom:20px; }
+  .plano .nome { font-weight:600; font-size:16px; }
+  .plano .valor { font-size:24px; font-weight:700; color:var(--brand); margin-top:4px; }
+  .plano .freq { color:var(--muted); font-size:13px; }
+  label { display:block; font-size:13px; font-weight:600; margin:14px 0 6px; }
+  input { width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:10px; font-size:15px; font-family:inherit; }
+  input:focus { outline:none; border-color:var(--brand); }
+  button { width:100%; margin-top:20px; padding:14px; border:0; border-radius:12px; background:var(--brand); color:#fff; font-size:16px; font-weight:600; cursor:pointer; }
+  button:disabled { opacity:.6; cursor:wait; }
+  .msg { margin-top:14px; padding:12px; border-radius:10px; font-size:14px; }
+  .msg.err { background:#fef2f2; color:var(--err); border:1px solid #fecaca; }
+  .msg.ok { background:#f0fdf4; color:var(--ok); border:1px solid #bbf7d0; }
+  .qr { text-align:center; }
+  .qr img { max-width:260px; width:100%; border:1px solid var(--line); border-radius:12px; padding:8px; background:#fff; }
+  .copia { margin-top:14px; }
+  .copia textarea { width:100%; height:84px; padding:10px; border:1px solid var(--line); border-radius:10px; font-family:ui-monospace,Menlo,monospace; font-size:12px; resize:none; }
+  .copia button { margin-top:8px; background:#1f1235; }
+  .info { font-size:13px; color:var(--muted); margin-top:12px; line-height:1.5; }
+  .skel { background:linear-gradient(90deg,#eee,#f6f6f6,#eee); background-size:200% 100%; animation:s 1.2s linear infinite; border-radius:6px; height:14px; }
+  @keyframes s { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+    <h1>💸 Pix Automático Vesti</h1>
+    <div class="sub">Pagamento e renovação automática em um único QR Code.</div>
+
+    <div id="planoBox" class="plano">
+      <div class="skel" style="width:60%"></div>
+      <div class="skel" style="width:40%; margin-top:10px; height:22px"></div>
+    </div>
+
+    <form id="form" style="display:none">
+      <label>Nome completo</label>
+      <input name="nome" required autocomplete="name" />
+      <label>E-mail</label>
+      <input name="email" type="email" required autocomplete="email" />
+      <label>CPF</label>
+      <input name="cpf" required inputmode="numeric" autocomplete="off" placeholder="só números" />
+      <button type="submit" id="btn">Gerar Pix</button>
+      <div id="msg"></div>
+    </form>
+
+    <div id="resultado" style="display:none">
+      <div class="msg ok">✅ Pix gerado! Pague abaixo — a recorrência é autorizada no mesmo ato.</div>
+      <div class="qr"><img id="qrImg" alt="QR Code Pix" /></div>
+      <div class="copia">
+        <label>Copia e cola</label>
+        <textarea id="qrText" readonly></textarea>
+        <button type="button" id="copyBtn">📋 Copiar código</button>
+      </div>
+      <div class="info" id="resumo"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const parceiro = params.get("parceiro");
+const plano = params.get("plano");
+
+const planoBox = document.getElementById("planoBox");
+const form = document.getElementById("form");
+const msg = document.getElementById("msg");
+const btn = document.getElementById("btn");
+const resultado = document.getElementById("resultado");
+
+function showErr(t){ msg.className="msg err"; msg.textContent=t; }
+function clearMsg(){ msg.className=""; msg.textContent=""; }
+function fmtBRL(c){ return (c/100).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
+
+async function carregarPlano(){
+  if(!parceiro || !plano){
+    planoBox.innerHTML = '<div class="msg err">Link inválido. Solicite um novo link ao atendimento.</div>';
+    return;
+  }
+  try {
+    const r = await fetch(`/api/plano?parceiro=${encodeURIComponent(parceiro)}&plano=${encodeURIComponent(plano)}`);
+    const data = await r.json();
+    if(!r.ok){ planoBox.innerHTML = `<div class="msg err">${data.erro || "Plano não encontrado."}</div>`; return; }
+    planoBox.innerHTML = `
+      <div class="nome">${data.nome}</div>
+      <div class="valor">${fmtBRL(data.valor_cents)}</div>
+      <div class="freq">Cobrança ${data.frequencia.toLowerCase()} — renovação automática</div>
+    `;
+    form.style.display = "block";
+  } catch(e){
+    planoBox.innerHTML = `<div class="msg err">Erro ao carregar plano: ${e.message}</div>`;
+  }
+}
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  clearMsg();
+  btn.disabled = true; btn.textContent = "Gerando…";
+  const fd = new FormData(form);
+  try {
+    const r = await fetch("/api/gerar-pix", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        parceiro, plano,
+        nome: fd.get("nome"),
+        email: fd.get("email"),
+        cpf: fd.get("cpf"),
+      }),
+    });
+    const data = await r.json();
+    if(!r.ok){ showErr(data.erro || "Falha ao gerar Pix."); btn.disabled=false; btn.textContent="Gerar Pix"; return; }
+    if(!data.qrcode && !data.qrcode_text){ showErr("Pix não foi retornado pela Iugu. Tente novamente em instantes."); btn.disabled=false; btn.textContent="Gerar Pix"; return; }
+
+    form.style.display = "none";
+    document.getElementById("qrImg").src = data.qrcode || "";
+    document.getElementById("qrText").value = data.qrcode_text || "";
+    document.getElementById("resumo").textContent = `Valor: ${fmtBRL(data.valor_cents||0)} · Fatura: ${data.invoice_id||"—"}`;
+    resultado.style.display = "block";
+  } catch(err){
+    showErr("Erro de rede: " + err.message);
+    btn.disabled = false; btn.textContent = "Gerar Pix";
+  }
+});
+
+document.getElementById("copyBtn").addEventListener("click", async () => {
+  const txt = document.getElementById("qrText").value;
+  try { await navigator.clipboard.writeText(txt); document.getElementById("copyBtn").textContent = "✅ Copiado!"; }
+  catch { document.getElementById("qrText").select(); document.execCommand("copy"); }
+});
+
+carregarPlano();
+</script>
+</body>
+</html>

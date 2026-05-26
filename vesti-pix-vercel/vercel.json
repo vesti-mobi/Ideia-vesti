@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/plano", "destination": "/api/plano.py" },
+    { "source": "/api/gerar-pix", "destination": "/api/gerar-pix.py" }
+  ]
+}
