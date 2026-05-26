@@ -1,16 +1,45 @@
 """POST /api/gerar-pix → cria customer (se preciso) + subscription com automatic_pix jornada 3."""
 import json
+import os
+import re
 from datetime import date, timedelta
 from http.server import BaseHTTPRequestHandler
 
 import requests
 
-from _iugu import (
-    BASE_URL,
-    buscar_plano,
-    freq_automatic_pix,
-    token_para_parceiro,
-)
+BASE_URL = "https://api.iugu.com/v1"
+
+FREQ_TO_AUTOMATIC_PIX = {
+    ("weeks", 1): "weekly",
+    ("months", 1): "monthly",
+    ("months", 3): "quarterly",
+    ("months", 6): "semiannually",
+    ("months", 12): "yearly",
+    ("years", 1): "yearly",
+}
+
+
+def token_para_parceiro(parceiro):
+    if not parceiro or not re.match(r"^[a-zA-Z0-9_-]+$", parceiro):
+        return None
+    key = f"IUGU_TOKEN_{parceiro.upper().replace('-', '_')}"
+    return os.environ.get(key)
+
+
+def buscar_plano(token, identifier):
+    r = requests.get(
+        f"{BASE_URL}/plans/identifier/{identifier}",
+        auth=(token, ""),
+        timeout=30,
+    )
+    if r.status_code >= 400:
+        return None, r
+    return r.json(), r
+
+
+def freq_automatic_pix(plano):
+    key = (plano.get("interval_type"), plano.get("interval") or 1)
+    return FREQ_TO_AUTOMATIC_PIX.get(key, "monthly")
 
 
 def _send(self, status, payload):
