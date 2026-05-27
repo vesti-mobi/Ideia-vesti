@@ -520,14 +520,14 @@ function renderTabTravadas() {
     options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
   });
   renderTable("tbl-travadas", [
-    {label:"Marca", fn:r=>r.name},
-    {label:"CS", fn:r=>r.cs},
-    {label:"Canal", fn:r=>r.canal},
-    {label:"Data entrada", fn:r=>(r.dataEntrada||"—").slice(0,10)},
-    {label:"1º pedido cadastrado", fn:r=>(r.primeiroPedidoCadastrado||"—").slice(0,10)},
-    {label:"1ª venda", fn:r=>(r.primeiraVenda||"—").slice(0,10)},
-    {label:"Produtos", cls:"num", fn:r=>fmtInt(r.qtProdutos||0)},
-    {label:"Dias travada", cls:"num", fn:r=>r._dias??"—"},
+    {label:"Marca", fn:r=>r.name, sort:r=>r.name},
+    {label:"CS", fn:r=>r.cs, sort:r=>r.cs},
+    {label:"Canal", fn:r=>r.canal, sort:r=>r.canal},
+    {label:"Data entrada", fn:r=>(r.dataEntrada||"—").slice(0,10), sort:r=>r.dataEntrada||""},
+    {label:"1º pedido cadastrado", fn:r=>(r.primeiroPedidoCadastrado||"—").slice(0,10), sort:r=>r.primeiroPedidoCadastrado||""},
+    {label:"1ª venda", fn:r=>(r.primeiraVenda||"—").slice(0,10), sort:r=>r.primeiraVenda||""},
+    {label:"Produtos", cls:"num", fn:r=>fmtInt(r.qtProdutos||0), sort:r=>r.qtProdutos||0},
+    {label:"Dias travada", cls:"num", fn:r=>r._dias??"—", sort:r=>r._dias??-1},
   ], lista.map(e=>({...e,_alert:true})));
 }
 
