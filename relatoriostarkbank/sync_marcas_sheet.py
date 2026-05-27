@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Sync da aba 'Contas dos clientes' (Google Sheet) para os 3 mapas do painel.
 
-Fonte:  https://docs.google.com/spreadsheets/d/1uOnHsppvseKyFZsFbUYv9gX1XxHrtr-OjLv3_I7Us1s/  aba gid=1082358844
+Fonte:  https://docs.google.com/spreadsheets/d/1jNdkA5aunf5jGGijXT0tcMTB-iW6-4OmXASucBjJqsQ/  aba gid=0
 Destino: pix_marcas.js, cnpj_marcas.js, razao_marcas.js (mesma pasta deste script)
 
 Comportamento: para cada marca presente na planilha, sobrescreve PIX/CNPJ/razao
@@ -16,8 +16,8 @@ import json, os, re, sys, unicodedata
 from pathlib import Path
 
 DIR = Path(__file__).parent
-SHEET_ID = '1uOnHsppvseKyFZsFbUYv9gX1XxHrtr-OjLv3_I7Us1s'
-WORKSHEET_GID = 1082358844
+SHEET_ID = '1jNdkA5aunf5jGGijXT0tcMTB-iW6-4OmXASucBjJqsQ'
+WORKSHEET_GID = 0
 
 # ----------------------- auth -----------------------
 import gspread
