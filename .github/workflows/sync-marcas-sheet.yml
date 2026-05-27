@@ -1,4 +1,4 @@
-name: Sync marcas (PIX/CNPJ/Razao) da planilha Google
+name: Sync marcas PIX CNPJ Razao da planilha Google
 
 on:
   schedule:
