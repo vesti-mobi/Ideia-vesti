@@ -16,34 +16,18 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Instalar dependencias Python
-        run: pip install --quiet google-api-python-client google-auth
-
-      - name: Restaurar Service Account
-        env:
-          GOOGLE_SA_JSON: ${{ secrets.GOOGLE_SA_JSON }}
-        run: |
-          if [ -z "$GOOGLE_SA_JSON" ]; then
-            echo "ERRO: secret GOOGLE_SA_JSON nao configurado"
-            exit 1
-          fi
-          mkdir -p PainelCSGerencial
-          echo "$GOOGLE_SA_JSON" > PainelCSGerencial/google_sa.json
-
-      - name: Fetch + build
+      - name: Fetch HubSpot + build
         working-directory: PlanilhasEPainelCS
+        env:
+          HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
         run: |
-          python fetch_sheets.py
+          python fetch_hubspot.py
           python build_html.py
-
-      - name: Limpar credencial
-        if: always()
-        run: rm -f PainelCSGerencial/google_sa.json
 
       - name: Commit e push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add PlanilhasEPainelCS/real_data.js PlanilhasEPainelCS/index.html 2>/dev/null || true
+          git add PlanilhasEPainelCS/real_data.js PlanilhasEPainelCS/hubspot_raw.json PlanilhasEPainelCS/index.html 2>/dev/null || true
           git diff --cached --quiet || git commit -m "PlanilhasEPainelCS: refresh $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
