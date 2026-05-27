@@ -532,6 +532,28 @@ function renderTabLinks() {
       }
     }
   });
+  // breakdown por canal (Starter/Uemtel/Atta/Parceiros)
+  const porCanal = {};
+  for (const e of lista) {
+    const c = canalDe(e) || "Outros";
+    const slot = porCanal[c] || (porCanal[c] = {cliques:0, links:0});
+    slot.cliques += e.cliquesTotal || 0;
+    slot.links   += e.linksCompartilhados || 0;
+  }
+  const canais = Object.keys(porCanal).sort();
+  const canalCor = {Starter:COLORS[0], Uemtel:COLORS[3], Atta:COLORS[5], Parceiros:COLORS[7], Outros:"#999"};
+  makeChart("chart-links-cliques-canal", {
+    type:"doughnut",
+    data:{labels:canais, datasets:[{data:canais.map(c=>porCanal[c].cliques), backgroundColor:canais.map(c=>canalCor[c]||COLORS[10])}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:"bottom"},
+      tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw.toLocaleString("pt-BR")} cliques`}}}}
+  });
+  makeChart("chart-links-env-canal", {
+    type:"doughnut",
+    data:{labels:canais, datasets:[{data:canais.map(c=>porCanal[c].links), backgroundColor:canais.map(c=>canalCor[c]||COLORS[10])}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:"bottom"},
+      tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw.toLocaleString("pt-BR")} links`}}}}
+  });
   // top 10 por cliques
   const ranked = lista.filter(e=>(e.cliquesTotal||0)>0).sort((a,b)=>b.cliquesTotal-a.cliquesTotal);
   const top10 = ranked.slice(0,10);
@@ -544,8 +566,8 @@ function renderTabLinks() {
     {label:"Marca", fn:r=>r.name},
     {label:"CS", fn:r=>r.cs},
     {label:"Canal", fn:r=>r.canal},
-    {label:"Links compartilhados", cls:"num", fn:r=>fmtInt(r.linksCompartilhados||0)},
-    {label:"Cliques totais", cls:"num", fn:r=>fmtInt(r.cliquesTotal||0)},
+    {label:"Links Enviados", cls:"num", fn:r=>fmtInt(r.linksCompartilhados||0)},
+    {label:"Cliques nos Links", cls:"num", fn:r=>fmtInt(r.cliquesTotal||0)},
   ], ranked);
 }
 

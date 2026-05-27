@@ -253,13 +253,40 @@ GROUP BY p.domainId
 # Reativacao: fatura Iugu paga apos o vencimento (paid_at > due_date).
 # Conta uma reativacao por (dominio, mes do paid_at).
 SQL_LINKS = """
-SELECT
-    domain_id,
-    [Nome Influenciador] AS influenciador,
-    [Nome do dominio]    AS nome_dominio,
-    [Soma cliques]       AS cliques,
-    FORMAT(TRY_CAST(created_at AS DATE), 'yyyy-MM') AS mes
-FROM dbo.PedidosUTM_InserirClickdosprodutos
+-- Mesma fonte do PBIX "CS - Sucesso do Cliente 2025":
+--   Links Enviados   = COUNT(DISTINCT product_sent_lists_id)
+--   Cliques nos Links = SUM(rankings_shared_links)
+-- Join via SucessoDoCliente_CadastroUser (USERS_ID -> DomainId).
+WITH links AS (
+    SELECT u.DomainId AS domain_id,
+           FORMAT(p.product_sent_lists_created_at, 'yyyy-MM') AS mes,
+           COUNT(DISTINCT p.product_sent_lists_id) AS links
+    FROM dbo.SucessoDoCliente_Products p
+    JOIN dbo.SucessoDoCliente_CadastroUser u ON u.UserId = p.USERS_ID
+    WHERE p.product_sent_lists_created_at IS NOT NULL
+      AND p.product_sent_lists_created_at >= '2024-01-01'
+      AND p.product_sent_lists_created_at <  '2100-01-01'
+    GROUP BY u.DomainId, FORMAT(p.product_sent_lists_created_at, 'yyyy-MM')
+),
+cliques AS (
+    SELECT u.DomainId AS domain_id,
+           FORMAT(r.rankings_created_at, 'yyyy-MM') AS mes,
+           SUM(r.rankings_shared_links) AS cliques
+    FROM dbo.SucessoDoCliente_Rankings r
+    JOIN dbo.SucessoDoCliente_CadastroUser u ON u.UserId = r.USERS_ID
+    WHERE r.rankings_created_at IS NOT NULL
+      AND r.rankings_created_at >= '2024-01-01'
+      AND r.rankings_created_at <  '2100-01-01'
+    GROUP BY u.DomainId, FORMAT(r.rankings_created_at, 'yyyy-MM')
+)
+SELECT COALESCE(l.domain_id, c.domain_id) AS domain_id,
+       COALESCE(l.mes, c.mes)             AS mes,
+       COALESCE(l.links, 0)               AS links,
+       COALESCE(c.cliques, 0)             AS cliques
+FROM links l
+FULL OUTER JOIN cliques c
+    ON c.domain_id = l.domain_id AND c.mes = l.mes
+WHERE COALESCE(l.links, 0) + COALESCE(c.cliques, 0) > 0
 """
 
 SQL_REATIVACAO = """
@@ -373,19 +400,17 @@ def build_links(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
         except (TypeError, ValueError): pass
         if dom not in empresas_by_dom:
             continue
-        cliq = int(r.get("cliques") or 0)
-        mes = r.get("mes") or ""
+        links = int(r.get("links") or 0)
+        cliq  = int(r.get("cliques") or 0)
+        mes   = r.get("mes") or ""
         slot = out.setdefault(dom, {"linksCompartilhados": 0, "cliquesTotal": 0,
                                      "cliquesPorMes": {}, "linksPorMes": {},
                                      "influenciadores": []})
-        slot["linksCompartilhados"] += 1
-        slot["cliquesTotal"] += cliq
+        slot["linksCompartilhados"] += links
+        slot["cliquesTotal"]        += cliq
         if mes:
-            slot["cliquesPorMes"][mes] = slot["cliquesPorMes"].get(mes, 0) + cliq
-            slot["linksPorMes"][mes]   = slot["linksPorMes"].get(mes, 0) + 1
-        inf = (r.get("influenciador") or "").strip()
-        if inf and inf not in slot["influenciadores"]:
-            slot["influenciadores"].append(inf)
+            if links: slot["linksPorMes"][mes]   = slot["linksPorMes"].get(mes, 0) + links
+            if cliq:  slot["cliquesPorMes"][mes] = slot["cliquesPorMes"].get(mes, 0) + cliq
     return out
 
 
