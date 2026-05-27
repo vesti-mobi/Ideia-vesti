@@ -1,0 +1,51 @@
+name: Sync marcas (PIX/CNPJ/Razao) da planilha Google
+
+on:
+  schedule:
+    - cron: '0 12 * * *'  # 12:00 UTC = 09:00 BRT (1x ao dia)
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Motivo do disparo manual'
+        required: false
+        default: 'manual'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: pip install gspread google-auth
+
+      - name: Rodar sync da planilha
+        working-directory: relatoriostarkbank
+        env:
+          GOOGLE_SHEETS_SA_JSON: ${{ secrets.GOOGLE_SHEETS_SA_JSON }}
+        run: python sync_marcas_sheet.py
+
+      - name: Commit e push se houver mudancas
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add relatoriostarkbank/pix_marcas.js \
+                  relatoriostarkbank/cnpj_marcas.js \
+                  relatoriostarkbank/razao_marcas.js 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "sem mudancas"
+          else
+            git commit -m "Sync marcas (planilha) $(date +'%d/%m/%Y %H:%M')"
+            for i in 1 2 3; do
+              if git push; then break; fi
+              echo "push falhou (tentativa $i), rebase..."
+              git pull --rebase origin main || exit 1
+            done
+          fi
