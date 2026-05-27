@@ -4,9 +4,12 @@
 Fonte:  https://docs.google.com/spreadsheets/d/1jNdkA5aunf5jGGijXT0tcMTB-iW6-4OmXASucBjJqsQ/  aba gid=0
 Destino: pix_marcas.js, cnpj_marcas.js, razao_marcas.js (mesma pasta deste script)
 
-Comportamento: para cada marca presente na planilha, sobrescreve PIX/CNPJ/razao
-no JS correspondente. Marcas que NAO estao na planilha sao MANTIDAS como
-estao (fallback). Nada e apagado.
+Comportamento APPEND-ONLY: para cada marca da planilha, SO preenche PIX/CNPJ/
+razao no JS se a marca AINDA NAO existe la. Marcas ja cadastradas no JS sao
+mantidas como estao — a planilha nunca sobrescreve. Nada e apagado.
+
+A coluna "razao social" e OPCIONAL na planilha — se nao existir, o sync de
+razao e pulado (PIX/CNPJ seguem normalmente).
 
 Auth:
   - Local: define GOOGLE_SHEETS_SA_JSON_FILE=path/para/sa.json
@@ -67,10 +70,12 @@ k_cnpj    = find_header(sample, 'cnpj')  # pega a primeira coluna chamada CNPJ
 k_razao   = find_header(sample, 'razao social', 'razão social', 'razao')
 
 missing = [n for n, k in [('empresa', k_empresa), ('chave pix', k_pix),
-                            ('cnpj', k_cnpj), ('razao social', k_razao)] if k is None]
+                            ('cnpj', k_cnpj)] if k is None]
 if missing:
-    sys.exit(f'Cabecalhos faltando: {missing}. Encontrados: {list(sample.keys())}')
+    sys.exit(f'Cabecalhos obrigatorios faltando: {missing}. Encontrados: {list(sample.keys())}')
 print(f'Colunas: empresa={k_empresa!r} pix={k_pix!r} cnpj={k_cnpj!r} razao={k_razao!r}')
+if k_razao is None:
+    print('  (sem coluna "razao social" na planilha — sync de razao desativado)')
 
 # ----------------------- coleta da planilha -----------------------
 sheet_pix, sheet_cnpj, sheet_razao = {}, {}, {}
@@ -83,7 +88,7 @@ for r in rows:
     nn = norm(nm)
     pix   = str(r.get(k_pix, '')   or '').strip()
     cnpj  = str(r.get(k_cnpj, '')  or '').strip()
-    razao = str(r.get(k_razao, '') or '').strip()
+    razao = str(r.get(k_razao, '') or '').strip() if k_razao else ''
     if pix:   sheet_pix[nn]   = pix
     if cnpj:  sheet_cnpj[nn]  = cnpj
     if razao: sheet_razao[nn] = razao
@@ -138,14 +143,10 @@ def update_js(path, sheet_map, label):
         if nk not in by_key:
             order.append(nk)
         by_key[nk] = [k, v]
-    added = updated = unchanged = 0
+    added = kept = 0
     for nk, val in sheet_map.items():
         if nk in by_key:
-            if by_key[nk][1] != val:
-                by_key[nk][1] = val
-                updated += 1
-            else:
-                unchanged += 1
+            kept += 1  # ja existe no JS — planilha NAO sobrescreve
         else:
             by_key[nk] = [nk, val]
             order.append(nk)
@@ -154,10 +155,10 @@ def update_js(path, sheet_map, label):
     new_block = render_block(new_items)
     new_text = text[:start] + new_block + text[end + 1:]
     if new_text == text:
-        print(f'  {label}: sem mudancas ({len(new_items)} entradas, ={unchanged} iguais)')
+        print(f'  {label}: sem mudancas ({len(new_items)} entradas, ={kept} ja cadastradas)')
         return
     path.write_text(new_text, encoding='utf-8')
-    print(f'  {label}: +{added} novas, ~{updated} atualizadas, ={unchanged} iguais (total {len(new_items)})')
+    print(f'  {label}: +{added} novas, ={kept} preservadas (total {len(new_items)})')
 
 print('\nMerge nos .js:')
 update_js(DIR / 'pix_marcas.js',   sheet_pix,   'PIX  ')
