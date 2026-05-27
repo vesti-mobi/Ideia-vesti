@@ -88,6 +88,7 @@ def main():
         meses_set.update(g.get("mensal", {}).keys())
         semanas_set.update(g.get("semanal", {}).keys())
         qtd_vendas_mes = g.get("qtdVendasMes", {})
+        qtd_vendas_pagas_mes = g.get("qtdVendasPagasMes", {})
         enriched.append({
             **e,
             "qtProdutos": c.get("qtProdutos", 0),
@@ -97,9 +98,12 @@ def main():
             "primeiroCadastroProduto": c.get("primeiroCadastroProduto", ""),
             "primeiroPedidoCadastrado": c.get("primeiroPedidoCadastrado", ""),
             "primeiraVenda": g.get("primeiraVenda", ""),
+            "primeiraVendaPaga": g.get("primeiraVendaPaga", ""),
             "qtdVendasMes": qtd_vendas_mes,
-            "mes5Vendas":  _primeiras_n(qtd_vendas_mes, 5),
-            "mes25Vendas": _primeiras_n(qtd_vendas_mes, 25),
+            "qtdVendasPagasMes": qtd_vendas_pagas_mes,
+            # mes5/25Vendas usam SOMENTE pedidos pagos (payment_paidAt preenchido)
+            "mes5Vendas":  _primeiras_n(qtd_vendas_pagas_mes, 5),
+            "mes25Vendas": _primeiras_n(qtd_vendas_pagas_mes, 25),
             "mensal":   g.get("mensal", {}),
             "semanal":  g.get("semanal", {}),
             "temVPAtivo":     v.get("temVPAtivo", False),

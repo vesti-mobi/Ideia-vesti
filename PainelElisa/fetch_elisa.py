@@ -181,7 +181,9 @@ SELECT
     SUM(p.summary_total) AS val_total,
     SUM(CASE WHEN p.payment_method='PIX' THEN 1 ELSE 0 END)        AS qt_pix,
     SUM(CASE WHEN p.payment_method='CREDIT_CARD' THEN 1 ELSE 0 END) AS qt_cartao,
-    COUNT(*) AS qt_total
+    COUNT(*) AS qt_total,
+    -- pedidos pagos (payment_paidAt preenchido = pagamento confirmado, mesmo se ainda WAITING)
+    SUM(CASE WHEN p.payment_paidAt IS NOT NULL AND p.payment_paidAt <> '' THEN 1 ELSE 0 END) AS qt_paid
 FROM dbo.MongoDB_Pedidos_Geral p
 WHERE p.summary_total IS NOT NULL AND p.summary_total > 0 AND p.summary_total < 50000
   AND p.settings_createdAt_TIMESTAMP >= '2025-01-01'
@@ -210,7 +212,9 @@ def build_gmv(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
             continue
         mes = dia.strftime("%Y-%m")
         sem = _semana_iso(dia)
-        emp = by_emp.setdefault(dom, {"mensal": {}, "semanal": {}, "primeiraVenda": None, "qtdVendasMes": {}})
+        emp = by_emp.setdefault(dom, {"mensal": {}, "semanal": {}, "primeiraVenda": None,
+                                       "primeiraVendaPaga": None,
+                                       "qtdVendasMes": {}, "qtdVendasPagasMes": {}})
         for chave, periodo in (("mensal", mes), ("semanal", sem)):
             bucket = emp[chave].setdefault(periodo, {
                 "valPix": 0.0, "valCartao": 0.0, "valTotal": 0.0,
@@ -222,11 +226,17 @@ def build_gmv(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
             bucket["qtPix"]     += int(r.get("qt_pix") or 0)
             bucket["qtCartao"]  += int(r.get("qt_cartao") or 0)
             bucket["qtTotal"]   += int(r.get("qt_total") or 0)
-        # primeira venda
+        # primeira venda (qualquer status)
         dia_iso = dia.isoformat()
         if not emp["primeiraVenda"] or dia_iso < emp["primeiraVenda"]:
             emp["primeiraVenda"] = dia_iso
         emp["qtdVendasMes"][mes] = emp["qtdVendasMes"].get(mes, 0) + int(r.get("qt_total") or 0)
+        # vendas PAGAS (payment_paidAt preenchido)
+        qt_paid = int(r.get("qt_paid") or 0)
+        if qt_paid:
+            emp["qtdVendasPagasMes"][mes] = emp["qtdVendasPagasMes"].get(mes, 0) + qt_paid
+            if not emp["primeiraVendaPaga"] or dia_iso < emp["primeiraVendaPaga"]:
+                emp["primeiraVendaPaga"] = dia_iso
 
     return {"geradoEm": datetime.now(timezone.utc).isoformat(), "empresas": by_emp}
 

@@ -296,11 +296,12 @@ function renderTabPrimeiras(n) {
       options:{responsive:true, maintainAspectRatio:false}
     });
   } else {
-    // tempo 1a venda até 25
+    // tempo 1a venda paga até 25 vendas pagas
     const tempos = [];
     for (const e of lista) {
-      if (!e.mes25Vendas || !e.primeiraVenda) continue;
-      const dv = new Date(e.primeiraVenda);
+      const venda1 = e.primeiraVendaPaga || e.primeiraVenda;
+      if (!e.mes25Vendas || !venda1) continue;
+      const dv = new Date(venda1);
       const dm = new Date(e.mes25Vendas+"-15");
       const dias = Math.floor((dm-dv)/86400000);
       if (dias>=0 && dias<400) tempos.push(dias);
@@ -320,10 +321,11 @@ function renderTabPrimeiras(n) {
     });
   }
   const rows = lista.filter(e=>e[campo] === mesK).map(e => {
-    const ate1aVenda = diasEntre((e.dataEntrada||"").slice(0,10), e.primeiraVenda);
+    const venda1Paga = e.primeiraVendaPaga || e.primeiraVenda;
+    const ate1aVenda = diasEntre((e.dataEntrada||"").slice(0,10), venda1Paga);
     const ateNVendas = diasEntre((e.dataEntrada||"").slice(0,10), e[campo] ? e[campo]+"-15" : null);
     const permanencia = diasEntre((e.dataEntrada||"").slice(0,10), new Date().toISOString().slice(0,10));
-    return {...e, _ate1aVenda:ate1aVenda, _ateN:ateNVendas, _perm:permanencia};
+    return {...e, _venda1Paga:venda1Paga, _ate1aVenda:ate1aVenda, _ateN:ateNVendas, _perm:permanencia};
   });
   const cols = [
     {label:"Marca", fn:r=>r.name},
@@ -331,11 +333,11 @@ function renderTabPrimeiras(n) {
     {label:"Canal", fn:r=>r.canal},
     {label:"Data entrada", fn:r=>(r.dataEntrada||"—").slice(0,10)},
     {label:"Permanência (d)", cls:"num", fn:r=>r._perm??"—"},
-    {label:"1ª venda", fn:r=>r.primeiraVenda||"—"},
-    {label:"Dias até 1ª venda", cls:"num", fn:r=>r._ate1aVenda??"—"},
-    {label:`Mês ${n} vendas`, fn:r=>r[campo]||"—"},
+    {label:"1ª venda paga", fn:r=>r._venda1Paga||"—"},
+    {label:"Dias até 1ª venda paga", cls:"num", fn:r=>r._ate1aVenda??"—"},
+    {label:`Mês ${n}ª venda paga`, fn:r=>r[campo]||"—"},
   ];
-  if (n === 25) cols.push({label:"Dias até 25 vendas", cls:"num", fn:r=>r._ateN??"—"});
+  if (n === 25) cols.push({label:"Dias até 25 vendas pagas", cls:"num", fn:r=>r._ateN??"—"});
   renderTable(n===5?"tbl-p5":"tbl-p25", cols, rows);
 }
 
