@@ -68,6 +68,11 @@ table.dt{width:100%;border-collapse:collapse;font-size:12px}
 table.dt th{text-align:left;padding:8px 10px;background:#F8F9FA;font-weight:600;color:var(--g);
   font-size:10px;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--lg);
   position:sticky;top:0;z-index:3}
+table.dt th.sortable{cursor:pointer;user-select:none}
+table.dt th.sortable:hover{color:var(--dk);background:#EEF0F4}
+table.dt th.sortable::after{content:" ↕";opacity:.4;font-size:10px}
+table.dt th.sort-desc::after{content:" ↓";opacity:1;color:var(--p,#6C5CE7)}
+table.dt th.sort-asc::after{content:" ↑";opacity:1;color:var(--p,#6C5CE7)}
 table.dt td{padding:7px 10px;border-bottom:1px solid #f0f0f0}
 table.dt tr:hover td{background:#FAFAFA}
 table.dt tr.row-alert td{background:rgba(225,112,85,.08)}

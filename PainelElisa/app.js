@@ -47,16 +47,48 @@ function makeChart(id, cfg) {
   charts[id] = new Chart(ctx, cfg);
 }
 
+const _sortState = {}; // {tableId: {col: idx, dir: 'desc'|'asc'}}
 function renderTable(tableId, columns, rows) {
   const tbl = document.getElementById(tableId);
   if (!tbl) return;
   if (!rows.length) { tbl.innerHTML = `<tr><td class="empty" colspan="${columns.length}">Sem dados pros filtros atuais.</td></tr>`; return; }
-  const thead = `<thead><tr>${columns.map(c=>`<th class="${c.cls||''}">${c.label}</th>`).join("")}</tr></thead>`;
-  const tbody = `<tbody>${rows.map(r=>{
+  const st = _sortState[tableId];
+  let sortedRows = rows;
+  if (st && columns[st.col] && columns[st.col].sort) {
+    const k = columns[st.col].sort;
+    const mul = st.dir === 'asc' ? 1 : -1;
+    sortedRows = [...rows].sort((a,b)=>{
+      const va = k(a), vb = k(b);
+      if (va == null && vb == null) return 0;
+      if (va == null) return 1;
+      if (vb == null) return -1;
+      if (typeof va === 'number' && typeof vb === 'number') return (va-vb)*mul;
+      return String(va).localeCompare(String(vb), 'pt-BR', {numeric:true}) * mul;
+    });
+  }
+  const thead = `<thead><tr>${columns.map((c,i)=>{
+    const sortable = !!c.sort;
+    let cls = c.cls || '';
+    if (sortable) cls += (cls?' ':'') + 'sortable';
+    if (st && st.col === i) cls += ' sort-' + st.dir;
+    const attrs = sortable ? ` data-col="${i}"` : '';
+    return `<th class="${cls}"${attrs}>${c.label}</th>`;
+  }).join("")}</tr></thead>`;
+  const tbody = `<tbody>${sortedRows.map(r=>{
     const cls = r._alert ? "row-alert" : "";
     return `<tr class="${cls}">${columns.map(c=>`<td class="${c.cls||''}">${c.fn(r)}</td>`).join("")}</tr>`;
   }).join("")}</tbody>`;
   tbl.innerHTML = thead + tbody;
+  // bind sort handlers
+  tbl.querySelectorAll('th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const idx = +th.dataset.col;
+      const cur = _sortState[tableId];
+      const dir = (cur && cur.col === idx && cur.dir === 'desc') ? 'asc' : 'desc';
+      _sortState[tableId] = {col: idx, dir};
+      renderTable(tableId, columns, rows);
+    });
+  });
 }
 
 // ---------- HOME KPIs ----------
@@ -568,8 +600,8 @@ function renderTabLinks() {
     {label:"Marca", fn:r=>r.name},
     {label:"CS", fn:r=>r.cs},
     {label:"Canal", fn:r=>r.canal},
-    {label:"Links Enviados", cls:"num", fn:r=>fmtInt(r.linksCompartilhados||0)},
-    {label:"Cliques nos Links", cls:"num", fn:r=>fmtInt(r.cliquesTotal||0)},
+    {label:"Links Enviados", cls:"num", fn:r=>fmtInt(r.linksCompartilhados||0), sort:r=>r.linksCompartilhados||0},
+    {label:"Cliques nos Links", cls:"num", fn:r=>fmtInt(r.cliquesTotal||0), sort:r=>r.cliquesTotal||0},
   ], ranked);
 }
 
