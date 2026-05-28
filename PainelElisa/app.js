@@ -126,6 +126,7 @@ function renderKpis() {
   $("kpi-topparc").textContent = fmtInt(lista.filter(e=>!e.starter_interno && !PARC_EXCL.has((e.partner_raw||"").toLowerCase())).length);
   const hoje = new Date();
   const travadas = lista.filter(e => {
+    if (e.modulos !== undefined && !(e.modulos||"").toLowerCase().includes("vendas")) return false;
     const ped = e.primeiroPedidoCadastrado ? new Date(e.primeiroPedidoCadastrado) : null;
     const venda = e.primeiraVenda ? new Date(e.primeiraVenda) : null;
     const dias = ped ? Math.floor((hoje-ped)/86400000) : null;
@@ -496,7 +497,8 @@ function renderTabTravadas() {
     const venda = e.primeiraVenda ? new Date(e.primeiraVenda) : null;
     const dias = ped ? Math.floor((hoje-ped)/86400000) : null;
     return {...e, _ped:ped, _venda:venda, _dias:dias};
-  }).filter(e => (e._ped && !e._venda && e._dias > 14) || (e._ped && (e.qtProdutos||0) === 0))
+  }).filter(e => e.modulos === undefined || (e.modulos||"").toLowerCase().includes("vendas"))
+    .filter(e => (e._ped && !e._venda && e._dias > 14) || (e._ped && (e.qtProdutos||0) === 0))
     .sort((a,b)=>(b._dias||0)-(a._dias||0));
   // faixas dias
   const faixas = {"15-30d":0,"31-60d":0,"61-90d":0,"91-180d":0,"180d+":0};

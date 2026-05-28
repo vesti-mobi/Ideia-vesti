@@ -55,7 +55,7 @@ FILTRO_DOMINIOS = """
 # -----------------------------------------------------------------------------
 SQL_EMPRESAS = f"""
 WITH active_domains AS (
-    SELECT d.id, d.name, d.angel_id, d.integration_id, d.partner_id
+    SELECT d.id, d.name, d.angel_id, d.integration_id, d.partner_id, d.modulos
     FROM dbo.ODBC_Domains d
     WHERE {FILTRO_DOMINIOS}
 ),
@@ -86,7 +86,8 @@ SELECT
     i.name               AS integration_name,
     p.name               AS partner_name,
     sub.plan_name        AS plano,
-    inv_last.total_cents AS last_invoice_cents
+    inv_last.total_cents AS last_invoice_cents,
+    d.modulos            AS modulos
 FROM elisa_domains d
 JOIN ranked_companies rc          ON rc.domain_id = d.id
 LEFT JOIN dbo.ODBC_Angels a       ON a.id = d.angel_id
@@ -161,6 +162,7 @@ def build_empresas(rows: list[dict]) -> list[dict]:
             "integracao": r.get("integration_name") or "",
             "plano": r.get("plano") or "",
             "valor_mensal": round(valor_mensal, 2),
+            "modulos": (r.get("modulos") or ""),
             "is_filial": is_filial,
             "isMatriz": not is_filial,
             "matriz_name": matriz_name,
