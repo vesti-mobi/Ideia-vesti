@@ -134,7 +134,9 @@ window.PIX_MARCAS = (function(){
         "zoe sport":                    "zoesportsoficial@gmail.com",
         "modas carla":                  "inter",
         "daline":                       "nubank",
-        "charisma matriz":              "Santander"
+        "charisma matriz":              "Santander",
+        "cvl varejo":                   "contato@atualtextil.com",
+        "cvl n friburgo":               "contato@atualtextil.com"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
