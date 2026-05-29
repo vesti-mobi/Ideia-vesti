@@ -142,7 +142,25 @@ window.PIX_MARCAS = (function(){
         "cvl moda- cd nova friburgo":   "contato@atualtextil.com",
         "cvlnfriburgo":                 "contato@atualtextil.com",
         "cvl moda- plaza polo":         "29888894000260",
-        "cvlplazapolo":                 "29888894000260"
+        "cvlplazapolo":                 "29888894000260",
+        "vestipago":                    "49345891000107",
+        "andressa - teste":             "49345891000107",
+        "zeros confeccao":              "45180025000152",
+        "miss mel":                     "17974887000111",
+        "snacessorios":                 "60801292000193",
+        "ttng":                         "12292902000128",
+        "refugiomodas":                 "13624458000163",
+        "bymitomazela":                 "37266456000108",
+        "felpsconfec":                  "9917433937",
+        "vintagestyle":                 "51486393000126",
+        "mattoswear":                   "45204996000195",
+        "layzaaguiar":                  "4001387190",
+        "mariafuxico":                  "60534565000180",
+        "cvlfdasmalhas":                "29888894000503",
+        "cvlmodario":                   "29888894000775",
+        "cvlpontesaud":                 "29888894000694",
+        "cvlvarejo":                    "contato@atualtextil.com",
+        "vnonze":                       "4007594d-a545-43cc-9357-277dd4c030e1"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()

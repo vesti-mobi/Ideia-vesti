@@ -1685,7 +1685,24 @@ window.CNPJ_MARCAS = (function(){
         "maria lima santa cruz":                             "21721042000434",
         "patachosn":                                         "38544161000119",
         "vistamy":                                           "24680354000192",
-        "zeros confec":                                      "45180025000152"
+        "zeros confec":                                      "45180025000152",
+        "vestipago":                                         "49345891000107",
+        "andressa - teste":                                  "49345891000107",
+        "zeros confeccao":                                   "45180025000152",
+        "miss mel":                                          "17974887000111",
+        "snacessorios":                                      "60801292000193",
+        "refugiomodas":                                      "13624458000163",
+        "bymitomazela":                                      "37266456000108",
+        "felpsconfec":                                       "9917433937",
+        "vintagestyle":                                      "51486393000126",
+        "mattoswear":                                        "45204996000195",
+        "layzaaguiar":                                       "4001387190",
+        "mariafuxico":                                       "60534565000180",
+        "cvlfdasmalhas":                                     "29888894000503",
+        "cvlmodario":                                        "29888894000775",
+        "cvlpontesaud":                                      "29888894000694",
+        "cvlvarejo":                                         "34253125000145",
+        "vnonze":                                            "33882279000133"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
