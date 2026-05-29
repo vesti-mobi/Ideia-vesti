@@ -400,6 +400,8 @@ window.RAZAO_MARCAS = (function(){
         "cvl moda - feirao das malhas":                      "SOULTEX TECIDOS LTDA",
         "cvl moda - moda rio":                               "SOULTEX TECIDOS LTDA",
         "cvl moda - plaza polo":                             "SOULTEX TECIDOS LTDA",
+        "cvl moda- plaza polo":                              "SOULTEX TECIDOS LTDA",
+        "cvlplazapolo":                                      "SOULTEX TECIDOS LTDA",
         "cvl moda - ponte da saudade":                       "SOULTEX TECIDOS LTDA",
         "cvl moda - varejo":                                 "SOULTEX TECIDOS LTDA",
         "d mais representacoes":                             "D MAIS REPRESENTACOES",

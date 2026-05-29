@@ -136,7 +136,11 @@ window.PIX_MARCAS = (function(){
         "daline":                       "nubank",
         "charisma matriz":              "Santander",
         "cvl varejo":                   "contato@atualtextil.com",
-        "cvl n friburgo":               "contato@atualtextil.com"
+        "cvl n friburgo":               "contato@atualtextil.com",
+        "cvl moda- cd nova friburgo":   "contato@atualtextil.com",
+        "cvlnfriburgo":                 "contato@atualtextil.com",
+        "cvl moda- plaza polo":         "29888894000260",
+        "cvlplazapolo":                 "29888894000260"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
