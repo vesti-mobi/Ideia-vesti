@@ -29,6 +29,8 @@ window.PIX_MARCAS = (function(){
         "maria fuxico":                 "60534565000180",
         "marbella":                     "52998138000125",
         "cvl cidade moda":              "29888894000422",
+        "cvl moda - cidade da moda":    "29888894000422",
+        "cvlcidademoda":                "29888894000422",
         "cvl f das malhas":             "29888894000503",
         "cvl moda rio":                 "29888894000775",
         "cvl plaza polo":               "29888894000260",

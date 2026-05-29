@@ -397,6 +397,7 @@ window.RAZAO_MARCAS = (function(){
         "cubo cubo":                                         "CONFECÇÕES CUBO CUBO LTDA",
         "cvl moda - cd nova friburgo":                       "SOULTEX TECIDOS LTDA",
         "cvl moda - cidade da moda":                         "SOULTEX TECIDOS LTDA",
+        "cvlcidademoda":                                     "SOULTEX TECIDOS LTDA",
         "cvl moda - feirao das malhas":                      "SOULTEX TECIDOS LTDA",
         "cvl moda - moda rio":                               "SOULTEX TECIDOS LTDA",
         "cvl moda - plaza polo":                             "SOULTEX TECIDOS LTDA",

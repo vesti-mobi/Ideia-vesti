@@ -23,6 +23,7 @@ window.CNPJ_MARCAS = (function(){
         "vintage style":                                     "51.486.393/0001-26",
         "marbella":                                          "52.998.138/0001-25",
         "cvl cidade moda":                                   "29.888.894/0004-22",
+        "cvlcidademoda":                                     "29.888.894/0004-22",
         "cvl f das malhas":                                  "29.888.894/0005-03",
         "cvl moda rio":                                      "29.888.894/0007-75",
         "cvl plaza polo":                                    "29.888.894/0002-60",
