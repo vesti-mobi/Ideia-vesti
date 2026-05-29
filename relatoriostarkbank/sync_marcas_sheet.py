@@ -7,6 +7,17 @@ Destino: pix_marcas.js, cnpj_marcas.js, razao_marcas.js (mesma pasta deste scrip
 Comportamento APPEND-ONLY: para cada marca da planilha, SO preenche PIX/CNPJ/
 razao no JS se a marca AINDA NAO existe la. Marcas ja cadastradas no JS sao
 mantidas como estao — a planilha nunca sobrescreve. Nada e apagado.
+Quando o valor da planilha DIVERGE do que ja esta no JS, isso e logado como
+"DRIFT" (mas NAO sobrescreve — ha overrides manuais deliberados, ex.: Deslum/
+Incentive; ajuste manual se for o caso).
+
+ALIAS por WorkSpace: o painel casa PIX/CNPJ/razao pelo nomeFantasia do
+invoices.js, que as vezes difere do nome na planilha (ex.: planilha "CVL Plaza
+Polo" vs painel "CVL Moda- PLAZA POLO"). Para resolver, o script cruza a coluna
+"WorkSpace" da planilha com o invoices.js (workspaceId -> companyId -> todos os
+nomeFantasia daquele companyId) e gera uma chave-alias para cada nomeFantasia
+real. Assim qualquer grafia que o painel use resolve. Requer invoices.js na
+mesma pasta; se faltar, so o alias por WorkSpace e pulado (o resto roda normal).
 
 A coluna "razao social" e OPCIONAL na planilha — se nao existir, o sync de
 razao e pulado (PIX/CNPJ seguem normalmente).
@@ -68,31 +79,82 @@ k_empresa = find_header(sample, 'empresa', 'marca', 'nome')
 k_pix     = find_header(sample, 'chave pix', 'pix', 'chave_pix')
 k_cnpj    = find_header(sample, 'cnpj')  # pega a primeira coluna chamada CNPJ
 k_razao   = find_header(sample, 'razao social', 'razão social', 'razao')
+k_ws      = find_header(sample, 'workspace', 'work space', 'ws')
 
 missing = [n for n, k in [('empresa', k_empresa), ('chave pix', k_pix),
                             ('cnpj', k_cnpj)] if k is None]
 if missing:
     sys.exit(f'Cabecalhos obrigatorios faltando: {missing}. Encontrados: {list(sample.keys())}')
-print(f'Colunas: empresa={k_empresa!r} pix={k_pix!r} cnpj={k_cnpj!r} razao={k_razao!r}')
+print(f'Colunas: empresa={k_empresa!r} pix={k_pix!r} cnpj={k_cnpj!r} razao={k_razao!r} workspace={k_ws!r}')
 if k_razao is None:
     print('  (sem coluna "razao social" na planilha — sync de razao desativado)')
+if k_ws is None:
+    print('  (sem coluna "WorkSpace" na planilha — alias por WorkSpace desativado)')
+
+# ----------------------- invoices.js: workspaceId -> nomeFantasia(s) -----------------------
+def load_ws_names(path):
+    """Le invoices.js e retorna {workspaceId: set(nomeFantasia)} fazendo a ponte
+    workspaceId -> companyId -> todos os nomeFantasia daquele companyId (o painel
+    agrupa por companyId, entao qualquer um desses nomes pode virar o rotulo).
+    Retorna {} se invoices.js faltar ou nao parsear."""
+    try:
+        txt = path.read_text(encoding='utf-8')
+    except FileNotFoundError:
+        print('  (invoices.js nao encontrado — alias por WorkSpace pulado)')
+        return {}
+    try:
+        obj = json.loads(txt[txt.index('{'): txt.rindex('}') + 1])
+    except Exception as e:
+        print(f'  (aviso: invoices.js nao parseou: {e} — alias por WorkSpace pulado)')
+        return {}
+    fats = obj.get('faturas') or []
+    ws_companies, company_names = {}, {}
+    for r in fats:
+        w  = str(r.get('workspaceId') or '').strip()
+        c  = str(r.get('companyId')   or '').strip()
+        nf = str(r.get('nomeFantasia') or '').strip()
+        if w and c:
+            ws_companies.setdefault(w, set()).add(c)
+        if c and nf:
+            company_names.setdefault(c, set()).add(nf)
+    ws_names = {}
+    for w, comps in ws_companies.items():
+        s = set()
+        for c in comps:
+            s |= company_names.get(c, set())
+        if s:
+            ws_names[w] = s
+    return ws_names
+
+ws_names = load_ws_names(DIR / 'invoices.js') if k_ws else {}
 
 # ----------------------- coleta da planilha -----------------------
 sheet_pix, sheet_cnpj, sheet_razao = {}, {}, {}
 skipped = 0
+alias_keys = 0  # quantas chaves vieram de nomeFantasia do invoices (alem do nome da planilha)
 for r in rows:
     nm = str(r.get(k_empresa, '') or '').strip()
     if not nm:
         skipped += 1
         continue
-    nn = norm(nm)
     pix   = str(r.get(k_pix, '')   or '').strip()
     cnpj  = str(r.get(k_cnpj, '')  or '').strip()
     razao = str(r.get(k_razao, '') or '').strip() if k_razao else ''
-    if pix:   sheet_pix[nn]   = pix
-    if cnpj:  sheet_cnpj[nn]  = cnpj
-    if razao: sheet_razao[nn] = razao
-print(f'Da planilha: {len(sheet_pix)} PIX, {len(sheet_cnpj)} CNPJ, {len(sheet_razao)} razao social (linhas vazias: {skipped})')
+    # chaves-alvo: o nome da planilha + todos os nomeFantasia do WorkSpace dela
+    names = {nm}
+    if k_ws:
+        wsid = str(r.get(k_ws, '') or '').strip()
+        if wsid and wsid in ws_names:
+            extra = ws_names[wsid] - {nm}
+            alias_keys += len(extra)
+            names |= extra
+    for name in names:
+        nn = norm(name)
+        if pix:   sheet_pix[nn]   = pix
+        if cnpj:  sheet_cnpj[nn]  = cnpj
+        if razao: sheet_razao[nn] = razao
+print(f'Da planilha: {len(sheet_pix)} PIX, {len(sheet_cnpj)} CNPJ, {len(sheet_razao)} razao social '
+      f'(linhas vazias: {skipped}; +{alias_keys} chaves-alias via WorkSpace)')
 
 # ----------------------- merge nos .js -----------------------
 def parse_raw_block(text):
@@ -143,10 +205,14 @@ def update_js(path, sheet_map, label):
         if nk not in by_key:
             order.append(nk)
         by_key[nk] = [k, v]
-    added = kept = 0
+    added = kept = drift = 0
     for nk, val in sheet_map.items():
         if nk in by_key:
             kept += 1  # ja existe no JS — planilha NAO sobrescreve
+            if by_key[nk][1] != val:
+                drift += 1
+                print(f'    DRIFT {label.strip()}: "{by_key[nk][0]}" = {by_key[nk][1]!r} no JS, '
+                      f'planilha diz {val!r} (preservado JS; ajuste manual se necessario)')
         else:
             by_key[nk] = [nk, val]
             order.append(nk)
@@ -155,10 +221,10 @@ def update_js(path, sheet_map, label):
     new_block = render_block(new_items)
     new_text = text[:start] + new_block + text[end + 1:]
     if new_text == text:
-        print(f'  {label}: sem mudancas ({len(new_items)} entradas, ={kept} ja cadastradas)')
+        print(f'  {label}: sem mudancas ({len(new_items)} entradas, ={kept} ja cadastradas, {drift} drift)')
         return
     path.write_text(new_text, encoding='utf-8')
-    print(f'  {label}: +{added} novas, ={kept} preservadas (total {len(new_items)})')
+    print(f'  {label}: +{added} novas, ={kept} preservadas, {drift} drift (total {len(new_items)})')
 
 print('\nMerge nos .js:')
 update_js(DIR / 'pix_marcas.js',   sheet_pix,   'PIX  ')
