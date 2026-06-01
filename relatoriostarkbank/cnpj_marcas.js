@@ -1702,7 +1702,10 @@ window.CNPJ_MARCAS = (function(){
         "cvlmodario":                                        "29888894000775",
         "cvlpontesaud":                                      "29888894000694",
         "cvlvarejo":                                         "34253125000145",
-        "vnonze":                                            "33882279000133"
+        "vnonze":                                            "33882279000133",
+        "arte d vestir":                                     "9420135000180",
+        "califor matriz":                                    "51256997000186",
+        "sammy t shirts":                                    "41295274000132"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
