@@ -33,7 +33,7 @@ API_BASE = "https://apivesti.vesti.mobi/payment/v1/starkbank"
 URL_WORKSPACES = f"{API_BASE}/workspaces"
 URL_PURCHASES = API_BASE + "/workspace/{ws}/purchases"
 URL_PURCHASE = API_BASE + "/workspace/{ws}/purchase/{pur}"
-MAX_WORKERS = 8
+MAX_WORKERS = 16
 
 # Marcas de teste — excluidas do CR.
 EXCLUDED_NAMES = {"andressa vesti", "andressa - teste"}
@@ -530,13 +530,21 @@ def main() -> None:
     workspaces = list_workspaces(token)
     print(f"[api] {len(workspaces)} workspaces ativas")
 
-    # 2) lista todas as purchases por workspace (paginadas)
-    tarefas: list[dict] = []
-    ws_pagination_falhou: list[str] = []
-    for ws in workspaces:
+    # 2) lista todas as purchases por workspace (paginadas) — EM PARALELO.
+    # A listagem por workspace e independente, entao roda em ThreadPool. Os
+    # resultados sao reconstruidos na ORDEM ORIGINAL dos workspaces pra que o
+    # invoices.js final fique identico (diff git minimo).
+    def _list_ws(ws: dict) -> tuple:
         ws_id = ws.get("id")
         ws_name = ws.get("name") or ""
         purchases, ok = list_purchases(ws_id, token)
+        return (ws_id, ws_name, purchases, ok)
+
+    tarefas: list[dict] = []
+    ws_pagination_falhou: list[str] = []
+    with cf.ThreadPoolExecutor(max_workers=MAX_WORKERS) as ex:
+        resultados_ws = list(ex.map(_list_ws, workspaces))
+    for ws_id, ws_name, purchases, ok in resultados_ws:
         marker = "" if ok else " [PAGINACAO INCOMPLETA]"
         print(f"[api]   {ws_name}: {len(purchases)} purchases{marker}")
         if not ok:

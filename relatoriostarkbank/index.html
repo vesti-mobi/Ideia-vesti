@@ -974,13 +974,14 @@ function renderCp(){
             pixCell+
         '</tr>');
         if(!dOpen)return;
-        // agrupa por empresa dentro do dia
+        // agrupa por empresa dentro do dia; ordena por valor BRUTO DESC
+        // (maior valor primeiro), dentro de cada dia.
         var byC={};
         pags.forEach(function(p){(byC[p.companyId]=byC[p.companyId]||[]).push(p)});
+        var ctByCid={};
+        Object.keys(byC).forEach(function(cid){ctByCid[cid]=sumTotals(byC[cid])});
         var cids=Object.keys(byC).sort(function(a,b){
-            var na=(byC[a][0].nomeFantasia||'').toLowerCase();
-            var nb=(byC[b][0].nomeFantasia||'').toLowerCase();
-            return na<nb?-1:na>nb?1:0;
+            return (ctByCid[b].gross||0)-(ctByCid[a].gross||0);
         });
         cids.forEach(function(cid){
             var cPags=byC[cid];
