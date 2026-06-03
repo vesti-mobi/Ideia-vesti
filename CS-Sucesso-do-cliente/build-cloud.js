@@ -32,6 +32,13 @@ const DATASET_ID = 'b3377e38-83ae-4ea2-a4fd-6d7a496f3a93'; // CS - Sucesso do Cl
 const LINKS_DATASET_ID = 'c5c35166-68b7-4861-a035-71f7b800b08f';
 const DAX_ENDPOINT = `/v1.0/myorg/groups/${WORKSPACE_ID}/datasets/${DATASET_ID}/executeQueries`;
 
+// Correções manuais de CS (Anjo): quando o dataset Power BI "CS - Sucesso do Cliente 2024"
+// (Query1[Anjo]) está defasado em relação à CS atual da empresa. Chave = Id Empresa (GUID).
+// Vence sobre a fonte Power BI/CSV. Remover a entrada quando a fonte for corrigida.
+const CS_OVERRIDE = {
+    'd0231db2-31f6-494b-9fa3-c6c6fb0386cf': 'Jennyfer Rabelo', // Maclagen — CS trocou de Priscila Argolo p/ Jennyfer (03/06/2026)
+};
+
 // VestiPago workspace + dataset (para lista de empresas com VestiPago)
 const VP_WORKSPACE_ID = 'f80301c2-8735-40d2-8662-1f8a627d3f61';
 const VP_DATASET_ID = '606be0ee-2c8c-4f43-8ad6-0be04f95d616';
@@ -1940,7 +1947,7 @@ async function main() {
                 valPedidosPendentes: Math.round(e.valPedidosPendentes * 100) / 100,
                 linksEnviados: e.linksEnviados,
                 cliques: e.cliques,
-                anjo: (metricasMap[e.id] && metricasMap[e.id].cs) || e.anjo,
+                anjo: CS_OVERRIDE[e.id] || (metricasMap[e.id] && metricasMap[e.id].cs) || e.anjo,
                 modulo: e.modulo,
                 tags: e.tags,
                 temIntegracao: e.temIntegracao,
