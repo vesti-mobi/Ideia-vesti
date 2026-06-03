@@ -9,6 +9,11 @@ on:
         description: 'Motivo do disparo manual'
         required: false
         default: 'manual'
+      somente_fabric:
+        description: 'Modo rapido: atualiza so CP/Antecipacao (Fabric, ~1min). Pula o fetcher de Faturas da API Vesti (~22min).'
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   update:
@@ -43,6 +48,9 @@ jobs:
         run: python fetch_data.py
 
       - name: Rodar fetcher Faturas (API Vesti)
+        # Etapa lenta (~22min). Pulada no modo rapido (somente_fabric=true).
+        # Em runs agendados github.event.inputs e nulo, entao roda normalmente.
+        if: ${{ github.event.inputs.somente_fabric != 'true' }}
         working-directory: relatoriostarkbank
         env:
           VESTIAPI_TOKEN: ${{ secrets.VESTIAPI_TOKEN }}
