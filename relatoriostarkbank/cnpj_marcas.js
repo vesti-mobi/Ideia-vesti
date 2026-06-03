@@ -1738,7 +1738,10 @@ window.CNPJ_MARCAS = (function(){
         "boise var":                                         "BOISE CONFECCOES LTDA",
         "feminisces":                                        "JESSICA DO CARMO SANTAREM 03575815127",
         "restore":                                           "REGIANE ALICE DA LUZ 48006959889",
-        "v&m plus":                                          "52.244.294 SECILIA VASQUES"
+        "v&m plus":                                          "52.244.294 SECILIA VASQUES",
+        "mieco":                                             "48464095000120",
+        "santo vicio (fabrica)":                             "33159386000138",
+        "morena charme (matriz)":                            "22481273000138"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
