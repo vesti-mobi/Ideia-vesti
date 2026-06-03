@@ -28,6 +28,7 @@ window.PIX_MARCAS = (function(){
         "layza aguiar":                 "04001387190",
         "maria fuxico":                 "60534565000180",
         "marbella":                     "52998138000125",
+        "marbella atacadista":          "52998138000125",
         "cvl cidade moda":              "29888894000422",
         "cvl moda - cidade da moda":    "29888894000422",
         "cvlcidademoda":                "29888894000422",
