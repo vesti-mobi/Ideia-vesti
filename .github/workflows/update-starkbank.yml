@@ -68,14 +68,28 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add relatoriostarkbank/dados.js relatoriostarkbank/invoices.js relatoriostarkbank/cancelados_valores.js 2>/dev/null || true
-          if git diff --cached --quiet; then
-            echo "sem mudancas"
+          # Arquivos gerados sao regeracoes completas. No modo rapido o invoices.js
+          # (CR) NAO foi tocado, entao nao o incluimos pra nao reverter um update
+          # concorrente da API. Em runs completos/agendados, inclui os tres.
+          if [ "${{ github.event.inputs.somente_fabric }}" = "true" ]; then
+            FILES="relatoriostarkbank/dados.js relatoriostarkbank/cancelados_valores.js"
           else
-            git commit -m "Atualizacao StarkBank $(date +'%d/%m/%Y %H:%M')"
-            for i in 1 2 3; do
-              if git push; then break; fi
-              echo "push falhou (tentativa $i), rebase..."
-              git pull --rebase origin main || exit 1
-            done
+            FILES="relatoriostarkbank/dados.js relatoriostarkbank/invoices.js relatoriostarkbank/cancelados_valores.js"
           fi
+          MSG="Atualizacao StarkBank $(date +'%d/%m/%Y %H:%M')"
+          # Sem rebase: reaplica nossos arquivos recem-gerados sobre o topo do remoto.
+          # Evita conflitos de merge em arquivos regenerados quando dois runs colidem.
+          for i in 1 2 3 4 5; do
+            git fetch -q origin main
+            # reset MIXED: index volta pro topo do remoto (preserva mudancas
+            # concorrentes em outros arquivos); working tree intacto com nossos
+            # arquivos gerados, que re-adicionamos a seguir.
+            git reset -q origin/main
+            git add $FILES 2>/dev/null || true
+            if git diff --cached --quiet; then echo "sem mudancas"; exit 0; fi
+            git commit -q -m "$MSG"
+            if git push; then echo "push ok (tentativa $i)"; exit 0; fi
+            echo "push falhou (tentativa $i), re-sincronizando..."
+            sleep 3
+          done
+          echo "push falhou apos varias tentativas"; exit 1
