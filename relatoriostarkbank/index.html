@@ -376,6 +376,30 @@ window._dadosError=null;
     s7.onerror=function(){};
     document.head.appendChild(s7);
 })();
+// auto-reload: mantem o relatorio sempre na versao mais nova sem refresh manual.
+// O cache-bust acima ja garante dados frescos numa recarga; o problema e a aba ficar
+// aberta sem nunca recarregar. Aqui recarregamos quando a pagina ficou velha (>15min de
+// vida), mas SO se a aba estiver visivel e o usuario ocioso (>2min sem interagir) e nao
+// estiver digitando num filtro — pra nao atrapalhar quem esta analisando. E, ao voltar
+// pra uma aba velha, recarrega na hora.
+(function(){
+    var MAX_VIDA=15*60*1000, OCIOSO=2*60*1000;
+    var loadedAt=Date.now(), lastInteract=Date.now();
+    ['mousemove','keydown','click','touchstart','scroll'].forEach(function(ev){
+        window.addEventListener(ev,function(){lastInteract=Date.now()},{passive:true});
+    });
+    function velha(){return Date.now()-loadedAt>MAX_VIDA}
+    function digitando(){var a=document.activeElement;return a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA')}
+    function recarregar(){if(!digitando())location.reload()}
+    setInterval(function(){
+        if(document.visibilityState==='visible' && velha() && Date.now()-lastInteract>OCIOSO){
+            recarregar();
+        }
+    },5*60*1000);
+    document.addEventListener('visibilitychange',function(){
+        if(document.visibilityState==='visible' && velha()) recarregar();
+    });
+})();
 // captura qualquer erro de JS pra nao ficar silencioso
 window.addEventListener('error',function(e){
     if(window._dadosError)return;
