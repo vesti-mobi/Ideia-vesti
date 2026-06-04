@@ -164,7 +164,10 @@ window.PIX_MARCAS = (function(){
         "vnonze":                       "4007594d-a545-43cc-9357-277dd4c030e1",
         "mieco":                        "48464095000120",
         "santo vicio (fabrica)":        "33159386000138",
-        "morena charme (matriz)":       "22481273000138"
+        "morena charme (matriz)":       "22481273000138",
+        "mi&co":                        "48464095000120",
+        "winnie confeccoes":            "54991210000118",
+        "aline confeccoes":             "17937620000154"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()

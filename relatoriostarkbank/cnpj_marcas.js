@@ -1741,7 +1741,8 @@ window.CNPJ_MARCAS = (function(){
         "v&m plus":                                          "52.244.294 SECILIA VASQUES",
         "mieco":                                             "48464095000120",
         "santo vicio (fabrica)":                             "33159386000138",
-        "morena charme (matriz)":                            "22481273000138"
+        "morena charme (matriz)":                            "22481273000138",
+        "winnie confeccoes":                                 "54991210000118"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
