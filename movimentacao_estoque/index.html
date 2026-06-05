@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Movimentação de Estoque</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--p:#6C5CE7;--g:#00B894;--r:#E17055;--y:#F39C12;--b:#0984E3;--bg:#F5F6FA;--card:#fff;--tx:#2D3436;--mut:#636E72;--bd:#DFE6E9;--rd:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);padding:24px;line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto}
+h1{font-size:22px;font-weight:800;display:flex;align-items:center;gap:10px}
+.info{color:var(--mut);font-size:13px;margin-top:2px}
+.grid{display:grid;gap:16px;margin:18px 0}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.kpi{background:var(--card);border:1px solid var(--bd);border-radius:var(--rd);padding:16px}
+.kpi .lbl{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.kpi .val{font-size:24px;font-weight:800;margin-top:4px}
+.cols{grid-template-columns:1fr 1fr}
+@media(max-width:800px){.cols{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--rd);padding:18px}
+.card h2{font-size:15px;font-weight:700;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--bd)}
+th{font-size:11px;text-transform:uppercase;color:var(--mut);letter-spacing:.03em;cursor:pointer;user-select:none}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:4px;background:var(--p);opacity:.85}
+.barwrap{background:#eef0f4;border-radius:4px;overflow:hidden}
+.tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px}
+.pos{color:var(--g)}.neg{color:var(--r)}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--mut)}
+.foot{color:var(--mut);font-size:12px;margin-top:18px;text-align:center}
+.empty{color:var(--mut);padding:20px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📦 Movimentação de Estoque</h1>
+  <div class="info">Período: <strong id="periodo">--</strong> · Atualizado em <span id="dtGerado">--</span> · fonte: VestiHouse <span class="mono">dbo.movimentacao_estoque</span></div>
+
+  <div class="grid kpis" id="kpis"></div>
+
+  <div class="grid cols">
+    <div class="card">
+      <h2>Por ação</h2>
+      <table><thead><tr><th>Ação</th><th class="r">Qtd</th><th>%</th></tr></thead><tbody id="tbAcao"></tbody></table>
+    </div>
+    <div class="card">
+      <h2>Por origem</h2>
+      <table><thead><tr><th>Origem</th><th class="r">Qtd</th><th>%</th></tr></thead><tbody id="tbOrigem"></tbody></table>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Histórico diário</h2>
+      <table><thead><tr><th>Dia</th><th class="r">Movimentações</th><th class="r">Empresas</th><th class="r">Domínios</th><th class="r">SKUs</th></tr></thead><tbody id="tbHist"></tbody></table>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Top empresas por movimentação <span style="font-weight:400;color:var(--mut)">(clique no cabeçalho pra ordenar)</span></h2>
+      <table>
+        <thead><tr>
+          <th data-sort="nome">Empresa</th>
+          <th class="r" data-sort="n">Total</th>
+          <th class="r" data-sort="ins">Insert</th>
+          <th class="r" data-sort="upd">Update</th>
+          <th class="r" data-sort="del">Delete</th>
+          <th class="r" data-sort="skus">SKUs</th>
+          <th class="r" data-sort="saldoLiq">Saldo líq.</th>
+        </tr></thead>
+        <tbody id="tbEmp"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<script>
+// cache-bust agressivo no dados.js (evita versao velha)
+(function(){
+  var s=document.createElement('script');
+  s.src='dados.js?v='+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+  s.onload=render; s.onerror=function(){document.getElementById('foot').textContent='falha ao carregar dados.js';};
+  document.head.appendChild(s);
+})();
+
+var fmtN=function(v){return (v||0).toLocaleString('pt-BR');};
+function fmtD(s){if(!s)return '-';var p=String(s).slice(0,10).split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function pct(n,t){return t?((n/t*100).toFixed(1)+'%'):'0%';}
+var sortState={col:'n',dir:-1};
+
+function render(){
+  var D=window.DADOS; if(!D){return;}
+  document.getElementById('periodo').textContent = D.periodo.de===D.periodo.ate ? fmtD(D.periodo.de) : (fmtD(D.periodo.de)+' a '+fmtD(D.periodo.ate));
+  var gd=D.geradoEm?new Date(D.geradoEm):null;
+  document.getElementById('dtGerado').textContent=gd?gd.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'--';
+
+  var K=D.kpis, cards=[
+    ['Movimentações',fmtN(K.totalMov)],['Empresas',fmtN(K.empresas)],['Domínios',fmtN(K.dominios)],
+    ['SKUs',fmtN(K.skus)],['Produtos',fmtN(K.produtos)],['Pedidos',fmtN(K.pedidos)]
+  ];
+  document.getElementById('kpis').innerHTML=cards.map(function(c){return '<div class="kpi"><div class="lbl">'+c[0]+'</div><div class="val">'+c[1]+'</div></div>';}).join('');
+
+  var totA=D.porAcao.reduce(function(s,r){return s+r.n;},0);
+  document.getElementById('tbAcao').innerHTML=D.porAcao.map(function(r){
+    return '<tr><td>'+r.action+'</td><td class="r">'+fmtN(r.n)+'</td><td><div class="barwrap"><div class="bar" style="width:'+(r.n/totA*100)+'%"></div></div><span class="mono">'+pct(r.n,totA)+'</span></td></tr>';
+  }).join('');
+
+  var totO=D.porOrigem.reduce(function(s,r){return s+r.n;},0), maxO=D.porOrigem[0]?D.porOrigem[0].n:1;
+  document.getElementById('tbOrigem').innerHTML=D.porOrigem.map(function(r){
+    return '<tr><td class="mono">'+r.origin+'</td><td class="r">'+fmtN(r.n)+'</td><td><div class="barwrap"><div class="bar" style="width:'+(r.n/maxO*100)+'%"></div></div><span class="mono">'+pct(r.n,totO)+'</span></td></tr>';
+  }).join('');
+
+  var H=(D.historico||[]).slice().reverse();
+  document.getElementById('tbHist').innerHTML = H.length?H.map(function(h){
+    return '<tr><td>'+fmtD(h.d)+'</td><td class="r">'+fmtN(h.totalMov)+'</td><td class="r">'+fmtN(h.empresas)+'</td><td class="r">'+fmtN(h.dominios)+'</td><td class="r">'+fmtN(h.skus)+'</td></tr>';
+  }).join(''):'<tr><td colspan="5" class="empty">sem histórico ainda</td></tr>';
+
+  renderEmp();
+  document.getElementById('foot').textContent='Top '+ (D.topEmpresas?D.topEmpresas.length:0) +' empresas · dados agregados no VestiHouse (Fabric)';
+}
+
+function renderEmp(){
+  var D=window.DADOS, rows=(D.topEmpresas||[]).slice();
+  rows.sort(function(a,b){
+    var x=a[sortState.col], y=b[sortState.col];
+    if(typeof x==='string'){x=(x||'').toLowerCase();y=(y||'').toLowerCase();return x<y?-sortState.dir:x>y?sortState.dir:0;}
+    return (x-y)*sortState.dir;
+  });
+  document.getElementById('tbEmp').innerHTML=rows.map(function(e){
+    var sl=e.saldoLiq, cls=sl>0?'pos':(sl<0?'neg':'');
+    return '<tr><td>'+esc(e.nome)+' <span class="mono">#'+e.domainId+'</span></td>'+
+      '<td class="r"><strong>'+fmtN(e.n)+'</strong></td>'+
+      '<td class="r" style="color:var(--g)">'+fmtN(e.ins)+'</td>'+
+      '<td class="r" style="color:var(--b)">'+fmtN(e.upd)+'</td>'+
+      '<td class="r" style="color:var(--r)">'+fmtN(e.del)+'</td>'+
+      '<td class="r">'+fmtN(e.skus)+'</td>'+
+      '<td class="r '+cls+'">'+(sl>0?'+':'')+fmtN(sl)+'</td></tr>';
+  }).join('');
+}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+document.querySelectorAll('th[data-sort]').forEach(function(th){
+  th.addEventListener('click',function(){
+    var c=th.getAttribute('data-sort');
+    if(sortState.col===c)sortState.dir*=-1; else {sortState.col=c;sortState.dir=(c==='nome')?1:-1;}
+    renderEmp();
+  });
+});
+
+// auto-reload: mantem o relatorio fresco sem refresh manual (so ocioso e visivel)
+(function(){
+  var MAX_VIDA=20*60*1000, OCIOSO=2*60*1000, loadedAt=Date.now(), last=Date.now();
+  ['mousemove','keydown','click','scroll'].forEach(function(ev){window.addEventListener(ev,function(){last=Date.now();},{passive:true});});
+  function velha(){return Date.now()-loadedAt>MAX_VIDA;}
+  function dig(){var a=document.activeElement;return a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA');}
+  setInterval(function(){if(document.visibilityState==='visible'&&velha()&&Date.now()-last>OCIOSO&&!dig())location.reload();},5*60*1000);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&velha()&&!dig())location.reload();});
+})();
+</script>
+</body>
+</html>

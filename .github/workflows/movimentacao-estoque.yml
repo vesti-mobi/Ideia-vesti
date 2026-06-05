@@ -1,0 +1,47 @@
+name: Atualizar Movimentacao de Estoque
+
+on:
+  schedule:
+    - cron: '0 11 * * *'   # 08:00 BRT (apos o snapshot diario da tabela)
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias
+        run: npm install tedious
+
+      - name: Gerar dados.js a partir do VestiHouse
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+        run: node movimentacao_estoque/build_data.js
+
+      - name: Commit e push se houver mudancas
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          FILES="movimentacao_estoque/dados.js movimentacao_estoque/historico.json"
+          MSG="Movimentacao estoque $(date +'%d/%m/%Y %H:%M')"
+          # push robusto sem rebase (reaplica os arquivos gerados sobre o topo do remoto)
+          for i in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset -q origin/main
+            git add $FILES 2>/dev/null || true
+            if git diff --cached --quiet; then echo "sem mudancas"; exit 0; fi
+            git commit -q -m "$MSG"
+            if git push; then echo "push ok (tentativa $i)"; exit 0; fi
+            echo "push falhou (tentativa $i), re-sincronizando..."
+            sleep 3
+          done
+          echo "push falhou apos varias tentativas"; exit 1
