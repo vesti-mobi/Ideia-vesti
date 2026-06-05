@@ -173,6 +173,47 @@ async function main() {
 
   fs.writeFileSync(path.join(DIR, 'dados.js'), 'window.DADOS = ' + JSON.stringify(dados) + ';\n', 'utf-8');
   console.log(`OK: dados.js gerado (${dados.kpis.totalMov} movimentacoes, periodo ${dados.periodo.de}..${dados.periodo.ate}).`);
+
+  // ===================== BUSCA (estatica) =====================
+  // As sincronizacoes em massa (INTEGRATION_BULK_*) sao 95% do volume e ruido
+  // automatico. Embarcamos so as movimentacoes "de gente" (reserva/venda/
+  // separacao/app) — poucas dezenas de milhar — pra busca client-side por
+  // dominio/empresa/produto/sku/data. Chaves curtas pra reduzir o payload.
+  const FILTRO_REAIS = "origin NOT LIKE 'INTEGRATION_BULK%'";
+  const linhas = await query(tok, `
+    SELECT created_at, action, origin, sku,
+           old_qty, new_qty, old_balance, new_balance,
+           domain_id, company_id, product_id, order_id
+    FROM ${TABELA}
+    WHERE ${FILTRO_REAIS}
+    ORDER BY created_at DESC`, 'linhas busca (nao-bulk)');
+
+  const empNomes = await query(tok, `
+    SELECT DISTINCT m.company_id, c.company_name
+    FROM ${TABELA} m LEFT JOIN dbo.ODBC_Companies c ON m.company_id = c.id
+    WHERE ${FILTRO_REAIS}`, 'nomes empresas');
+  const domNomes = await query(tok, `
+    SELECT DISTINCT m.domain_id, d.name
+    FROM ${TABELA} m LEFT JOIN dbo.ODBC_Domains d ON m.domain_id = d.id
+    WHERE ${FILTRO_REAIS}`, 'nomes dominios');
+
+  const empresas = {}; empNomes.forEach(r => { if (r.company_id) empresas[r.company_id] = r.company_name || ''; });
+  const dominios = {}; domNomes.forEach(r => { if (r.domain_id != null) dominios[r.domain_id] = r.name || ''; });
+
+  const busca = {
+    geradoEm: dados.geradoEm,
+    periodo: dados.periodo,
+    nota: 'Busca cobre movimentacoes de venda/reserva/separacao/app. Sincronizacoes de integracao em massa (INTEGRATION_BULK_*) aparecem so nos totais.',
+    empresas, dominios,
+    rows: linhas.map(r => ({
+      t: r.created_at ? new Date(r.created_at).toISOString() : null,
+      a: r.action, o: r.origin, s: r.sku,
+      dq: r.old_qty, nq: r.new_qty, db: r.old_balance, nb: r.new_balance,
+      dm: r.domain_id, c: r.company_id, p: r.product_id, od: r.order_id,
+    })),
+  };
+  fs.writeFileSync(path.join(DIR, 'busca.js'), 'window.BUSCA = ' + JSON.stringify(busca) + ';\n', 'utf-8');
+  console.log(`OK: busca.js gerado (${busca.rows.length} linhas pesquisaveis, ${Object.keys(empresas).length} empresas, ${Object.keys(dominios).length} dominios).`);
 }
 
 main().catch(e => { console.error('FALHA:', e.message); process.exit(1); });

@@ -16,12 +16,21 @@ nada de linha crua no `dados.js`.
 - O workflow fica na **raiz** do repo: `.github/workflows/movimentacao-estoque.yml`.
 
 ## O que o relatório mostra
+- **🔎 Busca** por domínio, empresa, produto, SKU e data (client-side, instantânea).
+  Carrega `busca.js` sob demanda (~41k movimentações "de gente": reserva/venda/
+  separação/app). As sincronizações de integração em massa (`INTEGRATION_BULK_*`,
+  95% do volume) **não** entram na busca linha a linha — só nos totais.
 - **KPIs:** movimentações, empresas, domínios, SKUs, produtos, pedidos.
 - **Por ação:** INSERT / UPDATE / DELETE.
 - **Por origem:** INTEGRATION_BULK_*, RESERVE_*, STOCK_SEPARATION_*, APP_*, etc.
 - **Histórico diário:** acumulado a cada execução (a tabela só guarda o dia atual).
 - **Top 50 empresas:** nome (via JOIN `dbo.ODBC_Companies`), total, split por ação,
   SKUs e saldo líquido (`Σ new_balance − old_balance`).
+
+> Busca ao vivo (consultar as 1,5M linhas em tempo real, incl. as bulk) exigiria
+> um backend que alcance o Fabric SQL — o Vercel (AWS) não alcança a porta 1433
+> do Fabric (cross-cloud); só hosts no Azure / GitHub Actions / rede local. Por
+> isso a busca é estática sobre o subconjunto não-bulk.
 
 ## Execução
 - **Automática:** workflow diário às **11:00 UTC (08:00 BRT)** + `workflow_dispatch`.

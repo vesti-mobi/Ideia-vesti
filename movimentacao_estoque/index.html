@@ -35,6 +35,13 @@ td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--mut)}
 .foot{color:var(--mut);font-size:12px;margin-top:18px;text-align:center}
 .empty{color:var(--mut);padding:20px;text-align:center}
+.filtros{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.filtros input,.filtros select{padding:7px 9px;border:1px solid var(--bd);border-radius:8px;font-family:inherit;font-size:13px;background:#fff}
+.filtros input{min-width:150px}
+.filtros button{padding:8px 16px;border:none;border-radius:8px;background:var(--p);color:#fff;font-weight:600;cursor:pointer;font-size:13px}
+.filtros button.sec{background:#eef0f4;color:var(--tx)}
+.scroll{max-height:560px;overflow:auto}
+.qd{color:var(--mut)} .qd b{color:var(--tx)}
 </style>
 </head>
 <body>
@@ -43,6 +50,33 @@ td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
   <div class="info">Período: <strong id="periodo">--</strong> · Atualizado em <span id="dtGerado">--</span> · fonte: VestiHouse <span class="mono">dbo.movimentacao_estoque</span></div>
 
   <div class="grid kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="card" id="buscaCard">
+      <h2>🔎 Buscar movimentações <span style="font-weight:400;color:var(--mut)">(reserva / venda / separação / app — exclui sincronizações de integração em massa)</span></h2>
+      <div class="filtros">
+        <input id="fDom" placeholder="Domínio (id ou nome)">
+        <input id="fEmp" placeholder="Empresa (id ou nome)">
+        <input id="fProd" placeholder="Produto (id)">
+        <input id="fSku" placeholder="SKU">
+        <input id="fData" type="date">
+        <select id="fAcao"><option value="">Ação (todas)</option><option>INSERT</option><option>UPDATE</option><option>DELETE</option></select>
+        <select id="fOrigem"><option value="">Origem (todas)</option></select>
+        <button onclick="buscar()">Buscar</button>
+        <button class="sec" onclick="limparBusca()">Limpar</button>
+      </div>
+      <div id="buscaStatus" class="info" style="margin-bottom:8px"></div>
+      <div class="scroll">
+        <table>
+          <thead><tr>
+            <th>Data/hora</th><th>Empresa</th><th>Domínio</th><th>SKU</th>
+            <th>Ação</th><th>Origem</th><th class="r">Qtd</th><th class="r">Saldo</th><th>Produto</th>
+          </tr></thead>
+          <tbody id="tbBusca"><tr><td colspan="9" class="empty">preencha um filtro (domínio, empresa, produto ou SKU) e clique em Buscar</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
   <div class="grid cols">
     <div class="card">
@@ -154,6 +188,80 @@ document.querySelectorAll('th[data-sort]').forEach(function(th){
     if(sortState.col===c)sortState.dir*=-1; else {sortState.col=c;sortState.dir=(c==='nome')?1:-1;}
     renderEmp();
   });
+});
+
+// ===================== BUSCA (carrega busca.js sob demanda) =====================
+var BUSCA_LOADED=false, BUSCA_LOADING=false, MAX_SHOW=1000;
+function loadBusca(cb){
+  if(BUSCA_LOADED){cb();return;}
+  if(BUSCA_LOADING)return;
+  BUSCA_LOADING=true;
+  document.getElementById('buscaStatus').textContent='carregando base de busca (~uma vez)...';
+  var s=document.createElement('script');
+  s.src='busca.js?v='+Date.now();
+  s.onload=function(){
+    BUSCA_LOADED=true;BUSCA_LOADING=false;document.getElementById('buscaStatus').textContent='';
+    // popula origens
+    var ors={};(window.BUSCA.rows||[]).forEach(function(r){ors[r.o]=1;});
+    var sel=document.getElementById('fOrigem');
+    Object.keys(ors).sort().forEach(function(o){var op=document.createElement('option');op.value=o;op.textContent=o;sel.appendChild(op);});
+    cb();
+  };
+  s.onerror=function(){BUSCA_LOADING=false;document.getElementById('buscaStatus').textContent='falha ao carregar busca.js';};
+  document.head.appendChild(s);
+}
+function buscar(){ loadBusca(doBuscar); }
+function limparBusca(){
+  ['fDom','fEmp','fProd','fSku','fData'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('fAcao').value=''; document.getElementById('fOrigem').value='';
+  document.getElementById('tbBusca').innerHTML='<tr><td colspan="9" class="empty">preencha um filtro e clique em Buscar</td></tr>';
+  document.getElementById('buscaStatus').textContent='';
+}
+function val(id){return (document.getElementById(id).value||'').trim();}
+function doBuscar(){
+  var B=window.BUSCA; if(!B){return;}
+  var fDom=val('fDom').toLowerCase(), fEmp=val('fEmp').toLowerCase(), fProd=val('fProd').toLowerCase(),
+      fSku=val('fSku').toLowerCase(), fData=val('fData'), fAcao=val('fAcao'), fOrigem=val('fOrigem');
+  if(!fDom&&!fEmp&&!fProd&&!fSku){
+    document.getElementById('buscaStatus').textContent='informe ao menos: domínio, empresa, produto ou SKU.';
+    return;
+  }
+  var res=B.rows.filter(function(r){
+    if(fDom){ var dn=(B.dominios[r.dm]||'').toLowerCase(); if(String(r.dm)!==fDom && dn.indexOf(fDom)<0) return false; }
+    if(fEmp){ var en=(B.empresas[r.c]||'').toLowerCase(); if(String(r.c).toLowerCase()!==fEmp && en.indexOf(fEmp)<0) return false; }
+    if(fProd){ if(String(r.p||'').toLowerCase().indexOf(fProd)<0) return false; }
+    if(fSku){ if(String(r.s||'').toLowerCase().indexOf(fSku)<0) return false; }
+    if(fData){ if(!r.t || r.t.slice(0,10)!==fData) return false; }
+    if(fAcao){ if(r.a!==fAcao) return false; }
+    if(fOrigem){ if(r.o!==fOrigem) return false; }
+    return true;
+  });
+  document.getElementById('buscaStatus').innerHTML='<span class="qd"><b>'+fmtN(res.length)+'</b> movimentação(ões)'+(res.length>MAX_SHOW?(' — mostrando as '+MAX_SHOW+' mais recentes'):'')+'</span>';
+  var tb=document.getElementById('tbBusca');
+  if(!res.length){ tb.innerHTML='<tr><td colspan="9" class="empty">nenhuma movimentação (lembrando: sincronizações em massa não entram aqui)</td></tr>'; return; }
+  tb.innerHTML=res.slice(0,MAX_SHOW).map(function(r){
+    var emp=B.empresas[r.c]||r.c, dom=B.dominios[r.dm]||('#'+r.dm);
+    var dt=r.t?new Date(r.t):null;
+    var dtTxt=dt?dt.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}):'-';
+    return '<tr>'+
+      '<td>'+dtTxt+'</td>'+
+      '<td>'+esc(emp)+'</td>'+
+      '<td>'+esc(dom)+' <span class="mono">#'+r.dm+'</span></td>'+
+      '<td class="mono">'+esc(r.s)+'</td>'+
+      '<td>'+r.a+'</td>'+
+      '<td class="mono">'+r.o+'</td>'+
+      '<td class="r">'+r.dq+'&rarr;'+r.nq+'</td>'+
+      '<td class="r">'+r.db+'&rarr;'+r.nb+'</td>'+
+      '<td class="mono" title="'+esc(r.p)+'">'+esc(String(r.p||'').slice(0,8))+'…</td>'+
+    '</tr>';
+  }).join('');
+}
+// Enter nos campos dispara a busca
+['fDom','fEmp','fProd','fSku','fData'].forEach(function(id){
+  document.addEventListener('DOMContentLoaded',function(){});
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter' && ['fDom','fEmp','fProd','fSku','fData'].indexOf((e.target&&e.target.id)||'')>=0) buscar();
 });
 
 // auto-reload: mantem o relatorio fresco sem refresh manual (so ocioso e visivel)
