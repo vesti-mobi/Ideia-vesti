@@ -1742,7 +1742,8 @@ window.CNPJ_MARCAS = (function(){
         "mieco":                                             "48464095000120",
         "santo vicio (fabrica)":                             "33159386000138",
         "morena charme (matriz)":                            "22481273000138",
-        "winnie confeccoes":                                 "54991210000118"
+        "winnie confeccoes":                                 "54991210000118",
+        "modas carlas plus":                                 "49222592000185"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
