@@ -59,12 +59,32 @@ WITH active_domains AS (
     FROM dbo.ODBC_Domains d
     WHERE {FILTRO_DOMINIOS}
 ),
+-- Canal Atta: NAO tem CS por marca, entao puxamos o canal inteiro pelo nome do
+-- parceiro, independente de CS e ignorando a exclusao de partner_id do FILTRO_DOMINIOS.
+atta_domains AS (
+    SELECT d.id, d.name, d.angel_id, d.integration_id, d.partner_id, d.modulos
+    FROM dbo.ODBC_Domains d
+    JOIN dbo.ODBC_Partners p ON p.id = d.partner_id
+    WHERE d.modulos LIKE '%vendas%'
+      AND LOWER(d.name) NOT LIKE '%teste%'
+      AND LOWER(p.name) IN ('atta', 'attasoft')
+),
 elisa_domains AS (
-    SELECT ad.*, d2.created_at AS domain_created_at
+    -- Visao original: marcas dos CS Elisa/Jennyfer (mantem a exclusao de partner_id)
+    SELECT ad.id, ad.name, ad.angel_id, ad.integration_id, ad.partner_id, ad.modulos,
+           d2.created_at AS domain_created_at
     FROM active_domains ad
     JOIN dbo.ODBC_Domains d2 ON d2.id = ad.id
     JOIN dbo.ODBC_Angels a ON a.id = ad.angel_id
     WHERE a.name IN ('Elisa Marques', 'Jennyfer Rabelo')
+
+    UNION  -- dedup: marca Atta que tambem tenha CS Elisa/Jenny entra uma vez so
+
+    -- Canal Atta inteiro, com ou sem CS
+    SELECT atd.id, atd.name, atd.angel_id, atd.integration_id, atd.partner_id, atd.modulos,
+           d3.created_at AS domain_created_at
+    FROM atta_domains atd
+    JOIN dbo.ODBC_Domains d3 ON d3.id = atd.id
 ),
 ranked_companies AS (
     SELECT
