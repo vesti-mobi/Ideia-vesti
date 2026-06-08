@@ -45,6 +45,18 @@ td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
+<div id="loginScreen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#2D3436,#636E72)">
+  <div style="background:#fff;border-radius:16px;padding:40px;width:360px;box-shadow:0 8px 32px rgba(0,0,0,.2);text-align:center">
+    <div style="font-size:34px;margin-bottom:4px">📦</div>
+    <div style="font-family:'Inter',sans-serif;font-size:24px;font-weight:800;color:#6C5CE7;margin-bottom:4px">Movimentação de Estoque</div>
+    <div style="font-size:13px;color:#636E72;margin-bottom:28px">VestiHouse</div>
+    <input type="password" id="loginPass" placeholder="Digite a senha..." style="width:100%;padding:12px 16px;border:2px solid #DFE6E9;border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;outline:none;margin-bottom:12px;text-align:center" onkeydown="if(event.key==='Enter')doLogin()">
+    <div id="loginError" style="color:#E17055;font-size:12px;margin-bottom:12px;display:none">Senha incorreta</div>
+    <button onclick="doLogin()" style="width:100%;padding:12px;background:#6C5CE7;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">Entrar</button>
+  </div>
+</div>
+
+<div id="dashContent" style="display:none">
 <div class="wrap">
   <h1>📦 Movimentação de Estoque</h1>
   <div class="info">Período: <strong id="periodo">--</strong> · Atualizado em <span id="dtGerado">--</span> · fonte: VestiHouse <span class="mono">dbo.movimentacao_estoque</span></div>
@@ -116,6 +128,25 @@ td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
 
   <div class="foot" id="foot"></div>
 </div>
+</div><!-- /#dashContent -->
+
+<script>
+function doLogin(){
+  var pass = document.getElementById('loginPass').value;
+  if (pass === 'Mudar123'){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashContent').style.display = 'block';
+    sessionStorage.setItem('movest_auth','1');
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('loginPass').style.borderColor = '#E17055';
+  }
+}
+if (sessionStorage.getItem('movest_auth') === '1'){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashContent').style.display = 'block';
+}
+</script>
 
 <script>
 // cache-bust agressivo no dados.js (evita versao velha)
