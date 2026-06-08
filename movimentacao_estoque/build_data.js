@@ -181,12 +181,15 @@ async function main() {
   // dominio/empresa/produto/sku/data. Chaves curtas pra reduzir o payload.
   const FILTRO_REAIS = "origin NOT LIKE 'INTEGRATION_BULK%'";
   const linhas = await query(tok, `
-    SELECT created_at, action, origin, sku,
-           old_qty, new_qty, old_balance, new_balance,
-           domain_id, company_id, product_id, order_id
-    FROM ${TABELA}
-    WHERE ${FILTRO_REAIS}
-    ORDER BY created_at DESC`, 'linhas busca (nao-bulk)');
+    SELECT m.created_at, m.action, m.origin, m.sku,
+           m.old_qty, m.new_qty, m.old_balance, m.new_balance,
+           m.domain_id, m.company_id, m.product_id, m.order_id, m.user_id,
+           u.email AS user_email,
+           LTRIM(RTRIM(CONCAT(ISNULL(u.name,''), ' ', ISNULL(u.lastname,'')))) AS user_nome
+    FROM ${TABELA} m
+    LEFT JOIN dbo.ODBC_Users u ON m.user_id = u.id
+    WHERE m.origin NOT LIKE 'INTEGRATION_BULK%'
+    ORDER BY m.created_at DESC`, 'linhas busca (nao-bulk)');
 
   const empNomes = await query(tok, `
     SELECT DISTINCT m.company_id, c.company_name
@@ -210,6 +213,7 @@ async function main() {
       a: r.action, o: r.origin, s: r.sku,
       dq: r.old_qty, nq: r.new_qty, db: r.old_balance, nb: r.new_balance,
       dm: r.domain_id, c: r.company_id, p: r.product_id, od: r.order_id,
+      usr: r.user_email || '', un: (r.user_nome || '').trim(), uid: r.user_id || '',
     })),
   };
   fs.writeFileSync(path.join(DIR, 'busca.js'), 'window.BUSCA = ' + JSON.stringify(busca) + ';\n', 'utf-8');

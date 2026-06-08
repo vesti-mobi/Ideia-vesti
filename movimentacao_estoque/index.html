@@ -71,6 +71,7 @@ td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
         <input id="fEmp" placeholder="Empresa (id ou nome)">
         <input id="fProd" placeholder="Produto (id)">
         <input id="fSku" placeholder="SKU">
+        <input id="fUser" placeholder="Usuário (e-mail)">
         <input id="fData" type="date">
         <select id="fAcao"><option value="">Ação (todas)</option><option>INSERT</option><option>UPDATE</option><option>DELETE</option></select>
         <select id="fOrigem"><option value="">Origem (todas)</option></select>
@@ -81,10 +82,10 @@ td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
       <div class="scroll">
         <table>
           <thead><tr>
-            <th>Data/hora</th><th>Empresa</th><th>Domínio</th><th>SKU</th>
+            <th>Data/hora</th><th>Empresa</th><th>Usuário</th><th>Domínio</th><th>SKU</th>
             <th>Ação</th><th>Origem</th><th class="r">Qtd</th><th class="r">Saldo</th><th>Produto</th>
           </tr></thead>
-          <tbody id="tbBusca"><tr><td colspan="9" class="empty">preencha um filtro (domínio, empresa, produto ou SKU) e clique em Buscar</td></tr></tbody>
+          <tbody id="tbBusca"><tr><td colspan="10" class="empty">preencha um filtro (domínio, empresa, produto, SKU ou usuário) e clique em Buscar</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -266,18 +267,18 @@ function loadBusca(cb){
 }
 function buscar(){ loadBusca(doBuscar); }
 function limparBusca(){
-  ['fDom','fEmp','fProd','fSku','fData'].forEach(function(id){document.getElementById(id).value='';});
+  ['fDom','fEmp','fProd','fSku','fUser','fData'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('fAcao').value=''; document.getElementById('fOrigem').value='';
-  document.getElementById('tbBusca').innerHTML='<tr><td colspan="9" class="empty">preencha um filtro e clique em Buscar</td></tr>';
+  document.getElementById('tbBusca').innerHTML='<tr><td colspan="10" class="empty">preencha um filtro e clique em Buscar</td></tr>';
   document.getElementById('buscaStatus').textContent='';
 }
 function val(id){return (document.getElementById(id).value||'').trim();}
 function doBuscar(){
   var B=window.BUSCA; if(!B){return;}
   var fDom=val('fDom').toLowerCase(), fEmp=val('fEmp').toLowerCase(), fProd=val('fProd').toLowerCase(),
-      fSku=val('fSku').toLowerCase(), fData=val('fData'), fAcao=val('fAcao'), fOrigem=val('fOrigem');
-  if(!fDom&&!fEmp&&!fProd&&!fSku){
-    document.getElementById('buscaStatus').textContent='informe ao menos: domínio, empresa, produto ou SKU.';
+      fSku=val('fSku').toLowerCase(), fUser=val('fUser').toLowerCase(), fData=val('fData'), fAcao=val('fAcao'), fOrigem=val('fOrigem');
+  if(!fDom&&!fEmp&&!fProd&&!fSku&&!fUser){
+    document.getElementById('buscaStatus').textContent='informe ao menos: domínio, empresa, produto, SKU ou usuário.';
     return;
   }
   var res=B.rows.filter(function(r){
@@ -285,6 +286,7 @@ function doBuscar(){
     if(fEmp){ var en=(B.empresas[r.c]||'').toLowerCase(); if(String(r.c).toLowerCase()!==fEmp && en.indexOf(fEmp)<0) return false; }
     if(fProd){ if(String(r.p||'').toLowerCase().indexOf(fProd)<0) return false; }
     if(fSku){ if(String(r.s||'').toLowerCase().indexOf(fSku)<0) return false; }
+    if(fUser){ var who=((r.usr||'')+' '+(r.un||'')).toLowerCase(); if(who.indexOf(fUser)<0) return false; }
     if(fData){ if(!r.t || r.t.slice(0,10)!==fData) return false; }
     if(fAcao){ if(r.a!==fAcao) return false; }
     if(fOrigem){ if(r.o!==fOrigem) return false; }
@@ -292,7 +294,7 @@ function doBuscar(){
   });
   document.getElementById('buscaStatus').innerHTML='<span class="qd"><b>'+fmtN(res.length)+'</b> movimentação(ões)'+(res.length>MAX_SHOW?(' — mostrando as '+MAX_SHOW+' mais recentes'):'')+'</span>';
   var tb=document.getElementById('tbBusca');
-  if(!res.length){ tb.innerHTML='<tr><td colspan="9" class="empty">nenhuma movimentação (lembrando: sincronizações em massa não entram aqui)</td></tr>'; return; }
+  if(!res.length){ tb.innerHTML='<tr><td colspan="10" class="empty">nenhuma movimentação (lembrando: sincronizações em massa não entram aqui)</td></tr>'; return; }
   tb.innerHTML=res.slice(0,MAX_SHOW).map(function(r){
     var emp=B.empresas[r.c]||r.c, dom=B.dominios[r.dm]||('#'+r.dm);
     var dt=r.t?new Date(r.t):null;
@@ -300,6 +302,7 @@ function doBuscar(){
     return '<tr>'+
       '<td>'+dtTxt+'</td>'+
       '<td>'+esc(emp)+'</td>'+
+      '<td class="mono"'+(r.un?' title="'+esc(r.un)+'"':'')+'>'+esc(r.usr||r.un||'—')+'</td>'+
       '<td>'+esc(dom)+' <span class="mono">#'+r.dm+'</span></td>'+
       '<td class="mono">'+esc(r.s)+'</td>'+
       '<td>'+r.a+'</td>'+
@@ -315,7 +318,7 @@ function doBuscar(){
   document.addEventListener('DOMContentLoaded',function(){});
 });
 document.addEventListener('keydown',function(e){
-  if(e.key==='Enter' && ['fDom','fEmp','fProd','fSku','fData'].indexOf((e.target&&e.target.id)||'')>=0) buscar();
+  if(e.key==='Enter' && ['fDom','fEmp','fProd','fSku','fUser','fData'].indexOf((e.target&&e.target.id)||'')>=0) buscar();
 });
 
 // ===================== HISTORICO POR EMPRESA (carrega empresas_dia.js sob demanda) =====================
