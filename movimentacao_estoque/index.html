@@ -90,6 +90,29 @@ td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
     </div>
   </div>
 
+  <div class="grid">
+    <div class="card" id="empDiaCard">
+      <h2>📅 Histórico por empresa (dia a dia) <span style="font-weight:400;color:var(--mut)">(acumula 1 resumo por marca a cada snapshot — pesquise por marca e/ou por dia)</span></h2>
+      <div class="filtros">
+        <input id="edEmp" placeholder="Empresa (id ou nome)">
+        <select id="edDia"><option value="">Dia (todos)</option></select>
+        <button onclick="buscarEmpDia()">Buscar</button>
+        <button class="sec" onclick="limparEmpDia()">Limpar</button>
+      </div>
+      <div id="edStatus" class="info" style="margin-bottom:8px"></div>
+      <div class="scroll">
+        <table>
+          <thead><tr>
+            <th>Dia</th><th>Empresa</th><th>Domínio</th>
+            <th class="r">Total</th><th class="r">Insert</th><th class="r">Update</th><th class="r">Delete</th>
+            <th class="r">Não-bulk</th><th class="r">SKUs</th><th class="r">Saldo líq.</th>
+          </tr></thead>
+          <tbody id="tbEmpDia"><tr><td colspan="10" class="empty">informe uma marca (id ou nome) e/ou escolha um dia, depois clique em Buscar</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <div class="grid cols">
     <div class="card">
       <h2>Por ação</h2>
@@ -293,6 +316,70 @@ function doBuscar(){
 });
 document.addEventListener('keydown',function(e){
   if(e.key==='Enter' && ['fDom','fEmp','fProd','fSku','fData'].indexOf((e.target&&e.target.id)||'')>=0) buscar();
+});
+
+// ===================== HISTORICO POR EMPRESA (carrega empresas_dia.js sob demanda) =====================
+var ED_LOADED=false, ED_LOADING=false, ED_MAX=2000;
+function loadEmpDia(cb){
+  if(ED_LOADED){cb();return;}
+  if(ED_LOADING)return;
+  ED_LOADING=true;
+  document.getElementById('edStatus').textContent='carregando histórico por empresa (~uma vez)...';
+  var s=document.createElement('script');
+  s.src='empresas_dia.js?v='+Date.now();
+  s.onload=function(){
+    ED_LOADED=true;ED_LOADING=false;document.getElementById('edStatus').textContent='';
+    var sel=document.getElementById('edDia');
+    (window.EMPRESAS_DIA.dias||[]).slice().reverse().forEach(function(d){
+      var op=document.createElement('option');op.value=d;op.textContent=fmtD(d);sel.appendChild(op);
+    });
+    cb();
+  };
+  s.onerror=function(){ED_LOADING=false;document.getElementById('edStatus').textContent='ainda sem histórico por empresa (gera no próximo build).';};
+  document.head.appendChild(s);
+}
+function buscarEmpDia(){ loadEmpDia(doBuscarEmpDia); }
+function limparEmpDia(){
+  document.getElementById('edEmp').value='';
+  document.getElementById('edDia').value='';
+  document.getElementById('tbEmpDia').innerHTML='<tr><td colspan="10" class="empty">informe uma marca (id ou nome) e/ou escolha um dia, depois clique em Buscar</td></tr>';
+  document.getElementById('edStatus').textContent='';
+}
+function doBuscarEmpDia(){
+  var ED=window.EMPRESAS_DIA; if(!ED){return;}
+  var fEmp=(document.getElementById('edEmp').value||'').trim().toLowerCase();
+  var fDia=document.getElementById('edDia').value;
+  if(!fEmp && !fDia){
+    document.getElementById('edStatus').textContent='informe uma marca ou escolha um dia.';
+    return;
+  }
+  var res=ED.rows.filter(function(r){
+    if(fDia && r.d!==fDia) return false;
+    if(fEmp){ var en=(ED.empresas[r.c]||'').toLowerCase(); if(String(r.c).toLowerCase()!==fEmp && en.indexOf(fEmp)<0) return false; }
+    return true;
+  });
+  res.sort(function(a,b){ if(a.d!==b.d) return a.d<b.d?1:-1; return b.n-a.n; });
+  document.getElementById('edStatus').innerHTML='<span class="qd"><b>'+fmtN(res.length)+'</b> linha(s) empresa/dia'+(res.length>ED_MAX?(' — mostrando '+ED_MAX):'')+'</span>';
+  var tb=document.getElementById('tbEmpDia');
+  if(!res.length){ tb.innerHTML='<tr><td colspan="10" class="empty">sem movimentação para esse filtro nos dias capturados</td></tr>'; return; }
+  tb.innerHTML=res.slice(0,ED_MAX).map(function(r){
+    var nome=ED.empresas[r.c]||r.c, cls=r.sl>0?'pos':(r.sl<0?'neg':'');
+    return '<tr>'+
+      '<td>'+fmtD(r.d)+'</td>'+
+      '<td>'+esc(nome)+'</td>'+
+      '<td class="mono">#'+r.dom+'</td>'+
+      '<td class="r"><strong>'+fmtN(r.n)+'</strong></td>'+
+      '<td class="r" style="color:var(--g)">'+fmtN(r.i)+'</td>'+
+      '<td class="r" style="color:var(--b)">'+fmtN(r.u)+'</td>'+
+      '<td class="r" style="color:var(--r)">'+fmtN(r.x)+'</td>'+
+      '<td class="r">'+fmtN(r.nb)+'</td>'+
+      '<td class="r">'+fmtN(r.sk)+'</td>'+
+      '<td class="r '+cls+'">'+(r.sl>0?'+':'')+fmtN(r.sl)+'</td>'+
+    '</tr>';
+  }).join('');
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter' && (e.target&&e.target.id)==='edEmp') buscarEmpDia();
 });
 
 // auto-reload: mantem o relatorio fresco sem refresh manual (so ocioso e visivel)

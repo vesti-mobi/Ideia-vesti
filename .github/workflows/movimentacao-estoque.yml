@@ -31,7 +31,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          FILES="movimentacao_estoque/dados.js movimentacao_estoque/historico.json movimentacao_estoque/busca.js"
+          FILES="movimentacao_estoque/dados.js movimentacao_estoque/historico.json movimentacao_estoque/busca.js movimentacao_estoque/empresas_dia.json movimentacao_estoque/empresas_dia.js"
           MSG="Movimentacao estoque $(date +'%d/%m/%Y %H:%M')"
           # push robusto sem rebase (reaplica os arquivos gerados sobre o topo do remoto)
           for i in 1 2 3 4 5; do

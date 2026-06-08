@@ -214,6 +214,63 @@ async function main() {
   };
   fs.writeFileSync(path.join(DIR, 'busca.js'), 'window.BUSCA = ' + JSON.stringify(busca) + ';\n', 'utf-8');
   console.log(`OK: busca.js gerado (${busca.rows.length} linhas pesquisaveis, ${Object.keys(empresas).length} empresas, ${Object.keys(dominios).length} dominios).`);
+
+  // ===================== HISTORICO POR EMPRESA (dia a dia) =====================
+  // 1 linha por empresa/dia (resumo compacto, NAO as linhas cruas). Acumula a cada
+  // snapshot pra dar serie temporal por marca: permite pesquisar uma marca e ver
+  // todos os dias que ela movimentou, OU pesquisar um dia e ver todas as marcas.
+  // Inclui TODAS as empresas com movimentacao no dia (bulk + nao-bulk).
+  const RETENCAO_DIAS = 180;
+  const empDia = await query(tok, `
+    SELECT m.company_id, m.domain_id,
+           MAX(c.company_name) AS nome,
+           COUNT(*) AS n,
+           SUM(CASE WHEN m.action='INSERT' THEN 1 ELSE 0 END) AS ins,
+           SUM(CASE WHEN m.action='UPDATE' THEN 1 ELSE 0 END) AS upd,
+           SUM(CASE WHEN m.action='DELETE' THEN 1 ELSE 0 END) AS del,
+           SUM(CASE WHEN m.origin NOT LIKE 'INTEGRATION_BULK%' THEN 1 ELSE 0 END) AS naoBulk,
+           COUNT(DISTINCT m.sku) AS skus,
+           SUM(CAST(m.new_balance AS bigint) - CAST(m.old_balance AS bigint)) AS saldoLiq
+    FROM ${TABELA} m
+    LEFT JOIN dbo.ODBC_Companies c ON m.company_id = c.id
+    GROUP BY m.company_id, m.domain_id`, 'empresas/dia');
+
+  const edPath = path.join(DIR, 'empresas_dia.json');
+  let ed = { dias: [], empresas: {}, rows: [] };
+  try {
+    const prev = JSON.parse(fs.readFileSync(edPath, 'utf-8'));
+    if (prev && prev.rows) ed = prev;
+  } catch (e) {}
+
+  // upsert do dia de referencia (reexecucao do mesmo dia nao duplica)
+  ed.rows = ed.rows.filter(r => r.d !== diaRef);
+  empDia.forEach(r => {
+    if (!r.company_id) return;
+    const nome = (r.nome || '').trim();
+    if (nome) ed.empresas[r.company_id] = nome;
+    ed.rows.push({
+      d: diaRef, c: r.company_id, dom: r.domain_id,
+      n: Number(r.n) || 0, i: Number(r.ins) || 0, u: Number(r.upd) || 0, x: Number(r.del) || 0,
+      nb: Number(r.naoBulk) || 0, sk: Number(r.skus) || 0, sl: Number(r.saldoLiq) || 0,
+    });
+  });
+
+  // retencao: mantem so os ultimos RETENCAO_DIAS dias
+  let dias = Array.from(new Set(ed.rows.map(r => r.d))).sort();
+  if (dias.length > RETENCAO_DIAS) {
+    const corte = dias[dias.length - RETENCAO_DIAS];
+    ed.rows = ed.rows.filter(r => r.d >= corte);
+    dias = Array.from(new Set(ed.rows.map(r => r.d))).sort();
+  }
+  ed.dias = dias;
+  // limpa nomes de empresas que nao aparecem mais em nenhuma linha
+  const ativos = new Set(ed.rows.map(r => r.c));
+  Object.keys(ed.empresas).forEach(id => { if (!ativos.has(id)) delete ed.empresas[id]; });
+
+  ed.atualizadoEm = dados.geradoEm;
+  fs.writeFileSync(edPath, JSON.stringify(ed), 'utf-8');
+  fs.writeFileSync(path.join(DIR, 'empresas_dia.js'), 'window.EMPRESAS_DIA = ' + JSON.stringify(ed) + ';\n', 'utf-8');
+  console.log(`OK: empresas_dia gerado (${ed.rows.length} linhas empresa/dia, ${ed.dias.length} dia(s), ${Object.keys(ed.empresas).length} empresas).`);
 }
 
 main().catch(e => { console.error('FALHA:', e.message); process.exit(1); });
