@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Métricas VestiPago</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p:#6C5CE7;--p2:#a29bfe;--g:#00B894;--r:#E17055;--y:#F39C12;--b:#0984E3;
+  --gold:#C9A227;--vesti:#0E9F6E;
+  --bg:#F4F5FB;--card:#fff;--tx:#2D3436;--mut:#7A8085;--bd:#E7EAF0;--rd:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);padding:22px;line-height:1.5}
+/* login */
+#login{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#2D3436,#6C5CE7);position:fixed;inset:0;z-index:100}
+#login .box{background:#fff;border-radius:18px;padding:42px;width:370px;box-shadow:0 12px 40px rgba(0,0,0,.3);text-align:center}
+#login h2{font-size:22px;font-weight:900;margin-bottom:4px}
+#login .sub{font-size:13px;color:var(--mut);margin-bottom:24px}
+#login input{width:100%;padding:13px 16px;border:2px solid var(--bd);border-radius:10px;font:14px 'Inter';outline:none;margin-bottom:12px;text-align:center}
+#login input:focus{border-color:var(--p)}
+#login button{width:100%;padding:13px;background:var(--p);color:#fff;border:none;border-radius:10px;font:600 14px 'Inter';cursor:pointer}
+#login button:hover{opacity:.92}
+#loginErr{color:var(--r);font-size:12px;margin-bottom:12px;display:none}
+.app{display:none}
+.wrap{max-width:1360px;margin:0 auto}
+/* topo */
+.top{display:flex;align-items:center;gap:16px;background:linear-gradient(120deg,#6C5CE7 0%,#8B7FF0 50%,#00B894 100%);color:#fff;padding:22px 30px;border-radius:var(--rd);margin-bottom:18px;box-shadow:0 6px 22px rgba(108,92,231,.25)}
+.top h1{font-size:23px;font-weight:900;letter-spacing:-.3px}
+.top .sub{font-size:12.5px;opacity:.9;margin-top:3px}
+.top .info{margin-left:auto;text-align:right;font-size:11.5px;opacity:.92}
+.top .logout{margin-left:14px;padding:8px 14px;background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:9px;font:600 12px 'Inter';cursor:pointer}
+.top .logout:hover{background:rgba(255,255,255,.3)}
+/* controles globais */
+.ctrl{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--card);border-radius:var(--rd);padding:14px 18px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.seg{display:inline-flex;background:#EEF0F7;border-radius:10px;padding:4px}
+.seg button{border:none;background:none;padding:8px 18px;border-radius:7px;font:600 13px 'Inter';color:var(--mut);cursor:pointer}
+.seg button.on{background:#fff;color:var(--p);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.ctrl label{font:600 11px 'Inter';color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-right:-6px}
+.ctrl select{padding:9px 12px;border:1.5px solid var(--bd);border-radius:9px;font:14px 'Inter';outline:none;background:#fff}
+.legend{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mut)}
+.legend .dot{width:11px;height:11px;border-radius:3px;background:var(--vesti);display:inline-block}
+/* tabs */
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.tabs button{border:none;background:var(--card);padding:11px 18px;border-radius:11px;font:600 13.5px 'Inter';color:var(--mut);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.tabs button.on{background:var(--p);color:#fff;box-shadow:0 4px 14px rgba(108,92,231,.3)}
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:18px}
+.kpi{background:var(--card);border-radius:var(--rd);padding:18px 22px;box-shadow:0 2px 8px rgba(0,0,0,.04);border-left:4px solid var(--p)}
+.kpi.green{border-color:var(--g)} .kpi.blue{border-color:var(--b)} .kpi.gold{border-color:var(--vesti)} .kpi.orange{border-color:var(--y)} .kpi.gray{border-color:#B2BEC3}
+.kpi .lbl{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.kpi .val{font-size:23px;font-weight:900;margin-top:6px;color:var(--tx)}
+.kpi .vsub{font-size:11.5px;color:var(--mut);margin-top:3px}
+.kpi.gold .val{color:var(--vesti)}
+/* cards/tabelas */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:980px){.grid2{grid-template-columns:1fr}}
+.cardbox{background:var(--card);border-radius:var(--rd);box-shadow:0 2px 10px rgba(0,0,0,.04);margin-bottom:16px;overflow:hidden}
+.cardbox h3{font-size:14.5px;font-weight:800;padding:16px 20px 0;display:flex;align-items:center;gap:8px}
+.cardbox .hint{font-size:11.5px;color:var(--mut);padding:2px 20px 12px}
+.tblwrap{overflow-x:auto;padding:6px 4px 10px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+th{text-align:right;padding:11px 14px;font-size:10.5px;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;background:#FAFBFE;border-bottom:1.5px solid var(--bd);white-space:nowrap}
+th.l,td.l{text-align:left}
+td{padding:10px 14px;border-bottom:1px solid #F2F3F7;text-align:right;white-space:nowrap}
+tr:hover td{background:#FAF9FF}
+td.money{font-weight:700} .pos{color:var(--g)} .muted{color:var(--mut)}
+th.vesti,td.vesti{background:rgba(14,159,110,.07)}
+td.vesti{color:var(--vesti);font-weight:800}
+th.vesti{color:var(--vesti)}
+tfoot td{font-weight:800;background:#F7F7FC;border-top:2px solid var(--bd)}
+.star{color:var(--vesti);font-size:11px}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#EEF0F7;color:var(--p)}
+/* svg chart */
+.chart{padding:10px 16px 16px}
+.bar{fill:var(--p2)} .bar:hover{fill:var(--p)}
+.gline{fill:none;stroke:var(--vesti);stroke-width:2.5}
+.gdot{fill:var(--vesti)}
+.axis{font-size:10px;fill:var(--mut)}
+.gridln{stroke:#EEF0F7;stroke-width:1}
+.search{width:100%;max-width:320px;padding:9px 12px;border:1.5px solid var(--bd);border-radius:9px;font:13px 'Inter';outline:none;margin:0 20px 10px}
+.search:focus{border-color:var(--p)}
+.note{font-size:12px;color:var(--mut);background:#FFF8E6;border:1px solid #FCE9B5;border-radius:10px;padding:10px 14px;margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="box">
+    <h2>Métricas VestiPago</h2>
+    <div class="sub">Financeiro de cartão • antecipação • métodos</div>
+    <div id="loginErr">Senha incorreta</div>
+    <input type="password" id="pwd" placeholder="Senha" autocomplete="current-password">
+    <button onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<div class="app" id="app">
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Métricas VestiPago 💳</h1>
+      <div class="sub">Detalhamento de transações de cartão (API) + antecipação BDR + métodos de pagamento</div>
+    </div>
+    <div class="info" id="info"></div>
+    <button class="logout" onclick="logout()">Sair</button>
+  </div>
+
+  <div class="ctrl">
+    <div class="seg" id="segPer">
+      <button data-per="semana" class="on">Semanal</button>
+      <button data-per="mes">Mensal</button>
+    </div>
+    <label>Ano</label>
+    <select id="selAno"></select>
+    <div class="legend"><span class="dot"></span> Colunas <b>destacadas</b> = ganho da Vesti</div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div id="view"></div>
+</div>
+</div>
+
+<script src="dados.js"></script>
+<script>
+/* ===== login ===== */
+const PWD='Mudar123';
+function doLogin(){const v=document.getElementById('pwd').value;if(v===PWD){sessionStorage.setItem('vp_auth','1');show()}else{document.getElementById('loginErr').style.display='block'}}
+function logout(){sessionStorage.removeItem('vp_auth');location.reload()}
+function show(){document.getElementById('login').style.display='none';document.getElementById('app').style.display='block';init()}
+document.getElementById('pwd').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+if(sessionStorage.getItem('vp_auth')==='1')show();
+
+/* ===== helpers ===== */
+const D=window.DADOS||{};
+const MES=['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const brl=x=>'R$ '+(x||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const brlk=x=>{x=x||0;const a=Math.abs(x);if(a>=1e6)return 'R$ '+(x/1e6).toLocaleString('pt-BR',{maximumFractionDigits:2})+'M';if(a>=1e3)return 'R$ '+(x/1e3).toLocaleString('pt-BR',{maximumFractionDigits:1})+'k';return brl(x)};
+const int=x=>(x||0).toLocaleString('pt-BR');
+const pct=(a,b)=>b?((a/b*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%'):'—';
+let state={per:'semana',ano:'all',tab:'completo'};
+
+function plabel(r){return state.per==='semana'?('S'+r.p):MES[r.p];}
+function plabelYear(r){return plabel(r)+(anosDisponiveis().length>1?('/'+String(r.ano).slice(2)):'');}
+function anosDisponiveis(){
+  const s=new Set();(D.card[state.per]||[]).forEach(r=>s.add(r.ano));(D.bdrLedger[state.per]||[]).forEach(r=>s.add(r.ano));
+  return [...s].sort();
+}
+function filtraAno(arr){return state.ano==='all'?arr:arr.filter(r=>r.ano==state.ano);}
+function nomeMarca(c,dom){const e=D.empresas[c];if(e&&e.nome)return e.nome;const dn=D.dominios[dom];return dn||('marca '+(dom||c||'?'));}
+
+/* ===== tabs ===== */
+const TABS=[
+  {id:'completo',label:'📊 Completo'},
+  {id:'method',label:'💳 Method'},
+  {id:'bdr',label:'⏩ BDR / Antecipação'},
+  {id:'metodos',label:'🧾 Métodos de pagamento'},
+  {id:'duplicata',label:'🏷️ Duplicata de Method'},
+];
+function init(){
+  document.getElementById('info').innerHTML=
+    `Período: <b>${D.periodo.de} → ${D.periodo.ate}</b><br>Atualizado ${new Date(D.geradoEm).toLocaleString('pt-BR')}`;
+  // anos
+  const sel=document.getElementById('selAno');
+  const refreshAnos=()=>{const ax=anosDisponiveis();sel.innerHTML='<option value="all">Todos</option>'+ax.map(a=>`<option value="${a}">${a}</option>`).join('');if(![...sel.options].some(o=>o.value==state.ano))state.ano='all';sel.value=state.ano;};
+  refreshAnos();
+  sel.onchange=()=>{state.ano=sel.value;render()};
+  // segment
+  document.querySelectorAll('#segPer button').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#segPer button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+    state.per=b.dataset.per;refreshAnos();render();
+  });
+  // tabs
+  const t=document.getElementById('tabs');
+  t.innerHTML=TABS.map(x=>`<button data-tab="${x.id}" class="${x.id===state.tab?'on':''}">${x.label}</button>`).join('');
+  t.querySelectorAll('button').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;t.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');render()});
+  render();
+}
+
+/* ===== SVG bar+line chart ===== */
+function chart(rows,barKey,lineKey,barLbl,lineLbl){
+  if(!rows.length)return '';
+  const W=Math.max(520,rows.length*64),H=240,pl=52,pr=52,pt=20,pb=34;
+  const maxB=Math.max(...rows.map(r=>r[barKey]),1),maxL=Math.max(...rows.map(r=>r[lineKey]),1);
+  const cw=(W-pl-pr)/rows.length;
+  const x=i=>pl+i*cw+cw/2;
+  const yB=v=>H-pb-(v/maxB)*(H-pt-pb);
+  const yL=v=>H-pb-(v/maxL)*(H-pt-pb);
+  let bars='',line='',dots='',lbls='',gr='';
+  for(let g=0;g<=4;g++){const yy=pt+g*(H-pt-pb)/4;gr+=`<line class="gridln" x1="${pl}" y1="${yy}" x2="${W-pr}" y2="${yy}"/>`;}
+  rows.forEach((r,i)=>{
+    const bw=Math.min(cw*.55,40);
+    bars+=`<rect class="bar" x="${x(i)-bw/2}" y="${yB(r[barKey])}" width="${bw}" height="${H-pb-yB(r[barKey])}" rx="3"><title>${r._lbl}: ${brl(r[barKey])}</title></rect>`;
+    lbls+=`<text class="axis" x="${x(i)}" y="${H-pb+16}" text-anchor="middle">${r._lbl}</text>`;
+  });
+  rows.forEach((r,i)=>{line+=`${i?'L':'M'}${x(i)},${yL(r[lineKey])} `;dots+=`<circle class="gdot" cx="${x(i)}" cy="${yL(r[lineKey])}" r="3.5"><title>${r._lbl}: ${brl(r[lineKey])}</title></circle>`;});
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" width="100%" style="max-height:260px">
+    ${gr}${bars}<path class="gline" d="${line}"/>${dots}${lbls}
+    <text class="axis" x="${pl}" y="13">${barLbl} (barras) · ${lineLbl} (linha verde)</text>
+  </svg></div>`;
+}
+
+/* ===== render ===== */
+function render(){
+  const v=document.getElementById('view');
+  if(state.tab==='completo')v.innerHTML=tabCompleto();
+  else if(state.tab==='method')v.innerHTML=tabMethod();
+  else if(state.tab==='bdr')v.innerHTML=tabBDR();
+  else if(state.tab==='metodos')v.innerHTML=tabMetodos();
+  else if(state.tab==='duplicata')v.innerHTML=tabDuplicata();
+  hookSearch();
+}
+
+function sum(arr,k){return arr.reduce((a,r)=>a+(r[k]||0),0);}
+
+/* --- COMPLETO --- */
+function tabCompleto(){
+  const rows=filtraAno(D.card[state.per]||[]).map(r=>({...r,_lbl:plabelYear(r)}));
+  const k=D.kpis;
+  const tot=k=>sum(rows,k);
+  const kpis=`<div class="kpis">
+    <div class="kpi blue"><div class="lbl">Cliente pagou (value)</div><div class="val">${brlk(tot('value'))}</div><div class="vsub">${int(tot('n'))} transações</div></div>
+    <div class="kpi green"><div class="lbl">Marca recebe (netValue)</div><div class="val">${brlk(tot('netValue'))}</div><div class="vsub">${pct(tot('netValue'),tot('value'))} do pago</div></div>
+    <div class="kpi gold"><div class="lbl">★ Ganho Vesti total</div><div class="val">${brlk(tot('ganhoVesti'))}</div><div class="vsub">antifraude + MDR Vesti + antec. Vesti</div></div>
+    <div class="kpi gray"><div class="lbl">MDR banco + antec. banco</div><div class="val">${brlk(tot('mdrBanco')+tot('antecipBanco'))}</div><div class="vsub">custo de adquirência</div></div>
+  </div>`;
+  const ch=`<div class="cardbox"><h3>Volume por ${state.per==='semana'?'semana':'mês'}</h3>
+    <div class="hint">Barras = valor pago pelo cliente · linha verde = ganho da Vesti</div>
+    ${chart(rows,'value','ganhoVesti','Cliente pagou','Ganho Vesti')}</div>`;
+  const head=`<tr>
+    <th class="l">${state.per==='semana'?'Semana':'Mês'}</th><th>Transações</th>
+    <th>Cliente pagou</th><th>Marca recebe</th>
+    <th class="vesti">★ Antifraude</th><th>VestiPago</th>
+    <th>MDR banco</th><th class="vesti">★ MDR Vesti</th>
+    <th>Antecipação</th><th>Antec. banco</th><th class="vesti">★ Antec. Vesti</th>
+    <th class="vesti">★ Ganho Vesti</th></tr>`;
+  const body=rows.map(r=>`<tr>
+    <td class="l"><span class="pill">${r._lbl}</span></td><td class="muted">${int(r.n)}</td>
+    <td class="money">${brl(r.value)}</td><td class="money pos">${brl(r.netValue)}</td>
+    <td class="money vesti">${brl(r.antifraud)}</td><td class="money">${brl(r.vestiPago)}</td>
+    <td class="money muted">${brl(r.mdrBanco)}</td><td class="money vesti">${brl(r.mdrVesti)}</td>
+    <td class="money">${brl(r.antecip)}</td><td class="money muted">${brl(r.antecipBanco)}</td><td class="money vesti">${brl(r.antecipVesti)}</td>
+    <td class="money vesti">${brl(r.ganhoVesti)}</td></tr>`).join('');
+  const foot=`<tr>
+    <td class="l">Total</td><td>${int(tot('n'))}</td>
+    <td>${brl(tot('value'))}</td><td class="pos">${brl(tot('netValue'))}</td>
+    <td class="vesti">${brl(tot('antifraud'))}</td><td>${brl(tot('vestiPago'))}</td>
+    <td>${brl(tot('mdrBanco'))}</td><td class="vesti">${brl(tot('mdrVesti'))}</td>
+    <td>${brl(tot('antecip'))}</td><td>${brl(tot('antecipBanco'))}</td><td class="vesti">${brl(tot('antecipVesti'))}</td>
+    <td class="vesti">${brl(tot('ganhoVesti'))}</td></tr>`;
+  return kpis+ch+`<div class="cardbox"><h3>Detalhamento financeiro completo</h3>
+    <div class="hint">value = cliente pagou · netValue = marca recebe · MDR banco = adquirente · ★ = ganho da Vesti</div>
+    <div class="tblwrap"><table>${head}<tbody>${body}</tbody><tfoot>${foot}</tfoot></table></div></div>`;
+}
+
+/* --- METHOD --- (por método de pagamento + por bandeira) */
+function tabMethod(){
+  const met=filtraAno(D.metodo[state.per]||[]);
+  const ban=filtraAno(D.bandeira[state.per]||[]);
+  // agrega por metodo (todos os periodos do filtro)
+  const byMet={};met.forEach(r=>{const m=byMet[r.metodo]||(byMet[r.metodo]={metodo:r.metodo,n:0,value:0,netValue:0,mdrVesti:0,antifraud:0,antecipVesti:0});m.n+=r.n;m.value+=r.value;m.netValue+=r.netValue;m.mdrVesti+=r.mdrVesti;m.antifraud+=r.antifraud;m.antecipVesti+=r.antecipVesti;});
+  const mets=Object.values(byMet).sort((a,b)=>b.value-a.value);
+  const byBrand={};ban.forEach(r=>{const m=byBrand[r.brand]||(byBrand[r.brand]={brand:r.brand,n:0,value:0});m.n+=r.n;m.value+=r.value;});
+  const brands=Object.values(byBrand).sort((a,b)=>b.value-a.value);
+  const totV=sum(mets,'value');
+  const tMet=`<div class="cardbox"><h3>Por método de pagamento</h3>
+    <div class="hint">Ganhos Vesti destacados</div>
+    <div class="tblwrap"><table>
+    <tr><th class="l">Método</th><th>Transações</th><th>Cliente pagou</th><th>% do total</th><th class="vesti">★ Antifraude</th><th class="vesti">★ MDR Vesti</th><th class="vesti">★ Antec. Vesti</th></tr>
+    ${mets.map(m=>`<tr><td class="l"><b>${m.metodo}</b></td><td class="muted">${int(m.n)}</td><td class="money">${brl(m.value)}</td><td class="muted">${pct(m.value,totV)}</td>
+      <td class="money vesti">${brl(m.antifraud)}</td><td class="money vesti">${brl(m.mdrVesti)}</td><td class="money vesti">${brl(m.antecipVesti)}</td></tr>`).join('')}
+    </table></div></div>`;
+  const totB=sum(brands,'value');
+  const tBan=`<div class="cardbox"><h3>Por bandeira do cartão</h3>
+    <div class="tblwrap"><table>
+    <tr><th class="l">Bandeira</th><th>Transações</th><th>Cliente pagou</th><th>% do total</th></tr>
+    ${brands.map(b=>`<tr><td class="l"><b>${b.brand}</b></td><td class="muted">${int(b.n)}</td><td class="money">${brl(b.value)}</td><td class="muted">${pct(b.value,totB)}</td></tr>`).join('')}
+    </table></div></div>`;
+  // serie por periodo
+  const serie=filtraAno(D.card[state.per]||[]).map(r=>({...r,_lbl:plabelYear(r)}));
+  const ch=`<div class="cardbox"><h3>Valor transacionado por ${state.per==='semana'?'semana':'mês'}</h3>${chart(serie,'value','mdrVesti','Cliente pagou','MDR Vesti')}</div>`;
+  return ch+`<div class="grid2">${tMet}${tBan}</div>`;
+}
+
+/* --- BDR / ANTECIPAÇÃO --- */
+function tabBDR(){
+  const ap=filtraAno(D.antecipProvider[state.per]||[]);
+  const byProv={};ap.forEach(r=>{const m=byProv[r.prov]||(byProv[r.prov]={prov:r.prov,n:0,antecip:0,antecipBanco:0,antecipVesti:0});m.n+=r.n;m.antecip+=r.antecip;m.antecipBanco+=r.antecipBanco;m.antecipVesti+=r.antecipVesti;});
+  const provs=Object.values(byProv).sort((a,b)=>b.antecip-a.antecip);
+  const tProv=`<div class="cardbox"><h3>Antecipação por provedor</h3>
+    <div class="hint">antecipationValue = cobrado da marca · provider fee = banco · ★ Vesti fee = ganho da Vesti</div>
+    <div class="tblwrap"><table>
+    <tr><th class="l">Provedor</th><th>Transações</th><th>Antecipação (marca)</th><th>Taxa banco</th><th class="vesti">★ Taxa Vesti</th></tr>
+    ${provs.map(p=>`<tr><td class="l"><b>${p.prov}</b></td><td class="muted">${int(p.n)}</td><td class="money">${brl(p.antecip)}</td><td class="money muted">${brl(p.antecipBanco)}</td><td class="money vesti">${brl(p.antecipVesti)}</td></tr>`).join('')}
+    <tr><td class="l"><b>Total</b></td><td>${int(sum(provs,'n'))}</td><td class="money">${brl(sum(provs,'antecip'))}</td><td class="money">${brl(sum(provs,'antecipBanco'))}</td><td class="money vesti">${brl(sum(provs,'antecipVesti'))}</td></tr>
+    </table></div></div>`;
+  // ledger BDR
+  const led=filtraAno(D.bdrLedger[state.per]||[]).map(r=>({...r,_lbl:plabelYear(r)}));
+  const tLed=`<div class="cardbox"><h3>Ledger BDR (tabela dbo.bdr)</h3>
+    <div class="hint">valor onerado/presente/juros e rebate da operação BDR, por ${state.per}</div>
+    <div class="tblwrap"><table>
+    <tr><th class="l">${state.per==='semana'?'Semana':'Mês'}</th><th>Operações</th><th>Valor onerado</th><th>Valor presente</th><th>Juros</th><th>Rebate</th><th>Rebate financeiro</th></tr>
+    ${led.map(r=>`<tr><td class="l"><span class="pill">${r._lbl}</span></td><td class="muted">${int(r.n)}</td><td class="money">${brl(r.onerado)}</td><td class="money">${brl(r.presente)}</td><td class="money">${brl(r.juros)}</td><td class="money">${brl(r.rebate)}</td><td class="money pos">${brl(r.rebateFin)}</td></tr>`).join('')}
+    <tr><td class="l"><b>Total</b></td><td>${int(sum(led,'n'))}</td><td class="money">${brl(sum(led,'onerado'))}</td><td class="money">${brl(sum(led,'presente'))}</td><td class="money">${brl(sum(led,'juros'))}</td><td class="money">${brl(sum(led,'rebate'))}</td><td class="money pos">${brl(sum(led,'rebateFin'))}</td></tr>
+    </table></div></div>`;
+  const ch=`<div class="cardbox"><h3>Antecipação cobrada vs ganho Vesti por ${state.per}</h3>${chart(filtraAno(D.card[state.per]||[]).map(r=>({...r,_lbl:plabelYear(r)})),'antecip','antecipVesti','Antecipação (marca)','Antec. Vesti')}</div>`;
+  return ch+tProv+tLed;
+}
+
+/* --- MÉTODOS DE PAGAMENTO (Companies) --- */
+function tabMetodos(){
+  const mp=D.metodosPagamento||{porMetodo:[],totalEmpresas:0};
+  const max=Math.max(...mp.porMetodo.map(m=>m.empresas),1);
+  const bars=mp.porMetodo.map(m=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 0">
+      <div style="width:190px;font-weight:600;font-size:13px">${m.metodo}</div>
+      <div style="flex:1;background:#EEF0F7;border-radius:8px;height:26px;position:relative">
+        <div style="width:${m.empresas/max*100}%;background:linear-gradient(90deg,#6C5CE7,#a29bfe);height:100%;border-radius:8px"></div>
+      </div>
+      <div style="width:70px;text-align:right;font-weight:800">${int(m.empresas)}</div>
+    </div>`).join('');
+  return `<div class="kpis">
+    <div class="kpi"><div class="lbl">Marcas com métodos cadastrados</div><div class="val">${int(mp.totalEmpresas)}</div></div>
+    <div class="kpi green"><div class="lbl">Métodos diferentes</div><div class="val">${mp.porMetodo.length}</div></div>
+  </div>
+  <div class="cardbox"><h3>Marcas por método de pagamento habilitado</h3>
+   <div class="hint">Fonte: dbo.ODBC_Company_Method_Payments (quantas marcas têm cada método ativo)</div>
+   <div style="padding:8px 20px 18px">${bars}</div></div>`;
+}
+
+/* --- DUPLICATA DE METHOD (pivot marca x periodo de value) --- */
+function tabDuplicata(){
+  const rows=filtraAno(D.empresaPeriodo[state.per]||[]);
+  const periods=[...new Set(rows.map(r=>r.ano+'-'+r.p))].sort((a,b)=>{const[ay,ap]=a.split('-').map(Number),[by,bp]=b.split('-').map(Number);return ay-by||ap-bp});
+  const plab=key=>{const[y,p]=key.split('-').map(Number);return (state.per==='semana'?'S'+p:MES[p])+(anosDisponiveis().length>1?'/'+String(y).slice(2):'');};
+  const byMarca={};
+  rows.forEach(r=>{const m=byMarca[r.c]||(byMarca[r.c]={c:r.c,dom:r.dom,nome:nomeMarca(r.c,r.dom),tot:0,cells:{}});m.cells[r.ano+'-'+r.p]=(m.cells[r.ano+'-'+r.p]||0)+r.value;m.tot+=r.value;});
+  let marcas=Object.values(byMarca).sort((a,b)=>b.tot-a.tot);
+  const head=`<tr><th class="l">Marca</th>${periods.map(p=>`<th>${plab(p)}</th>`).join('')}<th>Total</th></tr>`;
+  window._dupMarcas=marcas;window._dupPeriods=periods;window._dupPlab=plab;
+  return `<div class="note">Pivot <b>marca × ${state.per}</b> do valor transacionado (value). ${marcas.length} marcas — use a busca.</div>
+   <div class="cardbox"><h3>Duplicata de Method — valor por marca e ${state.per}</h3>
+   <input class="search" id="dupSearch" placeholder="🔎 buscar marca...">
+   <div class="tblwrap"><table id="dupTable"><thead>${head}</thead><tbody>${dupBody(marcas,periods,plab)}</tbody></table></div></div>`;
+}
+function dupBody(marcas,periods){
+  return marcas.slice(0,200).map(m=>`<tr><td class="l"><b>${m.nome}</b> <span class="muted">#${m.dom||''}</span></td>
+    ${periods.map(p=>{const v=m.cells[p];return `<td class="money ${v?'':'muted'}">${v?brlk(v):'·'}</td>`}).join('')}
+    <td class="money pos">${brlk(m.tot)}</td></tr>`).join('');
+}
+function hookSearch(){
+  const s=document.getElementById('dupSearch');if(!s)return;
+  s.oninput=()=>{const q=s.value.toLowerCase();const f=window._dupMarcas.filter(m=>m.nome.toLowerCase().includes(q)||String(m.dom||'').includes(q));
+    document.querySelector('#dupTable tbody').innerHTML=dupBody(f,window._dupPeriods);};
+}
+</script>
+</body>
+</html>
