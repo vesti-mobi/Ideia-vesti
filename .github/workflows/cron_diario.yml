@@ -1,0 +1,28 @@
+name: Atualizar Historico de Logs de Estoque
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # 03:00 UTC = 00:00 BRT (meia-noite de Brasilia)
+  workflow_dispatch:        # permite execucao manual pela aba Actions
+
+jobs:
+  atualizar-logs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependencias
+        run: pip install --no-cache-dir psycopg2-binary
+
+      - name: Executar ETL incremental de logs
+        env:
+          DB_ORIGEM_URL: ${{ secrets.DB_ORIGEM_URL }}
+          DB_DESTINO_URL: ${{ secrets.DB_DESTINO_URL }}
+        run: python movimentacao_estoque/atualizar_logs.py
