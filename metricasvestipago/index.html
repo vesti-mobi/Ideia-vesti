@@ -72,6 +72,9 @@ th.vesti{color:var(--vesti)}
 tfoot td{font-weight:800;background:#F7F7FC;border-top:2px solid var(--bd)}
 .star{color:var(--vesti);font-size:11px}
 .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#EEF0F7;color:var(--p)}
+.src{font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:6px;vertical-align:middle;margin-left:6px;text-transform:uppercase;letter-spacing:.5px}
+.src.api{background:#E8F0FE;color:#1A73E8}
+.src.vp{background:#E6F7F0;color:#0E9F6E}
 /* svg chart */
 .chart{padding:10px 16px 16px}
 .bar{fill:var(--p2)} .bar:hover{fill:var(--p)}
@@ -148,6 +151,16 @@ function isoWeekMonday(y,w){const s=new Date(Date.UTC(y,0,1+(w-1)*7));const d=s.
 function dm(d){return String(d.getUTCDate()).padStart(2,'0')+'/'+MES[d.getUTCMonth()+1];}
 function weekRange(ano,p){const mon=isoWeekMonday(ano,p);const sun=new Date(mon);sun.setUTCDate(mon.getUTCDate()+6);return dm(mon)+'–'+dm(sun);}
 function plabelFull(r){return state.per==='semana'?('S'+r.p+' · '+weekRange(r.ano,r.p)):(MES[r.p]+'/'+r.ano);}
+function withLbl(arr){return filtraAno(arr||[]).map(r=>({...r,_lbl:plabelYear(r),_lblFull:plabelFull(r)}));}
+// tabela generica por periodo. cols: [{h, k, fmt:'money'|'int', cls}]
+function ptable(title,hint,rows,cols){
+  const perH=state.per==='semana'?'Semana':'Mês';
+  const head=`<tr><th class="l">${perH}</th>`+cols.map(c=>`<th class="${c.cls||''}">${c.h}</th>`).join('')+`</tr>`;
+  const cell=(r,c)=>{const v=r[c.k];const txt=c.fmt==='int'?int(v):brl(v);const base=c.fmt==='int'?'muted':'money';return `<td class="${base} ${c.cls||''}">${txt}</td>`;};
+  const body=rows.map(r=>`<tr><td class="l"><span class="pill">${r._lblFull}</span></td>`+cols.map(c=>cell(r,c)).join('')+`</tr>`).join('');
+  const foot=`<tr><td class="l">Total</td>`+cols.map(c=>{const s=sum(rows,c.k);return `<td class="${c.cls||''}">${c.fmt==='int'?int(s):brl(s)}</td>`;}).join('')+`</tr>`;
+  return `<div class="cardbox"><h3>${title}</h3>${hint?`<div class="hint">${hint}</div>`:''}<div class="tblwrap"><table>${head}<tbody>${body}</tbody><tfoot>${foot}</tfoot></table></div></div>`;
+}
 function anosDisponiveis(){
   const s=new Set();(D.card[state.per]||[]).forEach(r=>s.add(r.ano));(D.bdrLedger[state.per]||[]).forEach(r=>s.add(r.ano));
   return [...s].sort();
@@ -254,63 +267,94 @@ function tabCompleto(){
     <td>${brl(tot('mdrBanco'))}</td><td class="vesti">${brl(tot('mdrVesti'))}</td>
     <td>${brl(tot('antecip'))}</td><td>${brl(tot('antecipBanco'))}</td><td class="vesti">${brl(tot('antecipVesti'))}</td>
     <td class="vesti">${brl(tot('ganhoVesti'))}</td></tr>`;
-  return kpis+ch+`<div class="cardbox"><h3>Detalhamento financeiro completo</h3>
+  const cardTbl=`<div class="cardbox"><h3>💳 Cartão de Crédito <span class="src api">API</span></h3>
     <div class="hint">value = cliente pagou · netValue = marca recebe · MDR banco = adquirente · ★ = ganho da Vesti</div>
     <div class="tblwrap"><table>${head}<tbody>${body}</tbody><tfoot>${foot}</tfoot></table></div></div>`;
+  const gmv=ptable('🛒 Pedidos & GMV — todos os métodos <span class="src vp">Vesti</span>',
+    'nº de pedidos pagos e GMV total (summary.total) — fonte MongoDB_Pedidos_Geral',
+    withLbl(D.ordersGMV[state.per]),
+    [{h:'Pedidos',k:'nPedidos',fmt:'int'},{h:'GMV total',k:'gmv',fmt:'money',cls:'pos'}]);
+  return kpis+ch+cardTbl+gmv;
 }
 
-/* --- METHOD --- (por método de pagamento + por bandeira) */
+/* --- METHOD --- (mesmas tabelas do PBIX: Cartão, PIX, Antifraud, Seguro, Active Users x2) */
 function tabMethod(){
-  const met=filtraAno(D.metodo[state.per]||[]);
-  const ban=filtraAno(D.bandeira[state.per]||[]);
-  // agrega por metodo (todos os periodos do filtro)
-  const byMet={};met.forEach(r=>{const m=byMet[r.metodo]||(byMet[r.metodo]={metodo:r.metodo,n:0,value:0,netValue:0,mdrVesti:0,antifraud:0,antecipVesti:0});m.n+=r.n;m.value+=r.value;m.netValue+=r.netValue;m.mdrVesti+=r.mdrVesti;m.antifraud+=r.antifraud;m.antecipVesti+=r.antecipVesti;});
-  const mets=Object.values(byMet).sort((a,b)=>b.value-a.value);
-  const byBrand={};ban.forEach(r=>{const m=byBrand[r.brand]||(byBrand[r.brand]={brand:r.brand,n:0,value:0});m.n+=r.n;m.value+=r.value;});
-  const brands=Object.values(byBrand).sort((a,b)=>b.value-a.value);
-  const totV=sum(mets,'value');
-  const tMet=`<div class="cardbox"><h3>Por método de pagamento</h3>
-    <div class="hint">Ganhos Vesti destacados</div>
-    <div class="tblwrap"><table>
-    <tr><th class="l">Método</th><th>Transações</th><th>Cliente pagou</th><th>% do total</th><th class="vesti">★ Antifraude</th><th class="vesti">★ MDR Vesti</th><th class="vesti">★ Antec. Vesti</th></tr>
-    ${mets.map(m=>`<tr><td class="l"><b>${m.metodo}</b></td><td class="muted">${int(m.n)}</td><td class="money">${brl(m.value)}</td><td class="muted">${pct(m.value,totV)}</td>
-      <td class="money vesti">${brl(m.antifraud)}</td><td class="money vesti">${brl(m.mdrVesti)}</td><td class="money vesti">${brl(m.antecipVesti)}</td></tr>`).join('')}
+  const perH=state.per==='semana'?'Semana':'Mês';
+  // 1) Cartão de Crédito (API) com MDR
+  const cardTbl=ptable('💳 Cartão de Crédito <span class="src api">API</span>',
+    'value=cliente pagou · MDR banco=adquirente · ★=ganho da Vesti',
+    withLbl(D.card[state.per]),[
+    {h:'Transações',k:'n',fmt:'int'},{h:'Cliente pagou',k:'value'},
+    {h:'MDR banco',k:'mdrBanco',cls:'muted'},{h:'★ MDR Vesti',k:'mdrVesti',cls:'vesti'},
+    {h:'★ Antifraude',k:'antifraud',cls:'vesti'},{h:'Antecipação',k:'antecip'},
+    {h:'★ Antec. Vesti',k:'antecipVesti',cls:'vesti'},{h:'Marca recebe',k:'netValue',cls:'pos'}]);
+  // 2) PIX (Vesti)
+  const pixTbl=ptable('⚡ PIX <span class="src vp">Vesti</span>','pedidos pagos via PIX (valor = summary.total)',
+    withLbl(D.pix[state.per]),[{h:'Transações',k:'n',fmt:'int'},{h:'Valor',k:'value',cls:'pos'}]);
+  // 3) Antifraud (Vesti) — por fonte
+  const af=filtraAno(D.antifraud[state.per]); const byS={};af.forEach(r=>{byS[r.src]=(byS[r.src]||0)+r.n;});
+  const afRows=Object.entries(byS).map(([src,n])=>({src,n})).sort((a,b)=>b.n-a.n); const afTot=afRows.reduce((a,r)=>a+r.n,0);
+  const afTbl=`<div class="cardbox"><h3>🛡️ Antifraud <span class="src vp">Vesti</span></h3>
+    <div class="hint">pedidos por fonte de antifraude</div>
+    <div class="tblwrap"><table><tr><th class="l">Fonte</th><th>Pedidos</th><th>% do total</th></tr>
+    ${afRows.map(r=>`<tr><td class="l"><b>${r.src}</b></td><td class="muted">${int(r.n)}</td><td class="muted">${pct(r.n,afTot)}</td></tr>`).join('')}
+    <tr><td class="l"><b>Total</b></td><td>${int(afTot)}</td><td></td></tr></table></div></div>`;
+  // 4) Seguro (Vesti)
+  const seg=withLbl(D.seguro[state.per]);
+  const segTbl=`<div class="cardbox"><h3>🔒 Seguro <span class="src vp">Vesti</span></h3>
+    <div class="hint">pedidos com/sem seguro no cartão (creditCard.insurance)</div>
+    <div class="tblwrap"><table><tr><th class="l">${perH}</th><th>Com seguro</th><th>Sem seguro</th><th>% com</th></tr>
+    ${seg.map(r=>`<tr><td class="l"><span class="pill">${r._lblFull}</span></td><td class="muted">${int(r.comSeguro)}</td><td class="muted">${int(r.semSeguro)}</td><td class="muted">${pct(r.comSeguro,r.comSeguro+r.semSeguro)}</td></tr>`).join('')}
+    <tr><td class="l"><b>Total</b></td><td>${int(sum(seg,'comSeguro'))}</td><td>${int(sum(seg,'semSeguro'))}</td><td></td></tr></table></div></div>`;
+  // 5) Active Users (Vesti)
+  const auTbl=ptable('👥 Active Users <span class="src vp">Vesti</span>','marcas distintas com pedido pago no período',
+    withLbl(D.activeUsers[state.per]),[{h:'Marcas ativas',k:'marcas',fmt:'int'},{h:'Pedidos',k:'pedidos',fmt:'int'}]);
+  // 6) Active Users por método (pivot período × bucket)
+  const aum=filtraAno(D.activeUsersMetodo[state.per]); const aMeth=['PIX','Cartão de crédito','Outros'];
+  const aKeys=[...new Set(aum.map(r=>r.ano+'|'+r.p))].sort((a,b)=>{const[ay,ap]=a.split('|').map(Number),[by,bp]=b.split('|').map(Number);return ay-by||ap-bp});
+  const aLook={};aum.forEach(r=>{aLook[r.ano+'|'+r.p+'|'+r.metodo]=r.marcas;});
+  const aumTbl=`<div class="cardbox"><h3>👥 Active Users por método <span class="src vp">Vesti</span></h3>
+    <div class="hint">marcas distintas que receberam por cada método no período</div>
+    <div class="tblwrap"><table><tr><th class="l">${perH}</th>${aMeth.map(m=>`<th>${m}</th>`).join('')}</tr>
+    ${aKeys.map(key=>{const[y,p]=key.split('|').map(Number);return `<tr><td class="l"><span class="pill">${plabelFull({ano:y,p})}</span></td>${aMeth.map(m=>`<td class="muted">${int(aLook[key+'|'+m]||0)}</td>`).join('')}</tr>`;}).join('')}
     </table></div></div>`;
-  const totB=sum(brands,'value');
-  const tBan=`<div class="cardbox"><h3>Por bandeira do cartão</h3>
-    <div class="tblwrap"><table>
-    <tr><th class="l">Bandeira</th><th>Transações</th><th>Cliente pagou</th><th>% do total</th></tr>
-    ${brands.map(b=>`<tr><td class="l"><b>${b.brand}</b></td><td class="muted">${int(b.n)}</td><td class="money">${brl(b.value)}</td><td class="muted">${pct(b.value,totB)}</td></tr>`).join('')}
-    </table></div></div>`;
-  // serie por periodo
-  const serie=filtraAno(D.card[state.per]||[]).map(r=>({...r,_lbl:plabelYear(r)}));
-  const ch=`<div class="cardbox"><h3>Valor transacionado por ${state.per==='semana'?'semana':'mês'}</h3>${chart(serie,'value','mdrVesti','Cliente pagou','MDR Vesti')}</div>`;
-  return ch+`<div class="grid2">${tMet}${tBan}</div>`;
+  return cardTbl+`<div class="grid2">${pixTbl}${afTbl}</div>`+`<div class="grid2">${segTbl}${auTbl}</div>`+aumTbl;
 }
 
-/* --- BDR / ANTECIPAÇÃO --- */
+/* --- BDR / ANTECIPAÇÃO --- (Cartão, Active Users, A receber da BDR + extras) */
 function tabBDR(){
+  // 1) Cartão de Crédito (API)
+  const cardTbl=ptable('💳 Cartão de Crédito <span class="src api">API</span>','financeiro de cartão por período · ★=ganho da Vesti',
+    withLbl(D.card[state.per]),[
+    {h:'Transações',k:'n',fmt:'int'},{h:'Cliente pagou',k:'value'},{h:'★ Antifraude',k:'antifraud',cls:'vesti'},
+    {h:'VestiPago',k:'vestiPago'},{h:'Antecipação',k:'antecip'},{h:'★ Antec. Vesti',k:'antecipVesti',cls:'vesti'},{h:'Marca recebe',k:'netValue',cls:'pos'}]);
+  // 2) A receber da BDR (Vesti) — Valor Vesti = rebate_financeiro
+  const receber=ptable('💰 A receber da BDR <span class="src vp">Vesti</span>','valor que a Vesti tem a receber da BDR (rebate_financeiro) por período',
+    withLbl(D.bdrLedger[state.per]),[{h:'Operações',k:'n',fmt:'int'},{h:'★ A receber (Vesti)',k:'rebateFin',cls:'vesti'}]);
+  // 3) Active Users (Vesti)
+  const au=ptable('👥 Active Users <span class="src vp">Vesti</span>','marcas distintas com pedido pago no período',
+    withLbl(D.activeUsers[state.per]),[{h:'Marcas ativas',k:'marcas',fmt:'int'},{h:'Pedidos',k:'pedidos',fmt:'int'}]);
+  // extra: antecipação por provedor (API)
   const ap=filtraAno(D.antecipProvider[state.per]||[]);
   const byProv={};ap.forEach(r=>{const m=byProv[r.prov]||(byProv[r.prov]={prov:r.prov,n:0,antecip:0,antecipBanco:0,antecipVesti:0});m.n+=r.n;m.antecip+=r.antecip;m.antecipBanco+=r.antecipBanco;m.antecipVesti+=r.antecipVesti;});
   const provs=Object.values(byProv).sort((a,b)=>b.antecip-a.antecip);
-  const tProv=`<div class="cardbox"><h3>Antecipação por provedor</h3>
-    <div class="hint">antecipationValue = cobrado da marca · provider fee = banco · ★ Vesti fee = ganho da Vesti</div>
+  const tProv=`<div class="cardbox"><h3>⏩ Antecipação por provedor <span class="src api">API</span></h3>
+    <div class="hint">antecipationValue=cobrado da marca · provider fee=banco · ★ Vesti fee=ganho da Vesti</div>
     <div class="tblwrap"><table>
     <tr><th class="l">Provedor</th><th>Transações</th><th>Antecipação (marca)</th><th>Taxa banco</th><th class="vesti">★ Taxa Vesti</th></tr>
     ${provs.map(p=>`<tr><td class="l"><b>${p.prov}</b></td><td class="muted">${int(p.n)}</td><td class="money">${brl(p.antecip)}</td><td class="money muted">${brl(p.antecipBanco)}</td><td class="money vesti">${brl(p.antecipVesti)}</td></tr>`).join('')}
     <tr><td class="l"><b>Total</b></td><td>${int(sum(provs,'n'))}</td><td class="money">${brl(sum(provs,'antecip'))}</td><td class="money">${brl(sum(provs,'antecipBanco'))}</td><td class="money vesti">${brl(sum(provs,'antecipVesti'))}</td></tr>
     </table></div></div>`;
-  // ledger BDR
-  const led=filtraAno(D.bdrLedger[state.per]||[]).map(r=>({...r,_lbl:plabelYear(r),_lblFull:plabelFull(r)}));
-  const tLed=`<div class="cardbox"><h3>Ledger BDR (tabela dbo.bdr)</h3>
-    <div class="hint">valor onerado/presente/juros e rebate da operação BDR, por ${state.per}</div>
+  // extra: ledger BDR detalhado
+  const led=withLbl(D.bdrLedger[state.per]);
+  const tLed=`<div class="cardbox"><h3>📒 Ledger BDR detalhado <span class="src vp">Vesti</span></h3>
+    <div class="hint">dbo.bdr — valor onerado/presente/juros/rebate por ${state.per}</div>
     <div class="tblwrap"><table>
     <tr><th class="l">${state.per==='semana'?'Semana':'Mês'}</th><th>Operações</th><th>Valor onerado</th><th>Valor presente</th><th>Juros</th><th>Rebate</th><th>Rebate financeiro</th></tr>
     ${led.map(r=>`<tr><td class="l"><span class="pill">${r._lblFull}</span></td><td class="muted">${int(r.n)}</td><td class="money">${brl(r.onerado)}</td><td class="money">${brl(r.presente)}</td><td class="money">${brl(r.juros)}</td><td class="money">${brl(r.rebate)}</td><td class="money pos">${brl(r.rebateFin)}</td></tr>`).join('')}
     <tr><td class="l"><b>Total</b></td><td>${int(sum(led,'n'))}</td><td class="money">${brl(sum(led,'onerado'))}</td><td class="money">${brl(sum(led,'presente'))}</td><td class="money">${brl(sum(led,'juros'))}</td><td class="money">${brl(sum(led,'rebate'))}</td><td class="money pos">${brl(sum(led,'rebateFin'))}</td></tr>
     </table></div></div>`;
-  const ch=`<div class="cardbox"><h3>Antecipação cobrada vs ganho Vesti por ${state.per}</h3>${chart(filtraAno(D.card[state.per]||[]).map(r=>({...r,_lbl:plabelYear(r)})),'antecip','antecipVesti','Antecipação (marca)','Antec. Vesti')}</div>`;
-  return ch+tProv+tLed;
+  return `<div class="grid2">${receber}${au}</div>`+cardTbl+tProv+tLed;
 }
 
 /* --- MÉTODOS DE PAGAMENTO (Companies) --- */

@@ -84,7 +84,8 @@ async function main() {
   console.log('Token SQL...');
   const tok = await sqlToken(env);
 
-  const dados = { geradoEm: new Date().toISOString(), card: {}, metodo: {}, bandeira: {}, antecipProvider: {}, bdrLedger: {}, empresaPeriodo: {} };
+  const dados = { geradoEm: new Date().toISOString(), card: {}, metodo: {}, bandeira: {}, antecipProvider: {}, bdrLedger: {}, empresaPeriodo: {},
+    ordersGMV: {}, pix: {}, antifraud: {}, seguro: {}, activeUsers: {}, activeUsersMetodo: {} };
 
   // KPIs / periodo
   const k = (await query(tok, `SELECT COUNT(*) n, MIN(paidAt_ts) mn, MAX(paidAt_ts) mx, COUNT(DISTINCT companyId) emp,
@@ -164,6 +165,52 @@ async function main() {
       GROUP BY DATEPART(YEAR, CONVERT(date, dt_ref)), ${pexpr} ORDER BY ano, p`, `bdrLedger.${pk}`))
       .map(r => ({ ano: num(r.ano), p: num(r.p), n: num(r.n),
         onerado: num(r.onerado), presente: num(r.presente), juros: num(r.juros), rebate: num(r.rebate), rebateFin: num(r.rebateFin) }));
+  }
+
+  // ===== PEDIDOS (Vesti, dbo.MongoDB_Pedidos_Geral) — tudo que NAO e financeiro de cartao =====
+  // PIX, Antifraud, Seguro, Active Users, nº pedidos + GMV. Janela: pagos em 2026.
+  const ODATE = 'TRY_CONVERT(datetime, payment_paidAt)';
+  const OW = `payment_isPaid = 1 AND ${ODATE} >= '2026-01-01'`;
+  const OT = 'dbo.MongoDB_Pedidos_Geral';
+  const OPER = {
+    semana: { y: `DATEPART(YEAR, ${ODATE})`, p: `DATEPART(ISO_WEEK, ${ODATE})` },
+    mes:    { y: `DATEPART(YEAR, ${ODATE})`, p: `DATEPART(MONTH, ${ODATE})` },
+  };
+  const metBucket = `CASE WHEN payment_method IN ('PIX','Pix') THEN 'PIX'
+    WHEN payment_method = 'CREDIT_CARD' THEN 'Cartão de crédito' ELSE 'Outros' END`;
+  for (const [pk, pe] of Object.entries(OPER)) {
+    // nº pedidos + GMV total (tabela 2 de "Completo")
+    dados.ordersGMV[pk] = (await query(tok, `
+      SELECT ${pe.y} ano, ${pe.p} p, COUNT(*) nPedidos, SUM(summary_total) gmv
+      FROM ${OT} WHERE ${OW} GROUP BY ${pe.y}, ${pe.p} ORDER BY ano, p`, `ordersGMV.${pk}`))
+      .map(r => ({ ano: num(r.ano), p: num(r.p), nPedidos: num(r.nPedidos), gmv: num(r.gmv) }));
+    // PIX
+    dados.pix[pk] = (await query(tok, `
+      SELECT ${pe.y} ano, ${pe.p} p, COUNT(*) n, SUM(summary_total) value
+      FROM ${OT} WHERE ${OW} AND payment_method IN ('PIX','Pix') GROUP BY ${pe.y}, ${pe.p} ORDER BY ano, p`, `pix.${pk}`))
+      .map(r => ({ ano: num(r.ano), p: num(r.p), n: num(r.n), value: num(r.value) }));
+    // Antifraud por fonte
+    dados.antifraud[pk] = (await query(tok, `
+      SELECT ${pe.y} ano, ${pe.p} p, ISNULL(payment_transaction_antifraudSource,'(sem)') src, COUNT(*) n
+      FROM ${OT} WHERE ${OW} GROUP BY ${pe.y}, ${pe.p}, ISNULL(payment_transaction_antifraudSource,'(sem)') ORDER BY ano, p`, `antifraud.${pk}`))
+      .map(r => ({ ano: num(r.ano), p: num(r.p), src: r.src, n: num(r.n) }));
+    // Seguro (creditCard.insurance)
+    dados.seguro[pk] = (await query(tok, `
+      SELECT ${pe.y} ano, ${pe.p} p,
+        SUM(CASE WHEN payment_creditCard_insurance = 1 THEN 1 ELSE 0 END) comSeguro,
+        SUM(CASE WHEN payment_creditCard_insurance = 0 THEN 1 ELSE 0 END) semSeguro
+      FROM ${OT} WHERE ${OW} GROUP BY ${pe.y}, ${pe.p} ORDER BY ano, p`, `seguro.${pk}`))
+      .map(r => ({ ano: num(r.ano), p: num(r.p), comSeguro: num(r.comSeguro), semSeguro: num(r.semSeguro) }));
+    // Active Users: marcas distintas + pedidos por periodo
+    dados.activeUsers[pk] = (await query(tok, `
+      SELECT ${pe.y} ano, ${pe.p} p, COUNT(DISTINCT companyId) marcas, COUNT(*) pedidos
+      FROM ${OT} WHERE ${OW} GROUP BY ${pe.y}, ${pe.p} ORDER BY ano, p`, `activeUsers.${pk}`))
+      .map(r => ({ ano: num(r.ano), p: num(r.p), marcas: num(r.marcas), pedidos: num(r.pedidos) }));
+    // Active Users por metodo (bucket PIX/Cartao/Outros)
+    dados.activeUsersMetodo[pk] = (await query(tok, `
+      SELECT ${pe.y} ano, ${pe.p} p, ${metBucket} metodo, COUNT(DISTINCT companyId) marcas
+      FROM ${OT} WHERE ${OW} GROUP BY ${pe.y}, ${pe.p}, ${metBucket} ORDER BY ano, p`, `activeUsersMetodo.${pk}`))
+      .map(r => ({ ano: num(r.ano), p: num(r.p), metodo: r.metodo, marcas: num(r.marcas) }));
   }
 
   // nomes de marca/dominio (so das empresas que aparecem no cartao)
