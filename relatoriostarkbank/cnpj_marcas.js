@@ -1738,7 +1738,12 @@ window.CNPJ_MARCAS = (function(){
         "boise var":                                         "BOISE CONFECCOES LTDA",
         "feminisces":                                        "21.032.633/0001-51",
         "restore":                                           "34.981.369/0001-44",
-        "v&m plus":                                          "52.244.294 SECILIA VASQUES"
+        "v&m plus":                                          "52.244.294 SECILIA VASQUES",
+        "mieco":                                             "48464095000120",
+        "winnie confeccoes":                                 "54991210000118",
+        "santo vicio (fabrica)":                             "33159386000138",
+        "morena charme (matriz)":                            "22481273000138",
+        "modas carlas plus":                                 "49222592000185"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
