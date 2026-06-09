@@ -143,6 +143,11 @@ let state={per:'semana',ano:'all',tab:'completo'};
 
 function plabel(r){return state.per==='semana'?('S'+r.p):MES[r.p];}
 function plabelYear(r){return plabel(r)+(anosDisponiveis().length>1?('/'+String(r.ano).slice(2)):'');}
+// segunda-feira da semana ISO (ano,w) e intervalo dd/Mês–dd/Mês
+function isoWeekMonday(y,w){const s=new Date(Date.UTC(y,0,1+(w-1)*7));const d=s.getUTCDay();const m=new Date(s);if(d<=4)m.setUTCDate(s.getUTCDate()-d+1);else m.setUTCDate(s.getUTCDate()+8-d);return m;}
+function dm(d){return String(d.getUTCDate()).padStart(2,'0')+'/'+MES[d.getUTCMonth()+1];}
+function weekRange(ano,p){const mon=isoWeekMonday(ano,p);const sun=new Date(mon);sun.setUTCDate(mon.getUTCDate()+6);return dm(mon)+'–'+dm(sun);}
+function plabelFull(r){return state.per==='semana'?('S'+r.p+' · '+weekRange(r.ano,r.p)):(MES[r.p]+'/'+r.ano);}
 function anosDisponiveis(){
   const s=new Set();(D.card[state.per]||[]).forEach(r=>s.add(r.ano));(D.bdrLedger[state.per]||[]).forEach(r=>s.add(r.ano));
   return [...s].sort();
@@ -216,7 +221,7 @@ function sum(arr,k){return arr.reduce((a,r)=>a+(r[k]||0),0);}
 
 /* --- COMPLETO --- */
 function tabCompleto(){
-  const rows=filtraAno(D.card[state.per]||[]).map(r=>({...r,_lbl:plabelYear(r)}));
+  const rows=filtraAno(D.card[state.per]||[]).map(r=>({...r,_lbl:plabelYear(r),_lblFull:plabelFull(r)}));
   const k=D.kpis;
   const tot=k=>sum(rows,k);
   const kpis=`<div class="kpis">
@@ -236,7 +241,7 @@ function tabCompleto(){
     <th>Antecipação</th><th>Antec. banco</th><th class="vesti">★ Antec. Vesti</th>
     <th class="vesti">★ Ganho Vesti</th></tr>`;
   const body=rows.map(r=>`<tr>
-    <td class="l"><span class="pill">${r._lbl}</span></td><td class="muted">${int(r.n)}</td>
+    <td class="l"><span class="pill">${r._lblFull}</span></td><td class="muted">${int(r.n)}</td>
     <td class="money">${brl(r.value)}</td><td class="money pos">${brl(r.netValue)}</td>
     <td class="money vesti">${brl(r.antifraud)}</td><td class="money">${brl(r.vestiPago)}</td>
     <td class="money muted">${brl(r.mdrBanco)}</td><td class="money vesti">${brl(r.mdrVesti)}</td>
@@ -296,12 +301,12 @@ function tabBDR(){
     <tr><td class="l"><b>Total</b></td><td>${int(sum(provs,'n'))}</td><td class="money">${brl(sum(provs,'antecip'))}</td><td class="money">${brl(sum(provs,'antecipBanco'))}</td><td class="money vesti">${brl(sum(provs,'antecipVesti'))}</td></tr>
     </table></div></div>`;
   // ledger BDR
-  const led=filtraAno(D.bdrLedger[state.per]||[]).map(r=>({...r,_lbl:plabelYear(r)}));
+  const led=filtraAno(D.bdrLedger[state.per]||[]).map(r=>({...r,_lbl:plabelYear(r),_lblFull:plabelFull(r)}));
   const tLed=`<div class="cardbox"><h3>Ledger BDR (tabela dbo.bdr)</h3>
     <div class="hint">valor onerado/presente/juros e rebate da operação BDR, por ${state.per}</div>
     <div class="tblwrap"><table>
     <tr><th class="l">${state.per==='semana'?'Semana':'Mês'}</th><th>Operações</th><th>Valor onerado</th><th>Valor presente</th><th>Juros</th><th>Rebate</th><th>Rebate financeiro</th></tr>
-    ${led.map(r=>`<tr><td class="l"><span class="pill">${r._lbl}</span></td><td class="muted">${int(r.n)}</td><td class="money">${brl(r.onerado)}</td><td class="money">${brl(r.presente)}</td><td class="money">${brl(r.juros)}</td><td class="money">${brl(r.rebate)}</td><td class="money pos">${brl(r.rebateFin)}</td></tr>`).join('')}
+    ${led.map(r=>`<tr><td class="l"><span class="pill">${r._lblFull}</span></td><td class="muted">${int(r.n)}</td><td class="money">${brl(r.onerado)}</td><td class="money">${brl(r.presente)}</td><td class="money">${brl(r.juros)}</td><td class="money">${brl(r.rebate)}</td><td class="money pos">${brl(r.rebateFin)}</td></tr>`).join('')}
     <tr><td class="l"><b>Total</b></td><td>${int(sum(led,'n'))}</td><td class="money">${brl(sum(led,'onerado'))}</td><td class="money">${brl(sum(led,'presente'))}</td><td class="money">${brl(sum(led,'juros'))}</td><td class="money">${brl(sum(led,'rebate'))}</td><td class="money pos">${brl(sum(led,'rebateFin'))}</td></tr>
     </table></div></div>`;
   const ch=`<div class="cardbox"><h3>Antecipação cobrada vs ganho Vesti por ${state.per}</h3>${chart(filtraAno(D.card[state.per]||[]).map(r=>({...r,_lbl:plabelYear(r)})),'antecip','antecipVesti','Antecipação (marca)','Antec. Vesti')}</div>`;
@@ -337,7 +342,8 @@ function tabDuplicata(){
   const byMarca={};
   rows.forEach(r=>{const m=byMarca[r.c]||(byMarca[r.c]={c:r.c,dom:r.dom,nome:nomeMarca(r.c,r.dom),tot:0,cells:{}});m.cells[r.ano+'-'+r.p]=(m.cells[r.ano+'-'+r.p]||0)+r.value;m.tot+=r.value;});
   let marcas=Object.values(byMarca).sort((a,b)=>b.tot-a.tot);
-  const head=`<tr><th class="l">Marca</th>${periods.map(p=>`<th>${plab(p)}</th>`).join('')}<th>Total</th></tr>`;
+  const ptitle=key=>{const[y,p]=key.split('-').map(Number);return state.per==='semana'?('Semana '+p+' · '+weekRange(y,p)):(MES[p]+'/'+y);};
+  const head=`<tr><th class="l">Marca</th>${periods.map(p=>`<th title="${ptitle(p)}">${plab(p)}</th>`).join('')}<th>Total</th></tr>`;
   window._dupMarcas=marcas;window._dupPeriods=periods;window._dupPlab=plab;
   return `<div class="note">Pivot <b>marca × ${state.per}</b> do valor transacionado (value). ${marcas.length} marcas — use a busca.</div>
    <div class="cardbox"><h3>Duplicata de Method — valor por marca e ${state.per}</h3>
