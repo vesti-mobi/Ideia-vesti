@@ -135,7 +135,7 @@ window.PIX_MARCAS = (function(){
         "zeros confec":                 "45180025000152",
         "zeros confeccoes":             "45180025000152",
         "zoe sport":                    "zoesportsoficial@gmail.com",
-        "modas carla":                  "inter",
+        "modas carla":                  "49222592000185",
         "daline":                       "nubank",
         "charisma matriz":              "Santander",
         "cvl varejo":                   "contato@atualtextil.com",
