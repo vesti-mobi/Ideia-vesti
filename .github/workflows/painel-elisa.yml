@@ -1,0 +1,57 @@
+name: Atualizar Painel Elisa
+
+on:
+  schedule:
+    - cron: '0 11 * * *'   # 08:00 BRT
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar ODBC Driver 18 for SQL Server
+        run: |
+          . /etc/os-release
+          curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc > /dev/null
+          curl -sSL "https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/prod.list" | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update -qq
+          sudo ACCEPT_EULA=Y apt-get install -y -qq msodbcsql18 unixodbc-dev
+
+      - name: Instalar dependencias Python
+        run: pip install pyodbc
+
+      - name: Rodar pipeline (fetch + build)
+        working-directory: PainelElisa
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+        run: |
+          python fetch_elisa.py
+          python build_data.py
+
+      - name: Commit e push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          FILES="PainelElisa/dashboard_data.js PainelElisa/companies_elisa.json PainelElisa/gmv_elisa.json PainelElisa/cadastros_elisa.json PainelElisa/vestipago_elisa.json PainelElisa/reativacao_elisa.json PainelElisa/links_elisa.json"
+          MSG="Atualizacao Painel Elisa $(date +'%d/%m/%Y %H:%M')"
+          for i in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset -q origin/main
+            git add $FILES 2>/dev/null || true
+            if git diff --cached --quiet; then echo "sem mudancas"; exit 0; fi
+            git commit -q -m "$MSG"
+            if git push; then echo "push ok (tentativa $i)"; exit 0; fi
+            echo "push falhou (tentativa $i), re-sincronizando..."
+            sleep 3
+          done
+          echo "push falhou apos varias tentativas"; exit 1
