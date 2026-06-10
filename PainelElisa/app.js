@@ -4,7 +4,7 @@ const fmtInt = (n) => Number(n||0).toLocaleString("pt-BR");
 const $ = (id) => document.getElementById(id);
 
 const state = { periodo:"mensal", chave:"", cs:"todas", canais:new Set(["Starter","Uemtel","Atta","Parceiros"]), empresa:"todas", tab:"home", cadMes:"todos" };
-const D = (typeof DADOS !== "undefined") ? DADOS : { empresas:[], mesesList:[], semanasList:[] };
+const D = (typeof DADOS !== "undefined") ? DADOS : { empresas:[], mesesList:[], semanasList:[], anosList:[] };
 const PARC_EXCL = new Set(["atta","attasoft","onix","uemtel"]);
 const isUemtel = (e) => (e.partner_raw||"").toLowerCase() === "uemtel";
 const isAtta   = (e) => ["atta","attasoft"].includes((e.partner_raw||"").toLowerCase());
@@ -33,11 +33,43 @@ function vpBadge(e) {
   return `<span class="pill pill-nenhum">sem VP</span>`;
 }
 
-function bucket(e) {
-  const fonte = state.periodo === "mensal" ? e.mensal : e.semanal;
-  return fonte[state.chave] || {valPix:0,valCartao:0,valTotal:0,qtPix:0,qtCartao:0,qtTotal:0};
+// agrega e.mensal por ano -> e.anual ({"2026": {...}}) e popula D.anosList
+function buildAnual() {
+  const anos = new Set();
+  for (const e of D.empresas) {
+    const anual = {};
+    for (const [m, b] of Object.entries(e.mensal || {})) {
+      const ano = m.slice(0, 4);
+      anos.add(ano);
+      const a = anual[ano] || (anual[ano] = {valPix:0,valCartao:0,valTotal:0,qtPix:0,qtCartao:0,qtTotal:0});
+      a.valPix += b.valPix||0; a.valCartao += b.valCartao||0; a.valTotal += b.valTotal||0;
+      a.qtPix += b.qtPix||0; a.qtCartao += b.qtCartao||0; a.qtTotal += b.qtTotal||0;
+    }
+    e.anual = anual;
+  }
+  D.anosList = Array.from(anos).sort();
 }
-const mesAtualChave = () => state.periodo === "mensal" ? state.chave : (state.chave||"").slice(0,7);
+
+function bucket(e) {
+  const fonte = state.periodo === "mensal" ? e.mensal : state.periodo === "anual" ? e.anual : e.semanal;
+  return (fonte||{})[state.chave] || {valPix:0,valCartao:0,valTotal:0,qtPix:0,qtCartao:0,qtTotal:0};
+}
+// chave de mês de referência (mensal: "YYYY-MM", semanal: "YYYY-MM", anual: "YYYY")
+const mesAtualChave = () => state.periodo === "mensal" ? state.chave
+  : state.periodo === "anual" ? state.chave
+  : (state.chave||"").slice(0,7);
+// true se o mês "YYYY-MM" cai no período selecionado (no anual, compara o ano)
+const mesMatch = (m) => !m ? false : state.periodo === "anual" ? m.slice(0,4) === state.chave : m === mesAtualChave();
+// nº de reativações da empresa dentro do período selecionado
+function reativNoPeriodo(e) {
+  const r = e.reativacoesPorMes || {};
+  if (state.periodo === "anual") {
+    let s = 0;
+    for (const [m, q] of Object.entries(r)) if (m.slice(0,4) === state.chave) s += q;
+    return s;
+  }
+  return r[mesAtualChave()] || 0;
+}
 
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 function makeChart(id, cfg) {
@@ -105,9 +137,9 @@ function renderKpis() {
     if (!e.temFreteAtivo) semFrete++;
     cadProds += e.qtProdutos||0;
     if ((e.qtProdutos||0) > 0) cadMarcas++;
-    if (e.mes5Vendas  && e.mes5Vendas  === mesK) p5++;
-    if (e.mes25Vendas && e.mes25Vendas === mesK) p25++;
-    if (((e.reativacoesPorMes||{})[mesK]||0) > 0) reativ++;
+    if (mesMatch(e.mes5Vendas)) p5++;
+    if (mesMatch(e.mes25Vendas)) p25++;
+    if (reativNoPeriodo(e) > 0) reativ++;
   }
   $("kpi-gmv").textContent = fmtBRL(gmv);
   $("kpi-gmv-sub").textContent = `${lista.length} marcas · ${state.chave||"—"}`;
@@ -353,7 +385,7 @@ function renderTabPrimeiras(n) {
       options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
     });
   }
-  const rows = lista.filter(e=>e[campo] === mesK).map(e => {
+  const rows = lista.filter(e=>mesMatch(e[campo])).map(e => {
     const venda1Paga = e.primeiraVendaPaga || e.primeiraVenda;
     const ate1aVenda = diasEntre((e.dataEntrada||"").slice(0,10), venda1Paga);
     const ateNVendas = diasEntre((e.dataEntrada||"").slice(0,10), e[campo] ? e[campo]+"-15" : null);
@@ -478,8 +510,8 @@ function renderTabReativ() {
     data:{labels:top10.map(e=>e.name), datasets:[{label:"reativações", data:top10.map(e=>e.totalReativ), backgroundColor:COLORS[7]}]},
     options:{indexAxis:"y", responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
   });
-  const rows = lista.filter(e=>((e.reativacoesPorMes||{})[mesK]||0) > 0)
-    .map(e=>({...e, _q: (e.reativacoesPorMes||{})[mesK]||0}))
+  const rows = lista.map(e=>({...e, _q: reativNoPeriodo(e)}))
+    .filter(e=>e._q > 0)
     .sort((a,b)=>b._q - a._q);
   renderTable("tbl-reativ", [
     {label:"Marca", fn:r=>r.name},
@@ -651,7 +683,7 @@ function renderActiveTab() {
 // ---------- Filtros ----------
 function populaPeriodoValor() {
   const sel = $("filter-periodo-valor");
-  const lista = state.periodo === "mensal" ? D.mesesList : D.semanasList;
+  const lista = state.periodo === "mensal" ? D.mesesList : state.periodo === "anual" ? D.anosList : D.semanasList;
   sel.innerHTML = lista.slice().reverse().map(v=>`<option value="${v}">${v}</option>`).join("");
   if (!lista.includes(state.chave)) state.chave = lista[lista.length-1] || "";
   sel.value = state.chave;
@@ -683,5 +715,6 @@ function bind() {
 
 (function init(){
   $("gerado-em").textContent = "Gerado em " + (D.geradoEm||"—").slice(0,16).replace("T"," ");
+  buildAnual();
   populaPeriodoValor(); populaEmpresas(); populaCadMesSelect(); bind(); renderActiveTab();
 })();

@@ -510,9 +510,9 @@
     "temFreteAtivo": true
   },
   "139874": {
-    "temVPAtivo": false,
+    "temVPAtivo": true,
     "temPixAtivo": false,
-    "temCartaoAtivo": false,
+    "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
   "139911": {
@@ -1461,7 +1461,7 @@
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
-    "temFreteAtivo": false
+    "temFreteAtivo": true
   },
   "1511409": {
     "temVPAtivo": false,
@@ -2217,7 +2217,7 @@
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
-    "temFreteAtivo": false
+    "temFreteAtivo": true
   },
   "2005999": {
     "temVPAtivo": true,
@@ -2319,7 +2319,7 @@
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
-    "temFreteAtivo": false
+    "temFreteAtivo": true
   },
   "826600": {
     "temVPAtivo": false,
@@ -2538,10 +2538,10 @@
     "temFreteAtivo": true
   },
   "303358": {
-    "temVPAtivo": false,
+    "temVPAtivo": true,
     "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": false
+    "temCartaoAtivo": true,
+    "temFreteAtivo": true
   },
   "162394": {
     "temVPAtivo": false,
@@ -2577,7 +2577,7 @@
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
-    "temFreteAtivo": true
+    "temFreteAtivo": false
   },
   "1416085": {
     "temVPAtivo": false,
@@ -3018,9 +3018,9 @@
     "temFreteAtivo": false
   },
   "1113427": {
-    "temVPAtivo": false,
+    "temVPAtivo": true,
     "temPixAtivo": false,
-    "temCartaoAtivo": false,
+    "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
   "137955": {
@@ -3342,9 +3342,9 @@
     "temFreteAtivo": true
   },
   "344642": {
-    "temVPAtivo": false,
+    "temVPAtivo": true,
     "temPixAtivo": false,
-    "temCartaoAtivo": false,
+    "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
   "308984": {
@@ -3363,7 +3363,7 @@
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
-    "temFreteAtivo": false
+    "temFreteAtivo": true
   },
   "2003891": {
     "temVPAtivo": false,
@@ -3423,7 +3423,7 @@
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
-    "temFreteAtivo": false
+    "temFreteAtivo": true
   },
   "38070": {
     "temVPAtivo": true,
