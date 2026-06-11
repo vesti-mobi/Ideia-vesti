@@ -1743,7 +1743,10 @@ window.CNPJ_MARCAS = (function(){
         "winnie confeccoes":                                 "54991210000118",
         "santo vicio (fabrica)":                             "33159386000138",
         "morena charme (matriz)":                            "22481273000138",
-        "modas carlas plus":                                 "49222592000185"
+        "modas carlas plus":                                 "49222592000185",
+        "the lion confec (zoe sport":                        "41426603000137",
+        "santo vicio (fabrica":                              "33159386000138",
+        "morena charme (matriz":                             "22481273000138"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()

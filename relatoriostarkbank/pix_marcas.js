@@ -168,7 +168,10 @@ window.PIX_MARCAS = (function(){
         "mi&co":                        "48464095000120",
         "winnie confeccoes":            "54991210000118",
         "aline confeccoes":             "17937620000154",
-        "modas carlas plus":            "49222592000185"
+        "modas carlas plus":            "49222592000185",
+        "the lion confec (zoe sport":   "zoesportsoficial@gmail.com",
+        "santo vicio (fabrica":         "33159386000138",
+        "morena charme (matriz":        "22481273000138"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
