@@ -188,7 +188,7 @@
 <div class="filters-bar" id="filtersBar">
     <div class="filter-group">
         <span class="filter-label">Empresa</span>
-        <input list="dlEmpresas" id="fEmpresa" class="filter-input" placeholder="Nome ou Company ID..." autocomplete="off">
+        <input list="dlEmpresas" id="fEmpresa" class="filter-input" placeholder="Nome, CNPJ ou Company ID..." autocomplete="off">
         <datalist id="dlEmpresas"></datalist>
     </div>
     <div class="filter-group">
@@ -594,10 +594,13 @@ function updateEmpresaDatalist(){
     let empresas=fA?DADOS.empresas.filter(e=>e.anjo===fA):DADOS.empresas;
     // Show only matrizes and companies without filiais (hide filiais from main dropdown)
     empresas=empresas.filter(e=>e.isMatriz||!e.matrizId);
-    const termo=stripAcc(document.getElementById('fEmpresa').value.trim());
-    const lista=termo?empresas.filter(e=>stripAcc(e.nome).includes(termo)):empresas;
+    const raw=document.getElementById('fEmpresa').value.trim();
+    const termo=stripAcc(raw);
+    const termoCnpj=cnpjQuery(raw);
+    // Casa por nome OU por CNPJ (so digitos). Digitar "13919082" surge a empresa do CNPJ.
+    const lista=termo?empresas.filter(e=>stripAcc(e.nome).includes(termo)||(termoCnpj&&cnpjDigits(e.cnpj).includes(termoCnpj))):empresas;
     lista.forEach(e=>{
-        const o=document.createElement('option');o.value=e.nome;dl.appendChild(o);
+        const o=document.createElement('option');o.value=e.nome;if(e.cnpj)o.label=e.cnpj;dl.appendChild(o);
         // Datalist filtering in browsers is accent-sensitive. Add a second option
         // with the accent-stripped name so typing "delia" surfaces "Délia Modas Fashion".
         const semAcento=stripAcc(e.nome);
@@ -619,6 +622,10 @@ function clearFilters(){
 
 /* ========== TEXT HELPERS ========== */
 function stripAcc(s){return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+// So digitos do CNPJ \u2014 permite buscar com ou sem pontuacao (13.919.082/0001-14 == 13919082000114).
+function cnpjDigits(s){return (s||'').toString().replace(/\D/g,'');}
+// Trata o termo digitado como CNPJ so quando NAO tem letras (evita "Loja 24h" filtrar por "24").
+function cnpjQuery(s){return /[a-zA-Z]/.test(s||'')?'':cnpjDigits(s);}
 
 /* ========== DATE HELPERS ========== */
 function monthInRange(ym,de,ate){
@@ -638,6 +645,7 @@ function sumMonthly(e,field,de,ate){
 /* ========== FILTER ========== */
 function applyFilters(){
     const fE=stripAcc(document.getElementById('fEmpresa').value.trim());
+    const fECnpj=cnpjQuery(document.getElementById('fEmpresa').value);
     const fA=document.getElementById('fAnjo').value;
     const fCa=document.getElementById('fCanal').value;
     const fCr=document.getElementById('fCartao').value;
@@ -660,7 +668,7 @@ function applyFilters(){
     const fFilial=document.getElementById('fFilial').value;
 
     filtered=DADOS.empresas.filter(e=>{
-        if(fE&&!stripAcc(e.nome).includes(fE)&&!(e.id&&e.id.toLowerCase().includes(fE)))return false;
+        if(fE&&!stripAcc(e.nome).includes(fE)&&!(e.id&&e.id.toLowerCase().includes(fE))&&!(fECnpj&&cnpjDigits(e.cnpj).includes(fECnpj)))return false;
         if(fA&&e.anjo!==fA)return false;
         if(fCa&&e.canal!==fCa)return false;
         if(fCr==='Sim'&&e.cartao!=='Sim')return false;
@@ -680,7 +688,7 @@ function applyFilters(){
 
     // Apply filial filter after main filter
     if(fE){
-        const mainMatch=DADOS.empresas.find(e=>stripAcc(e.nome)===fE||(e.id&&e.id.toLowerCase()===fE));
+        const mainMatch=DADOS.empresas.find(e=>stripAcc(e.nome)===fE||(e.id&&e.id.toLowerCase()===fE)||(fECnpj&&cnpjDigits(e.cnpj)===fECnpj));
         if(mainMatch&&mainMatch.filiais&&mainMatch.filiais.length>0){
             if(fFilial){
                 // Specific filial/matriz selected - show only that one
@@ -737,7 +745,8 @@ function toggleEmpresaDetails(){
 }
 function getDisplayEmpresa(){
     const fE=stripAcc(document.getElementById('fEmpresa').value.trim());
-    const mainMatch=fE?DADOS.empresas.find(e=>stripAcc(e.nome)===fE||(e.id&&e.id.toLowerCase()===fE)):null;
+    const fECnpj=cnpjQuery(document.getElementById('fEmpresa').value);
+    const mainMatch=(fE||fECnpj)?DADOS.empresas.find(e=>stripAcc(e.nome)===fE||(e.id&&e.id.toLowerCase()===fE)||(fECnpj&&cnpjDigits(e.cnpj)===fECnpj)):null;
     if(!mainMatch) return {main:null,display:null};
     const fFilial=document.getElementById('fFilial').value;
     if(fFilial){
@@ -1953,6 +1962,12 @@ function loadApp(){
             const v=this.value.trim();
             if(v.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)){
                 const emp=DADOS.empresas.find(e=>e.id&&e.id.toLowerCase()===v.toLowerCase());
+                if(emp){this.value=emp.nome;}
+            }
+            // CNPJ completo (14 digitos, com ou sem pontuacao) -> troca pelo nome da empresa.
+            const vCnpj=cnpjDigits(v);
+            if(vCnpj.length===14){
+                const emp=DADOS.empresas.find(e=>cnpjDigits(e.cnpj)===vCnpj);
                 if(emp){this.value=emp.nome;}
             }
             updateEmpresaDatalist();
