@@ -1256,7 +1256,7 @@ window.RAZAO_MARCAS = (function(){
         "pty & v10 - pedidos":                               "PEPTUCHY & V10 CONFECCOES LTDA",
         "pury":                                              "pury",
         "pury (matriz)":                                     "pury (matriz)",
-        "pury aimores":                                      "LJK LOOK MODAS LTDA",
+        "pury aimores":                                      "HSS COMERCIO DE ROUPAS LTDA",
         "pury miller":                                       "HSS COMERCIO DE ROUPAS LTDA",
         "pury total":                                        "WON JOON YOON - MODAS LTDA",
         "pusco":                                             "PERSIO ALEXANDR",

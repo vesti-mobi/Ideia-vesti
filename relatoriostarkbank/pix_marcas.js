@@ -10,7 +10,7 @@ window.PIX_MARCAS = (function(){
         "nick atacado":                 "44839916000105",
         "eriluz jeans":                 "32796225000192",
         "patachos":                     "38544161000119",
-        "pury aimores":                 "41662997000122",
+        "pury aimores":                 "52886041000120",
         "groovy night":                 "48399889000158",
         "rl fitness":                   "48795745000110",
         "zero um confec":               "47516113000108",
