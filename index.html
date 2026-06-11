@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Painéis Vesti — Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --p:#6C5CE7; --p2:#00B894; --tx:#2D3436; --mut:#636E72; --bg:#F4F5F9; --line:#E4E7EE; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Inter',sans-serif;color:var(--tx);background:var(--bg)}
+
+  /* ---- Login ---- */
+  #loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;
+    background:linear-gradient(135deg,#2D3436,#6C5CE7)}
+  #loginScreen .box{background:#fff;border-radius:16px;padding:40px;width:360px;
+    box-shadow:0 8px 32px rgba(0,0,0,.25);text-align:center}
+  #loginScreen .logo{font-size:34px;margin-bottom:6px}
+  #loginScreen h1{font-size:22px;font-weight:800;color:var(--p);margin:0 0 4px}
+  #loginScreen .sub{font-size:13px;color:var(--mut);margin-bottom:26px}
+  #loginScreen input{width:100%;padding:12px 16px;border:2px solid #DFE6E9;border-radius:10px;
+    font-size:14px;font-family:inherit;outline:none;margin-bottom:12px;text-align:center}
+  #loginScreen input:focus{border-color:var(--p)}
+  #loginScreen button{width:100%;padding:12px;background:var(--p);color:#fff;border:none;
+    border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+  #loginScreen button:hover{background:#5a4bd6}
+  #loginError{color:#E17055;font-size:12px;margin-bottom:12px;display:none}
+
+  /* ---- Hub ---- */
+  #hub{display:none}
+  header{background:#fff;border-bottom:1px solid var(--line);padding:22px 0}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  header .row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  header h1{margin:0;font-size:22px;font-weight:800}
+  header h1 span{color:var(--p)}
+  header .desc{font-size:13px;color:var(--mut);margin-top:2px}
+  #search{padding:10px 14px;border:2px solid var(--line);border-radius:10px;font-size:14px;
+    font-family:inherit;outline:none;min-width:240px}
+  #search:focus{border-color:var(--p)}
+  #logout{background:none;border:none;color:var(--mut);font-size:12px;cursor:pointer;text-decoration:underline}
+
+  .group{margin-top:30px}
+  .group h2{font-size:13px;font-weight:700;color:var(--mut);text-transform:uppercase;
+    letter-spacing:.5px;margin:0 0 14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  a.card{display:block;background:#fff;border:1px solid var(--line);border-radius:14px;
+    padding:20px;text-decoration:none;color:inherit;transition:.15s;position:relative;overflow:hidden}
+  a.card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--p)}
+  a.card.fin:before{background:var(--p2)}
+  a.card.op:before{background:#0984E3}
+  a.card.tool:before{background:#E17055}
+  a.card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(45,52,54,.12);border-color:transparent}
+  a.card .ico{font-size:26px;margin-bottom:10px}
+  a.card .name{font-size:16px;font-weight:700;margin-bottom:4px}
+  a.card .sub{font-size:12.5px;color:var(--mut);line-height:1.45}
+  a.card .ext{position:absolute;top:18px;right:18px;font-size:12px;color:#B2BEC3}
+  #empty{display:none;color:var(--mut);font-size:14px;padding:30px 0;text-align:center}
+  footer{max-width:1080px;margin:40px auto 24px;padding:0 24px;color:#B2BEC3;font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="loginScreen">
+  <div class="box">
+    <div class="logo">🔐</div>
+    <h1>Painéis Vesti</h1>
+    <div class="sub">Acesso restrito</div>
+    <input type="password" id="loginPass" placeholder="Digite a senha..." autofocus
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <div id="loginError">Senha incorreta</div>
+    <button onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<!-- ===== HUB ===== -->
+<div id="hub">
+  <header>
+    <div class="wrap row">
+      <div>
+        <h1>Painéis <span>Vesti</span></h1>
+        <div class="desc">Central de dashboards · clique para abrir</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <input id="search" placeholder="🔎 Buscar painel..." oninput="filtra()">
+        <button id="logout" onclick="logout()">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap" id="groups"></div>
+  <div class="wrap"><div id="empty">Nenhum painel encontrado.</div></div>
+
+  <footer>Acesso interno · vesti-mobi/dados</footer>
+</div>
+
+<script>
+// ===== Lista de painéis =====
+// Links relativos = GitHub Pages (mesmo repo). Pix = app externo na Vercel.
+const PANELS = [
+  { g:"Customer Success", cls:"", items:[
+    { ico:"📊", name:"Painel CS — Customer Success", sub:"Visão geral de CS / Vesti", url:"CS-Painel/" },
+    { ico:"🌟", name:"CS — Sucesso do Cliente 2025-2026", sub:"Reconstrução do PBIX de CS", url:"CS-Sucesso-do-cliente/" },
+    { ico:"📈", name:"Painel CS Gerencial", sub:"Empresas, NPS/CSAT, Onlog/Frete, churn", url:"PainelCSGerencial/" },
+    { ico:"🗓️", name:"Painel CS — Reuniões", sub:"Reuniões × Negócios (HubSpot)", url:"PlanilhasEPainelCS/" },
+    { ico:"💁", name:"Painel Elisa", sub:"CS Elisa / Jenny", url:"PainelElisa/" },
+  ]},
+  { g:"VestiPago / Financeiro", cls:"fin", items:[
+    { ico:"💳", name:"Métricas VestiPago", sub:"Transações e BDR (5 abas, Semana/Mês)", url:"metricasvestipago/" },
+    { ico:"🆕", name:"Novos VestiPago", sub:"Novas adesões VestiPago", url:"NovosVestiPago/" },
+    { ico:"🏦", name:"StarkBank VestiPago — Recebíveis", sub:"CP / Antecipação / recebíveis", url:"relatoriostarkbank/" },
+  ]},
+  { g:"Pedidos & Operações", cls:"op", items:[
+    { ico:"🏷️", name:"Pedidos por Marca", sub:"Volume e valores por marca", url:"Pedidos-por-Marca/" },
+    { ico:"📦", name:"Relatório de Pedidos", sub:"Relatório geral de pedidos", url:"Relatorio-Pedidos/" },
+    { ico:"📥", name:"Movimentação de Estoque", sub:"Reserva / venda / separação (VestiHouse)", url:"movimentacao_estoque/" },
+  ]},
+  { g:"Ferramentas", cls:"tool", items:[
+    { ico:"⚡", name:"Pix Automático", sub:"Gerador de Pix recorrente (cliente) — Vercel", url:"https://vesti-pix.vercel.app/", ext:true },
+  ]},
+];
+
+function render(){
+  const root = document.getElementById('groups');
+  root.innerHTML = '';
+  PANELS.forEach(grp=>{
+    const sec = document.createElement('div');
+    sec.className = 'group';
+    sec.dataset.group = grp.g.toLowerCase();
+    sec.innerHTML = `<h2>${grp.g}</h2>`;
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    grp.items.forEach(it=>{
+      const a = document.createElement('a');
+      a.className = 'card ' + (grp.cls||'');
+      a.href = it.url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.dataset.search = (it.name + ' ' + it.sub + ' ' + grp.g).toLowerCase();
+      a.innerHTML = `${it.ext?'<span class="ext">↗ externo</span>':''}
+        <div class="ico">${it.ico}</div>
+        <div class="name">${it.name}</div>
+        <div class="sub">${it.sub}</div>`;
+      grid.appendChild(a);
+    });
+    sec.appendChild(grid);
+    root.appendChild(sec);
+  });
+}
+
+function filtra(){
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  let visiveis = 0;
+  document.querySelectorAll('.group').forEach(sec=>{
+    let any = false;
+    sec.querySelectorAll('a.card').forEach(c=>{
+      const hit = !q || c.dataset.search.includes(q);
+      c.style.display = hit ? '' : 'none';
+      if(hit){ any = true; visiveis++; }
+    });
+    sec.style.display = any ? '' : 'none';
+  });
+  document.getElementById('empty').style.display = visiveis ? 'none' : 'block';
+}
+
+// ===== Login (client-side, igual aos outros painéis) =====
+function doLogin(){
+  const pass = document.getElementById('loginPass').value;
+  if (pass === 'Mudar123'){
+    sessionStorage.setItem('hub_auth','1');
+    showHub();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+function logout(){
+  sessionStorage.removeItem('hub_auth');
+  location.reload();
+}
+function showHub(){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('hub').style.display = 'block';
+  render();
+}
+if (sessionStorage.getItem('hub_auth') === '1'){
+  showHub();
+} else {
+  document.getElementById('loginPass').focus();
+}
+</script>
+</body>
+</html>
