@@ -2319,7 +2319,7 @@
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
-    "temFreteAtivo": true
+    "temFreteAtivo": false
   },
   "826600": {
     "temVPAtivo": false,
@@ -2946,8 +2946,8 @@
     "temFreteAtivo": true
   },
   "156269": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
+    "temVPAtivo": true,
+    "temPixAtivo": true,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
@@ -3111,7 +3111,7 @@
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
-    "temFreteAtivo": false
+    "temFreteAtivo": true
   },
   "2041369": {
     "temVPAtivo": false,
