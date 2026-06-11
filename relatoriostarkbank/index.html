@@ -1135,9 +1135,26 @@ function downloadExcel(){
         b.parcelas++; b.gross+=p.grossValue||0; b.vp+=p.vpValue||0;
         b.af+=p.antifraudValue||0; b.antec+=p.antecipationValue||0; b.net+=p.netValue||0;
     });
-    var keys=Object.keys(byKey).sort();
-    var data=keys.map(function(k){
-        var r=byKey[k];
+    // Ordena igual a tela (seletor fSort): "Empresa A→Z" = por nome da marca;
+    // "Data" (padrao) = data crescente e, dentro de cada dia, MAIOR valor bruto
+    // primeiro (maior -> menor). Antes era Object.keys().sort() = ordem da chave
+    // payDate|companyId, que saia "aleatoria" em relacao ao valor.
+    var sortMode=(document.getElementById('fSort')||{}).value||'date';
+    var aggRows=Object.keys(byKey).map(function(k){return byKey[k]});
+    if(sortMode==='empresa'){
+        aggRows.sort(function(a,b){
+            var na=(a.nomeFantasia||'').toLowerCase(), nb=(b.nomeFantasia||'').toLowerCase();
+            if(na<nb)return -1; if(na>nb)return 1;
+            return (a.payDate||'').localeCompare(b.payDate||'');
+        });
+    }else{
+        aggRows.sort(function(a,b){
+            var d=(a.payDate||'').localeCompare(b.payDate||'');
+            if(d!==0)return d;
+            return (b.gross||0)-(a.gross||0);
+        });
+    }
+    var data=aggRows.map(function(r){
         return {
             'Data a pagar': r.payDate?fmtD(r.payDate):'',
             'Empresa': r.nomeFantasia,
