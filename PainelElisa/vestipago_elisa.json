@@ -1398,16 +1398,16 @@
     "temFreteAtivo": true
   },
   "1436061": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
+    "temVPAtivo": true,
+    "temPixAtivo": true,
     "temCartaoAtivo": false,
-    "temFreteAtivo": false
+    "temFreteAtivo": true
   },
   "1437352": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
-    "temFreteAtivo": false
+    "temFreteAtivo": true
   },
   "1444714": {
     "temVPAtivo": false,
@@ -3258,10 +3258,10 @@
     "temFreteAtivo": true
   },
   "1979643": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
+    "temVPAtivo": true,
+    "temPixAtivo": true,
     "temCartaoAtivo": false,
-    "temFreteAtivo": false
+    "temFreteAtivo": true
   },
   "1825305": {
     "temVPAtivo": false,
