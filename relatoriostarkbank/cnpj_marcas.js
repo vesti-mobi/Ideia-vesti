@@ -1746,7 +1746,10 @@ window.CNPJ_MARCAS = (function(){
         "modas carlas plus":                                 "49222592000185",
         "the lion confec (zoe sport":                        "41426603000137",
         "santo vicio (fabrica":                              "33159386000138",
-        "morena charme (matriz":                             "22481273000138"
+        "morena charme (matriz":                             "22481273000138",
+        "believe jeans":                                     "34264546000171",
+        "ag moda intima":                                    "28316523000160",
+        "versally":                                          "48473990000101"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
