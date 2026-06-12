@@ -1,5 +1,5 @@
 // Saldos Starkbank (gerado por fetch_saldos.py)
-window.SALDO_GERADO_EM = "2026-06-12T00:26:16";
+window.SALDO_GERADO_EM = "2026-06-12T02:49:13";
 window.SALDO_VESTIPAGO = 148204.05;
 window.SALDO_TOTAL_MARCAS = 0.00;
 window.SALDOS = {
@@ -45,7 +45,7 @@ window.SALDOS = {
   "5470462878416896": 0.0,
   "5483328285179904": 0.0,
   "5521890078621696": 0.0,
-  "5566388825489408": null,
+  "5566388825489408": 0.0,
   "5608413570531328": 0.0,
   "5654328784191488": 0.0,
   "5747095782817792": 0.0,
@@ -146,7 +146,7 @@ window.SALDO_BY_COMPANY = {
   "c34bfa3b-91d0-4f97-aeb4-112506dd3b60": 0.0,
   "47f00a13-aec7-4850-9190-f30ecfa60640": 0.0,
   "08fc8fb4-b1c8-484b-9482-aac2f7b9319e": 0.0,
-  "889ecd48-fc2a-42e9-90d5-9bb4f6fa69cb": null,
+  "889ecd48-fc2a-42e9-90d5-9bb4f6fa69cb": 0.0,
   "a0478e0b-e16a-4198-bdd5-949025d33868": 0.0,
   "4d02fcf3-8129-41ac-8fa7-0f30b61b63bd": 0.0,
   "a6ae819f-851e-4285-9ca2-98006b3b409d": 0.0,
