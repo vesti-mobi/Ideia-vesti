@@ -237,7 +237,13 @@ window.PIX_MARCAS = (function(){
         "feminisces":                   "21032633000151",
         "vitoria fashion":              "55010981000140",
         "restore":                      "34981369000144",
-        "v&m plus":                     "52244294000109"
+        "v&m plus":                     "52244294000109",
+        "califor":                      "51256997000186",
+        "believe moda":                 "34264546000171",
+        "miss cigarreteie":             "28358130000110",
+        "malvada plus":                 "52487936000192",
+        "re store":                     "34981369000144",
+        "vem plus":                     "52244294000109"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()

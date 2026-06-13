@@ -1749,7 +1749,10 @@ window.CNPJ_MARCAS = (function(){
         "morena charme (matriz":                             "22481273000138",
         "believe jeans":                                     "34264546000171",
         "ag moda intima":                                    "28316523000160",
-        "versally":                                          "48473990000101"
+        "versally":                                          "48473990000101",
+        "miss cigarreteie":                                  "28358130000110",
+        "re store":                                          "34981369000144",
+        "vem plus":                                          "52244294000109"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
