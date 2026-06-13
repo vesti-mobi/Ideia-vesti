@@ -2184,10 +2184,10 @@
     "temFreteAtivo": false
   },
   "1957538": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
+    "temVPAtivo": true,
+    "temPixAtivo": true,
     "temCartaoAtivo": false,
-    "temFreteAtivo": false
+    "temFreteAtivo": true
   },
   "2068618": {
     "temVPAtivo": false,
@@ -2539,7 +2539,7 @@
   },
   "303358": {
     "temVPAtivo": true,
-    "temPixAtivo": false,
+    "temPixAtivo": true,
     "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
