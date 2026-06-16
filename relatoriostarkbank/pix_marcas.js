@@ -244,7 +244,9 @@ window.PIX_MARCAS = (function(){
         "malvada plus":                 "52487936000192",
         "re store":                     "34981369000144",
         "vem plus":                     "52244294000109",
-        "mj fashion filial":            "24541598000194"
+        "mj fashion filial":            "24541598000194",
+        "cavweillers":                  "36269709000134",
+        "believe moda evangelica":      "34264546000171"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
