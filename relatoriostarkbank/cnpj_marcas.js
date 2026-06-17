@@ -1113,7 +1113,7 @@ window.CNPJ_MARCAS = (function(){
         "mocinha charmosa":                                  "47.927.182/0001-04",
         "moda galvez":                                       "30.998.855/0001-14",
         "moda inn":                                          "49.921.554/0001-10",
-        "modas carla":                                       "49.222.592/0001-85",
+        "modas carla":                                       "49222592000185",
         "modas clarice":                                     "62.989.339/0001-10",
         "modas condor":                                      "30.691.241/0001-95",
         "modas faviola":                                     "53.808.170/0001-63",
