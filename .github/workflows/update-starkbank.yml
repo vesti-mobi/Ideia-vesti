@@ -56,6 +56,15 @@ jobs:
           VESTIAPI_TOKEN: ${{ secrets.VESTIAPI_TOKEN }}
         run: python fetch_invoices.py
 
+      - name: Reconciliar antecipacao real (dados.js x invoices.js)
+        # A classificacao do Mongo e por pedido; o Stark antecipa por parcela
+        # (tag contract-chunk). Este passo move pro fluxo as parcelas que NAO
+        # foram antecipadas de fato, corrigindo o CP Fluxo (subestimado) e o
+        # CP Antecipacao (inflado). Roda nos dois modos: usa o invoices.js fresco
+        # no run completo, ou o ja existente no repo no modo rapido.
+        working-directory: relatoriostarkbank
+        run: python enrich_antecipacao_real.py
+
       - name: Rodar fetcher Cancelados (Fabric)
         working-directory: relatoriostarkbank
         env:
