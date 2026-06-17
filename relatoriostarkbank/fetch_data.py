@@ -17,6 +17,7 @@ import os
 import struct
 import subprocess
 import sys
+import time
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
@@ -471,9 +472,30 @@ def build(raw: list[dict]) -> dict:
     }
 
 
+def _fetch_with_retry(max_attempts: int = 4) -> list[dict]:
+    """Abre conexao e roda a query. O endpoint SQL do Fabric derruba o link de
+    forma intermitente (08S01 'Communication link failure'), entao tentamos
+    novamente com backoff em vez de deixar o run inteiro falhar."""
+    delay = 15
+    for attempt in range(1, max_attempts + 1):
+        try:
+            with connect() as conn:
+                return fetch_rows(conn)
+        except pyodbc.Error as e:
+            sqlstate = e.args[0] if e.args else ""
+            if attempt == max_attempts:
+                print(f"[fabric] falha definitiva apos {attempt} tentativas: {e}",
+                      file=sys.stderr)
+                raise
+            print(f"[fabric] erro {sqlstate} (tentativa {attempt}/{max_attempts}); "
+                  f"aguardando {delay}s e reconectando...", file=sys.stderr)
+            time.sleep(delay)
+            delay *= 2
+    raise RuntimeError("unreachable")
+
+
 def main() -> None:
-    with connect() as conn:
-        raw = fetch_rows(conn)
+    raw = _fetch_with_retry()
     data = build(raw)
     OUT_JS.write_text(
         "window.DADOS = " + json.dumps(data, ensure_ascii=False) + ";\n",

@@ -2,7 +2,7 @@
 
 Gera cancelados_valores.js consumido por cancelados.html.
 """
-import io, json, os, re, struct, subprocess, sys, urllib.parse, urllib.request
+import io, json, os, re, struct, subprocess, sys, time, urllib.parse, urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 try:
@@ -56,6 +56,50 @@ def connect():
     print('ERRO: sem auth', file=sys.stderr); sys.exit(1)
 
 
+def _fetch_valores(oids, max_attempts: int = 4) -> dict:
+    delay = 15
+    for attempt in range(1, max_attempts + 1):
+        valores = {}
+        try:
+            with connect() as conn:
+                cur = conn.cursor()
+                for i in range(0, len(oids), 500):
+                    chunk = oids[i:i+500]
+                    placeholders = ','.join('?'*len(chunk))
+                    sql = f"""
+                        SELECT _id,
+                            MAX(orderNumber) AS order_number,
+                            MAX(summary_total) AS summary_total,
+                            MAX(payment_transaction_installments) AS installments,
+                            MAX(customer_name) AS customer_name,
+                            MAX(customer_doc) AS customer_doc,
+                            MAX(CONVERT(DATE, DATEADD(HOUR,-3,TRY_CAST(settings_createdAt_TIMESTAMP AS DATETIME2)))) AS order_date
+                        FROM dbo.MongoDB_Pedidos_Geral
+                        WHERE _id IN ({placeholders})
+                        GROUP BY _id
+                    """
+                    cur.execute(sql, chunk)
+                    cols = [d[0] for d in cur.description]
+                    for r in cur.fetchall():
+                        d = dict(zip(cols, r))
+                        oid = d.pop('_id')
+                        d['order_date'] = d['order_date'].isoformat() if d['order_date'] else ''
+                        d['summary_total'] = float(d['summary_total']) if d['summary_total'] is not None else None
+                        valores[oid] = d
+                    print(f'  lote {i//500+1}: {len(valores)}/{len(oids)}')
+            return valores
+        except pyodbc.Error as e:
+            sqlstate = e.args[0] if e.args else ''
+            if attempt == max_attempts:
+                print(f'[fabric] falha definitiva apos {attempt} tentativas: {e}', file=sys.stderr)
+                raise
+            print(f'[fabric] erro {sqlstate} (tentativa {attempt}/{max_attempts}); '
+                  f'aguardando {delay}s e reconectando...', file=sys.stderr)
+            time.sleep(delay)
+            delay *= 2
+    raise RuntimeError('unreachable')
+
+
 def main():
     txt = INV.read_text(encoding='utf-8')
     m = re.search(r'window\.INVOICES\s*=\s*(\{.*\})\s*;?\s*$', txt, re.DOTALL)
@@ -67,34 +111,10 @@ def main():
     if not oids:
         OUT.write_text('window.CANCELADOS_VALORES = {};\n', encoding='utf-8'); return
 
-    # Query em lotes (IN aceita ~1000)
-    valores = {}
-    with connect() as conn:
-        cur = conn.cursor()
-        for i in range(0, len(oids), 500):
-            chunk = oids[i:i+500]
-            placeholders = ','.join('?'*len(chunk))
-            sql = f"""
-                SELECT _id,
-                    MAX(orderNumber) AS order_number,
-                    MAX(summary_total) AS summary_total,
-                    MAX(payment_transaction_installments) AS installments,
-                    MAX(customer_name) AS customer_name,
-                    MAX(customer_doc) AS customer_doc,
-                    MAX(CONVERT(DATE, DATEADD(HOUR,-3,TRY_CAST(settings_createdAt_TIMESTAMP AS DATETIME2)))) AS order_date
-                FROM dbo.MongoDB_Pedidos_Geral
-                WHERE _id IN ({placeholders})
-                GROUP BY _id
-            """
-            cur.execute(sql, chunk)
-            cols = [d[0] for d in cur.description]
-            for r in cur.fetchall():
-                d = dict(zip(cols, r))
-                oid = d.pop('_id')
-                d['order_date'] = d['order_date'].isoformat() if d['order_date'] else ''
-                d['summary_total'] = float(d['summary_total']) if d['summary_total'] is not None else None
-                valores[oid] = d
-            print(f'  lote {i//500+1}: {len(valores)}/{len(oids)}')
+    # Query em lotes (IN aceita ~1000). O endpoint SQL do Fabric derruba o link
+    # de forma intermitente (08S01); reabrimos a conexao e tentamos de novo em
+    # vez de matar o run (que impediria o commit do dados.js ja atualizado).
+    valores = _fetch_valores(oids)
 
     out = {'geradoEm': datetime.now(timezone.utc).isoformat(), 'valores': valores}
     OUT.write_text('window.CANCELADOS_VALORES = ' + json.dumps(out, ensure_ascii=False) + ';\n', encoding='utf-8')
