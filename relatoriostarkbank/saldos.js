@@ -1,5 +1,5 @@
 // Saldos Starkbank (gerado por fetch_saldos.py)
-window.SALDO_GERADO_EM = "2026-06-17T22:26:49";
+window.SALDO_GERADO_EM = "2026-06-18T00:25:39";
 window.SALDO_VESTIPAGO = 202290.78;
 window.SALDO_TOTAL_MARCAS = 0.00;
 window.SALDOS = {
@@ -70,9 +70,9 @@ window.SALDOS = {
   "6006175088771072": 0.0,
   "6020872567521280": 0.0,
   "6021041950294016": 0.0,
-  "6022495662505984": 0.0,
+  "6022495662505984": null,
   "6095384881397760": 0.0,
-  "6129505309556736": null,
+  "6129505309556736": 0.0,
   "6182094935949312": 0.0,
   "6206306606120960": 0.0,
   "6253072323969024": 0.0,
@@ -136,7 +136,7 @@ window.SALDO_BY_COMPANY = {
   "4560fa1f-5da9-4284-9ca3-9865006d075a": 0.0,
   "889ecd48-fc2a-42e9-90d5-9bb4f6fa69cb": 0.0,
   "a23f0e13-47df-4dd9-9917-427b5dc9f615": 0.0,
-  "8caab995-ab4a-4650-bdec-65ef12c338fe": null,
+  "8caab995-ab4a-4650-bdec-65ef12c338fe": 0.0,
   "ae25c036-ea33-4a86-8f6f-a3cb7ca16642": 0.0,
   "27748cbd-9ab4-4cf9-91e9-4f1427da487f": 0.0,
   "c34bfa3b-91d0-4f97-aeb4-112506dd3b60": 0.0,
@@ -197,7 +197,7 @@ window.SALDO_BY_COMPANY = {
   "11712759-16c5-40d7-880f-8d61cc995143": 0.0,
   "48021a8e-92d2-4c6c-a350-147dacb147a4": 0.0,
   "782eb870-4ad7-4ae3-aa15-e2ba7ec5066c": 0.0,
-  "7ab84616-66fa-45a1-823b-1803a539bc4d": 0.0,
+  "7ab84616-66fa-45a1-823b-1803a539bc4d": null,
   "2ba7bc6c-e2e8-4602-92fd-84150f965a62": 0.0,
   "9d455324-c9d2-402e-a969-66ac73ea033a": 0.0,
   "eb77bd2b-6c07-46b3-b8aa-f88e8bb056b7": 0.0,
