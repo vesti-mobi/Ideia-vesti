@@ -1753,7 +1753,8 @@ window.CNPJ_MARCAS = (function(){
         "miss cigarreteie":                                  "28358130000110",
         "re store":                                          "34981369000144",
         "vem plus":                                          "52244294000109",
-        "mj fashion filial":                                 "24541598000194"
+        "mj fashion filial":                                 "24541598000194",
+        "ce moda feminna":                                   "5243626708"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
