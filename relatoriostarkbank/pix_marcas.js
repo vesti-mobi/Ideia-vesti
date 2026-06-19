@@ -247,7 +247,8 @@ window.PIX_MARCAS = (function(){
         "mj fashion filial":            "24541598000194",
         "cavweillers":                  "36269709000134",
         "believe moda evangelica":      "34264546000171",
-        "ce moda feminna":              "5243626708"
+        "ce moda feminna":              "5243626708",
+        "trama jeans":                  "Sem chave PIX"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
