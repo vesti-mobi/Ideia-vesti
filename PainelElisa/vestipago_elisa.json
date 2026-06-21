@@ -170,7 +170,7 @@
   "33995": {
     "temVPAtivo": true,
     "temPixAtivo": true,
-    "temCartaoAtivo": false,
+    "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
   "35249": {
@@ -966,9 +966,9 @@
     "temFreteAtivo": true
   },
   "662705": {
-    "temVPAtivo": false,
+    "temVPAtivo": true,
     "temPixAtivo": false,
-    "temCartaoAtivo": false,
+    "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
   "663336": {
@@ -1283,15 +1283,15 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1321436": {
-    "temVPAtivo": true,
-    "temPixAtivo": true,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
   "1326489": {
     "temVPAtivo": false,
     "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": true
+  },
+  "1345663": {
+    "temVPAtivo": true,
+    "temPixAtivo": true,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
@@ -1615,7 +1615,7 @@
   },
   "1606915": {
     "temVPAtivo": true,
-    "temPixAtivo": false,
+    "temPixAtivo": true,
     "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
@@ -1775,6 +1775,12 @@
     "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
+  "1516158": {
+    "temVPAtivo": true,
+    "temPixAtivo": true,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": true
+  },
   "166269": {
     "temVPAtivo": true,
     "temPixAtivo": false,
@@ -1787,22 +1793,16 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "1516158": {
+  "1986877": {
     "temVPAtivo": true,
-    "temPixAtivo": true,
-    "temCartaoAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
   "203996": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
-  "1986877": {
-    "temVPAtivo": true,
-    "temPixAtivo": false,
-    "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
   "1791824": {
@@ -1859,25 +1859,19 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1768661": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": false
-  },
   "1797546": {
     "temVPAtivo": true,
     "temPixAtivo": true,
     "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
-  "18011": {
+  "1391212": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "1391212": {
+  "18011": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -1902,12 +1896,6 @@
     "temFreteAtivo": false
   },
   "846854": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": false
-  },
-  "1885074": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -1949,17 +1937,17 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1181984": {
-    "temVPAtivo": true,
-    "temPixAtivo": true,
-    "temCartaoAtivo": true,
-    "temFreteAtivo": true
-  },
   "642658": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
+  },
+  "1181984": {
+    "temVPAtivo": true,
+    "temPixAtivo": true,
+    "temCartaoAtivo": true,
+    "temFreteAtivo": true
   },
   "1081260": {
     "temVPAtivo": false,
@@ -1991,17 +1979,17 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1225814": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
   "1551132": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
+  },
+  "1225814": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": true
   },
   "1942933": {
     "temVPAtivo": true,
@@ -2015,22 +2003,16 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "174040": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
   "1982744": {
     "temVPAtivo": true,
     "temPixAtivo": true,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1433479": {
-    "temVPAtivo": true,
+  "174040": {
+    "temVPAtivo": false,
     "temPixAtivo": false,
-    "temCartaoAtivo": true,
+    "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
   "515740": {
@@ -2038,6 +2020,12 @@
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
+  },
+  "1433479": {
+    "temVPAtivo": true,
+    "temPixAtivo": false,
+    "temCartaoAtivo": true,
+    "temFreteAtivo": true
   },
   "292317": {
     "temVPAtivo": false,
@@ -2063,13 +2051,13 @@
     "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
-  "2011812": {
+  "12": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "12": {
+  "2011812": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -2081,6 +2069,18 @@
     "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
+  "1870805": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": false
+  },
+  "184471": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": false
+  },
   "1977096": {
     "temVPAtivo": true,
     "temPixAtivo": true,
@@ -2088,12 +2088,6 @@
     "temFreteAtivo": true
   },
   "723225": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": false
-  },
-  "1870805": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -2117,19 +2111,19 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1393814": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": false
-  },
   "1300009": {
     "temVPAtivo": true,
     "temPixAtivo": false,
     "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
-  "1803600": {
+  "2093801": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": false
+  },
+  "1393814": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -2159,25 +2153,19 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "322528": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": false
-  },
   "2053636": {
     "temVPAtivo": true,
     "temPixAtivo": true,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1426063": {
+  "322528": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "1885118": {
+  "1426063": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -2188,6 +2176,12 @@
     "temPixAtivo": true,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
+  },
+  "1885118": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": false
   },
   "2068618": {
     "temVPAtivo": false,
@@ -2207,17 +2201,17 @@
     "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
-  "252040": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": false
-  },
   "2061322": {
     "temVPAtivo": true,
     "temPixAtivo": true,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
+  },
+  "252040": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": false
   },
   "2005999": {
     "temVPAtivo": true,
@@ -2243,17 +2237,17 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1528187": {
-    "temVPAtivo": true,
-    "temPixAtivo": false,
-    "temCartaoAtivo": true,
-    "temFreteAtivo": true
-  },
   "1922670": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
+  },
+  "1528187": {
+    "temVPAtivo": true,
+    "temPixAtivo": false,
+    "temCartaoAtivo": true,
+    "temFreteAtivo": true
   },
   "1563593": {
     "temVPAtivo": false,
@@ -2285,19 +2279,25 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "309890": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": false
-  },
   "2025346": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
+  "309890": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": false
+  },
   "1814060": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": true
+  },
+  "132195": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -2309,7 +2309,7 @@
     "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
-  "132195": {
+  "2067207": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -2320,12 +2320,6 @@
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
-  },
-  "2067207": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
   },
   "826600": {
     "temVPAtivo": false,
@@ -2363,17 +2357,11 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "1893722": {
-    "temVPAtivo": true,
+  "1435521": {
+    "temVPAtivo": false,
     "temPixAtivo": false,
-    "temCartaoAtivo": true,
-    "temFreteAtivo": true
-  },
-  "1832872": {
-    "temVPAtivo": true,
-    "temPixAtivo": true,
     "temCartaoAtivo": false,
-    "temFreteAtivo": true
+    "temFreteAtivo": false
   },
   "1163227": {
     "temVPAtivo": false,
@@ -2381,13 +2369,7 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "1435521": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": false
-  },
-  "47475": {
+  "1893722": {
     "temVPAtivo": true,
     "temPixAtivo": false,
     "temCartaoAtivo": true,
@@ -2403,6 +2385,12 @@
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
+    "temFreteAtivo": true
+  },
+  "47475": {
+    "temVPAtivo": true,
+    "temPixAtivo": false,
+    "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
   "1398097": {
@@ -2453,13 +2441,13 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "1995402": {
+  "2025163": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "2025163": {
+  "1995402": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -2483,6 +2471,12 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
+  "1278467": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": true
+  },
   "1934741": {
     "temVPAtivo": true,
     "temPixAtivo": true,
@@ -2495,7 +2489,7 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1278467": {
+  "1825244": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -2507,22 +2501,10 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1825244": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
   "1794530": {
     "temVPAtivo": true,
     "temPixAtivo": true,
     "temCartaoAtivo": true,
-    "temFreteAtivo": true
-  },
-  "2074274": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
   "1589515": {
@@ -2531,9 +2513,9 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "280295": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
+  "2074274": {
+    "temVPAtivo": true,
+    "temPixAtivo": true,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
@@ -2541,6 +2523,12 @@
     "temVPAtivo": true,
     "temPixAtivo": true,
     "temCartaoAtivo": true,
+    "temFreteAtivo": true
+  },
+  "280295": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
   "162394": {
@@ -2555,17 +2543,17 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "2040689": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
   "1428685": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
+  },
+  "2040689": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": true
   },
   "1044132": {
     "temVPAtivo": false,
@@ -2573,13 +2561,13 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1814020": {
+  "1416085": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "1416085": {
+  "1814020": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -2597,6 +2585,12 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
+  "1933943": {
+    "temVPAtivo": true,
+    "temPixAtivo": true,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": true
+  },
   "284275": {
     "temVPAtivo": false,
     "temPixAtivo": false,
@@ -2609,13 +2603,13 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "382073": {
+  "156071": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "156071": {
+  "382073": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -2627,17 +2621,17 @@
     "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
-  "22077": {
-    "temVPAtivo": true,
-    "temPixAtivo": false,
-    "temCartaoAtivo": true,
-    "temFreteAtivo": true
-  },
   "1834101": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
+  },
+  "22077": {
+    "temVPAtivo": true,
+    "temPixAtivo": false,
+    "temCartaoAtivo": true,
+    "temFreteAtivo": true
   },
   "897140": {
     "temVPAtivo": false,
@@ -2646,12 +2640,6 @@
     "temFreteAtivo": false
   },
   "1812999": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": false
-  },
-  "2034779": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -2759,16 +2747,16 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "2790": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
   "1418487": {
     "temVPAtivo": true,
     "temPixAtivo": true,
     "temCartaoAtivo": true,
+    "temFreteAtivo": true
+  },
+  "2790": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
   "937781": {
@@ -2795,21 +2783,15 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "562980": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
-  "2041380": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
   "2061311": {
     "temVPAtivo": true,
     "temPixAtivo": true,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": true
+  },
+  "562980": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
@@ -2843,17 +2825,17 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "1786269": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
   "375198": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
+  },
+  "1786269": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": true
   },
   "1807517": {
     "temVPAtivo": false,
@@ -2891,16 +2873,16 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1010908": {
-    "temVPAtivo": true,
-    "temPixAtivo": false,
-    "temCartaoAtivo": true,
-    "temFreteAtivo": true
-  },
   "437493": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
+    "temFreteAtivo": true
+  },
+  "1010908": {
+    "temVPAtivo": true,
+    "temPixAtivo": false,
+    "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
   "2068066": {
@@ -2951,6 +2933,12 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
+  "1992701": {
+    "temVPAtivo": true,
+    "temPixAtivo": true,
+    "temCartaoAtivo": true,
+    "temFreteAtivo": true
+  },
   "1845851": {
     "temVPAtivo": true,
     "temPixAtivo": true,
@@ -2963,21 +2951,15 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1992701": {
-    "temVPAtivo": true,
-    "temPixAtivo": true,
-    "temCartaoAtivo": true,
+  "1562486": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
   "2002496": {
     "temVPAtivo": true,
     "temPixAtivo": true,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
-  "1562486": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
@@ -2996,6 +2978,12 @@
   "2019731": {
     "temVPAtivo": true,
     "temPixAtivo": true,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": true
+  },
+  "2090422": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
@@ -3041,9 +3029,9 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "2041160": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
+  "1803582": {
+    "temVPAtivo": true,
+    "temPixAtivo": true,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
@@ -3058,12 +3046,6 @@
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
-  },
-  "1803582": {
-    "temVPAtivo": true,
-    "temPixAtivo": true,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
   },
   "1994087": {
     "temVPAtivo": false,
@@ -3089,19 +3071,7 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1880422": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": false
-  },
   "1115082": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
-  "2074247": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -3113,13 +3083,7 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "2041369": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
-  "2035512": {
+  "2074247": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -3137,25 +3101,25 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "1867647": {
-    "temVPAtivo": true,
-    "temPixAtivo": true,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
   "1281451": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "318671": {
+  "1867647": {
+    "temVPAtivo": true,
+    "temPixAtivo": true,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": true
+  },
+  "1355617": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "1355617": {
+  "318671": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -3185,13 +3149,13 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "1938037": {
+  "715258": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "715258": {
+  "1938037": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -3233,13 +3197,19 @@
     "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
+  "2007005": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": true
+  },
   "376584": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "2007005": {
+  "914287": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -3251,7 +3221,7 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "914287": {
+  "1825305": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -3260,12 +3230,6 @@
   "1979643": {
     "temVPAtivo": true,
     "temPixAtivo": true,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
-  },
-  "1825305": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
@@ -3311,13 +3275,13 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "19261": {
+  "1122393": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
   },
-  "1122393": {
+  "19261": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
@@ -3335,16 +3299,16 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "344642": {
-    "temVPAtivo": true,
-    "temPixAtivo": false,
-    "temCartaoAtivo": true,
-    "temFreteAtivo": true
-  },
   "892034": {
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
+    "temFreteAtivo": true
+  },
+  "344642": {
+    "temVPAtivo": true,
+    "temPixAtivo": false,
+    "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
   "1977127": {
@@ -3401,6 +3365,12 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
+  "2016411": {
+    "temVPAtivo": true,
+    "temPixAtivo": true,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": true
+  },
   "1335245": {
     "temVPAtivo": false,
     "temPixAtivo": false,
@@ -3412,12 +3382,6 @@
     "temPixAtivo": false,
     "temCartaoAtivo": false,
     "temFreteAtivo": false
-  },
-  "2016411": {
-    "temVPAtivo": true,
-    "temPixAtivo": true,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": true
   },
   "2061300": {
     "temVPAtivo": false,
@@ -3443,17 +3407,17 @@
     "temCartaoAtivo": false,
     "temFreteAtivo": false
   },
-  "1941157": {
-    "temVPAtivo": false,
-    "temPixAtivo": false,
-    "temCartaoAtivo": false,
-    "temFreteAtivo": false
-  },
   "2001884": {
     "temVPAtivo": true,
     "temPixAtivo": true,
     "temCartaoAtivo": false,
     "temFreteAtivo": true
+  },
+  "1941157": {
+    "temVPAtivo": false,
+    "temPixAtivo": false,
+    "temCartaoAtivo": false,
+    "temFreteAtivo": false
   },
   "312645": {
     "temVPAtivo": false,
