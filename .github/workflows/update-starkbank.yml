@@ -2,7 +2,8 @@ name: Atualizar Relatorio StarkBank VestiPago
 
 on:
   schedule:
-    - cron: '0 */3 * * *'  # a cada 3h (reduz carga na capacidade F2 do Fabric)
+    - cron: '0 7 * * *'    # 04:00 BRT: run COMPLETO (CR via API Vesti + CP)
+    - cron: '0 */3 * * *'  # a cada 3h: SO CP (Fabric). NAO toca a API/banco da Vesti
   workflow_dispatch:
     inputs:
       reason:
@@ -53,13 +54,19 @@ jobs:
         run: python fetch_data.py
 
       - name: Rodar fetcher Faturas (API Vesti)
-        # Etapa lenta (~22min). Pulada no modo rapido (somente_fabric=true).
-        # Em runs agendados github.event.inputs e nulo, entao roda normalmente.
-        if: ${{ github.event.inputs.somente_fabric != 'true' }}
+        # Etapa lenta (~22min) que pagina todas as marcas na API Vesti e
+        # sobrecarrega o banco de producao. Por isso roda SO 1x/dia, no run
+        # agendado das 04:00 BRT (cron '0 7 * * *'), ou em disparo manual
+        # completo (workflow_dispatch com somente_fabric=false). Nos runs de 3h
+        # (so CP) e no modo rapido, e pulada. Quando roda, deixa o marcador
+        # .cr_updated pro passo de commit saber que deve incluir o invoices.js.
+        if: ${{ github.event.inputs.somente_fabric != 'true' && (github.event.schedule == '0 7 * * *' || github.event_name == 'workflow_dispatch') }}
         working-directory: relatoriostarkbank
         env:
           VESTIAPI_TOKEN: ${{ secrets.VESTIAPI_TOKEN }}
-        run: python fetch_invoices.py
+        run: |
+          python fetch_invoices.py
+          touch "$GITHUB_WORKSPACE/.cr_updated"
 
       - name: Reconciliar antecipacao real (dados.js x invoices.js)
         # A classificacao do Mongo e por pedido; o Stark antecipa por parcela
@@ -84,13 +91,14 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Arquivos gerados sao regeracoes completas. No modo rapido o invoices.js
-          # (CR) NAO foi tocado, entao nao o incluimos pra nao reverter um update
-          # concorrente da API. Em runs completos/agendados, inclui os tres.
-          if [ "${{ github.event.inputs.somente_fabric }}" = "true" ]; then
-            FILES="relatoriostarkbank/dados.js relatoriostarkbank/cancelados_valores.js"
-          else
+          # Arquivos gerados sao regeracoes completas. So incluimos o invoices.js
+          # (CR) quando o fetcher da API rodou de fato (marcador .cr_updated) —
+          # senao (runs de 3h so-CP / modo rapido) estariamos re-adicionando uma
+          # copia possivelmente defasada e revertendo o update diario concorrente.
+          if [ -f .cr_updated ]; then
             FILES="relatoriostarkbank/dados.js relatoriostarkbank/invoices.js relatoriostarkbank/cancelados_valores.js"
+          else
+            FILES="relatoriostarkbank/dados.js relatoriostarkbank/cancelados_valores.js"
           fi
           MSG="Atualizacao StarkBank $(date +'%d/%m/%Y %H:%M')"
           # Sem rebase: reaplica nossos arquivos recem-gerados sobre o topo do remoto.
