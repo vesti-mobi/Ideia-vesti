@@ -1,14 +1,18 @@
 """
-Relatorio StarkBank VestiPago — Recebiveis.
+Relatorio StarkBank VestiPago — Recebiveis (CP).
 
-Puxa pedidos com payment_transaction_provider = 'STARKBANK' da tabela
-dbo.MongoDB_Pedidos_Geral no lakehouse VestiHouse (Fabric). Gera dados.js
-consumido pelo index.html desta pasta.
+Fonte: API Vesti ao vivo `order/v1/report/orders-paylinks`, desnormalizando
+payment.receivables (1 linha por parcela) — mesma logica do PBI "Pagamento
+Stark". Substituiu o espelho do Fabric (dbo.mongodb_pedidos_recebiveis), que
+materializava so ~1 de N parcelas/pedido e deixava o CP em ~46% do real.
+Gera dados.js consumido pelo index.html desta pasta.
 
-Auth:
-- local: az CLI (az login na conta com acesso ao Fabric)
-- CI:    FABRIC_REFRESH_TOKEN + FABRIC_TENANT_ID (+ FABRIC_CLIENT_ID opcional)
-         — trocado por access token no fluxo refresh_token OAuth2
+Filtros: isClosed + payment.isPaid + CREDIT_CARD + STARKBANK, janela de
+~6 meses por payment.paidAt. Todas as marcas (sem filtro de companyId).
+Antecipacao x Fluxo: parcela com antecipationValue > 0 = antecipada.
+
+Auth: VESTI_ORDER_TOKEN (Bearer JWT de servico, sem expiracao).
+As funcoes Fabric (connect/fetch_rows/SQL) ficam abaixo so como legado.
 """
 
 import io
@@ -20,14 +24,13 @@ import sys
 import time
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 try:
-    import pyodbc
+    import pyodbc  # usado so pelas funcoes Fabric legadas (fora do caminho principal)
 except ImportError:
-    print("ERRO: pyodbc nao instalado. Rode: py -m pip install pyodbc", file=sys.stderr)
-    sys.exit(1)
+    pyodbc = None
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 
@@ -472,30 +475,196 @@ def build(raw: list[dict]) -> dict:
     }
 
 
-def _fetch_with_retry(max_attempts: int = 6) -> list[dict]:
-    """Abre conexao e roda a query. O endpoint SQL do Fabric falha de forma
-    intermitente por dois motivos: 08S01 'Communication link failure' e, na
-    capacidade F2 (2 CUs), 24801 'compute capacity exceeded its limits' quando
-    a capacidade esta saturada por outros jobs. Em ambos os casos tentamos de
-    novo com backoff longo (ate ~13min) pra atravessar a janela de throttling
-    em vez de deixar o run inteiro morrer em ~100s."""
-    delay = 30
+# ---------- fonte: API Vesti (orders-paylinks) ----------
+# O CP vem da API ao vivo (payment.receivables completo), NAO do espelho Fabric
+# (que materializava so ~1 de N parcelas/pedido -> CP ficava em ~46% do real).
+# Mesma logica do PBI "Pagamento Stark" (orders_receivables_custom.py).
+
+API_URL = "https://apivesti.vesti.mobi/order/v1/report/orders-paylinks"
+WINDOW_DAYS = int(os.environ.get("CP_WINDOW_DAYS", "190"))  # ~6 meses
+PAGE_LIMIT = 1000
+INVOICES_JS = ROOT / "invoices.js"
+
+
+def _order_token() -> str:
+    t = os.environ.get("VESTI_ORDER_TOKEN", "").strip()
+    if not t:
+        print("ERRO: defina VESTI_ORDER_TOKEN (JWT da API de pedidos Vesti)",
+              file=sys.stderr)
+        sys.exit(1)
+    return t
+
+
+def _brt(s) -> str:
+    """ISO UTC ('...Z') -> string BRT (-3h) 'YYYY-MM-DDTHH:MM:SS'; vazio se nulo.
+    Mantem a mesma convencao do antigo SQL (DATEADD(HOUR,-3,...))."""
+    if not s:
+        return ""
+    try:
+        dt = datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+        if dt.tzinfo is not None:
+            dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+        return (dt - timedelta(hours=3)).strftime("%Y-%m-%dT%H:%M:%S")
+    except Exception:
+        return str(s)[:19]
+
+
+def _company_meta_from_invoices() -> dict:
+    """companyId -> {nome, ws, domain} a partir do invoices.js (CR), ja presente
+    no repo. Evita depender de Fabric/companies_data.json so pro nome da marca."""
+    meta: dict[str, dict] = {}
+    if not INVOICES_JS.exists():
+        print("[api] invoices.js ausente — nomes de marca podem ficar vazios",
+              file=sys.stderr)
+        return meta
+    try:
+        txt = INVOICES_JS.read_text(encoding="utf-8").strip()
+        txt = txt[txt.index("=") + 1:].rstrip().rstrip(";")
+        inv = json.loads(txt)
+        for f in inv.get("faturas", []):
+            cid = f.get("companyId")
+            if not cid or cid in meta:
+                continue
+            meta[cid] = {
+                "nome": f.get("nomeFantasia") or "",
+                "ws": str(f.get("workspaceId") or "").strip(),
+                "domain": str(f.get("domainId") or "").strip(),
+            }
+    except Exception as e:
+        print(f"[api] falha lendo invoices.js: {e}", file=sys.stderr)
+    print(f"[api] {len(meta)} marcas mapeadas via invoices.js")
+    return meta
+
+
+def _get_json(url: str, headers: dict, attempts: int = 4) -> dict:
+    """GET com retry/backoff por requisicao (cobre IncompleteRead/URLError/5xx),
+    pra um soluco numa pagina nao obrigar a refazer a paginacao inteira."""
+    delay = 5
+    for a in range(1, attempts + 1):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=headers),
+                                        timeout=120) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except Exception as e:
+            if a == attempts:
+                raise
+            print(f"[api]   retry {a}/{attempts} ({type(e).__name__}: {e})",
+                  file=sys.stderr)
+            time.sleep(delay)
+            delay = min(delay * 2, 60)
+
+
+def fetch_orders() -> list[dict]:
+    token = _order_token()
+    gte = (datetime.now(timezone.utc) - timedelta(days=WINDOW_DAYS)).strftime("%Y-%m-%dT%H:%M:%S")
+    headers = {"accept": "application/json", "Authorization": "Bearer " + token}
+    base = {
+        "filter[isClosed]": "true",
+        "filter[payment.isPaid]": "true",
+        "filter[payment.method]": "CREDIT_CARD",
+        "filter[payment.transaction.provider]": "STARKBANK",
+        "filter[payment.paidAt][$gte]": gte,
+        "select": "orderNumber,companyId,domainId,customer,payment",
+        "limit": PAGE_LIMIT,
+    }
+    print(f"[api] pedidos pagos STARKBANK com payment.paidAt >= {gte}")
+    all_orders: list[dict] = []
+    total_pages = None
+    total_docs = None
+    page = 1
+    while True:
+        params = dict(base)
+        params["page"] = page
+        d = _get_json(API_URL + "?" + urllib.parse.urlencode(params), headers)
+        items = d.get("data", []) if isinstance(d, dict) else (d or [])
+        all_orders.extend(items)
+        if total_pages is None and isinstance(d, dict):
+            total_pages = int(d.get("totalPages") or 1)
+            total_docs = d.get("totalDocs")
+        print(f"[api]   pagina {page}/{total_pages}: +{len(items)} "
+              f"(acum {len(all_orders)}/{total_docs})")
+        # ATENCAO: o hasNextPage desta API e bugado (retorna False a partir da
+        # pagina 7 mesmo havendo mais paginas). Paginamos por totalPages e so
+        # paramos quando acabarem as paginas ou uma pagina vier vazia.
+        if not items or (total_pages and page >= total_pages):
+            break
+        page += 1
+    if total_docs and len(all_orders) < total_docs:
+        print(f"[api] AVISO: coletados {len(all_orders)} < totalDocs {total_docs}",
+              file=sys.stderr)
+    print(f"[api] {len(all_orders)} pedidos no total")
+    return all_orders
+
+
+def rows_from_orders(orders: list[dict]) -> list[dict]:
+    """Desnormaliza payment.receivables no formato de linha que build() espera
+    (mesmas chaves rec_*/order_* do antigo SQL do Fabric)."""
+    meta = _company_meta_from_invoices()
+    rows: list[dict] = []
+    for o in orders:
+        pay = o.get("payment") or {}
+        tx = pay.get("transaction") or {}
+        cust = o.get("customer") or {}
+        cid = o.get("companyId") or ""
+        m = meta.get(cid, {})
+        paid_brt = _brt(pay.get("paidAt"))
+        order_date = paid_brt[:10]  # API nao traz createdAt; usa a data do pagamento
+        domain = str(o.get("domainId") or m.get("domain") or "").strip()
+        for rc in (pay.get("receivables") or []):
+            rows.append({
+                "order_id": o.get("_id") or "",
+                "order_number": o.get("orderNumber"),
+                "company_id": cid,
+                "domain_id": domain,
+                "customer_name": cust.get("name") or "",
+                "customer_doc": cust.get("doc") or "",
+                "order_date": order_date,
+                "payment_method": pay.get("method") or "",
+                "provider": tx.get("provider") or "STARKBANK",
+                "is_paid": pay.get("isPaid"),
+                "paid_at": paid_brt,
+                "installments_total": tx.get("installments") or 0,
+                "tx_net_value": tx.get("netValue") or 0,
+                "summary_total": tx.get("value") or 0,
+                "rec_id": rc.get("receivableId") or "",
+                "rec_installment": rc.get("installment") or 0,
+                "rec_due_at": _brt(rc.get("dueAt")),
+                "rec_paid_at": _brt(rc.get("paidAt")),
+                "rec_status": rc.get("status") or "",
+                "rec_net_value": rc.get("netValue") or 0,
+                "rec_gross_value": rc.get("grossValue") or 0,
+                "rec_vp_value": rc.get("vestiPagoValue") or 0,
+                "rec_antifraud_value": rc.get("antifraudValue") or 0,
+                "rec_antecipation_value": rc.get("antecipationValue"),
+                "rec_advanced": rc.get("advanced"),
+                "rec_invoice_url": rc.get("invoiceUrl") or "",
+                "rec_transaction_id": rc.get("transactionId") or "",
+                "company_provider": tx.get("provider") or "STARKBANK",
+                "company_name": m.get("nome") or "",
+                "antec_fee_enabled": None,
+                "antec_d1": 0,
+                "workspace_id": m.get("ws") or "",
+            })
+    print(f"[api] {len(rows)} linhas (uma por parcela)")
+    return rows
+
+
+def _fetch_with_retry(max_attempts: int = 4) -> list[dict]:
+    """Busca os pedidos na API Vesti e desnormaliza em linhas-parcela. Retry
+    com backoff em erros transitorios de rede/HTTP."""
+    delay = 15
     for attempt in range(1, max_attempts + 1):
         try:
-            with connect() as conn:
-                return fetch_rows(conn)
-        except pyodbc.Error as e:
-            sqlstate = e.args[0] if e.args else ""
-            throttle = "24801" in str(e)
+            return rows_from_orders(fetch_orders())
+        except Exception as e:
             if attempt == max_attempts:
-                print(f"[fabric] falha definitiva apos {attempt} tentativas: {e}",
+                print(f"[api] falha definitiva apos {attempt} tentativas: {e}",
                       file=sys.stderr)
                 raise
-            motivo = "capacidade estourada (24801)" if throttle else f"erro {sqlstate}"
-            print(f"[fabric] {motivo} (tentativa {attempt}/{max_attempts}); "
-                  f"aguardando {delay}s e reconectando...", file=sys.stderr)
+            print(f"[api] erro '{e}' (tentativa {attempt}/{max_attempts}); "
+                  f"aguardando {delay}s...", file=sys.stderr)
             time.sleep(delay)
-            delay = min(delay * 2, 300)
+            delay = min(delay * 2, 120)
     raise RuntimeError("unreachable")
 
 

@@ -2,8 +2,8 @@ name: Atualizar Relatorio StarkBank VestiPago
 
 on:
   schedule:
-    - cron: '0 7 * * *'    # 04:00 BRT: run COMPLETO (CR via API Vesti + CP)
-    - cron: '0 */3 * * *'  # a cada 3h: SO CP (Fabric). NAO toca a API/banco da Vesti
+    - cron: '0 7 * * *'    # 04:00 BRT: run COMPLETO (CR + CP, ambos API Vesti)
+    - cron: '0 */6 * * *'  # a cada 6h: SO CP (API orders-paylinks, ~4min)
   workflow_dispatch:
     inputs:
       reason:
@@ -11,7 +11,7 @@ on:
         required: false
         default: 'manual'
       somente_fabric:
-        description: 'Modo rapido: atualiza so CP/Antecipacao (Fabric, ~1min). Pula o fetcher de Faturas da API Vesti (~22min).'
+        description: 'Modo rapido: atualiza so o CP (API orders-paylinks, ~4min). Pula o CR/Faturas (~22min). (nome historico)'
         type: boolean
         required: false
         default: false
@@ -40,17 +40,15 @@ jobs:
       - name: Instalar dependencias Python
         run: pip install pyodbc
 
-      - name: Rodar fetcher StarkBank (Fabric)
-        # Fabric (CP) pode falhar por throttling da capacidade F2 (24801). Nao
-        # deve abortar o job: o CR (fetch_invoices, 100% API) e o commit precisam
-        # rodar mesmo assim. Quando o Fabric falha, dados.js fica como esta e so
-        # o invoices.js e atualizado/commitado.
+      - name: Rodar fetcher StarkBank (CP - API Vesti)
+        # CP agora vem da API Vesti (orders-paylinks, payment.receivables
+        # completo) — NAO mais do espelho Fabric, que vinha em ~46% do real.
+        # continue-on-error: se a API do CP falhar, nao deve abortar o job; o CR
+        # e o commit ainda rodam (dados.js so fica como esta).
         continue-on-error: true
         working-directory: relatoriostarkbank
         env:
-          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+          VESTI_ORDER_TOKEN: ${{ secrets.VESTI_ORDER_TOKEN }}
         run: python fetch_data.py
 
       - name: Rodar fetcher Faturas (API Vesti)
@@ -68,14 +66,11 @@ jobs:
           python fetch_invoices.py
           touch "$GITHUB_WORKSPACE/.cr_updated"
 
-      - name: Reconciliar antecipacao real (dados.js x invoices.js)
-        # A classificacao do Mongo e por pedido; o Stark antecipa por parcela
-        # (tag contract-chunk). Este passo move pro fluxo as parcelas que NAO
-        # foram antecipadas de fato, corrigindo o CP Fluxo (subestimado) e o
-        # CP Antecipacao (inflado). Roda nos dois modos: usa o invoices.js fresco
-        # no run completo, ou o ja existente no repo no modo rapido.
-        working-directory: relatoriostarkbank
-        run: python enrich_antecipacao_real.py
+      # (removido) "Reconciliar antecipacao real": era um remendo da era Fabric
+      # pra corrigir a classificacao Fluxo/Antecipacao. Agora o CP ja vem da API
+      # com antecipationValue por parcela, e o build() classifica direto
+      # (antecipationValue > 0 = antecipado). enrich_antecipacao_real.py fica no
+      # repo como referencia, mas nao roda mais no workflow.
 
       - name: Rodar fetcher Cancelados (Fabric)
         # Tambem Fabric: nao deve abortar o job nem o commit (ver fetcher acima).
