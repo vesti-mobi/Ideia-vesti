@@ -2,8 +2,7 @@ name: Atualizar Relatorio StarkBank VestiPago
 
 on:
   schedule:
-    - cron: '0 7 * * *'    # 04:00 BRT: run COMPLETO (CR + CP, ambos API Vesti)
-    - cron: '0 */6 * * *'  # a cada 6h: SO CP (API orders-paylinks, ~4min)
+    - cron: '0 7 * * *'    # 04:00 BRT: run COMPLETO 1x/dia (CR + CP, ambos API Vesti)
   workflow_dispatch:
     inputs:
       reason:
