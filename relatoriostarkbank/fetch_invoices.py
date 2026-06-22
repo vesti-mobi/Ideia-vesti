@@ -243,23 +243,30 @@ def write_warehouse(faturas: list[dict]) -> None:
     except Exception as e:
         print(f"[warehouse] skip (connect): {e}", file=sys.stderr)
         return
-    cur = conn.cursor()
-    cur.execute(DDL_PURCHASES)
-    cur.execute(DDL_INSTALLMENTS)
-    conn.commit()
-    snap = datetime.now(timezone.utc)
-    p_rows = [row_purchase(f, snap) for f in faturas if f.get("purchase")]
-    i_rows = []
-    for f in faturas:
-        insts = sorted((f.get("purchase") or {}).get("installments") or [],
-                       key=lambda x: x.get("due") or "")
-        for n, inst in enumerate(insts, start=1):
-            i_rows.append(row_installment(inst, snap, n))
-    print(f"[warehouse] upsert {len(p_rows)} purchases, {len(i_rows)} installments")
-    upsert(conn, "starkbank_purchases", COLS_PURCHASES, p_rows, "purchase_id")
-    upsert(conn, "starkbank_installments", COLS_INSTALLMENTS, i_rows, "installment_id")
-    conn.close()
-    print("[warehouse] ok")
+    # A escrita no warehouse e best-effort (snapshot lateral). Se a capacidade
+    # F2 estourar (24801) no meio do MERGE, NAO pode derrubar o fetch_invoices:
+    # o invoices.js (CR) ja foi escrito antes desta funcao e precisa ser
+    # commitado. Por isso engolimos qualquer erro do Fabric aqui.
+    try:
+        cur = conn.cursor()
+        cur.execute(DDL_PURCHASES)
+        cur.execute(DDL_INSTALLMENTS)
+        conn.commit()
+        snap = datetime.now(timezone.utc)
+        p_rows = [row_purchase(f, snap) for f in faturas if f.get("purchase")]
+        i_rows = []
+        for f in faturas:
+            insts = sorted((f.get("purchase") or {}).get("installments") or [],
+                           key=lambda x: x.get("due") or "")
+            for n, inst in enumerate(insts, start=1):
+                i_rows.append(row_installment(inst, snap, n))
+        print(f"[warehouse] upsert {len(p_rows)} purchases, {len(i_rows)} installments")
+        upsert(conn, "starkbank_purchases", COLS_PURCHASES, p_rows, "purchase_id")
+        upsert(conn, "starkbank_installments", COLS_INSTALLMENTS, i_rows, "installment_id")
+        conn.close()
+        print("[warehouse] ok")
+    except Exception as e:
+        print(f"[warehouse] skip (escrita falhou, CR nao afetado): {e}", file=sys.stderr)
 
 
 def load_enrichment_from_dados() -> tuple[dict, dict]:
