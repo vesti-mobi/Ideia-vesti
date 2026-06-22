@@ -56,8 +56,8 @@ def connect():
     print('ERRO: sem auth', file=sys.stderr); sys.exit(1)
 
 
-def _fetch_valores(oids, max_attempts: int = 4) -> dict:
-    delay = 15
+def _fetch_valores(oids, max_attempts: int = 6) -> dict:
+    delay = 30
     for attempt in range(1, max_attempts + 1):
         valores = {}
         try:
@@ -90,13 +90,15 @@ def _fetch_valores(oids, max_attempts: int = 4) -> dict:
             return valores
         except pyodbc.Error as e:
             sqlstate = e.args[0] if e.args else ''
+            throttle = '24801' in str(e)
             if attempt == max_attempts:
                 print(f'[fabric] falha definitiva apos {attempt} tentativas: {e}', file=sys.stderr)
                 raise
-            print(f'[fabric] erro {sqlstate} (tentativa {attempt}/{max_attempts}); '
+            motivo = 'capacidade estourada (24801)' if throttle else f'erro {sqlstate}'
+            print(f'[fabric] {motivo} (tentativa {attempt}/{max_attempts}); '
                   f'aguardando {delay}s e reconectando...', file=sys.stderr)
             time.sleep(delay)
-            delay *= 2
+            delay = min(delay * 2, 300)
     raise RuntimeError('unreachable')
 
 

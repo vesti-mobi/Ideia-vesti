@@ -472,25 +472,30 @@ def build(raw: list[dict]) -> dict:
     }
 
 
-def _fetch_with_retry(max_attempts: int = 4) -> list[dict]:
-    """Abre conexao e roda a query. O endpoint SQL do Fabric derruba o link de
-    forma intermitente (08S01 'Communication link failure'), entao tentamos
-    novamente com backoff em vez de deixar o run inteiro falhar."""
-    delay = 15
+def _fetch_with_retry(max_attempts: int = 6) -> list[dict]:
+    """Abre conexao e roda a query. O endpoint SQL do Fabric falha de forma
+    intermitente por dois motivos: 08S01 'Communication link failure' e, na
+    capacidade F2 (2 CUs), 24801 'compute capacity exceeded its limits' quando
+    a capacidade esta saturada por outros jobs. Em ambos os casos tentamos de
+    novo com backoff longo (ate ~13min) pra atravessar a janela de throttling
+    em vez de deixar o run inteiro morrer em ~100s."""
+    delay = 30
     for attempt in range(1, max_attempts + 1):
         try:
             with connect() as conn:
                 return fetch_rows(conn)
         except pyodbc.Error as e:
             sqlstate = e.args[0] if e.args else ""
+            throttle = "24801" in str(e)
             if attempt == max_attempts:
                 print(f"[fabric] falha definitiva apos {attempt} tentativas: {e}",
                       file=sys.stderr)
                 raise
-            print(f"[fabric] erro {sqlstate} (tentativa {attempt}/{max_attempts}); "
+            motivo = "capacidade estourada (24801)" if throttle else f"erro {sqlstate}"
+            print(f"[fabric] {motivo} (tentativa {attempt}/{max_attempts}); "
                   f"aguardando {delay}s e reconectando...", file=sys.stderr)
             time.sleep(delay)
-            delay *= 2
+            delay = min(delay * 2, 300)
     raise RuntimeError("unreachable")
 
 

@@ -2,7 +2,7 @@ name: Atualizar Relatorio StarkBank VestiPago
 
 on:
   schedule:
-    - cron: '0 * * * *'  # de hora em hora
+    - cron: '0 */3 * * *'  # a cada 3h (reduz carga na capacidade F2 do Fabric)
   workflow_dispatch:
     inputs:
       reason:
