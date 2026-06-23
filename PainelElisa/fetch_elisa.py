@@ -16,8 +16,11 @@ from __future__ import annotations
 
 import json
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
+
+import pyodbc
 
 from _fetch_fabric_base import connect, load_config
 
@@ -463,15 +466,51 @@ def build_reativacao(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict
     return out
 
 
+# Fabric derruba a conexao de forma intermitente (08S01 Communication link
+# failure). Sem retry o run morre e o painel nao atualiza no dia. Reconecta e
+# refaz TODAS as queries do zero (a conexao morta nao e reaproveitavel).
+TRANSIENT_SQLSTATES = {"08S01", "08001", "08003", "HYT00", "HYT01", "40001", "40197", "40613"}
+MAX_TENTATIVAS = 4
+BACKOFF_BASE_S = 15
+
+
+def _eh_transitorio(err: Exception) -> bool:
+    sqlstate = getattr(err, "args", [None])[0]
+    if sqlstate in TRANSIENT_SQLSTATES:
+        return True
+    msg = str(err).lower()
+    return "communication link failure" in msg or "timeout" in msg
+
+
+def coletar_do_fabric(cfg: dict) -> tuple[list, list, list, list, list, list]:
+    """connect + todas as queries, com retry/backoff em falha transitoria do Fabric."""
+    ultima_exc: Exception | None = None
+    for tentativa in range(1, MAX_TENTATIVAS + 1):
+        try:
+            with connect(cfg) as conn:
+                emp_rows    = run_query(conn, SQL_EMPRESAS, "empresas Elisa/Jenny")
+                gmv_rows    = run_query(conn, SQL_GMV, "GMV diario")
+                prod_rows   = run_query(conn, SQL_PRODUTOS, "qtd produtos por dominio")
+                pp_rows     = run_query(conn, SQL_PRIMEIRO_PEDIDO, "primeiro pedido cadastrado")
+                reativ_rows = run_query(conn, SQL_REATIVACAO, "reativacoes (fatura paga atrasada)")
+                links_rows  = run_query(conn, SQL_LINKS, "links/cliques compartilhados")
+            return emp_rows, gmv_rows, prod_rows, pp_rows, reativ_rows, links_rows
+        except pyodbc.Error as e:
+            ultima_exc = e
+            if tentativa >= MAX_TENTATIVAS or not _eh_transitorio(e):
+                raise
+            espera = BACKOFF_BASE_S * tentativa
+            print(f"[fabric] falha transitoria ({e.args[0] if e.args else e}); "
+                  f"tentativa {tentativa}/{MAX_TENTATIVAS}, reconectando em {espera}s ...",
+                  file=sys.stderr, flush=True)
+            time.sleep(espera)
+    assert ultima_exc is not None
+    raise ultima_exc
+
+
 def main() -> None:
     cfg = load_config()
-    with connect(cfg) as conn:
-        emp_rows    = run_query(conn, SQL_EMPRESAS, "empresas Elisa/Jenny")
-        gmv_rows    = run_query(conn, SQL_GMV, "GMV diario")
-        prod_rows   = run_query(conn, SQL_PRODUTOS, "qtd produtos por dominio")
-        pp_rows     = run_query(conn, SQL_PRIMEIRO_PEDIDO, "primeiro pedido cadastrado")
-        reativ_rows = run_query(conn, SQL_REATIVACAO, "reativacoes (fatura paga atrasada)")
-        links_rows  = run_query(conn, SQL_LINKS, "links/cliques compartilhados")
+    emp_rows, gmv_rows, prod_rows, pp_rows, reativ_rows, links_rows = coletar_do_fabric(cfg)
 
     empresas = build_empresas(emp_rows)
     OUT_COMPANIES.write_text(json.dumps(empresas, ensure_ascii=False, indent=2), encoding="utf-8")
