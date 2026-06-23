@@ -1,30 +1,46 @@
-"""Diagnostico de cobertura: vestipago_transaction_detail (fonte alternativa)."""
+"""Diagnostico: cobertura historica de recebiveis em MongoDB_Pedidos_Geral.
+
+Responde: ate onde (ano) cada provider tem os campos payment_receivables_*
+preenchidos, pra saber se da pra montar loan tape desde 2023.
+"""
 import fetch_data
 
 conn = fetch_data.connect()
 cur = conn.cursor()
 
-print("=== vestipago_transaction_detail ===", flush=True)
+print("=== Pedidos_Geral: provider x ano x preenchimento de recebivel ===", flush=True)
 cur.execute("""
-SELECT MIN(paidAt_ts) AS min_paid, MAX(paidAt_ts) AS max_paid,
-       MIN(createdAt_ts) AS min_created, MAX(createdAt_ts) AS max_created,
-       COUNT(*) AS total
-FROM dbo.vestipago_transaction_detail
+SELECT
+  payment_transaction_provider AS provider,
+  YEAR(DATEADD(HOUR,-3,TRY_CAST(settings_createdAt_TIMESTAMP AS DATETIME2))) AS ano,
+  COUNT(*) AS pedidos,
+  SUM(CASE WHEN payment_receivables_grossValue IS NOT NULL AND CAST(payment_receivables_grossValue AS NVARCHAR(50))<>'' THEN 1 ELSE 0 END) AS com_gross,
+  SUM(CASE WHEN payment_receivables_paidAt IS NOT NULL AND CAST(payment_receivables_paidAt AS NVARCHAR(50))<>'' THEN 1 ELSE 0 END) AS com_recPaid,
+  SUM(CASE WHEN payment_receivables_dueAt IS NOT NULL AND CAST(payment_receivables_dueAt AS NVARCHAR(50))<>'' THEN 1 ELSE 0 END) AS com_due,
+  SUM(CASE WHEN payment_paidAt IS NOT NULL AND CAST(payment_paidAt AS NVARCHAR(50))<>'' THEN 1 ELSE 0 END) AS com_orderPaid
+FROM dbo.MongoDB_Pedidos_Geral
+GROUP BY payment_transaction_provider,
+         YEAR(DATEADD(HOUR,-3,TRY_CAST(settings_createdAt_TIMESTAMP AS DATETIME2)))
+ORDER BY provider, ano
 """)
+rows = cur.fetchall()
 cols = [d[0] for d in cur.description]
-print("RESUMO:", dict(zip(cols, cur.fetchone())), flush=True)
+print(" | ".join(cols), flush=True)
+for r in rows:
+    print(" | ".join(str(x) for x in r), flush=True)
 
+print("\n=== range global settings_createdAt ===", flush=True)
 cur.execute("""
-SELECT paid_month, COUNT(*) AS qt
-FROM dbo.vestipago_transaction_detail
-WHERE paid_month IS NOT NULL
-GROUP BY paid_month ORDER BY paid_month
+SELECT MIN(DATEADD(HOUR,-3,TRY_CAST(settings_createdAt_TIMESTAMP AS DATETIME2))),
+       MAX(DATEADD(HOUR,-3,TRY_CAST(settings_createdAt_TIMESTAMP AS DATETIME2))),
+       COUNT(*)
+FROM dbo.MongoDB_Pedidos_Geral
 """)
-print("POR MES (paid_month):", flush=True)
+print(cur.fetchone(), flush=True)
+
+print("\n=== payment_method distribuicao (todos providers) ===", flush=True)
+cur.execute("SELECT payment_method, COUNT(*) FROM dbo.MongoDB_Pedidos_Geral GROUP BY payment_method ORDER BY 2 DESC")
 for r in cur.fetchall():
     print(f"  {r[0]}: {r[1]}", flush=True)
 
-# distintos method
-cur.execute("SELECT method, COUNT(*) FROM dbo.vestipago_transaction_detail GROUP BY method")
-print("METHODS:", [(r[0], r[1]) for r in cur.fetchall()], flush=True)
 conn.close()
