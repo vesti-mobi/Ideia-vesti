@@ -57,19 +57,20 @@ HEADER = [
 # migracao de processador). A tabela mongodb_pedidos_recebiveis (1 linha/parcela)
 # so tem janela recente (~2 meses) e so STARKBANK, por isso NAO e usada aqui — usar
 # Pedidos_Geral garante o historico inteiro com grao uniforme (1 recebivel/pedido).
-# Filtro pela Data da Aquisicao (receivables.paidAt, convertido p/ BRT) >= corte.
+# Versao SIMPLES: igual esta no datalake, sem conversao de fuso e sem hora —
+# datas so como DATE e valores crus. Filtro pela Data da Aquisicao (paidAt) >= corte.
 SQL = f"""
 WITH base AS (
     SELECT
-        DATEADD(HOUR, -3, TRY_CAST(p.payment_receivables_paidAt AS DATETIME2)) AS data_aquisicao,
-        TRY_CAST(p.payment_receivables_grossValue AS FLOAT)                    AS valor_aquisicao,
-        DATEADD(HOUR, -3, TRY_CAST(p.payment_receivables_dueAt AS DATETIME2))  AS data_vencimento,
+        CAST(p.payment_receivables_paidAt AS DATE) AS data_aquisicao,
+        p.payment_receivables_grossValue           AS valor_aquisicao,
+        CAST(p.payment_receivables_dueAt AS DATE)  AS data_vencimento,
         ( COALESCE(TRY_CAST(p.payment_receivables_vestiPagoValue   AS FLOAT), 0)
         + COALESCE(TRY_CAST(p.payment_receivables_antifraudValue   AS FLOAT), 0)
         + COALESCE(TRY_CAST(p.payment_receivables_antecipationValue AS FLOAT), 0) ) AS valor_nominal,
-        TRY_CAST(p.payment_receivables_netValue AS FLOAT)                      AS valor_pgto_recebido,
-        p.companyId                                                            AS sacado,
-        p.payment_method                                                       AS tipo_pagamento
+        p.payment_receivables_netValue             AS valor_pgto_recebido,
+        p.companyId                                AS sacado,
+        p.payment_method                           AS tipo_pagamento
     FROM dbo.MongoDB_Pedidos_Geral p
     WHERE p.payment_transaction_provider IN ('IUGU', 'Iugu', 'STARKBANK')
       AND p.payment_receivables_grossValue IS NOT NULL
