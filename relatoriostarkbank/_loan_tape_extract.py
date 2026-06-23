@@ -52,27 +52,14 @@ HEADER = [
     "Produto",
 ]
 
-# Fonte: mongodb_pedidos_recebiveis (1 linha/parcela) UNION pedidos ainda nao
-# espelhados em recebiveis (so existem em Pedidos_Geral). STARKBANK = VestiPago.
-# Filtro pela Data da Aquisicao (receivables.paidAt, em BRT) >= corte.
+# Fonte: MongoDB_Pedidos_Geral (1 linha por pedido, historico completo desde 2023).
+# Os recebiveis VestiPago vivem sob provider IUGU (2023->2026) e STARKBANK (2026->;
+# migracao de processador). A tabela mongodb_pedidos_recebiveis (1 linha/parcela)
+# so tem janela recente (~2 meses) e so STARKBANK, por isso NAO e usada aqui — usar
+# Pedidos_Geral garante o historico inteiro com grao uniforme (1 recebivel/pedido).
+# Filtro pela Data da Aquisicao (receivables.paidAt, convertido p/ BRT) >= corte.
 SQL = f"""
 WITH base AS (
-    SELECT
-        DATEADD(HOUR, -3, TRY_CAST(r.payment_receivables_paidAt AS DATETIME2)) AS data_aquisicao,
-        TRY_CAST(r.payment_receivables_grossValue AS FLOAT)                    AS valor_aquisicao,
-        DATEADD(HOUR, -3, TRY_CAST(r.payment_receivables_dueAt AS DATETIME2))  AS data_vencimento,
-        ( COALESCE(TRY_CAST(r.payment_receivables_vestiPagoValue   AS FLOAT), 0)
-        + COALESCE(TRY_CAST(r.payment_receivables_antifraudValue   AS FLOAT), 0)
-        + COALESCE(TRY_CAST(r.payment_receivables_antecipationValue AS FLOAT), 0) ) AS valor_nominal,
-        TRY_CAST(r.payment_receivables_netValue AS FLOAT)                      AS valor_pgto_recebido,
-        r.companyId                                                            AS sacado,
-        r.payment_method                                                       AS tipo_pagamento
-    FROM dbo.mongodb_pedidos_recebiveis r
-    WHERE r.payment_transaction_provider = 'STARKBANK'
-
-    UNION ALL
-
-    -- Pedidos STARKBANK que ainda nao foram copiados pra recebiveis
     SELECT
         DATEADD(HOUR, -3, TRY_CAST(p.payment_receivables_paidAt AS DATETIME2)) AS data_aquisicao,
         TRY_CAST(p.payment_receivables_grossValue AS FLOAT)                    AS valor_aquisicao,
@@ -84,8 +71,8 @@ WITH base AS (
         p.companyId                                                            AS sacado,
         p.payment_method                                                       AS tipo_pagamento
     FROM dbo.MongoDB_Pedidos_Geral p
-    WHERE p.payment_transaction_provider = 'STARKBANK'
-      AND p._id NOT IN (SELECT DISTINCT _id FROM dbo.mongodb_pedidos_recebiveis)
+    WHERE p.payment_transaction_provider IN ('IUGU', 'Iugu', 'STARKBANK')
+      AND p.payment_receivables_grossValue IS NOT NULL
 )
 SELECT
     data_aquisicao        AS [Data da Aquisição],
