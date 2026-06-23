@@ -25,6 +25,14 @@ jobs:
       - name: Instalar dependencias Python
         run: pip install pyodbc
 
+      - name: Diagnostico de cobertura (Fabric)
+        working-directory: relatoriostarkbank
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+        run: python _loan_tape_diag.py
+
       - name: Extrair Loan Tape (Fabric)
         working-directory: relatoriostarkbank
         env:
