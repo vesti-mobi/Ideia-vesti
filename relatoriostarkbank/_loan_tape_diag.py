@@ -1,36 +1,30 @@
-"""Diagnostico de cobertura de datas em mongodb_pedidos_recebiveis (STARKBANK)."""
-import sys
+"""Diagnostico de cobertura: vestipago_transaction_detail (fonte alternativa)."""
 import fetch_data
-
-SQL = """
-SELECT
-    MIN(DATEADD(HOUR,-3,TRY_CAST(payment_receivables_paidAt AS DATETIME2))) AS min_paid,
-    MAX(DATEADD(HOUR,-3,TRY_CAST(payment_receivables_paidAt AS DATETIME2))) AS max_paid,
-    MIN(DATEADD(HOUR,-3,TRY_CAST(payment_receivables_dueAt  AS DATETIME2))) AS min_due,
-    MAX(DATEADD(HOUR,-3,TRY_CAST(payment_receivables_dueAt  AS DATETIME2))) AS max_due,
-    COUNT(*) AS total,
-    SUM(CASE WHEN payment_receivables_paidAt IS NULL OR payment_receivables_paidAt='' THEN 1 ELSE 0 END) AS sem_paid
-FROM dbo.mongodb_pedidos_recebiveis
-WHERE payment_transaction_provider='STARKBANK'
-"""
-
-SQL_MES = """
-SELECT FORMAT(DATEADD(HOUR,-3,TRY_CAST(payment_receivables_paidAt AS DATETIME2)),'yyyy-MM') AS mes,
-       COUNT(*) AS qt
-FROM dbo.mongodb_pedidos_recebiveis
-WHERE payment_transaction_provider='STARKBANK'
-  AND payment_receivables_paidAt IS NOT NULL AND payment_receivables_paidAt<>''
-GROUP BY FORMAT(DATEADD(HOUR,-3,TRY_CAST(payment_receivables_paidAt AS DATETIME2)),'yyyy-MM')
-ORDER BY mes
-"""
 
 conn = fetch_data.connect()
 cur = conn.cursor()
-cur.execute(SQL)
+
+print("=== vestipago_transaction_detail ===", flush=True)
+cur.execute("""
+SELECT MIN(paidAt_ts) AS min_paid, MAX(paidAt_ts) AS max_paid,
+       MIN(createdAt_ts) AS min_created, MAX(createdAt_ts) AS max_created,
+       COUNT(*) AS total
+FROM dbo.vestipago_transaction_detail
+""")
 cols = [d[0] for d in cur.description]
 print("RESUMO:", dict(zip(cols, cur.fetchone())), flush=True)
-cur.execute(SQL_MES)
-print("POR MES (paidAt):", flush=True)
+
+cur.execute("""
+SELECT paid_month, COUNT(*) AS qt
+FROM dbo.vestipago_transaction_detail
+WHERE paid_month IS NOT NULL
+GROUP BY paid_month ORDER BY paid_month
+""")
+print("POR MES (paid_month):", flush=True)
 for r in cur.fetchall():
     print(f"  {r[0]}: {r[1]}", flush=True)
+
+# distintos method
+cur.execute("SELECT method, COUNT(*) FROM dbo.vestipago_transaction_detail GROUP BY method")
+print("METHODS:", [(r[0], r[1]) for r in cur.fetchall()], flush=True)
 conn.close()
