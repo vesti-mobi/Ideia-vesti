@@ -99,8 +99,8 @@ TRANSIENT = {"08S01", "08001", "08003", "HYT00", "HYT01", "40001", "40197", "406
 def _fmt(v):
     if v is None:
         return ""
-    if hasattr(v, "isoformat"):
-        return v.isoformat(sep=" ")
+    if hasattr(v, "isoformat"):       # date -> 'YYYY-MM-DD'
+        return v.isoformat()
     if isinstance(v, float):
         return f"{v:.2f}"
     return str(v)
