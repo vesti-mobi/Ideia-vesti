@@ -909,7 +909,7 @@
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
-    "temFreteAtivo": false
+    "temFreteAtivo": true
   },
   "612832": {
     "temVPAtivo": false,
@@ -967,7 +967,7 @@
   },
   "662705": {
     "temVPAtivo": true,
-    "temPixAtivo": false,
+    "temPixAtivo": true,
     "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
@@ -2023,7 +2023,7 @@
   },
   "1433479": {
     "temVPAtivo": true,
-    "temPixAtivo": false,
+    "temPixAtivo": true,
     "temCartaoAtivo": true,
     "temFreteAtivo": true
   },
@@ -2985,7 +2985,7 @@
     "temVPAtivo": false,
     "temPixAtivo": false,
     "temCartaoAtivo": false,
-    "temFreteAtivo": true
+    "temFreteAtivo": false
   },
   "1771336": {
     "temVPAtivo": true,
