@@ -1723,7 +1723,7 @@ window.CNPJ_MARCAS = (function(){
         "aero summer um":                                    "AERO SUMMER BRASIL LTDA",
         "ttng matriz":                                       "TAUNTING BRAND COMERCIO E VAREJO LTDA",
         "b.w. multi services":                               "B.W MULTI SERVICES LTDA",
-        "ce moda fem":                                       "FABIO GUERRA DOS SANTOS",
+        "ce moda fem":                                       "052.436.267-08",
         "bem me quer":                                       "E.T.LEE CONFECCOES",
         "ag moda":                                           "A.G.S Meias LTDA",
         "rery matriz":                                       "SAVASSI MODAS LTDA",
