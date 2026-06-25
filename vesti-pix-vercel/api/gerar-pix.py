@@ -85,11 +85,16 @@ def _criar_customer(token, nome, email, cpf):
 
 
 def _criar_assinatura(token, customer_id, plano, frequencia_ap, contract_number):
+    # expires_at longe no futuro: sem isso a Iugu cria a subscription com
+    # expires_at = hoje, ela "morre" no dia da criacao e nunca cicla, entao a
+    # recorrencia nunca e cobrada (mesmo bug ja corrigido no Streamlit).
+    expires_at = (date.today() + timedelta(days=365 * 5)).isoformat()
     payload = {
         "customer_id": customer_id,
         "plan_identifier": plano,
         "only_on_charge_success": False,
         "payable_with": "pix",
+        "expires_at": expires_at,
         "automatic_pix": {
             "journey": 3,
             "frequency": frequencia_ap,
