@@ -1814,6 +1814,22 @@
     "qtProdutos1oMes": 13,
     "primeiroPedidoCadastrado": "2024-01-18"
   },
+  "1448023": {
+    "qtProdutos": 80,
+    "produtosPorMes": {
+      "2025-03": 12,
+      "2025-05": 13,
+      "2025-04": 11,
+      "2024-11": 1,
+      "2025-06": 5,
+      "2025-02": 7,
+      "2025-01": 31
+    },
+    "primeiroCadastroProduto": "2024-11-22T15:34:32",
+    "primeiroMes": "2024-11",
+    "qtProdutos1oMes": 1,
+    "primeiroPedidoCadastrado": "2025-01-21"
+  },
   "456553": {
     "qtProdutos": 520,
     "produtosPorMes": {
@@ -2539,45 +2555,6 @@
     "primeiroMes": "2024-01",
     "qtProdutos1oMes": 31,
     "primeiroPedidoCadastrado": "2024-01-03"
-  },
-  "202785": {
-    "qtProdutos": 1071,
-    "produtosPorMes": {
-      "2024-03": 66,
-      "2024-12": 34,
-      "2026-01": 14,
-      "2024-02": 32,
-      "2025-01": 22,
-      "2025-06": 45,
-      "2026-03": 27,
-      "2025-02": 52,
-      "2024-05": 50,
-      "2024-01": 34,
-      "2026-06": 3,
-      "2025-08": 25,
-      "2024-08": 48,
-      "2024-11": 43,
-      "2025-09": 26,
-      "2024-10": 54,
-      "2024-06": 60,
-      "2026-02": 14,
-      "2025-10": 45,
-      "2025-03": 46,
-      "2025-12": 5,
-      "2025-07": 9,
-      "2025-04": 47,
-      "2024-09": 55,
-      "2025-11": 31,
-      "2025-05": 52,
-      "2026-04": 29,
-      "2024-07": 50,
-      "2024-04": 46,
-      "2026-05": 7
-    },
-    "primeiroCadastroProduto": "2024-01-09T19:08:37",
-    "primeiroMes": "2024-01",
-    "qtProdutos1oMes": 34,
-    "primeiroPedidoCadastrado": "2024-01-08"
   },
   "145706": {
     "qtProdutos": 4022,
@@ -7562,41 +7539,6 @@
     "qtProdutos1oMes": 2,
     "primeiroPedidoCadastrado": "2024-06-06"
   },
-  "236945": {
-    "qtProdutos": 304,
-    "produtosPorMes": {
-      "2025-11": 5,
-      "2025-05": 16,
-      "2026-06": 4,
-      "2024-04": 1,
-      "2024-10": 19,
-      "2024-09": 13,
-      "2026-04": 12,
-      "2025-02": 17,
-      "2025-09": 12,
-      "2025-04": 11,
-      "2024-03": 24,
-      "2026-01": 4,
-      "2025-07": 11,
-      "2025-03": 11,
-      "2025-06": 18,
-      "2024-11": 27,
-      "2024-08": 34,
-      "2024-01": 2,
-      "2025-08": 14,
-      "2026-02": 7,
-      "2024-02": 7,
-      "2026-03": 9,
-      "2026-05": 4,
-      "2025-10": 19,
-      "2024-05": 2,
-      "2025-01": 1
-    },
-    "primeiroCadastroProduto": "2024-01-30T08:50:02",
-    "primeiroMes": "2024-01",
-    "qtProdutos1oMes": 2,
-    "primeiroPedidoCadastrado": "2024-01-05"
-  },
   "764832": {
     "qtProdutos": 452,
     "produtosPorMes": {
@@ -7822,19 +7764,6 @@
     "primeiroMes": "2024-01",
     "qtProdutos1oMes": 16,
     "primeiroPedidoCadastrado": "2024-01-05"
-  },
-  "1997801": {
-    "qtProdutos": 125,
-    "produtosPorMes": {
-      "2026-05": 74,
-      "2026-06": 37,
-      "2026-03": 10,
-      "2026-04": 4
-    },
-    "primeiroCadastroProduto": "2026-03-27T17:17:21",
-    "primeiroMes": "2026-03",
-    "qtProdutos1oMes": 10,
-    "primeiroPedidoCadastrado": "2026-03-31"
   },
   "117175": {
     "qtProdutos": 1391,
@@ -8610,25 +8539,6 @@
     "qtProdutos1oMes": 24,
     "primeiroPedidoCadastrado": "2024-07-25"
   },
-  "1763152": {
-    "qtProdutos": 103,
-    "produtosPorMes": {
-      "2026-05": 5,
-      "2025-12": 4,
-      "2026-02": 7,
-      "2026-04": 1,
-      "2026-03": 5,
-      "2025-09": 15,
-      "2026-01": 3,
-      "2025-10": 57,
-      "2025-11": 5,
-      "2026-06": 1
-    },
-    "primeiroCadastroProduto": "2025-09-05T17:25:54",
-    "primeiroMes": "2025-09",
-    "qtProdutos1oMes": 15,
-    "primeiroPedidoCadastrado": "2025-09-05"
-  },
   "1791824": {
     "qtProdutos": 8,
     "produtosPorMes": {
@@ -9177,39 +9087,6 @@
     "primeiroMes": "2025-03",
     "qtProdutos1oMes": 7,
     "primeiroPedidoCadastrado": "2025-03-25"
-  },
-  "1081260": {
-    "qtProdutos": 108,
-    "produtosPorMes": {
-      "2026-04": 2,
-      "2024-12": 2,
-      "2025-12": 2,
-      "2026-05": 3,
-      "2026-01": 3,
-      "2025-08": 1,
-      "2025-10": 2,
-      "2024-11": 3,
-      "2025-02": 4,
-      "2025-09": 5,
-      "2024-10": 13,
-      "2024-06": 9,
-      "2025-05": 5,
-      "2024-01": 4,
-      "2025-11": 4,
-      "2026-06": 1,
-      "2025-04": 2,
-      "2026-02": 2,
-      "2025-01": 9,
-      "2025-03": 8,
-      "2024-09": 17,
-      "2026-03": 3,
-      "2025-07": 3,
-      "2025-06": 1
-    },
-    "primeiroCadastroProduto": "2024-01-16T14:57:47",
-    "primeiroMes": "2024-01",
-    "qtProdutos1oMes": 4,
-    "primeiroPedidoCadastrado": "2024-03-08"
   },
   "166943": {
     "qtProdutos": 1221,
@@ -10353,37 +10230,6 @@
     "qtProdutos1oMes": 54,
     "primeiroPedidoCadastrado": "2025-05-03"
   },
-  "268016": {
-    "qtProdutos": 885,
-    "produtosPorMes": {
-      "2024-12": 14,
-      "2024-11": 51,
-      "2024-06": 5,
-      "2025-01": 24,
-      "2024-09": 37,
-      "2024-07": 53,
-      "2025-03": 81,
-      "2026-06": 6,
-      "2025-02": 12,
-      "2024-04": 52,
-      "2024-02": 67,
-      "2024-05": 23,
-      "2026-03": 139,
-      "2025-06": 45,
-      "2024-10": 30,
-      "2025-05": 57,
-      "2024-03": 59,
-      "2025-04": 44,
-      "2026-05": 23,
-      "2026-04": 26,
-      "2024-08": 23,
-      "2024-01": 14
-    },
-    "primeiroCadastroProduto": "2024-01-31T13:58:19",
-    "primeiroMes": "2024-01",
-    "qtProdutos1oMes": 14,
-    "primeiroPedidoCadastrado": "2024-01-05"
-  },
   "299159": {
     "qtProdutos": 409,
     "produtosPorMes": {
@@ -10895,6 +10741,19 @@
     "qtProdutos1oMes": 22,
     "primeiroPedidoCadastrado": "2024-01-10"
   },
+  "1982744": {
+    "qtProdutos": 155,
+    "produtosPorMes": {
+      "2026-04": 42,
+      "2026-06": 5,
+      "2026-05": 70,
+      "2026-03": 38
+    },
+    "primeiroCadastroProduto": "2026-03-12T20:08:31",
+    "primeiroMes": "2026-03",
+    "qtProdutos1oMes": 38,
+    "primeiroPedidoCadastrado": "2026-03-19"
+  },
   "1418487": {
     "qtProdutos": 126,
     "produtosPorMes": {
@@ -11121,6 +10980,18 @@
     "qtProdutos1oMes": 8,
     "primeiroPedidoCadastrado": "2026-03-12"
   },
+  "1853374": {
+    "qtProdutos": 58,
+    "produtosPorMes": {
+      "2025-12": 3,
+      "2025-11": 51,
+      "2026-04": 4
+    },
+    "primeiroCadastroProduto": "2025-11-08T23:58:47",
+    "primeiroMes": "2025-11",
+    "qtProdutos1oMes": 51,
+    "primeiroPedidoCadastrado": "2025-11-09"
+  },
   "2067207": {
     "qtProdutos": 21,
     "produtosPorMes": {
@@ -11224,20 +11095,6 @@
     "primeiroMes": "2025-02",
     "qtProdutos1oMes": 34,
     "primeiroPedidoCadastrado": "2025-02-19"
-  },
-  "1791859": {
-    "qtProdutos": 22,
-    "produtosPorMes": {
-      "2026-05": 1,
-      "2026-04": 3,
-      "2026-03": 8,
-      "2025-09": 8,
-      "2025-10": 2
-    },
-    "primeiroCadastroProduto": "2025-09-29T10:29:50",
-    "primeiroMes": "2025-09",
-    "qtProdutos1oMes": 8,
-    "primeiroPedidoCadastrado": "2025-09-30"
   },
   "1979643": {
     "qtProdutos": 11,
@@ -11596,35 +11453,16 @@
     "qtProdutos1oMes": 10,
     "primeiroPedidoCadastrado": "2026-04-10"
   },
-  "90069": {
-    "qtProdutos": 597,
+  "1542417": {
+    "qtProdutos": 4,
     "produtosPorMes": {
-      "2025-01": 14,
-      "2024-08": 41,
-      "2026-05": 10,
-      "2026-03": 34,
-      "2025-06": 23,
-      "2026-02": 49,
-      "2026-04": 21,
-      "2024-09": 49,
-      "2025-07": 23,
-      "2024-07": 28,
-      "2026-06": 9,
-      "2025-08": 31,
-      "2025-11": 23,
-      "2025-12": 6,
-      "2025-09": 29,
-      "2025-02": 25,
-      "2025-03": 15,
-      "2025-10": 48,
-      "2025-04": 49,
-      "2024-10": 40,
-      "2025-05": 30
+      "2026-03": 1,
+      "2025-02": 3
     },
-    "primeiroCadastroProduto": "2024-07-29T14:07:52",
-    "primeiroMes": "2024-07",
-    "qtProdutos1oMes": 28,
-    "primeiroPedidoCadastrado": "2024-07-23"
+    "primeiroCadastroProduto": "2025-02-24T14:44:44",
+    "primeiroMes": "2025-02",
+    "qtProdutos1oMes": 3,
+    "primeiroPedidoCadastrado": "2025-02-26"
   },
   "2025163": {
     "qtProdutos": 596,
@@ -12424,6 +12262,17 @@
     "qtProdutos1oMes": 11,
     "primeiroPedidoCadastrado": "2025-11-06"
   },
+  "1927282": {
+    "qtProdutos": 87,
+    "produtosPorMes": {
+      "2026-02": 27,
+      "2026-01": 60
+    },
+    "primeiroCadastroProduto": "2026-01-15T18:04:58",
+    "primeiroMes": "2026-01",
+    "qtProdutos1oMes": 60,
+    "primeiroPedidoCadastrado": "2026-01-23"
+  },
   "1845879": {
     "qtProdutos": 14,
     "produtosPorMes": {
@@ -12827,16 +12676,6 @@
     "primeiroMes": "2024-05",
     "qtProdutos1oMes": 17,
     "primeiroPedidoCadastrado": "2024-01-04"
-  },
-  "1951437": {
-    "qtProdutos": 6,
-    "produtosPorMes": {
-      "2026-05": 6
-    },
-    "primeiroCadastroProduto": "2026-05-13T16:46:34",
-    "primeiroMes": "2026-05",
-    "qtProdutos1oMes": 6,
-    "primeiroPedidoCadastrado": "2026-05-19"
   },
   "2090422": {
     "qtProdutos": 6,
