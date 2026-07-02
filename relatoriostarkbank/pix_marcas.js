@@ -136,6 +136,7 @@ window.PIX_MARCAS = (function(){
         "zeros confeccoes":             "45180025000152",
         "zoe sport":                    "zoesportsoficial@gmail.com",
         "modas carla":                  "49222592000185",
+        "gilkai":                       "gilkai.gs@gmail.com",
         "daline":                       "+5585996817794",
         "charisma matriz":              "Santander",
         "cvl varejo":                   "contato@atualtextil.com",
@@ -172,7 +173,8 @@ window.PIX_MARCAS = (function(){
         "the lion confec (zoe sport":   "zoesportsoficial@gmail.com",
         "santo vicio (fabrica":         "33159386000138",
         "morena charme (matriz":        "22481273000138",
-        "dream shop":                   "CEF",
+        "dream shop":                   "11946448597",
+        "dreamshop":                    "11946448597",
         "jay jones":                    "Bradesco",
         "dallew jeans":                 "Itaú",
         "celer":                        "Cloudwalk",
@@ -218,7 +220,8 @@ window.PIX_MARCAS = (function(){
         "ttng matriz":                  "12292902000128",
         "b.w. multi services":          "Não cadastrada",
         "garage":                       "64941498000170",
-        "ce moda fem":                  "5243626708",
+        "ce moda fem":                  "05243626708",
+        "ce moda feminina":             "05243626708",
         "bem me quer":                  "22905439000104",
         "sisal jeans":                  "72868441000110",
         "snapper":                      "22749850000120",
@@ -248,7 +251,7 @@ window.PIX_MARCAS = (function(){
         "mj fashion filial":            "24541598000194",
         "cavweillers":                  "36269709000134",
         "believe moda evangelica":      "34264546000171",
-        "ce moda feminna":              "5243626708",
+        "ce moda feminna":              "05243626708",
         "trama jeans":                  "Sem chave PIX"
     };
     function norm(s){

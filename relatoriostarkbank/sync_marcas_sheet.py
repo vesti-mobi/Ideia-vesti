@@ -4,12 +4,16 @@
 Fonte:  https://docs.google.com/spreadsheets/d/1jNdkA5aunf5jGGijXT0tcMTB-iW6-4OmXASucBjJqsQ/  aba gid=0
 Destino: pix_marcas.js, cnpj_marcas.js, razao_marcas.js (mesma pasta deste script)
 
-Comportamento APPEND-ONLY: para cada marca da planilha, SO preenche PIX/CNPJ/
-razao no JS se a marca AINDA NAO existe la. Marcas ja cadastradas no JS sao
-mantidas como estao — a planilha nunca sobrescreve. Nada e apagado.
-Quando o valor da planilha DIVERGE do que ja esta no JS, isso e logado como
-"DRIFT" (mas NAO sobrescreve — ha overrides manuais deliberados, ex.: Deslum/
-Incentive; ajuste manual se for o caso).
+Comportamento SHEET-WINS (planilha e a fonte da verdade): para cada marca da
+planilha, preenche/ATUALIZA PIX/CNPJ/razao no JS com o valor da planilha. Se a
+marca ainda nao existe no JS, e inserida; se ja existe com valor diferente, e
+SOBRESCRITA (logado como UPDATE). Nada e apagado — chaves que so existem no JS
+(sem correspondencia na planilha) sao mantidas.
+
+Excecao (guard): se a planilha traz um marcador de "ainda sem chave" na coluna
+PIX (ex.: "Nao cadastrada", "Solicitada ao CS", "Sem chave PIX", "A definir") e
+o JS ja tem uma chave REAL (CNPJ/CPF/email/telefone/uuid), o valor do JS e
+PRESERVADO (logado como KEEP) — nao rebaixa uma chave boa para um status.
 
 ALIAS por WorkSpace: o painel casa PIX/CNPJ/razao pelo nomeFantasia do
 invoices.js, que as vezes difere do nome na planilha (ex.: planilha "CVL Plaza
@@ -194,6 +198,21 @@ def render_block(items, indent='        '):
         body = body[:-1]
     return '{\n' + body + '\n    }'
 
+# marcadores de "ainda sem chave" na coluna PIX — NAO devem rebaixar uma chave real
+NON_KEY_STATUS = {
+    'nao cadastrada', 'nao cadastrado', 'sem chave pix', 'sem chave',
+    'solicitada ao cs', 'solicitado ao cs', 'a definir', 'pendente', '-', '',
+}
+
+def looks_like_real_key(v):
+    """True se o valor parece uma chave PIX de verdade (CNPJ/CPF/email/telefone/uuid)."""
+    v = str(v or '').strip()
+    if '@' in v:                                    # email
+        return True
+    if v.startswith('+') or v.count('-') >= 3:      # telefone E.164 ou uuid
+        return True
+    return len(re.sub(r'\D', '', v)) >= 10          # >=10 digitos = CNPJ/CPF/telefone
+
 def update_js(path, sheet_map, label):
     text = path.read_text(encoding='utf-8')
     pairs, start, end = parse_raw_block(text)
@@ -205,14 +224,21 @@ def update_js(path, sheet_map, label):
         if nk not in by_key:
             order.append(nk)
         by_key[nk] = [k, v]
-    added = kept = drift = 0
+    added = updated = kept = 0
     for nk, val in sheet_map.items():
         if nk in by_key:
-            kept += 1  # ja existe no JS — planilha NAO sobrescreve
-            if by_key[nk][1] != val:
-                drift += 1
-                print(f'    DRIFT {label.strip()}: "{by_key[nk][0]}" = {by_key[nk][1]!r} no JS, '
-                      f'planilha diz {val!r} (preservado JS; ajuste manual se necessario)')
+            cur = by_key[nk][1]
+            if cur == val:
+                continue
+            # guard: planilha diz "sem chave" mas JS ja tem chave real -> preserva
+            if norm(val) in NON_KEY_STATUS and looks_like_real_key(cur):
+                kept += 1
+                print(f'    KEEP {label.strip()}: "{by_key[nk][0]}" mantem {cur!r} '
+                      f'(planilha diz {val!r} = sem chave)')
+                continue
+            print(f'    UPDATE {label.strip()}: "{by_key[nk][0]}" {cur!r} -> {val!r}')
+            by_key[nk][1] = val
+            updated += 1
         else:
             by_key[nk] = [nk, val]
             order.append(nk)
@@ -221,10 +247,10 @@ def update_js(path, sheet_map, label):
     new_block = render_block(new_items)
     new_text = text[:start] + new_block + text[end + 1:]
     if new_text == text:
-        print(f'  {label}: sem mudancas ({len(new_items)} entradas, ={kept} ja cadastradas, {drift} drift)')
+        print(f'  {label}: sem mudancas ({len(new_items)} entradas)')
         return
     path.write_text(new_text, encoding='utf-8')
-    print(f'  {label}: +{added} novas, ={kept} preservadas, {drift} drift (total {len(new_items)})')
+    print(f'  {label}: +{added} novas, ~{updated} atualizadas, ={kept} preservadas (total {len(new_items)})')
 
 print('\nMerge nos .js:')
 update_js(DIR / 'pix_marcas.js',   sheet_pix,   'PIX  ')

@@ -18,6 +18,7 @@ window.CNPJ_MARCAS = (function(){
         "malvada night":                                     "151.477.407-08",
         "deslum":                                            "480.672.778-42",
         "dream shop":                                        "51.729.055/0001-78",
+        "dreamshop":                                         "51.729.055/0001-78",
         "florence":                                          "34.379.955/0001-13",
         "felps confec":                                      "099.174.339-37",
         "vintage style":                                     "51.486.393/0001-26",
@@ -1754,7 +1755,7 @@ window.CNPJ_MARCAS = (function(){
         "re store":                                          "34981369000144",
         "vem plus":                                          "52244294000109",
         "mj fashion filial":                                 "24541598000194",
-        "ce moda feminna":                                   "5243626708"
+        "ce moda feminna":                                   "052.436.267-08"
     };
     function norm(s){
         return String(s||"").toLowerCase().trim()
