@@ -420,6 +420,15 @@
     "diasAtrasoTotal": 1038,
     "totalReativ": 714
   },
+  "1482280": {
+    "reativacoesPorMes": {
+      "2025-07": 544,
+      "2025-06": 544,
+      "2025-08": 544
+    },
+    "diasAtrasoTotal": 13056,
+    "totalReativ": 1632
+  },
   "130927": {
     "reativacoesPorMes": {
       "2026-01": 40,
@@ -441,15 +450,6 @@
     },
     "diasAtrasoTotal": 804,
     "totalReativ": 519
-  },
-  "1482280": {
-    "reativacoesPorMes": {
-      "2025-07": 544,
-      "2025-06": 544,
-      "2025-08": 544
-    },
-    "diasAtrasoTotal": 13056,
-    "totalReativ": 1632
   },
   "1294689": {
     "reativacoesPorMes": {
@@ -883,6 +883,14 @@
     "diasAtrasoTotal": 804,
     "totalReativ": 129
   },
+  "1549609": {
+    "reativacoesPorMes": {
+      "2025-11": 144,
+      "2026-02": 192
+    },
+    "diasAtrasoTotal": 1200,
+    "totalReativ": 336
+  },
   "894067": {
     "reativacoesPorMes": {
       "2025-12": 21,
@@ -905,14 +913,6 @@
     },
     "diasAtrasoTotal": 3767,
     "totalReativ": 321
-  },
-  "1549609": {
-    "reativacoesPorMes": {
-      "2025-11": 144,
-      "2026-02": 192
-    },
-    "diasAtrasoTotal": 1200,
-    "totalReativ": 336
   },
   "97181": {
     "reativacoesPorMes": {
@@ -986,26 +986,6 @@
     "diasAtrasoTotal": 1656,
     "totalReativ": 240
   },
-  "166943": {
-    "reativacoesPorMes": {
-      "2025-12": 42,
-      "2025-08": 18,
-      "2025-06": 18,
-      "2026-04": 24,
-      "2025-10": 42,
-      "2025-02": 18,
-      "2025-01": 18,
-      "2026-05": 24,
-      "2026-01": 24,
-      "2025-04": 18,
-      "2025-05": 36,
-      "2025-03": 18,
-      "2025-09": 24,
-      "2025-11": 42
-    },
-    "diasAtrasoTotal": 1242,
-    "totalReativ": 366
-  },
   "389380": {
     "reativacoesPorMes": {
       "2025-09": 588,
@@ -1029,6 +1009,26 @@
     },
     "diasAtrasoTotal": 113568,
     "totalReativ": 14364
+  },
+  "166943": {
+    "reativacoesPorMes": {
+      "2025-12": 42,
+      "2025-08": 18,
+      "2025-06": 18,
+      "2026-04": 24,
+      "2025-10": 42,
+      "2025-02": 18,
+      "2025-01": 18,
+      "2026-05": 24,
+      "2026-01": 24,
+      "2025-04": 18,
+      "2025-05": 36,
+      "2025-03": 18,
+      "2025-09": 24,
+      "2025-11": 42
+    },
+    "diasAtrasoTotal": 1242,
+    "totalReativ": 366
   },
   "172199": {
     "reativacoesPorMes": {
@@ -1069,8 +1069,8 @@
   "757564": {
     "reativacoesPorMes": {
       "2026-06": 19,
-      "2025-10": 44,
       "2025-02": 39,
+      "2025-10": 44,
       "2025-09": 44,
       "2025-12": 44,
       "2026-05": 44,
@@ -1236,6 +1236,18 @@
     "diasAtrasoTotal": 1143,
     "totalReativ": 597
   },
+  "42673": {
+    "reativacoesPorMes": {
+      "2025-03": 17,
+      "2025-02": 18,
+      "2026-03": 18,
+      "2025-06": 18,
+      "2025-11": 18,
+      "2026-02": 18
+    },
+    "diasAtrasoTotal": 196,
+    "totalReativ": 107
+  },
   "1206640": {
     "reativacoesPorMes": {
       "2026-02": 20,
@@ -1248,18 +1260,6 @@
     },
     "diasAtrasoTotal": 480,
     "totalReativ": 140
-  },
-  "42673": {
-    "reativacoesPorMes": {
-      "2025-03": 17,
-      "2025-02": 18,
-      "2026-03": 18,
-      "2025-06": 18,
-      "2025-11": 18,
-      "2026-02": 18
-    },
-    "diasAtrasoTotal": 196,
-    "totalReativ": 107
   },
   "796597": {
     "reativacoesPorMes": {
@@ -1892,6 +1892,14 @@
     "diasAtrasoTotal": 2304,
     "totalReativ": 2304
   },
+  "1409827": {
+    "reativacoesPorMes": {
+      "2025-08": 108,
+      "2025-07": 108
+    },
+    "diasAtrasoTotal": 216,
+    "totalReativ": 216
+  },
   "28210": {
     "reativacoesPorMes": {
       "2026-02": 24,
@@ -1902,13 +1910,16 @@
     "diasAtrasoTotal": 168,
     "totalReativ": 96
   },
-  "1409827": {
+  "1472742": {
     "reativacoesPorMes": {
-      "2025-08": 108,
-      "2025-07": 108
+      "2025-08": 104,
+      "2026-01": 104,
+      "2025-10": 104,
+      "2025-09": 104,
+      "2025-11": 104
     },
-    "diasAtrasoTotal": 216,
-    "totalReativ": 216
+    "diasAtrasoTotal": 728,
+    "totalReativ": 520
   },
   "44756": {
     "reativacoesPorMes": {
@@ -1926,17 +1937,6 @@
     },
     "diasAtrasoTotal": 1169,
     "totalReativ": 225
-  },
-  "1472742": {
-    "reativacoesPorMes": {
-      "2025-08": 104,
-      "2026-01": 104,
-      "2025-10": 104,
-      "2025-09": 104,
-      "2025-11": 104
-    },
-    "diasAtrasoTotal": 728,
-    "totalReativ": 520
   },
   "1574253": {
     "reativacoesPorMes": {
