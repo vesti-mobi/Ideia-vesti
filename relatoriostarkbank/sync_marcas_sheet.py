@@ -61,7 +61,11 @@ ws = next((w for w in sh.worksheets() if w.id == WORKSHEET_GID), None)
 if ws is None:
     sys.exit(f'aba gid={WORKSHEET_GID} nao encontrada')
 
-rows = ws.get_all_records()  # primeira linha = cabecalhos
+# numericise_ignore=['all']: NAO converte celulas para numero. Sem isto, o
+# gspread lia "09917433937" (CPF) como int 9917433937 e PERDIA o zero a
+# esquerda (Felps e varias marcas ficavam com o PIX/CNPJ errado no painel).
+# Mantendo tudo como string preserva a formatacao exatamente como na planilha.
+rows = ws.get_all_records(numericise_ignore=['all'])  # primeira linha = cabecalhos
 print(f'Aba "{ws.title}": {len(rows)} linhas')
 if not rows:
     sys.exit('planilha vazia')
@@ -238,11 +242,15 @@ def update_js(path, sheet_map, label):
             cur = by_key[nk][1]
             if cur == val:
                 continue
-            # guard: planilha diz "sem chave" mas JS ja tem chave real -> preserva
-            if norm(val) in NON_KEY_STATUS and looks_like_real_key(cur):
+            # guard: se a planilha traz um valor que NAO parece chave real (status
+            # "sem chave", OU lixo tipo nome de banco "Bradesco"/"Santander" que
+            # poluem a coluna Chave PIX) e o JS ja tem uma chave REAL, preserva o
+            # JS — nao rebaixa uma chave boa. Ex.: Jay Jones tinha "Bradesco" na
+            # planilha e sobrescrevia o PIX real (o CNPJ) no painel.
+            if (norm(val) in NON_KEY_STATUS or not looks_like_real_key(val)) and looks_like_real_key(cur):
                 kept += 1
                 print(f'    KEEP {label.strip()}: "{by_key[nk][0]}" mantem {cur!r} '
-                      f'(planilha diz {val!r} = sem chave)')
+                      f'(planilha diz {val!r} = sem chave real)')
                 continue
             print(f'    UPDATE {label.strip()}: "{by_key[nk][0]}" {cur!r} -> {val!r}')
             by_key[nk][1] = val
