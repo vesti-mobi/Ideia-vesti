@@ -175,7 +175,7 @@ window.PIX_MARCAS = (function(){
         "morena charme (matriz":        "22481273000138",
         "dream shop":                   "11946448597",
         "dreamshop":                    "11946448597",
-        "jay jones":                    "Bradesco",
+        "jay jones":                    "11231043000102",
         "dallew jeans":                 "Itaú",
         "celer":                        "Cloudwalk",
         "sara e mari":                  "01921515000197",
@@ -254,7 +254,7 @@ window.PIX_MARCAS = (function(){
         "trama jeans":                  "Sem chave PIX",
         "brytch jeans":                 "CEF",
         "charisma":                     "charismaatacado@gmail.com",
-        "jayjones":                     "Bradesco",
+        "jayjones":                     "11231043000102",
         "opera kids varejo":            "10656565000185",
         "versally":                     "48473990000101"
     };
