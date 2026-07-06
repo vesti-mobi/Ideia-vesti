@@ -181,8 +181,16 @@ def parse_raw_block(text):
     if end is None:
         raise ValueError('chave de fechamento nao encontrada')
     body = text[start:end + 1]
-    pairs = re.findall(r'"((?:[^"\\]|\\.)*)"\s*:\s*"((?:[^"\\]|\\.)*)"', body)
-    return list(pairs), start, end
+    raw_pairs = re.findall(r'"((?:[^"\\]|\\.)*)"\s*:\s*"((?:[^"\\]|\\.)*)"', body)
+    # Des-escapa (\\ -> \, \" -> ") ao LER. render_block re-escapa ao GRAVAR;
+    # sem des-escapar aqui, cada rodada re-escapava valores ja escapados e as
+    # barras invertidas DOBRAVAM a cada sync -> crescimento exponencial (o
+    # razao_marcas.js chegou a ~64MB com 4 valores de 16MB de barras). Com o
+    # des-escape, o ciclo ler->gravar vira idempotente.
+    def _unescape(s):
+        return re.sub(r'\\(.)', r'\1', s)
+    pairs = [(_unescape(k), _unescape(v)) for k, v in raw_pairs]
+    return pairs, start, end
 
 def render_block(items, indent='        '):
     if not items:
