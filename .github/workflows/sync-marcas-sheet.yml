@@ -2,7 +2,8 @@ name: Sync marcas PIX CNPJ Razao da planilha Google
 
 on:
   schedule:
-    - cron: '0 12 * * *'  # 12:00 UTC = 09:00 BRT (1x ao dia)
+    - cron: '7 7 * * *'    # 07:07 UTC = 04:07 BRT (madrugada; antes do relatorio StarkBank das 04:17 pra nao colidir no push). Minuto 7 (fora do topo da hora) reduz risco do GitHub descartar o agendamento.
+    - cron: '17 12 * * *'  # 12:17 UTC = 09:17 BRT (2a rodada no meio da manha)
   workflow_dispatch:
     inputs:
       reason:
