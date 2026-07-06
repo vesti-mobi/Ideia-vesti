@@ -804,7 +804,7 @@ window.CNPJ_MARCAS = (function(){
         "izuz jeans americana":                              "02.737.217/0004-57",
         "izuz jeans mirassol desativado":                    "02.737.217/0004-57",
         "izza":                                              "31.506.519/0001-70",
-        "izzat jeans":                                       "05.616.094/0001-41",
+        "izzat jeans":                                       "64020772000178",
         "j&d elegance":                                      "57.395.224/0001-67",
         "j&r modas feminina":                                "43.876.102/0001-88",
         "jackie o modas":                                    "08.482.962/0001-36",
