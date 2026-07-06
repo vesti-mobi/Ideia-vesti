@@ -92,7 +92,7 @@ window.PIX_MARCAS = (function(){
         "imporio fitness":              "38280852000152",
         "incentive":                    "incentivemoda@gmail.com",
         "incentive moda":               "incentivemoda@gmail.com",
-        "izzat jeans":                  "05616094000141",
+        "izzat jeans":                  "64020772000178",
         "jilem modas":                  "45860676000193",
         "kaessi":                       "24091573000136",
         "kalli":                        "49345891000107",
