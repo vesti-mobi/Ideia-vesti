@@ -3,7 +3,8 @@ const fmtBRL = (n) => Number(n||0).toLocaleString("pt-BR",{style:"currency",curr
 const fmtInt = (n) => Number(n||0).toLocaleString("pt-BR");
 const $ = (id) => document.getElementById(id);
 
-const state = { periodo:"mensal", chave:"", cs:"todas", canais:new Set(["Starter","Uemtel","Atta","Parceiros"]), empresa:"todas", tab:"home", cadMes:"todos" };
+// state.chaves = lista de periodos selecionados (multi-selecao). 1 item = comportamento antigo.
+const state = { periodo:"mensal", chaves:[], cs:"todas", canais:new Set(["Starter","Uemtel","Atta","Parceiros"]), empresa:"todas", tab:"home", cadMes:"todos" };
 const D = (typeof DADOS !== "undefined") ? DADOS : { empresas:[], mesesList:[], semanasList:[], anosList:[] };
 const PARC_EXCL = new Set(["atta","attasoft","onix","uemtel"]);
 const isUemtel = (e) => (e.partner_raw||"").toLowerCase() === "uemtel";
@@ -50,25 +51,49 @@ function buildAnual() {
   D.anosList = Array.from(anos).sort();
 }
 
+// soma os buckets de TODOS os periodos selecionados (state.chaves)
 function bucket(e) {
-  const fonte = state.periodo === "mensal" ? e.mensal : state.periodo === "anual" ? e.anual : e.semanal;
-  return (fonte||{})[state.chave] || {valPix:0,valCartao:0,valTotal:0,qtPix:0,qtCartao:0,qtTotal:0};
+  const fonte = (state.periodo === "mensal" ? e.mensal : state.periodo === "anual" ? e.anual : e.semanal) || {};
+  const acc = {valPix:0,valCartao:0,valTotal:0,qtPix:0,qtCartao:0,qtTotal:0};
+  for (const k of state.chaves) {
+    const b = fonte[k];
+    if (!b) continue;
+    acc.valPix += b.valPix||0; acc.valCartao += b.valCartao||0; acc.valTotal += b.valTotal||0;
+    acc.qtPix += b.qtPix||0; acc.qtCartao += b.qtCartao||0; acc.qtTotal += b.qtTotal||0;
+  }
+  return acc;
 }
-// chave de mês de referência (mensal: "YYYY-MM", semanal: "YYYY-MM", anual: "YYYY")
-const mesAtualChave = () => state.periodo === "mensal" ? state.chave
-  : state.periodo === "anual" ? state.chave
-  : (state.chave||"").slice(0,7);
-// true se o mês "YYYY-MM" cai no período selecionado (no anual, compara o ano)
-const mesMatch = (m) => !m ? false : state.periodo === "anual" ? m.slice(0,4) === state.chave : m === mesAtualChave();
-// nº de reativações da empresa dentro do período selecionado
+// conjunto de meses "YYYY-MM" cobertos pela selecao (mensal: a propria chave; semanal: o mes da semana)
+function mesesSelecionados() {
+  const s = new Set();
+  for (const k of state.chaves) s.add(state.periodo === "semanal" ? (k||"").slice(0,7) : k);
+  return s;
+}
+// rotulo amigavel da selecao (1 = a chave; N = "N períodos (min … max)")
+function chaveLabel() {
+  if (!state.chaves.length) return "—";
+  if (state.chaves.length === 1) return state.chaves[0];
+  const s = [...state.chaves].sort();
+  return `${s.length} períodos (${s[0]} … ${s[s.length-1]})`;
+}
+const mesAtualChave = () => chaveLabel();
+// true se o mês "YYYY-MM" cai em algum período selecionado (no anual, compara o ano)
+const mesMatch = (m) => {
+  if (!m) return false;
+  if (state.periodo === "anual") return state.chaves.some(k => m.slice(0,4) === k);
+  return mesesSelecionados().has(m);
+};
+// nº de reativações da empresa somado sobre os períodos selecionados
 function reativNoPeriodo(e) {
   const r = e.reativacoesPorMes || {};
   if (state.periodo === "anual") {
     let s = 0;
-    for (const [m, q] of Object.entries(r)) if (m.slice(0,4) === state.chave) s += q;
+    for (const [m, q] of Object.entries(r)) if (state.chaves.some(k => m.slice(0,4) === k)) s += q;
     return s;
   }
-  return r[mesAtualChave()] || 0;
+  let s = 0;
+  for (const mes of mesesSelecionados()) s += r[mes] || 0;
+  return s;
 }
 
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
@@ -142,7 +167,7 @@ function renderKpis() {
     if (reativNoPeriodo(e) > 0) reativ++;
   }
   $("kpi-gmv").textContent = fmtBRL(gmv);
-  $("kpi-gmv-sub").textContent = `${lista.length} marcas · ${state.chave||"—"}`;
+  $("kpi-gmv-sub").textContent = `${lista.length} marcas · ${chaveLabel()}`;
   $("kpi-vp").textContent = fmtBRL(cartao + pix);
   $("kpi-cartao").textContent = fmtBRL(cartao);
   $("kpi-pix").textContent = fmtBRL(pix);
@@ -664,7 +689,7 @@ window.goHome = goHome;
 
 function renderActiveTab() {
   // atualiza periodo-label em todas as tabs
-  document.querySelectorAll(".periodo-label").forEach(el => el.textContent = state.chave || "—");
+  document.querySelectorAll(".periodo-label").forEach(el => el.textContent = chaveLabel());
   if (state.tab === "home") { renderKpis(); return; }
   if (state.tab === "gmv") renderTabGmv();
   else if (state.tab === "vp") renderTabVp();
@@ -681,12 +706,46 @@ function renderActiveTab() {
 }
 
 // ---------- Filtros ----------
+function periodoLista() {
+  return state.periodo === "mensal" ? D.mesesList : state.periodo === "anual" ? D.anosList : D.semanasList;
+}
+// popula/reseta a selecao ao trocar de tipo de periodo: default = ultimo periodo (1 item = comportamento antigo)
 function populaPeriodoValor() {
-  const sel = $("filter-periodo-valor");
-  const lista = state.periodo === "mensal" ? D.mesesList : state.periodo === "anual" ? D.anosList : D.semanasList;
-  sel.innerHTML = lista.slice().reverse().map(v=>`<option value="${v}">${v}</option>`).join("");
-  if (!lista.includes(state.chave)) state.chave = lista[lista.length-1] || "";
-  sel.value = state.chave;
+  const lista = periodoLista();
+  state.chaves = state.chaves.filter(k => lista.includes(k));
+  if (!state.chaves.length) state.chaves = lista.length ? [lista[lista.length-1]] : [];
+  renderPeriodoDropdown();
+}
+// dropdown de checkboxes p/ selecionar 1+ periodos
+function renderPeriodoDropdown() {
+  const box = $("filter-periodo-valor");
+  if (!box) return;
+  const lista = periodoLista().slice().reverse();
+  const sel = new Set(state.chaves);
+  box.innerHTML =
+    `<button type="button" class="ms-toggle"><span class="ms-lbl">${chaveLabel()}</span><span class="ms-caret">▾</span></button>` +
+    `<div class="ms-panel">` +
+      `<div class="ms-actions"><button type="button" data-act="all">Todos</button>` +
+      `<button type="button" data-act="clear">Limpar</button></div>` +
+      `<div class="ms-options">` +
+        lista.map(v=>`<label class="ms-opt"><input type="checkbox" value="${v}"${sel.has(v)?" checked":""}> ${v}</label>`).join("") +
+      `</div>` +
+    `</div>`;
+  box.querySelector(".ms-toggle").addEventListener("click", ev => {
+    ev.stopPropagation(); box.classList.toggle("open");
+  });
+  box.querySelectorAll(".ms-opt input").forEach(cb => cb.addEventListener("change", () => {
+    if (cb.checked) { if (!state.chaves.includes(cb.value)) state.chaves.push(cb.value); }
+    else state.chaves = state.chaves.filter(k => k !== cb.value);
+    box.querySelector(".ms-lbl").textContent = chaveLabel();
+    renderActiveTab();
+  }));
+  box.querySelector('[data-act="all"]').addEventListener("click", () => {
+    state.chaves = periodoLista().slice(); renderPeriodoDropdown(); box.classList.add("open"); renderActiveTab();
+  });
+  box.querySelector('[data-act="clear"]').addEventListener("click", () => {
+    state.chaves = []; renderPeriodoDropdown(); box.classList.add("open"); renderActiveTab();
+  });
 }
 function populaEmpresas() {
   const sel = $("filter-empresa");
@@ -701,7 +760,11 @@ function bind() {
     btn.classList.add("active"); state.periodo = btn.dataset.period;
     populaPeriodoValor(); renderActiveTab();
   }));
-  $("filter-periodo-valor").addEventListener("change", e=>{ state.chave=e.target.value; renderActiveTab(); });
+  // fecha o dropdown de periodo ao clicar fora
+  document.addEventListener("click", e=>{
+    const box = $("filter-periodo-valor");
+    if (box && !box.contains(e.target)) box.classList.remove("open");
+  });
   $("filter-cs").addEventListener("change", e=>{ state.cs=e.target.value; populaEmpresas(); renderActiveTab(); });
   $("filter-canal").addEventListener("change", e=>{
     const cb = e.target;

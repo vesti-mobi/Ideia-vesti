@@ -17,25 +17,20 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Instalar ODBC Driver 18 for SQL Server
-        run: |
-          . /etc/os-release
-          curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc > /dev/null
-          curl -sSL "https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/prod.list" | sudo tee /etc/apt/sources.list.d/mssql-release.list
-          sudo apt-get update -qq
-          sudo ACCEPT_EULA=Y apt-get install -y -qq msodbcsql18 unixodbc-dev
-
       - name: Instalar dependencias Python
-        run: pip install pyodbc
+        run: pip install google-cloud-bigquery
 
-      - name: Rodar pipeline (fetch + build)
-        working-directory: PainelElisa
+      - name: Gravar credencial BigQuery (SA key)
         env:
-          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
         run: |
-          python fetch_elisa.py
+          printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
+
+      - name: Rodar pipeline (fetch BQ + build)
+        working-directory: PainelElisa
+        run: |
+          python fetch_elisa_bq.py
           python build_data.py
 
       - name: Commit e push
