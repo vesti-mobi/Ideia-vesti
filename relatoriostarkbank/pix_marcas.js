@@ -66,7 +66,7 @@ window.PIX_MARCAS = (function(){
         "alcance jeans pr":             "pessoal@alcancejeans.com",
         "anne blanc":                   "43865993000177",
         "arary":                        "13495868000151",
-        "barraca do willinha":          "60741324000102",
+        "barraca do willinha":          "35322340000113",
         "be free":                      "09121974000106",
         "by mi tomazela":               "37266456000108",
         "begkids":                      "44870711000192",
