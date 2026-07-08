@@ -137,32 +137,61 @@ def load_ws_names(path):
 ws_names = load_ws_names(DIR / 'invoices.js') if k_ws else {}
 
 # ----------------------- coleta da planilha -----------------------
+# Duas passadas para que uma marca com linha PROPRIA na planilha seja sempre a
+# fonte da verdade dela mesma:
+#   (1) valores DIRETOS (norm(nome da planilha)) — autoritativos;
+#   (2) aliases por WorkSpace — so preenchem nomeFantasia que NAO tem linha
+#       propria. Um alias NUNCA sobrescreve uma marca que tem a propria linha.
+# Sem isso, se o invoices.js de um dia liga por engano a empresa da marca A ao
+# WorkSpace da marca B (pedido com workspace trocado), a linha da B carimbava o
+# PIX/CNPJ dela em cima da A — foi o que trocou "Barraca do Willinha" pelo CNPJ
+# da "Petit Enfant" no sync de 06/07/2026.
 sheet_pix, sheet_cnpj, sheet_razao = {}, {}, {}
 skipped = 0
-alias_keys = 0  # quantas chaves vieram de nomeFantasia do invoices (alem do nome da planilha)
+alias_keys = 0      # chaves-alias efetivamente aplicadas (nomes sem linha propria)
+alias_blocked = 0   # aliases ignorados por baterem numa marca com linha propria
+
+# passada 1: nomes diretos (donos da propria linha)
+direct_keys = set()
 for r in rows:
     nm = str(r.get(k_empresa, '') or '').strip()
     if not nm:
         skipped += 1
         continue
+    nn = norm(nm)
+    direct_keys.add(nn)
     pix   = str(r.get(k_pix, '')   or '').strip()
     cnpj  = str(r.get(k_cnpj, '')  or '').strip()
     razao = str(r.get(k_razao, '') or '').strip() if k_razao else ''
-    # chaves-alvo: o nome da planilha + todos os nomeFantasia do WorkSpace dela
-    names = {nm}
-    if k_ws:
+    if pix:   sheet_pix[nn]   = pix
+    if cnpj:  sheet_cnpj[nn]  = cnpj
+    if razao: sheet_razao[nn] = razao
+
+# passada 2: aliases por WorkSpace — so para nomeFantasia SEM linha propria
+if k_ws:
+    for r in rows:
+        nm = str(r.get(k_empresa, '') or '').strip()
+        if not nm:
+            continue
         wsid = str(r.get(k_ws, '') or '').strip()
-        if wsid and wsid in ws_names:
-            extra = ws_names[wsid] - {nm}
-            alias_keys += len(extra)
-            names |= extra
-    for name in names:
-        nn = norm(name)
-        if pix:   sheet_pix[nn]   = pix
-        if cnpj:  sheet_cnpj[nn]  = cnpj
-        if razao: sheet_razao[nn] = razao
+        if not (wsid and wsid in ws_names):
+            continue
+        pix   = str(r.get(k_pix, '')   or '').strip()
+        cnpj  = str(r.get(k_cnpj, '')  or '').strip()
+        razao = str(r.get(k_razao, '') or '').strip() if k_razao else ''
+        for name in ws_names[wsid] - {nm}:
+            nn = norm(name)
+            if nn in direct_keys:   # marca tem linha propria -> protegida
+                alias_blocked += 1
+                continue
+            alias_keys += 1
+            if pix:   sheet_pix[nn]   = pix
+            if cnpj:  sheet_cnpj[nn]  = cnpj
+            if razao: sheet_razao[nn] = razao
+
 print(f'Da planilha: {len(sheet_pix)} PIX, {len(sheet_cnpj)} CNPJ, {len(sheet_razao)} razao social '
-      f'(linhas vazias: {skipped}; +{alias_keys} chaves-alias via WorkSpace)')
+      f'(linhas vazias: {skipped}; +{alias_keys} chaves-alias via WorkSpace; '
+      f'{alias_blocked} aliases ignorados por marca ter linha propria)')
 
 # ----------------------- merge nos .js -----------------------
 def parse_raw_block(text):
