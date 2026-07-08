@@ -2,7 +2,7 @@ name: Atualizar Relatorio StarkBank VestiPago
 
 on:
   schedule:
-    - cron: '17 7 * * *'    # 04:17 BRT: run COMPLETO 1x/dia (CR + CP, ambos API Vesti). Minuto 17 (fora do topo da hora) reduz o risco do GitHub descartar o agendamento.
+    - cron: '17 5 * * *'    # 02:17 BRT: run COMPLETO 1x/dia (CR + CP, ambos API Vesti). Minuto 17 (fora do topo da hora) reduz o risco do GitHub descartar o agendamento.
   workflow_dispatch:
     inputs:
       reason:
@@ -53,11 +53,11 @@ jobs:
       - name: Rodar fetcher Faturas (API Vesti)
         # Etapa lenta (~22min) que pagina todas as marcas na API Vesti e
         # sobrecarrega o banco de producao. Por isso roda SO 1x/dia, no run
-        # agendado das 04:17 BRT (cron '17 7 * * *'), ou em disparo manual
+        # agendado das 02:17 BRT (cron '17 5 * * *'), ou em disparo manual
         # completo (workflow_dispatch com somente_fabric=false). Nos runs de 3h
         # (so CP) e no modo rapido, e pulada. Quando roda, deixa o marcador
         # .cr_updated pro passo de commit saber que deve incluir o invoices.js.
-        if: ${{ github.event.inputs.somente_fabric != 'true' && (github.event.schedule == '17 7 * * *' || github.event_name == 'workflow_dispatch') }}
+        if: ${{ github.event.inputs.somente_fabric != 'true' && (github.event.schedule == '17 5 * * *' || github.event_name == 'workflow_dispatch') }}
         working-directory: relatoriostarkbank
         env:
           VESTIAPI_TOKEN: ${{ secrets.VESTIAPI_TOKEN }}
