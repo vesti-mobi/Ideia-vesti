@@ -1069,7 +1069,7 @@ window.RAZAO_MARCAS = (function(){
         "mocinha charmosa":                                  "Francisco Wagner Oliveira da Silva",
         "moda galvez":                                       "Hugo Quispe Layme",
         "moda inn":                                          "CONFECÇÕES SIMON LTDA",
-        "modas carla":                                       "MODAS CARLA PLUS SIZE LTDA",
+        "modas carla":                                       "Lizeth Quispe Escalante",
         "modas clarice":                                     "Anita Capiona Yanari",
         "modas condor":                                      "DENILSON CONDORI MOLLO CONFECCOES",
         "modas faviola":                                     "Faviola Mamani Callizaya",
