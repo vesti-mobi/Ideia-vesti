@@ -376,6 +376,13 @@ def build(raw: list[dict]) -> dict:
         ped["allPaid"] = ped["nPendentes"] == 0 and ped["nPagas"] > 0
         pedidos.append(ped)
 
+    return _assemble(pedidos)
+
+
+def _assemble(pedidos: list[dict]) -> dict:
+    """Gera pagamentos/resumo/listas a partir de uma lista de pedidos ja montada.
+    Separado de build() pra poder rodar sobre pedidos MESCLADOS (merge do CP
+    dos ultimos dias no dados.js existente) sem refazer a agregacao inteira."""
     pedidos.sort(key=lambda p: p.get("orderDate") or "", reverse=True)
 
     methods = sorted({p["paymentMethod"] for p in pedidos if p["paymentMethod"]})
@@ -482,7 +489,8 @@ def build(raw: list[dict]) -> dict:
 
 API_URL = "https://apivesti.vesti.mobi/order/v1/report/orders-paylinks"
 WINDOW_DAYS = int(os.environ.get("CP_WINDOW_DAYS", "190"))  # ~6 meses
-PAGE_LIMIT = int(os.environ.get("CP_PAGE_LIMIT", "100"))  # 1000/400 ainda davam 500 em paginas fundas; 100 evita
+PAGE_LIMIT = int(os.environ.get("CP_PAGE_LIMIT", "200"))  # teste: 200/pagina
+PAGE_DELAY = float(os.environ.get("CP_PAGE_DELAY", "2"))   # seg de pausa entre requisicoes (alivia carga no banco -> tenta evitar 500)
 INVOICES_JS = ROOT / "invoices.js"
 
 
@@ -572,29 +580,10 @@ def fetch_orders() -> list[dict]:
     total_pages = None
     total_docs = None
     page = 1
-    failed_pages = 0
     while True:
         params = dict(base)
         params["page"] = page
-        try:
-            d = _get_json(API_URL + "?" + urllib.parse.urlencode(params), headers)
-        except Exception as e:
-            # Uma pagina funda que 500a de forma persistente (offset alto
-            # sobrecarrega o banco de producao) NAO deve abortar a regeracao
-            # inteira do dados.js. Pulamos a pagina e seguimos — melhor um CP
-            # levemente incompleto e FRESCO do que manter o arquivo defasado.
-            # Mesma filosofia do fetch_invoices.py (paginacao incompleta).
-            failed_pages += 1
-            print(f"[api]   pagina {page}/{total_pages} FALHOU apos retries "
-                  f"({type(e).__name__}: {e}) — pulando", file=sys.stderr)
-            # Sem total_pages ainda (nem a 1a pagina abriu) nao sabemos o fim:
-            # corta pra nao rodar pra sempre.
-            if total_pages is None and page >= 5:
-                break
-            if total_pages and page >= total_pages:
-                break
-            page += 1
-            continue
+        d = _get_json(API_URL + "?" + urllib.parse.urlencode(params), headers)
         items = d.get("data", []) if isinstance(d, dict) else (d or [])
         all_orders.extend(items)
         if total_pages is None and isinstance(d, dict):
@@ -608,9 +597,8 @@ def fetch_orders() -> list[dict]:
         if not items or (total_pages and page >= total_pages):
             break
         page += 1
-    if failed_pages:
-        print(f"[api] AVISO: {failed_pages} pagina(s) falharam e foram puladas "
-              f"(CP parcial, mas fresco)", file=sys.stderr)
+        if PAGE_DELAY > 0:
+            time.sleep(PAGE_DELAY)  # throttle entre requisicoes p/ nao sobrecarregar o banco
     if total_docs and len(all_orders) < total_docs:
         print(f"[api] AVISO: coletados {len(all_orders)} < totalDocs {total_docs}",
               file=sys.stderr)
@@ -690,9 +678,51 @@ def _fetch_with_retry(max_attempts: int = 4) -> list[dict]:
     raise RuntimeError("unreachable")
 
 
+def _read_existing_data():
+    """Le o dados.js atual (window.DADOS = {...};) pra permitir merge parcial."""
+    if not OUT_JS.exists():
+        return None
+    txt = OUT_JS.read_text(encoding="utf-8").strip()
+    prefix = "window.DADOS = "
+    if txt.startswith(prefix):
+        txt = txt[len(prefix):]
+    if txt.endswith(";"):
+        txt = txt[:-1]
+    try:
+        return json.loads(txt)
+    except Exception as e:
+        print(f"[merge] falha ao ler dados.js existente: {e}", file=sys.stderr)
+        return None
+
+
 def main() -> None:
     raw = _fetch_with_retry()
-    data = build(raw)
+    fresh = build(raw)
+
+    # CP_MERGE=1 + janela curta (CP_WINDOW_DAYS=2): atualiza SO os pedidos dos
+    # ultimos dias e faz overlay por orderId no dados.js existente, mantendo todo
+    # o historico intacto. Serve pra fugir do 500 da paginacao funda (a janela
+    # curta tem poucas paginas -> offset raso -> nao estoura), atualizando pelo
+    # menos ontem+hoje sem depender do fetch completo de 190 dias.
+    if os.environ.get("CP_MERGE") == "1":
+        existing = _read_existing_data()
+        if not (existing and existing.get("pedidos")):
+            print("[merge] ERRO: CP_MERGE pedido mas dados.js existente esta "
+                  "inexistente/ilegivel — abortando pra NAO sobrescrever o "
+                  "historico com so a janela curta.", file=sys.stderr)
+            sys.exit(1)
+        by_id = {p.get("orderId"): p for p in existing["pedidos"] if p.get("orderId")}
+        n_before = len(by_id)
+        for p in fresh.get("pedidos", []):
+            oid = p.get("orderId")
+            if oid:
+                by_id[oid] = p  # fresco vence; pedidos antigos ficam intactos
+        data = _assemble(list(by_id.values()))
+        print(f"[merge] {len(fresh.get('pedidos', []))} pedidos frescos (janela "
+              f"{WINDOW_DAYS}d) aplicados; {n_before} -> {len(by_id)} pedidos no total")
+    else:
+        data = fresh
+
     OUT_JS.write_text(
         "window.DADOS = " + json.dumps(data, ensure_ascii=False) + ";\n",
         encoding="utf-8",
