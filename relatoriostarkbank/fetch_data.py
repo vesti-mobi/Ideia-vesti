@@ -489,8 +489,8 @@ def _assemble(pedidos: list[dict]) -> dict:
 
 API_URL = "https://apivesti.vesti.mobi/order/v1/report/orders-paylinks"
 WINDOW_DAYS = int(os.environ.get("CP_WINDOW_DAYS", "190"))  # ~6 meses
-PAGE_LIMIT = int(os.environ.get("CP_PAGE_LIMIT", "200"))  # teste: 200/pagina
-PAGE_DELAY = float(os.environ.get("CP_PAGE_DELAY", "2"))   # seg de pausa entre requisicoes (alivia carga no banco -> tenta evitar 500)
+PAGE_LIMIT = int(os.environ.get("CP_PAGE_LIMIT", "500"))  # com fatiamento mensal o offset e' raso; 500/pagina ~poucas paginas/mes
+PAGE_DELAY = float(os.environ.get("CP_PAGE_DELAY", "1"))   # seg de pausa entre requisicoes (gentil com o banco de producao)
 INVOICES_JS = ROOT / "invoices.js"
 
 
@@ -562,47 +562,91 @@ def _get_json(url: str, headers: dict, attempts: int = 4) -> dict:
             delay = min(delay * 2, 60)
 
 
+def _month_windows(start_dt: datetime, end_dt: datetime) -> list[tuple[datetime, datetime]]:
+    """Fatia [start_dt, end_dt] em janelas de mes-calendario (UTC). Cada janela
+    tem poucos pedidos -> poucas paginas -> offset raso -> a API nao da 500."""
+    wins: list[tuple[datetime, datetime]] = []
+    cur = start_dt
+    while cur <= end_dt:
+        if cur.month == 12:
+            nxt = datetime(cur.year + 1, 1, 1, tzinfo=timezone.utc)
+        else:
+            nxt = datetime(cur.year, cur.month + 1, 1, tzinfo=timezone.utc)
+        # lte = inicio do mes seguinte (janelas ENCOSTAM); o dedup por _id remove
+        # a duplicata da fronteira. Assim nenhum pedido no ultimo instante do mes
+        # (com milissegundos) escapa entre 23:59:59 e 00:00:00.
+        w_end = min(nxt, end_dt)
+        wins.append((cur, w_end))
+        cur = nxt
+    return wins
+
+
+def _fetch_window(base: dict, gte: str, lte: str, headers: dict, label: str) -> tuple[list[dict], int]:
+    """Pagina UMA janela (mes) com paidAt em [gte, lte]. Offset sempre raso."""
+    pbase = dict(base)
+    pbase["filter[payment.paidAt][$gte]"] = gte
+    pbase["filter[payment.paidAt][$lte]"] = lte
+    out: list[dict] = []
+    total_pages = None
+    total_docs = None
+    page = 1
+    while True:
+        params = dict(pbase)
+        params["page"] = page
+        d = _get_json(API_URL + "?" + urllib.parse.urlencode(params), headers)
+        items = d.get("data", []) if isinstance(d, dict) else (d or [])
+        out.extend(items)
+        if total_pages is None and isinstance(d, dict):
+            total_pages = int(d.get("totalPages") or 1)
+            total_docs = d.get("totalDocs")
+        print(f"[api]   {label} pagina {page}/{total_pages}: +{len(items)} "
+              f"(acum {len(out)}/{total_docs})")
+        # hasNextPage da API e bugado; paginamos por totalPages.
+        if not items or (total_pages and page >= total_pages):
+            break
+        page += 1
+        if PAGE_DELAY > 0:
+            time.sleep(PAGE_DELAY)  # gentil com o banco de producao
+    if total_docs and len(out) < total_docs:
+        print(f"[api]   {label} AVISO: coletados {len(out)} < totalDocs {total_docs}",
+              file=sys.stderr)
+    return out, int(total_docs or 0)
+
+
 def fetch_orders() -> list[dict]:
     token = _order_token()
-    gte = (datetime.now(timezone.utc) - timedelta(days=WINDOW_DAYS)).strftime("%Y-%m-%dT%H:%M:%S")
+    now = datetime.now(timezone.utc)
+    start = now - timedelta(days=WINDOW_DAYS)
     headers = {"accept": "application/json", "Authorization": "Bearer " + token}
     base = {
         "filter[isClosed]": "true",
         "filter[payment.isPaid]": "true",
         "filter[payment.method]": "CREDIT_CARD",
         "filter[payment.transaction.provider]": "STARKBANK",
-        "filter[payment.paidAt][$gte]": gte,
         "select": "orderNumber,companyId,domainId,customer,payment",
         "limit": PAGE_LIMIT,
     }
-    print(f"[api] pedidos pagos STARKBANK com payment.paidAt >= {gte}")
-    all_orders: list[dict] = []
-    total_pages = None
-    total_docs = None
-    page = 1
-    while True:
-        params = dict(base)
-        params["page"] = page
-        d = _get_json(API_URL + "?" + urllib.parse.urlencode(params), headers)
-        items = d.get("data", []) if isinstance(d, dict) else (d or [])
-        all_orders.extend(items)
-        if total_pages is None and isinstance(d, dict):
-            total_pages = int(d.get("totalPages") or 1)
-            total_docs = d.get("totalDocs")
-        print(f"[api]   pagina {page}/{total_pages}: +{len(items)} "
-              f"(acum {len(all_orders)}/{total_docs})")
-        # ATENCAO: o hasNextPage desta API e bugado (retorna False a partir da
-        # pagina 7 mesmo havendo mais paginas). Paginamos por totalPages e so
-        # paramos quando acabarem as paginas ou uma pagina vier vazia.
-        if not items or (total_pages and page >= total_pages):
-            break
-        page += 1
-        if PAGE_DELAY > 0:
-            time.sleep(PAGE_DELAY)  # throttle entre requisicoes p/ nao sobrecarregar o banco
-    if total_docs and len(all_orders) < total_docs:
-        print(f"[api] AVISO: coletados {len(all_orders)} < totalDocs {total_docs}",
-              file=sys.stderr)
-    print(f"[api] {len(all_orders)} pedidos no total")
+    windows = _month_windows(start, now)
+    print(f"[api] pedidos pagos STARKBANK, paidAt em [{start:%Y-%m-%d} .. {now:%Y-%m-%d}] "
+          f"— fatiado em {len(windows)} janelas mensais (evita offset fundo/500)")
+    by_id: dict[str, dict] = {}
+    sum_docs = 0
+    for (ws, we) in windows:
+        gte = ws.strftime("%Y-%m-%dT%H:%M:%S")
+        lte = we.strftime("%Y-%m-%dT%H:%M:%S")
+        label = f"{ws:%Y-%m}"
+        items, tdocs = _fetch_window(base, gte, lte, headers, label)
+        sum_docs += tdocs
+        n_new = 0
+        for o in items:
+            key = o.get("_id") or o.get("id") or f"{o.get('orderNumber')}|{o.get('companyId')}"
+            if key not in by_id:
+                by_id[key] = o
+                n_new += 1
+        print(f"[api] janela {label}: {len(items)} itens ({n_new} novos, dedup) — totalDocs {tdocs}")
+    all_orders = list(by_id.values())
+    print(f"[api] {len(all_orders)} pedidos no total ({len(windows)} janelas; "
+          f"soma totalDocs das janelas={sum_docs})")
     return all_orders
 
 
