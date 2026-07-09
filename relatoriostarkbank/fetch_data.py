@@ -482,7 +482,7 @@ def build(raw: list[dict]) -> dict:
 
 API_URL = "https://apivesti.vesti.mobi/order/v1/report/orders-paylinks"
 WINDOW_DAYS = int(os.environ.get("CP_WINDOW_DAYS", "190"))  # ~6 meses
-PAGE_LIMIT = int(os.environ.get("CP_PAGE_LIMIT", "400"))  # 1000 quebrava a API (500 em paginas fundas); 400 evita
+PAGE_LIMIT = int(os.environ.get("CP_PAGE_LIMIT", "100"))  # 1000/400 ainda davam 500 em paginas fundas; 100 evita
 INVOICES_JS = ROOT / "invoices.js"
 
 
