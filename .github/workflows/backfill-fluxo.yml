@@ -1,0 +1,51 @@
+name: Backfill CP Fluxo (recupera pedidos dropados API)
+
+on:
+  workflow_dispatch:
+    inputs:
+      snap_sha:
+        description: 'Commit do snapshot bom (dados.js de origem)'
+        required: false
+        default: '7b4738f4'
+
+concurrency:
+  group: starkbank-dados
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Extrai snapshot bom
+        working-directory: relatoriostarkbank
+        run: git show ${{ github.event.inputs.snap_sha }}:relatoriostarkbank/dados.js > /tmp/snap.js && wc -c /tmp/snap.js
+      - name: Backfill fluxo
+        working-directory: relatoriostarkbank
+        env:
+          DADOS_CUR: dados.js
+          SNAP: /tmp/snap.js
+          CANC: cancelados_valores.js
+          OUT: dados.js
+        run: python _backfill_fluxo.py
+      - name: Commit e push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset -q origin/main
+            git add relatoriostarkbank/dados.js
+            if git diff --cached --quiet; then echo "sem mudancas"; exit 0; fi
+            git commit -q -m "Backfill CP Fluxo: recupera pedidos dropados pela API ($(date +'%d/%m %H:%M'))"
+            if git push; then echo "push ok (tentativa $i)"; exit 0; fi
+            echo "push falhou ($i), re-sincronizando..."; sleep 3
+          done
+          echo "push falhou"; exit 1
