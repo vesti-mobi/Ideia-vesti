@@ -739,6 +739,67 @@ def _read_existing_data():
         return None
 
 
+def _load_cancelled_ids() -> set:
+    """orderIds cancelados (cancelados_valores.js) — pra nao re-inserir cancelados."""
+    f = ROOT / "cancelados_valores.js"
+    if not f.exists():
+        return set()
+    try:
+        t = f.read_text(encoding="utf-8").strip()
+        t = t[t.index("=") + 1:].rstrip().rstrip(";")
+        return set(json.loads(t).get("valores", {}).keys())
+    except Exception as e:
+        print(f"[persist] falha lendo cancelados_valores.js: {e}", file=sys.stderr)
+        return set()
+
+
+def _persist_fluxo_orders(fresh: dict) -> dict:
+    """Preserva pedidos de FLUXO (nao-antecipados) ja vistos que a API deixou de
+    devolver neste run, pra a cauda 'a pagar' nao desaparecer quando a API dropa
+    pedidos (comportamento observado: o conjunto de um mes encolhe sem que os
+    pedidos tenham sido cancelados).
+
+    Regras:
+      - o pedido FRESCO sempre vence (so re-inserimos pedidos AUSENTES do fresco),
+        entao nada e atualizado errado;
+      - so re-insere FLUXO (nao-antecipado) — a aba Antecipacao segue o retrato
+        fresco da API, sem alteracao;
+      - nao re-insere cancelados;
+      - PODA: so mantem o pedido persistido enquanto ele tiver ao menos uma parcela
+        vencendo hoje ou no futuro (BRT); quando todas venceram, ele sai sozinho.
+    """
+    existing = _read_existing_data()
+    if not (existing and existing.get("pedidos")):
+        return fresh  # 1a geracao / dados.js ilegivel -> nada a preservar
+
+    fresh_ids = {p.get("orderId") for p in fresh.get("pedidos", []) if p.get("orderId")}
+    canc_ids = _load_cancelled_ids()
+    brt_today = (datetime.now(timezone.utc) - timedelta(hours=3)).strftime("%Y-%m-%d")
+
+    readd = []
+    for p in existing["pedidos"]:
+        oid = p.get("orderId")
+        if not oid or oid in fresh_ids:        # presente no fresco -> fresco vence
+            continue
+        if p.get("antecipacaoEnabled"):        # antecipacao NAO e persistida
+            continue
+        if oid in canc_ids:                    # cancelado -> nao re-insere
+            continue
+        dues = [(pc.get("dueAt") or "")[:10] for pc in p.get("parcelas", [])]
+        if not any(d and d >= brt_today for d in dues):   # todas venceram -> poda
+            continue
+        p["_persistido"] = True                # marcador (transparencia/debug)
+        readd.append(p)
+
+    if not readd:
+        return fresh
+
+    merged = list(fresh["pedidos"]) + readd
+    print(f"[persist] {len(readd)} pedido(s) de fluxo preservados "
+          f"(sumiram da API mas ainda tem parcela a vencer)")
+    return _assemble(merged)
+
+
 def main() -> None:
     raw = _fetch_with_retry()
     fresh = build(raw)
@@ -765,7 +826,8 @@ def main() -> None:
         print(f"[merge] {len(fresh.get('pedidos', []))} pedidos frescos (janela "
               f"{WINDOW_DAYS}d) aplicados; {n_before} -> {len(by_id)} pedidos no total")
     else:
-        data = fresh
+        # Preserva a cauda de FLUXO que a API dropar (antecipacao segue fresca).
+        data = _persist_fluxo_orders(fresh)
 
     OUT_JS.write_text(
         "window.DADOS = " + json.dumps(data, ensure_ascii=False) + ";\n",
