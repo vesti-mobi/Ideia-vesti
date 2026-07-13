@@ -35,7 +35,8 @@ function httpsRequest(options, body) {
 function getToken(scope) {
     return async function() {
         const postBody = querystring.stringify({
-            client_id: '1950a258-227b-4e31-a9cf-717495945fc2',
+            // O refresh token do secret e emitido pelo FABRIC_CLIENT_ID; resgatar com outro client da AADSTS70000.
+            client_id: process.env.FABRIC_CLIENT_ID || '1950a258-227b-4e31-a9cf-717495945fc2',
             grant_type: 'refresh_token',
             refresh_token: FABRIC_REFRESH_TOKEN,
             scope: scope + ' offline_access',

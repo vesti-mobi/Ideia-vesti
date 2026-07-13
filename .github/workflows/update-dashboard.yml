@@ -78,6 +78,7 @@ jobs:
         env:
           FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
           FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
         run: node Pedidos-por-Marca/build-cloud.js
 
       - name: Verificar se houve alteracao
