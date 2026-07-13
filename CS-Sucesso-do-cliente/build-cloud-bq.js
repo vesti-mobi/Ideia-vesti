@@ -490,7 +490,16 @@ async function main() {
     });
 
     // ---------- 14. Faturamento (Iugu, fatura cheia) — match CNPJ depois nome ----------
-    const fatByCnpj = {}, fatByName = {};
+    // Uma marca costuma ter varios customer_id na Iugu (setup, assinatura, reajuste).
+    // Tanto o match por CNPJ quanto o por nome precisam SOMAR todos, senao a marca fica subcontada.
+    const emptyBucket = () => ({ paid:0,pending:0,expired:0,canceled:0,nPagas:0,nPendentes:0,nVencidas:0,qtd:0,faturas:[] });
+    const addToBucket = (b, rec) => {
+        b.paid+=rec.paid; b.pending+=rec.pending; b.expired+=rec.expired; b.canceled+=rec.canceled;
+        b.nPagas+=rec.nPagas; b.nPendentes+=rec.nPendentes; b.nVencidas+=rec.nVencidas; b.qtd+=rec.qtd;
+        b.faturas.push(...rec.faturas);
+        return b;
+    };
+    const fatByCnpj = {}, fatRecs = [];
     for (const r of faturamentoRows) {
         const rec = {
             paid: num(r.paid), pending: num(r.pending), expired: num(r.expired), canceled: num(r.canceled),
@@ -499,15 +508,9 @@ async function main() {
             customer_name: r.customer_name || '',
         };
         const c = digits(r.cnpj);
-        if (c.length >= 11) {
-            if (!fatByCnpj[c]) fatByCnpj[c] = { paid:0,pending:0,expired:0,canceled:0,nPagas:0,nPendentes:0,nVencidas:0,qtd:0,faturas:[] };
-            const b = fatByCnpj[c];
-            b.paid+=rec.paid; b.pending+=rec.pending; b.expired+=rec.expired; b.canceled+=rec.canceled;
-            b.nPagas+=rec.nPagas; b.nPendentes+=rec.nPendentes; b.nVencidas+=rec.nVencidas; b.qtd+=rec.qtd;
-            b.faturas.push(...rec.faturas);
-        }
+        if (c.length >= 11) addToBucket(fatByCnpj[c] || (fatByCnpj[c] = emptyBucket()), rec);
         const n = normSimple(rec.customer_name);
-        if (n && !fatByName[n]) fatByName[n] = rec;
+        if (n && n.length >= 4) fatRecs.push({ nome: n, rec });
     }
     let invoiceMatched = 0;
     for (const emp of empresasList) {
@@ -516,11 +519,11 @@ async function main() {
         if (ec.length >= 11 && fatByCnpj[ec]) data = fatByCnpj[ec];
         if (!data) {
             const nomeNorm = normSimple(emp.nome);
-            for (const [brand, bd] of Object.entries(fatByName)) {
-                if (brand.length < 4) continue;
-                const sh = Math.min(nomeNorm.length, brand.length);
-                if (nomeNorm === brand || (sh >= 5 && (nomeNorm.startsWith(brand) || brand.startsWith(nomeNorm)))) { data = bd; break; }
-            }
+            const cands = fatRecs.filter(({ nome }) => {
+                const sh = Math.min(nomeNorm.length, nome.length);
+                return nomeNorm === nome || (sh >= 5 && (nomeNorm.startsWith(nome) || nome.startsWith(nomeNorm)));
+            });
+            if (cands.length) data = cands.reduce((b, c) => addToBucket(b, c.rec), emptyBucket());
         }
         if (data) {
             const faturasSorted = [...data.faturas].sort((a, b) => (b.due || '').localeCompare(a.due || ''));
