@@ -296,6 +296,13 @@ async function main() {
         .map(e => ({ id: e.id, nome: e.nome, cnpj: e.cnpj, marca: e.marca, plano: e.plano, anjo: e.anjo, canal: e.canal, qtd: pedidosPorEmp[e.id].length }))
         .sort((a, b) => b.qtd - a.qtd);
 
+    // Sanity: fonte quebrada (ex: dataset PBI 404) devolve lista vazia. Abortar sem escrever,
+    // senao o build sobrescreve dados.js/chunks bons com {"empresas":[]} e zera o painel.
+    if (empList.length === 0) {
+        console.error('FATAL: 0 empresas com pedidos — fonte provavelmente indisponivel. dados.js/chunks preservados.');
+        process.exit(1);
+    }
+
     // Save dados.js
     fs.writeFileSync(path.join(DIR, 'dados.js'), 'const DADOS=' + JSON.stringify({ empresas: empList, gerado: new Date().toISOString() }) + ';', 'utf-8');
 
