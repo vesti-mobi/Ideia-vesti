@@ -257,11 +257,9 @@
             <div class="ei-row"><span class="ei-key">Canal</span><span class="ei-val" id="eiCanal">-</span></div>
             <div class="ei-row"><span class="ei-key">VestiPago</span><span class="ei-val" id="eiVestiPago">-</span></div>
             <div class="ei-row"><span class="ei-key">Modalidade</span><span class="ei-val" id="eiModalidade">-</span></div>
-            <div class="ei-row"><span class="ei-key">Frete Ativo</span><span class="ei-val" id="eiFreteAtivo">-</span></div>
             <div class="ei-row"><span class="ei-key">Estoque</span><span class="ei-val" id="eiControleEstoque">-</span></div>
             <div class="ei-row ei-secondary"><span class="ei-key">Tipo Integração</span><span class="ei-val" id="eiTipoInteg">-</span></div>
             <div class="ei-row ei-secondary"><span class="ei-key">Detalhe Integ.</span><span class="ei-val" id="eiIntegDetalhe">-</span></div>
-            <div class="ei-row ei-secondary" id="rowFreteTotal" style="display:none;"><span class="ei-key">Frete Total</span><span class="ei-val" id="eiFreteTotal">-</span></div>
         </div>
         <div class="ei-card">
             <div class="ei-card-title">Status</div>
@@ -833,9 +831,6 @@ function updateEmpresaPanel(){
         if(show.planoFilial){document.getElementById('eiPlanoFilial').textContent=fmtCFull(show.planoFilial);document.getElementById('rowPlanoFilial').style.display='';}else{document.getElementById('rowPlanoFilial').style.display='none';}
         if(show.planoDescontos){document.getElementById('eiDescontos').textContent=fmtCFull(show.planoDescontos);document.getElementById('rowDescontos').style.display='';}else{document.getElementById('rowDescontos').style.display='none';}
         document.getElementById('rowTotalCobrado').style.display='none';
-        // Frete
-        const freteEl=document.getElementById('eiFreteAtivo');
-        if(show.freteAtivo){freteEl.innerHTML='<span style="color:var(--success);font-weight:700;">Sim</span>';document.getElementById('eiFreteTotal').textContent=fmtCFull(show.freteTotal);document.getElementById('rowFreteTotal').style.display='';}else{freteEl.innerHTML='<span style="color:var(--text-muted);">Não</span>';document.getElementById('rowFreteTotal').style.display='none';}
         // Oráculo: Tem ou não + coluna
         const temOrac=document.getElementById('eiTemOraculo');
         const colOrac=document.getElementById('eiOraculoColuna');
@@ -1369,14 +1364,6 @@ function renderTab0(){
         {icon:'&#127915;',label:'Ticket Médio',value:fmtC(ticket)},
         {icon:'&#10060;',label:'Pedidos Cancelados',value:fmtN(canc)},
         {icon:'&#9888;',label:'Risco Alto Churn',value:fmtN(riscoAlto),color:'var(--danger)'},
-        {icon:'&#128666;',label:'Frete Total',value:fmtC(es.reduce((s,e)=>{
-            const fPDe=document.getElementById('fPedDe').value;
-            const fPAte=document.getElementById('fPedAte').value;
-            if((fPDe||fPAte)&&e.freteMensal&&e.freteMensal.length>0){
-                return s+e.freteMensal.filter(m=>(!fPDe||m.mes>=fPDe)&&(!fPAte||m.mes<=fPAte)).reduce((t,m)=>t+m.valor,0);
-            }
-            return s+(e.freteTotal||0);
-        },0))},
     ]);
 
     // Chart: Pedidos - Últimos 6 Meses (responde aos filtros)

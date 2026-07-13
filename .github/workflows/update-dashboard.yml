@@ -21,79 +21,33 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install xlsx tedious
+        run: npm install xlsx tedious @google-cloud/bigquery
 
-      - name: Rebuild CS Sucesso do Cliente via Fabric e HubSpot
+      - name: Configurar credencial BigQuery
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
+
+      - name: Rebuild CS Sucesso do Cliente via BigQuery e HubSpot
         env:
           HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
-          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-        run: node CS-Sucesso-do-cliente/build-cloud.js
-
-      - name: Propagar refresh token entre steps
-        continue-on-error: true
-        run: |
-          if [ -f CS-Sucesso-do-cliente/.new_refresh_token ]; then
-            NEW_TOKEN=$(cat CS-Sucesso-do-cliente/.new_refresh_token)
-            # Mascara o token nos logs (sem isso, qualquer step que printe env mostra o token em texto puro)
-            echo "::add-mask::$NEW_TOKEN"
-            echo "FABRIC_REFRESH_TOKEN=$NEW_TOKEN" >> $GITHUB_ENV
-          fi
-
-      - name: Patch Links e Cliques (fallback se build-cloud falhou)
-        continue-on-error: true
-        env:
-          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-        run: node CS-Sucesso-do-cliente/patch-links.js
-
-      - name: Patch Painel CS vendas mensais e invoices
-        continue-on-error: true
-        env:
-          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-        run: node CS-Sucesso-do-cliente/patch-painel-cs.js
-
-      - name: Patch Oraculo Fabric lote 1
-        continue-on-error: true
-        env:
-          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-        run: node CS-Sucesso-do-cliente/patch-oraculo.js
-
-      - name: Patch Oraculo Fabric lote 2
-        continue-on-error: true
-        env:
-          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-        run: sleep 30 && node CS-Sucesso-do-cliente/patch-oraculo.js
-
-      - name: Patch Oraculo Fabric lote 3
-        continue-on-error: true
-        env:
-          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-        run: sleep 30 && node CS-Sucesso-do-cliente/patch-oraculo.js
-
-      - name: Patch Invoices Iugu
-        continue-on-error: true
-        env:
-          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-        run: node CS-Sucesso-do-cliente/patch-invoices.js
+        run: node CS-Sucesso-do-cliente/build-cloud-bq.js
 
       - name: Patch fabricCounts (matriz/filial/total do PainelCSGerencial)
         continue-on-error: true
         run: node CS-Sucesso-do-cliente/patch-empresas.js
 
-      - name: Atualizar refresh token antes de Pedidos por Marca
+      # ---- Projetos ainda em Fabric (migração à parte): Pedidos-por-Marca e NovosVestiPago ----
+      - name: Rebuild Pedidos por Marca via Fabric
+        continue-on-error: true
+        env:
+          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+        run: node Pedidos-por-Marca/build-cloud.js
+
+      - name: Propagar refresh token (Pedidos-por-Marca / NovosVestiPago)
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
@@ -109,13 +63,6 @@ jobs:
             echo "FABRIC_REFRESH_TOKEN=$NEW_TOKEN" >> $GITHUB_ENV
             rm -f CS-Sucesso-do-cliente/.new_refresh_token
           fi
-
-      - name: Rebuild Pedidos por Marca via Fabric
-        continue-on-error: true
-        env:
-          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-        run: node Pedidos-por-Marca/build-cloud.js
 
       - name: Rebuild Novos VestiPago via Fabric lakehouse
         continue-on-error: true
@@ -138,7 +85,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add CS-Sucesso-do-cliente/dados.js Pedidos-por-Marca/dados.js Pedidos-por-Marca/chunks.js Pedidos-por-Marca/data/ NovosVestiPago/dados.js
           git commit -m "Atualizacao automatica completa $(date +'%d/%m/%Y %H:%M')"
-          # Retry com rebase em caso de race condition (alguem pushou durante o run)
           for i in 1 2 3; do
             if git push; then
               break
