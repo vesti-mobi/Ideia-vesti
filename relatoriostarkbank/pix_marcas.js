@@ -97,7 +97,7 @@ window.PIX_MARCAS = (function(){
         "kaessi":                       "24091573000136",
         "kalli":                        "49345891000107",
         "kauly":                        "fabriciopais@yahoo.com.br",
-        "kelly rodrigues":              "44851232000129",
+        "kelly rodrigues":              "54697378000115",
         "lesto":                        "58418377000145",
         "life activewear":              "52602995000164",
         "mafia fitness":                "41549988000120",
