@@ -347,6 +347,21 @@ async function main() {
         emp.isMatriz = lh.isMatriz; emp.isFilial = lh.isFilial; emp.lakehouseRn = lh.rn;
         empresasAtivas.push(emp);
     }
+    // Override de anjo/CS por dominio, para quando a carteira muda e o cadastro nao acompanha.
+    // O anjo vem de odbc_domains.angel_id -> odbc_angels. Assim que o angel_id for corrigido no
+    // sistema Vesti, a entrada aqui vira redundante e pode ser removida.
+    // (O dominio 1272421 — Kelly Rodrigues Store — ja foi corrigido no cadastro em 10/07 e nao
+    //  precisa de override; so a unidade Fortaleza segue apontando pro CS antigo.)
+    const ANJO_OVERRIDE = {
+        2052347: 'Luana Coutinho', // Kelly Rodrigues Fortaleza — cadastro ainda com Thamiris Ribeiro
+    };
+    let anjosSobrescritos = 0;
+    empresasAtivas.forEach(e => {
+        const novo = ANJO_OVERRIDE[Number(e.idDominio)];
+        if (novo && e.anjo !== novo) { e.anjo = novo; anjosSobrescritos++; }
+    });
+    if (anjosSobrescritos) console.log('  Anjo sobrescrito manualmente: ' + anjosSobrescritos + ' empresa(s)');
+
     empresasAtivas.forEach(e => {
         if (!e.idDominio) return;
         const key = String(e.idDominio);

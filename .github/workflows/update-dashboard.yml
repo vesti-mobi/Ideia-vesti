@@ -39,9 +39,13 @@ jobs:
         continue-on-error: true
         run: node CS-Sucesso-do-cliente/patch-empresas.js
 
-      # ---- Projetos ainda em Fabric (migração à parte): NovosVestiPago e Pedidos-por-Marca ----
-      # NovosVestiPago roda PRIMEIRO de proposito: o client_id hardcoded do Pedidos-por-Marca
-      # so aceita refresh token recem-emitido, entao ele precisa consumir o token que este step gera.
+      # Historico (< 2026-04) vem dos chunks ja publicados; o BQ traz de 2026-04 em diante.
+      # O build aborta sem escrever se o snapshot ou o resultado vierem degradados.
+      - name: Rebuild Pedidos por Marca via BigQuery
+        continue-on-error: true
+        run: node Pedidos-por-Marca/build-cloud-bq.js
+
+      # ---- Unico projeto ainda em Fabric (migração à parte): NovosVestiPago ----
       - name: Rebuild Novos VestiPago via Fabric lakehouse
         continue-on-error: true
         env:
@@ -50,36 +54,23 @@ jobs:
           FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
         run: node NovosVestiPago/build.js
 
+      # Mantido para rotacionar o secret: o refresh token do Fabric e de uso unico e outros
+      # workflows (metricas, movimentacao, starkbank) dependem dele estar valido.
       - name: Propagar refresh token (Fabric)
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          TOKEN_FILE=""
-          for f in NovosVestiPago/.new_refresh_token CS-Sucesso-do-cliente/.new_refresh_token; do
-            if [ -f "$f" ]; then TOKEN_FILE="$f"; break; fi
-          done
-          if [ -n "$TOKEN_FILE" ]; then
-            NEW_TOKEN=$(cat "$TOKEN_FILE")
+          if [ -f NovosVestiPago/.new_refresh_token ]; then
+            NEW_TOKEN=$(cat NovosVestiPago/.new_refresh_token)
             echo "::add-mask::$NEW_TOKEN"
             if [ -n "$GH_TOKEN" ]; then
               gh secret set FABRIC_REFRESH_TOKEN --body "$NEW_TOKEN" && echo "Secret rotacionado" || echo "WARN: gh secret set falhou"
             else
               echo "WARN: GH_PAT nao configurado — secret nao sera rotacionado (token vai expirar)"
             fi
-            echo "FABRIC_REFRESH_TOKEN=$NEW_TOKEN" >> $GITHUB_ENV
-            rm -f NovosVestiPago/.new_refresh_token CS-Sucesso-do-cliente/.new_refresh_token
-          else
-            echo "WARN: nenhum .new_refresh_token gerado — Pedidos-por-Marca vai usar o token do secret"
+            rm -f NovosVestiPago/.new_refresh_token
           fi
-
-      - name: Rebuild Pedidos por Marca via Fabric
-        continue-on-error: true
-        env:
-          FABRIC_REFRESH_TOKEN: ${{ env.FABRIC_REFRESH_TOKEN || secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-        run: node Pedidos-por-Marca/build-cloud.js
 
       - name: Verificar se houve alteracao
         id: check
