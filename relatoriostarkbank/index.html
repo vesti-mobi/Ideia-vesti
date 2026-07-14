@@ -44,6 +44,32 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);padding
 .subtabs{display:flex;gap:6px;margin:-8px 0 16px;padding-left:4px}
 .subtab{padding:7px 16px;background:transparent;border:1.5px solid var(--bd);border-radius:8px;cursor:pointer;font:600 12px 'Inter',sans-serif;color:var(--mut)}
 .subtab.active{background:var(--g);color:#fff;border-color:var(--g)}
+/* --- edicao das contas das marcas (CNPJ / razao / PIX) --- */
+#faixaEdicao{display:none;align-items:center;gap:12px;margin:-8px 0 14px;padding:10px 14px;background:#FFF8E7;border:1px solid #FFE0A3;border-radius:8px;font-size:12px;color:#8a6d1f}
+#faixaEdicao.on{display:flex}
+#faixaEdicao button{margin-left:auto;padding:6px 12px;background:#fff;border:1px solid #FFE0A3;border-radius:6px;font:600 11px 'Inter',sans-serif;color:#8a6d1f;cursor:pointer;white-space:nowrap}
+.lapisConta{background:#F1F2F6;border:0;border-radius:6px;padding:3px 7px;cursor:pointer;font-size:11px;margin-left:6px;vertical-align:middle}
+.lapisConta:hover{background:#e0e2ea}
+.mdBack{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:200}
+.mdBack.on{display:flex}
+.mdBox{background:#fff;border-radius:14px;padding:24px;width:420px;max-width:92vw;max-height:90vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.28)}
+.mdBox h3{font-size:17px;font-weight:800;margin-bottom:2px;text-transform:capitalize}
+.mdBox .mdSub{font-size:12px;color:var(--mut);margin-bottom:14px}
+.mdBox label{display:block;font-size:11px;font-weight:700;color:var(--mut);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.4px}
+.mdBox input{width:100%;padding:11px 13px;border:1.5px solid var(--bd);border-radius:8px;font:400 14px 'Inter',sans-serif;outline:none}
+.mdBox input:focus{border-color:var(--p)}
+.mdBox .dica{font-size:11px;color:var(--mut);margin-top:5px}
+.mdBox .aviso{background:#FFFBF0;border:1px solid #FFE9B8;border-radius:8px;padding:10px 12px;margin-top:12px;font-size:12px;color:#8a6d1f}
+.mdBox .erro{background:#FFF5F2;border:1px solid #FFD3C4;border-radius:8px;padding:10px 12px;margin-top:12px;font-size:12px;color:#c0392b}
+.mdBox .acoes{display:flex;gap:8px;margin-top:18px}
+.mdBox .acoes button{flex:1;padding:12px;border:0;border-radius:8px;font:600 13px 'Inter',sans-serif;cursor:pointer}
+.mdBox .acoes .ok{background:var(--p);color:#fff}
+.mdBox .acoes .ok:disabled{opacity:.6;cursor:not-allowed}
+.mdBox .acoes .cancel{background:#fff;color:var(--txt);border:1.5px solid var(--bd)}
+#toastConta{position:fixed;right:20px;bottom:20px;max-width:380px;padding:14px 18px;border-radius:10px;color:#fff;font:600 13px 'Inter',sans-serif;z-index:300;display:none;box-shadow:0 8px 28px rgba(0,0,0,.22)}
+#toastConta.on{display:block}
+#toastConta.ok{background:#00B894}
+#toastConta.err{background:#E17055}
 @media(max-width:1400px){.kpis{grid-template-columns:repeat(4,1fr)}}
 .filters{display:flex;gap:12px;align-items:flex-end;background:var(--card);border-radius:var(--rd);padding:16px 20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);flex-wrap:wrap}
 .fg{display:flex;flex-direction:column;gap:4px}
@@ -131,6 +157,11 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
         <div class="subtab" data-sub="antec" onclick="switchSub('antec')">Antecipação</div>
         <button id="btnExcel" onclick="downloadExcel()" style="display:none;margin-left:auto;padding:7px 14px;background:#00B894;color:#fff;border:0;border-radius:8px;font:600 12px 'Inter',sans-serif;cursor:pointer">⬇ Baixar Excel</button>
         <button id="btnCsvStark" onclick="downloadCsvStark()" style="display:none;margin-left:8px;padding:7px 14px;background:#6C5CE7;color:#fff;border:0;border-radius:8px;font:600 12px 'Inter',sans-serif;cursor:pointer" title="CSV no formato Starkbank (amount, name, taxId, key, scheduled, externalId)">⬇ Baixar CSV Stark</button>
+        <button id="btnEditarContas" onclick="alternarModoEdicao()" style="display:none;margin-left:8px;padding:7px 14px;background:#fff;color:#2D3436;border:1.5px solid var(--bd);border-radius:8px;font:600 12px 'Inter',sans-serif;cursor:pointer" title="Editar CNPJ, razão social e chave PIX das marcas">✏️ Editar contas</button>
+    </div>
+    <div id="faixaEdicao">
+        <span>✏️ <b>Modo edição ligado.</b> Clique no lápis da marca para alterar CNPJ, razão social ou chave PIX. O que você salvar vale na hora para todo mundo.</span>
+        <button onclick="sairModoEdicao()">Sair do modo edição</button>
     </div>
     <div class="subtabs" id="subtabsAud" style="display:none">
         <div class="subtab active" data-audsub="api" onclick="switchAudSub('api')">CR Stark API</div>
@@ -343,6 +374,41 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
 </div>
 </div>
 
+<!-- ===== edicao das contas das marcas (so a Laura, senha propria) ===== -->
+<div class="mdBack" id="mdSenha">
+    <div class="mdBox">
+        <h3 style="text-transform:none">Editar contas das marcas</h3>
+        <div class="mdSub">Essa parte muda para onde o dinheiro vai. Confirme com a sua senha de administradora (não é a senha do painel).</div>
+        <label>Senha de administradora</label>
+        <input type="password" id="mdSenhaInput" onkeydown="if(event.key==='Enter')confirmarSenhaAdmin()">
+        <div id="mdSenhaErro" class="erro" style="display:none"></div>
+        <div class="acoes">
+            <button class="cancel" onclick="fecharMd('mdSenha')">Cancelar</button>
+            <button class="ok" id="mdSenhaBtn" onclick="confirmarSenhaAdmin()">Entrar no modo edição</button>
+        </div>
+    </div>
+</div>
+
+<div class="mdBack" id="mdConta">
+    <div class="mdBox">
+        <h3 id="mdContaNome">Marca</h3>
+        <div class="mdSub">Alterou e salvou, vale na hora — para você e para todo mundo que abrir o painel.</div>
+        <label>CNPJ</label>
+        <input id="mdContaCnpj" placeholder="00.000.000/0000-00">
+        <label>Razão social</label>
+        <input id="mdContaRazao" placeholder="NOME DA EMPRESA LTDA">
+        <label>Chave PIX</label>
+        <input id="mdContaPix" placeholder="CNPJ, CPF, e-mail, +55… ou chave aleatória">
+        <div class="dica">Telefone precisa do <b>+55</b> na frente. Sem chave ainda? Escreva <b>Sem chave PIX</b>.</div>
+        <div id="mdContaMsg"></div>
+        <div class="acoes">
+            <button class="cancel" onclick="fecharMd('mdConta')">Cancelar</button>
+            <button class="ok" id="mdContaBtn" onclick="salvarConta()">Salvar</button>
+        </div>
+    </div>
+</div>
+<div id="toastConta"></div>
+
 <script>
 // carrega dados.js com cache-bust agressivo — evita browser servir versao velha
 window._dadosError=null;
@@ -425,6 +491,9 @@ function doLogout(){sessionStorage.removeItem('stark_auth');location.reload()}
 function showApp(){
     document.getElementById('loginScreen').style.display='none';
     document.getElementById('appContent').style.display='block';
+    // Contas (CNPJ/razao/PIX) ao vivo do servidor: mostra edicoes feitas ha 1 minuto,
+    // sem esperar o GitHub Pages republicar. Se falhar, valem os .js commitados.
+    carregarContasAPI();
     var tries=0;
     (function wait(){
         tries++;
@@ -590,6 +659,206 @@ function fmtPixKey(v){
     return s;
 }
 
+// ===========================================================================
+// CONTAS DAS MARCAS — CNPJ, razao social e chave PIX
+//
+// Fonte da verdade: relatoriostarkbank/marcas_contas.json no repositorio,
+// editado por aqui (botao "Editar contas", na aba Antecipacao) ou pelo app do
+// celular. Quem guarda a senha e o acesso ao GitHub e o servidor (stark-admin,
+// na Vercel) — a senha NUNCA fica nesta pagina, que e publica.
+//
+// Os arquivos pix_marcas.js / cnpj_marcas.js / razao_marcas.js continuam sendo
+// carregados: sao a copia de seguranca. Se o servidor estiver fora do ar, o
+// painel mostra os valores do ultimo commit — so nao deixa editar.
+// ===========================================================================
+var API_CONTAS='https://vesti-contas.vercel.app';
+var tokenAdmin=sessionStorage.getItem('stark_admin_token')||'';
+var modoEdicao=false;
+var marcaEditando=null;
+var confirmarPendente=false;
+
+// Monta um mapa com a mesma interface dos .js (get/norm), pra troca transparente.
+function mapaContas(campo,marcas){
+    function norm(s){return String(s||'').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+    var map={};
+    for(var k in marcas){ var v=marcas[k]?marcas[k][campo]:''; if(v) map[norm(k)]=v; }
+    return {get:function(nome){return map[norm(nome)]||''},norm:norm};
+}
+
+function aplicarContas(marcas){
+    window.CONTAS_MARCAS=marcas;
+    window.PIX_MARCAS=mapaContas('pix',marcas);
+    window.CNPJ_MARCAS=mapaContas('cnpj',marcas);
+    window.RAZAO_MARCAS=mapaContas('razao',marcas);
+}
+
+// Busca as contas ao vivo. Se falhar, nao faz nada: ficam valendo os .js.
+function carregarContasAPI(){
+    return fetch(API_CONTAS+'/api/marcas',{cache:'no-store'})
+        .then(function(r){return r.json()})
+        .then(function(d){
+            if(!d||!d.ok||!d.marcas)return;
+            aplicarContas(d.marcas);
+            if(typeof DADOS!=='undefined'&&DADOS)render();
+        })
+        .catch(function(){/* servidor fora do ar: segue com os .js commitados */});
+}
+
+// As 4 colunas de conta da aba Antecipacao (CNPJ, razao, PIX, saldo).
+function celulasContas(cLabel,cid){
+    var cnpj =window.CNPJ_MARCAS ?window.CNPJ_MARCAS.get(cLabel) :'';
+    var razao=window.RAZAO_MARCAS?window.RAZAO_MARCAS.get(cLabel):'';
+    var pix  =window.PIX_MARCAS  ?window.PIX_MARCAS.get(cLabel)  :'';
+    var saldo=(window.SALDO_BY_COMPANY||{})[cid]||0;
+    var lapis=modoEdicao
+        ?'<button class="lapisConta" data-marca="'+esc(cLabel)+'" title="Editar CNPJ, razão e PIX desta marca" onclick="event.stopPropagation();abrirEdicaoConta(this.dataset.marca)">✏️</button>'
+        :'';
+    return '<td class="mono" style="font-size:11px">'+esc(cnpj)+'</td>'+
+           '<td style="font-size:11px">'+esc(razao)+'</td>'+
+           '<td class="mono" style="font-size:11px">'+esc(fmtPixKey(pix))+lapis+'</td>'+
+           '<td class="money" style="font-size:11px;color:'+(saldo>0?'var(--g)':'var(--mut)')+'">'+fmtC(saldo)+'</td>';
+}
+
+function fecharMd(id){document.getElementById(id).classList.remove('on')}
+
+function toastConta(msg,tipo){
+    var t=document.getElementById('toastConta');
+    t.textContent=msg;
+    t.className='on '+(tipo||'ok');
+    clearTimeout(t._t);
+    t._t=setTimeout(function(){t.className=''},6000);
+}
+
+function alternarModoEdicao(){
+    if(modoEdicao){sairModoEdicao();return}
+    if(tokenAdmin){entrarModoEdicao();return}
+    document.getElementById('mdSenhaErro').style.display='none';
+    document.getElementById('mdSenhaInput').value='';
+    document.getElementById('mdSenha').classList.add('on');
+    setTimeout(function(){document.getElementById('mdSenhaInput').focus()},50);
+}
+
+function confirmarSenhaAdmin(){
+    var btn=document.getElementById('mdSenhaBtn');
+    var err=document.getElementById('mdSenhaErro');
+    btn.disabled=true; btn.textContent='Entrando…';
+    fetch(API_CONTAS+'/api/login',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({senha:document.getElementById('mdSenhaInput').value})
+    })
+    .then(function(r){return r.json()})
+    .then(function(d){
+        if(!d.ok){
+            err.textContent=d.erro||'Senha incorreta.';
+            err.style.display='block';
+            return;
+        }
+        tokenAdmin=d.token;
+        sessionStorage.setItem('stark_admin_token',tokenAdmin);
+        fecharMd('mdSenha');
+        entrarModoEdicao();
+    })
+    .catch(function(){
+        err.textContent='Não consegui falar com o servidor de contas. Confira sua internet.';
+        err.style.display='block';
+    })
+    .finally(function(){btn.disabled=false;btn.textContent='Entrar no modo edição'});
+}
+
+// So mexe na aparencia (faixa + texto do botao); quem redesenha a tabela e quem chama.
+function uiModoEdicao(){
+    document.getElementById('faixaEdicao').classList.toggle('on',modoEdicao);
+    document.getElementById('btnEditarContas').textContent=modoEdicao?'✏️ Editando…':'✏️ Editar contas';
+}
+
+function entrarModoEdicao(){ modoEdicao=true;  uiModoEdicao(); render(); }
+function sairModoEdicao(){   modoEdicao=false; uiModoEdicao(); render(); }
+
+function abrirEdicaoConta(nome){
+    marcaEditando=nome;
+    confirmarPendente=false;
+    document.getElementById('mdContaNome').textContent=nome;
+    document.getElementById('mdContaCnpj').value =window.CNPJ_MARCAS ?window.CNPJ_MARCAS.get(nome) :'';
+    document.getElementById('mdContaRazao').value=window.RAZAO_MARCAS?window.RAZAO_MARCAS.get(nome):'';
+    document.getElementById('mdContaPix').value  =window.PIX_MARCAS  ?window.PIX_MARCAS.get(nome)  :'';
+    document.getElementById('mdContaMsg').innerHTML='';
+    var b=document.getElementById('mdContaBtn');
+    b.textContent='Salvar'; b.disabled=false;
+    document.getElementById('mdConta').classList.add('on');
+}
+
+function salvarConta(){
+    var btn=document.getElementById('mdContaBtn');
+    var msg=document.getElementById('mdContaMsg');
+    btn.disabled=true; btn.textContent='Salvando…';
+    fetch(API_CONTAS+'/api/marcas',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+tokenAdmin},
+        body:JSON.stringify({
+            nome:marcaEditando,
+            cnpj:document.getElementById('mdContaCnpj').value,
+            razao:document.getElementById('mdContaRazao').value,
+            pix:document.getElementById('mdContaPix').value,
+            origem:'painel',
+            confirmar:confirmarPendente
+        })
+    })
+    .then(function(r){
+        if(r.status===401){
+            // sessao de 12h venceu: pede a senha de novo
+            tokenAdmin='';
+            sessionStorage.removeItem('stark_admin_token');
+            fecharMd('mdConta');
+            sairModoEdicao();
+            toastConta('Sua sessão de edição expirou. Clique em "Editar contas" e entre com a senha de novo.','err');
+            return null;
+        }
+        return r.json();
+    })
+    .then(function(d){
+        if(!d)return;
+        // O servidor achou algo estranho (ex.: PIX que nao parece chave) e quer confirmacao.
+        if(d.precisaConfirmar){
+            msg.innerHTML=d.avisos.map(function(a){
+                return '<div class="aviso">⚠️ '+esc(a.texto)+'</div>';
+            }).join('');
+            confirmarPendente=true;
+            btn.textContent='Salvar mesmo assim';
+            btn.disabled=false;
+            return;
+        }
+        if(!d.ok){
+            msg.innerHTML='<div class="erro">❌ '+esc(d.erro||'Não consegui salvar.')+'</div>';
+            btn.textContent='Tentar de novo';
+            btn.disabled=false;
+            return;
+        }
+        if(d.semMudanca){
+            fecharMd('mdConta');
+            toastConta('Nada mudou — os valores já eram esses.','ok');
+            return;
+        }
+        fecharMd('mdConta');
+        toastConta('Salvo! '+d.alterou.join(' e ')+' de "'+d.marca+'" já vale para todo mundo.','ok');
+        // Usa o que o servidor confirmou ter gravado, em vez de ir buscar de novo:
+        // a leitura do GitHub pode demorar alguns segundos pra refletir o commit,
+        // e voce veria o valor velho piscar na tela logo depois de salvar.
+        if(window.CONTAS_MARCAS){
+            window.CONTAS_MARCAS[d.marca]=d.valores;
+            aplicarContas(window.CONTAS_MARCAS);
+            render();
+        }else{
+            carregarContasAPI();
+        }
+    })
+    .catch(function(){
+        msg.innerHTML='<div class="erro">❌ Não consegui falar com o servidor. Confira sua internet e tente de novo.</div>';
+        btn.textContent='Tentar de novo';
+        btn.disabled=false;
+    });
+}
+
 var DADOS=null;
 var TAB='cp';      // 'cp' | 'cr' | 'aud'
 var SUB='fluxo';   // 'fluxo' | 'antec' (so usado quando TAB='cp')
@@ -650,6 +919,10 @@ function switchTab(which){
     document.getElementById('subtabs').style.display    = isCp?'flex':'none';
     document.getElementById('btnExcel').style.display   = isCp?'inline-block':'none';
     document.getElementById('btnCsvStark').style.display = (isCp && SUB==='antec')?'inline-block':'none';
+    // "Editar contas" so faz sentido onde as colunas de conta aparecem (CP > Antecipacao)
+    document.getElementById('btnEditarContas').style.display = (isCp && SUB==='antec')?'inline-block':'none';
+    // saiu da aba onde se edita: desliga o modo edicao (o render() do fim redesenha)
+    if(!(isCp && SUB==='antec') && modoEdicao){ modoEdicao=false; uiModoEdicao(); }
     document.getElementById('thPix').style.display      = (isCp && SUB==='antec')?'':'none';
     document.getElementById('thCnpj').style.display     = (isCp && SUB==='antec')?'':'none';
     document.getElementById('thRazao').style.display    = (isCp && SUB==='antec')?'':'none';
@@ -690,6 +963,8 @@ function switchSub(which){
     document.getElementById('thSaldoMarca').style.display = isAntec?'':'none';
     document.getElementById('btnExcel').style.display = 'inline-block';
     document.getElementById('btnCsvStark').style.display = isAntec?'inline-block':'none';
+    document.getElementById('btnEditarContas').style.display = isAntec?'inline-block':'none';
+    if(!isAntec && modoEdicao){ modoEdicao=false; uiModoEdicao(); }  // o render() abaixo redesenha
     openSet={};
     render();
 }
@@ -948,7 +1223,7 @@ function renderCp(){
                 '<td class="money" style="color:var(--y)">'+fmtC(ct.af)+'</td>'+
                 '<td class="money" style="color:var(--r)">'+fmtC(ct.antec)+'</td>'+
                 '<td class="money total">'+fmtC(ct.net)+'</td>'+
-                (showPix?'<td class="mono" style="font-size:11px">'+esc(window.CNPJ_MARCAS?window.CNPJ_MARCAS.get(cLabel):'')+'</td><td style="font-size:11px">'+esc(window.RAZAO_MARCAS?window.RAZAO_MARCAS.get(cLabel):'')+'</td><td class="mono" style="font-size:11px">'+esc(fmtPixKey(window.PIX_MARCAS?window.PIX_MARCAS.get(cLabel):''))+'</td><td class="money" style="font-size:11px;color:'+(((window.SALDO_BY_COMPANY||{})[cid]||0)>0?'var(--g)':'var(--mut)')+'">'+fmtC((window.SALDO_BY_COMPANY||{})[cid]||0)+'</td>':'')+
+                (showPix?celulasContas(cLabel,cid):'')+
             '</tr>');
             if(!cOpen)return;
             var byD={};
@@ -1025,7 +1300,7 @@ function renderCp(){
                 '<td class="money" style="color:var(--y)">'+fmtC(ct.af)+'</td>'+
                 '<td class="money" style="color:var(--r)">'+fmtC(ct.antec)+'</td>'+
                 '<td class="money total">'+fmtC(ct.net)+'</td>'+
-                (showPix?'<td class="mono" style="font-size:11px">'+esc(window.CNPJ_MARCAS?window.CNPJ_MARCAS.get(cLabel):'')+'</td><td style="font-size:11px">'+esc(window.RAZAO_MARCAS?window.RAZAO_MARCAS.get(cLabel):'')+'</td><td class="mono" style="font-size:11px">'+esc(fmtPixKey(window.PIX_MARCAS?window.PIX_MARCAS.get(cLabel):''))+'</td><td class="money" style="font-size:11px;color:'+(((window.SALDO_BY_COMPANY||{})[cid]||0)>0?'var(--g)':'var(--mut)')+'">'+fmtC((window.SALDO_BY_COMPANY||{})[cid]||0)+'</td>':'')+
+                (showPix?celulasContas(cLabel,cid):'')+
             '</tr>');
             if(!cOpen)return;
             // agrupa parcelas por pedido dentro da empresa
