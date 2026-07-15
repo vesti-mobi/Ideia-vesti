@@ -1,7 +1,7 @@
 {
   "_leia": "Fonte da verdade das contas das marcas (CNPJ, razao social, chave PIX). Editado pelo painel StarkBank / celular (app stark-admin). Os 3 arquivos pix_marcas.js, cnpj_marcas.js e razao_marcas.js sao GERADOS a partir daqui — nao edite eles na mao.",
-  "atualizadoEm": "2026-07-13T12:00:00Z",
-  "atualizadoPor": "migracao inicial (planilha Google -> edicao manual)",
+  "atualizadoEm": "2026-07-15T12:07:50.879Z",
+  "atualizadoPor": "celular",
   "marcas": {
     "2 wave": {
       "pix": "",
@@ -4144,9 +4144,11 @@
       "razao": "Jhon Abel Huaraka Ccahuana"
     },
     "jilem modas": {
-      "pix": "45860676000193",
-      "cnpj": "45860676000193",
-      "razao": "JILEM MODAS LTDA"
+      "pix": "+5511964321282",
+      "cnpj": "45.860.676/0001-93",
+      "razao": "JILEM MODAS LTDA",
+      "editadoEm": "2026-07-15T12:07:50.879Z",
+      "origem": "celular"
     },
     "jj fashion": {
       "pix": "",
