@@ -13,6 +13,7 @@ import io
 import json
 import os
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -45,22 +46,41 @@ def load_token() -> str:
 def http(method: str, path: str, token: str, body: dict | None = None) -> dict:
     url = path if path.startswith("http") else BASE + path
     data = json.dumps(body).encode("utf-8") if body is not None else None
-    req = urllib.request.Request(
-        url,
-        data=data,
-        method=method,
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json",
-        },
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            return json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        msg = e.read().decode("utf-8", errors="replace")
-        print(f"[hubspot] {method} {path} -> {e.code}: {msg}", file=sys.stderr)
-        sys.exit(2)
+    last_err: Exception | None = None
+    # Retry/backoff: no Windows a 2a conexao TLS do processo as vezes e
+    # resetada pelo host/AV (WinError 10054) mesmo com token valido.
+    for attempt in range(6):
+        req = urllib.request.Request(
+            url,
+            data=data,
+            method=method,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            # 429/5xx sao transitorios; demais erros HTTP sao fatais
+            if e.code == 429 or 500 <= e.code < 600:
+                last_err = e
+                wait = min(2 ** attempt, 30)
+                print(f"[hubspot] {method} {path} -> {e.code}, retry em {wait}s", file=sys.stderr)
+                time.sleep(wait)
+                continue
+            msg = e.read().decode("utf-8", errors="replace")
+            print(f"[hubspot] {method} {path} -> {e.code}: {msg}", file=sys.stderr)
+            sys.exit(2)
+        except (urllib.error.URLError, ConnectionError, TimeoutError) as e:
+            last_err = e
+            wait = min(2 ** attempt, 30)
+            print(f"[hubspot] {method} {path} conexao falhou ({e}); retry em {wait}s", file=sys.stderr)
+            time.sleep(wait)
+            continue
+    print(f"[hubspot] {method} {path} falhou apos retries: {last_err}", file=sys.stderr)
+    sys.exit(2)
 
 
 def resolve_owners(token: str) -> dict[str, str]:
