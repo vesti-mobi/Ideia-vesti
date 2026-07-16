@@ -1,6 +1,6 @@
 {
   "_leia": "Fonte da verdade das contas das marcas (CNPJ, razao social, chave PIX). Editado pelo painel StarkBank / celular (app stark-admin). Os 3 arquivos pix_marcas.js, cnpj_marcas.js e razao_marcas.js sao GERADOS a partir daqui — nao edite eles na mao.",
-  "atualizadoEm": "2026-07-15T12:07:50.879Z",
+  "atualizadoEm": "2026-07-16T18:01:05.290Z",
   "atualizadoPor": "celular",
   "marcas": {
     "2 wave": {
@@ -2849,9 +2849,11 @@
       "razao": "Andrezza Senesi Cortonesi"
     },
     "enfasy": {
-      "pix": "2a7fa437-21c9-4254-bff8-f9e1ab4ad1e8",
+      "pix": "22534629000154",
       "cnpj": "22.534.629/0001-54",
-      "razao": "JHONATAN ROSA BATISTA"
+      "razao": "JHONATAN ROSA BATISTA",
+      "editadoEm": "2026-07-16T18:01:05.290Z",
+      "origem": "celular"
     },
     "enfasy jeans": {
       "pix": "2a7fa437-21c9-4254-bff8-f9e1ab4ad1e8",
