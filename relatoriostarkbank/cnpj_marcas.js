@@ -576,7 +576,7 @@ window.CNPJ_MARCAS = (function(){
         "encantto estilo":                                   "13.300.432/0001-60",
         "enchantee femme":                                   "44.660.568/0001-04",
         "enfasy":                                            "22.534.629/0001-54",
-        "enfasy jeans":                                      "22534629000154",
+        "enfasy jeans":                                      "22.534.629/0001-54",
         "entretons":                                         "01.585.733/0001-06",
         "entretons - representantes":                        "74.663.759/0001-90",
         "equilibree":                                        "42347883000150",

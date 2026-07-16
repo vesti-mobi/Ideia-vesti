@@ -84,7 +84,7 @@ window.PIX_MARCAS = (function(){
         "elice fitness":                                     "c114571b-6c15-4363-ae39-22e9c180f05d",
         "emili":                                             "10426904000137",
         "enfasy":                                            "22534629000154",
-        "enfasy jeans":                                      "2a7fa437-21c9-4254-bff8-f9e1ab4ad1e8",
+        "enfasy jeans":                                      "22534629000154",
         "equilibree":                                        "42347883000150",
         "erilluz jeans":                                     "32796225000192",
         "eriluz jeans":                                      "32796225000192",
