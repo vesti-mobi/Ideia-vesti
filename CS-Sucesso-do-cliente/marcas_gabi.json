@@ -1,0 +1,782 @@
+{
+ "_fonte": "Marcas CS Gabi.xlsx",
+ "marcas": [
+  {
+   "nome": "Pianeta | TQ",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Ana Gonçalves Farroupilha",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "sim",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Alpelo",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Sigui Atacado",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Tango Fantasias",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Badocky",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Sml Modas",
+   "integracao": "não",
+   "filial": "R$359",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Modas GMF",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "V.R. Modas .Plus",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Rcr Original Clothing",
+   "integracao": "não",
+   "filial": "R$410",
+   "vestipago": "cartão / pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Mary Acessórios",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "sim (Ycloud)"
+  },
+  {
+   "nome": "Menina Gata",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Riviera Clothing",
+   "integracao": "Tiny",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Josh Menswear",
+   "integracao": "WebPic",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Apoá",
+   "integracao": "API",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Tricomix Polo",
+   "integracao": "Millenium",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Boladinhos Kids",
+   "integracao": "WebPic",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Sauê Beach Wear",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Imagivan",
+   "integracao": "API",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "sim (bot)"
+  },
+  {
+   "nome": "Sunweek",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Anemone",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Elice",
+   "integracao": "WebPic",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Wish Brand",
+   "integracao": "Bling V3",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Amofany",
+   "integracao": "Millenium",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "sim (bot)"
+  },
+  {
+   "nome": "FB Exclusive Co. / The Sailor Denim",
+   "integracao": "Tiny",
+   "filial": "não",
+   "vestipago": "pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Valentina Sirrah",
+   "integracao": "Bling V3",
+   "filial": "R$410",
+   "vestipago": "cartão",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Other Girls",
+   "integracao": "API",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Lucibella",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Join curves",
+   "integracao": "Millenium",
+   "filial": "R$600",
+   "vestipago": "cartão",
+   "oraculo": "sim (bot)"
+  },
+  {
+   "nome": "Bolovo Productions",
+   "integracao": "Tiny",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "In Love Clothing + Okey",
+   "integracao": "Sisplan V2",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Venoro",
+   "integracao": "Bling V3",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Stefani",
+   "integracao": "Tiny",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "sim (bot)"
+  },
+  {
+   "nome": "Lesto",
+   "integracao": "Bling V3",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Clomee",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Niran Confeccoes",
+   "integracao": "WebPic",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Villon Jeans",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Daline",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "sim (bot)"
+  },
+  {
+   "nome": "Anahi",
+   "integracao": "VirtualAge",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "She Brand",
+   "integracao": "API",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Tempo de Criança",
+   "integracao": "API",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Daiany Confecções",
+   "integracao": "Bling V3",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Sammy T-shirts​",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Brytch Jeans",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "sim"
+  },
+  {
+   "nome": "Balum Baby",
+   "integracao": "Bling V3",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "sim (bot)"
+  },
+  {
+   "nome": "Rosa Fina",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Manacá",
+   "integracao": "Totvs",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "sim (oráculo)"
+  },
+  {
+   "nome": "Gule Gule",
+   "integracao": "Totvs",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "sim (oráculo)"
+  },
+  {
+   "nome": "Mottive",
+   "integracao": "API",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Modas Condor",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Ousadia Feminina",
+   "integracao": "Bling V3",
+   "filial": "não",
+   "vestipago": "pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Tricotez Mega",
+   "integracao": "Bling V3",
+   "filial": "R$410",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Jazz Plus",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Crisfael",
+   "integracao": "Millenium",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Qbonita Atacado",
+   "integracao": "API",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Moda Gringa",
+   "integracao": "Millenium",
+   "filial": "não",
+   "vestipago": "pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Pietá",
+   "integracao": "Complete",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Nn Atacados",
+   "integracao": "WebPic",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Vistamy Jeans",
+   "integracao": "WebPic",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Martt",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Amicia",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Exinia",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Copine",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Sensual Fetiche",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Soror Clothing",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "jenny",
+   "oraculo": ""
+  },
+  {
+   "nome": "Donna Da Lua",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Estilo Coy",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Trimix",
+   "integracao": "VirtualAge",
+   "filial": "R$500",
+   "vestipago": "cartão",
+   "oraculo": "sim (oráculo)"
+  },
+  {
+   "nome": "Bauarte",
+   "integracao": "Millenium",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Grupo Lorsa",
+   "integracao": "VirtualAge",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "sim (bot)"
+  },
+  {
+   "nome": "Equivoco",
+   "integracao": "VirtualAge",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "sim (bot)"
+  },
+  {
+   "nome": "Vida Bela",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Júlia Plus",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Patmos",
+   "integracao": "Bling",
+   "filial": "R$359",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Edi Saraiva",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Villa Forte Jeans",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Valentins Fashion",
+   "integracao": "WebPic",
+   "filial": "não",
+   "vestipago": "não",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Gabyanna Confecções",
+   "integracao": "não",
+   "filial": "não",
+   "vestipago": "cartão / pix",
+   "oraculo": "não"
+  },
+  {
+   "nome": "Malhas Di Bom Gosto",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "QueBela",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "DeMissy",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Be Free",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Camburiu",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "República Caipira",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Danque",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Beige",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Gitaa",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Egoiste",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Egoiste Plus",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Valentins Fashion",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Moda Carla",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Sedução Dress",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Modas Carla",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Okey Store e Lov Club",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Teaser All Style",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Fashion Noire",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Mishamna / Nino danielli",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "Menina Bonita",
+   "integracao": "",
+   "filial": "",
+   "vestipago": "",
+   "oraculo": ""
+  },
+  {
+   "nome": "IMPLANTAÇÃO",
+   "integracao": "DATA",
+   "filial": "",
+   "vestipago": "CS",
+   "oraculo": ""
+  },
+  {
+   "nome": "Exprim",
+   "integracao": "2025-11-04 00:00:00",
+   "filial": "",
+   "vestipago": "Rodrigo",
+   "oraculo": ""
+  },
+  {
+   "nome": "Terra Mãe",
+   "integracao": "2026-02-24 00:00:00",
+   "filial": "",
+   "vestipago": "Rodrigo",
+   "oraculo": ""
+  },
+  {
+   "nome": "Yegrina",
+   "integracao": "2026-03-09 00:00:00",
+   "filial": "",
+   "vestipago": "Tati",
+   "oraculo": ""
+  },
+  {
+   "nome": "Folle Moda Feminina",
+   "integracao": "2026-03-25 00:00:00",
+   "filial": "",
+   "vestipago": "Rodrigo",
+   "oraculo": ""
+  },
+  {
+   "nome": "Amicca",
+   "integracao": "2026-04-06 00:00:00",
+   "filial": "",
+   "vestipago": "Tati",
+   "oraculo": ""
+  },
+  {
+   "nome": "Versally",
+   "integracao": "2026-04-16 00:00:00",
+   "filial": "",
+   "vestipago": "Tati",
+   "oraculo": ""
+  },
+  {
+   "nome": "Aline Mezzari",
+   "integracao": "2026-04-29 00:00:00",
+   "filial": "",
+   "vestipago": "Tati",
+   "oraculo": ""
+  },
+  {
+   "nome": "Céu de algodão",
+   "integracao": "2026-05-12 00:00:00",
+   "filial": "",
+   "vestipago": "Tati",
+   "oraculo": ""
+  },
+  {
+   "nome": "Bebela",
+   "integracao": "2026-05-27 00:00:00",
+   "filial": "",
+   "vestipago": "Tati",
+   "oraculo": ""
+  },
+  {
+   "nome": "DB Brand",
+   "integracao": "2026-06-12 00:00:00",
+   "filial": "",
+   "vestipago": "Tati",
+   "oraculo": ""
+  },
+  {
+   "nome": "Crifitop Kids",
+   "integracao": "2026-06-19 00:00:00",
+   "filial": "",
+   "vestipago": "Rodrigo",
+   "oraculo": ""
+  },
+  {
+   "nome": "Free Man",
+   "integracao": "2026-06-30 00:00:00",
+   "filial": "",
+   "vestipago": "Rodrigo",
+   "oraculo": ""
+  }
+ ]
+}

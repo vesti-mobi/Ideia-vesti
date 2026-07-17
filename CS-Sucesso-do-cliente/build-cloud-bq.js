@@ -173,6 +173,59 @@ async function main() {
         catch (e) { console.log('  WARN: _nps.json: ' + e.message); }
     }
 
+    // ---------- 4b. Tino (snapshot planilha Google) + Marcas CS Gabi (snapshot xlsx) ----------
+    // Snapshots commitados na pasta (o build no CI não tem as credenciais do Sheets nem o
+    // xlsx local). Atualizar com: python _refresh_tino_gabi.py  (requer creds Sheets + xlsx).
+    const tinoSet = new Set();
+    const tinoPath = path.join(DIR, 'tino_clientes.json');
+    if (fs.existsSync(tinoPath)) {
+        try { (JSON.parse(fs.readFileSync(tinoPath, 'utf-8')).clientes || []).forEach(c => { const n = normSimple(c.nome); if (n) tinoSet.add(n); }); }
+        catch (e) { console.log('  WARN: tino_clientes.json: ' + e.message); }
+        console.log('  Tino: ' + tinoSet.size + ' marcas');
+    }
+    // Aliases p/ marcas cujo nome na Tino difere do nome no cadastro Vesti
+    const TINO_ALIAS = { 'barraca willinha': 'barraca do willinha' };
+    for (const [from, to] of Object.entries(TINO_ALIAS)) if (tinoSet.has(from)) tinoSet.add(normSimple(to));
+
+    // Gabi: plataforma de integração (fallback quando o cadastro não traz). Ignora
+    // valores que não são plataforma (datas, "não", vazio).
+    const gabiPlataforma = {};
+    const gabiPath = path.join(DIR, 'marcas_gabi.json');
+    const isPlataforma = (v) => v && !/^n(ã|a)o$|^-$|^\d{4}-\d{2}-\d{2}|^data$/i.test(String(v).trim());
+    if (fs.existsSync(gabiPath)) {
+        try {
+            (JSON.parse(fs.readFileSync(gabiPath, 'utf-8')).marcas || []).forEach(m => {
+                const n = normSimple(m.nome); if (!n) return;
+                if (isPlataforma(m.integracao)) gabiPlataforma[n] = String(m.integracao).trim();
+            });
+        } catch (e) { console.log('  WARN: marcas_gabi.json: ' + e.message); }
+        console.log('  Gabi plataformas: ' + Object.keys(gabiPlataforma).length + ' marcas');
+    }
+    // Observações por marca (editadas no painel/celular via stark-admin, commitadas em
+    // observacoes.json). Mapa por companyId.
+    const obsMap = {};
+    const obsPath = path.join(DIR, 'observacoes.json');
+    if (fs.existsSync(obsPath)) {
+        try {
+            const o = JSON.parse(fs.readFileSync(obsPath, 'utf-8')).observacoes || {};
+            for (const [cid, v] of Object.entries(o)) if (v && v.texto) obsMap[cid] = v.texto;
+        } catch (e) { console.log('  WARN: observacoes.json: ' + e.message); }
+        console.log('  Observações: ' + Object.keys(obsMap).length + ' marcas');
+    }
+
+    // Match difuso nome-empresa -> valor. Usado p/ Tino (bool) e Gabi (plataforma).
+    function lookupByNome(nome, exactSet, fuzzyMap) {
+        const n = normSimple(nome); if (!n) return undefined;
+        if (exactSet) { if (exactSet.has(n)) return true; }
+        if (fuzzyMap && fuzzyMap[n] !== undefined) return fuzzyMap[n];
+        // fuzzy contains (>=5 chars) — mesma regra do match de marcas/faturamento
+        const pool = exactSet ? [...exactSet] : Object.keys(fuzzyMap);
+        for (const k of pool) {
+            if (k.length >= 5 && n.length >= 5 && (k.includes(n) || n.includes(k))) return exactSet ? true : fuzzyMap[k];
+        }
+        return exactSet ? false : undefined;
+    }
+
     // ---------- 5. Matriz por domínio ----------
     const matrizPorDominio = new Map();
     for (const lh of lakehouseEmpresas) if (lh.isMatriz && !matrizPorDominio.has(lh.dominioId)) matrizPorDominio.set(lh.dominioId, lh);
@@ -347,21 +400,6 @@ async function main() {
         emp.isMatriz = lh.isMatriz; emp.isFilial = lh.isFilial; emp.lakehouseRn = lh.rn;
         empresasAtivas.push(emp);
     }
-    // Override de anjo/CS por dominio, para quando a carteira muda e o cadastro nao acompanha.
-    // O anjo vem de odbc_domains.angel_id -> odbc_angels. Assim que o angel_id for corrigido no
-    // sistema Vesti, a entrada aqui vira redundante e pode ser removida.
-    // (O dominio 1272421 — Kelly Rodrigues Store — ja foi corrigido no cadastro em 10/07 e nao
-    //  precisa de override; so a unidade Fortaleza segue apontando pro CS antigo.)
-    const ANJO_OVERRIDE = {
-        2052347: 'Luana Coutinho', // Kelly Rodrigues Fortaleza — cadastro ainda com Thamiris Ribeiro
-    };
-    let anjosSobrescritos = 0;
-    empresasAtivas.forEach(e => {
-        const novo = ANJO_OVERRIDE[Number(e.idDominio)];
-        if (novo && e.anjo !== novo) { e.anjo = novo; anjosSobrescritos++; }
-    });
-    if (anjosSobrescritos) console.log('  Anjo sobrescrito manualmente: ' + anjosSobrescritos + ' empresa(s)');
-
     empresasAtivas.forEach(e => {
         if (!e.idDominio) return;
         const key = String(e.idDominio);
@@ -455,8 +493,14 @@ async function main() {
             temVestiPago: vestiPagoSet.has(f.id), isMatriz: matrizIds.has(f.id),
         })).sort((a, b) => { if (a.isMatriz && !b.isMatriz) return -1; if (!a.isMatriz && b.isMatriz) return 1; return a.nome.localeCompare(b.nome); });
 
+        // Tino (planilha Google) + plataforma de integração (cadastro > Gabi fallback)
+        const tino = lookupByNome(nome, tinoSet, null) ? 'Sim' : 'Não';
+        let integracaoPlat = (e.integracao || '').trim();
+        if (!integracaoPlat) { const gp = lookupByNome(nome, null, gabiPlataforma); if (gp) integracaoPlat = gp; }
+
         return {
             i: idx, id: e.id, idDominio: e.idDominio, nome, canal: e.canal,
+            tino, integracaoPlat, observacao: obsMap[e.id] || '',
             cartao: e.cartaoImpl ? 'Sim' : 'Não', pix: e.pixImpl ? 'Sim' : 'Não', cnpj: e.cnpj,
             temVestiPago, vestiPagoTransacionando: temVestiPago && (e.transCartao + e.transPix) > 0,
             transCartao: e.transCartao, transPix: e.transPix, transTotal: e.transTotal,
@@ -505,16 +549,7 @@ async function main() {
     });
 
     // ---------- 14. Faturamento (Iugu, fatura cheia) — match CNPJ depois nome ----------
-    // Uma marca costuma ter varios customer_id na Iugu (setup, assinatura, reajuste).
-    // Tanto o match por CNPJ quanto o por nome precisam SOMAR todos, senao a marca fica subcontada.
-    const emptyBucket = () => ({ paid:0,pending:0,expired:0,canceled:0,nPagas:0,nPendentes:0,nVencidas:0,qtd:0,faturas:[] });
-    const addToBucket = (b, rec) => {
-        b.paid+=rec.paid; b.pending+=rec.pending; b.expired+=rec.expired; b.canceled+=rec.canceled;
-        b.nPagas+=rec.nPagas; b.nPendentes+=rec.nPendentes; b.nVencidas+=rec.nVencidas; b.qtd+=rec.qtd;
-        b.faturas.push(...rec.faturas);
-        return b;
-    };
-    const fatByCnpj = {}, fatRecs = [];
+    const fatByCnpj = {}, fatByName = {};
     for (const r of faturamentoRows) {
         const rec = {
             paid: num(r.paid), pending: num(r.pending), expired: num(r.expired), canceled: num(r.canceled),
@@ -523,9 +558,15 @@ async function main() {
             customer_name: r.customer_name || '',
         };
         const c = digits(r.cnpj);
-        if (c.length >= 11) addToBucket(fatByCnpj[c] || (fatByCnpj[c] = emptyBucket()), rec);
+        if (c.length >= 11) {
+            if (!fatByCnpj[c]) fatByCnpj[c] = { paid:0,pending:0,expired:0,canceled:0,nPagas:0,nPendentes:0,nVencidas:0,qtd:0,faturas:[] };
+            const b = fatByCnpj[c];
+            b.paid+=rec.paid; b.pending+=rec.pending; b.expired+=rec.expired; b.canceled+=rec.canceled;
+            b.nPagas+=rec.nPagas; b.nPendentes+=rec.nPendentes; b.nVencidas+=rec.nVencidas; b.qtd+=rec.qtd;
+            b.faturas.push(...rec.faturas);
+        }
         const n = normSimple(rec.customer_name);
-        if (n && n.length >= 4) fatRecs.push({ nome: n, rec });
+        if (n && !fatByName[n]) fatByName[n] = rec;
     }
     let invoiceMatched = 0;
     for (const emp of empresasList) {
@@ -534,11 +575,11 @@ async function main() {
         if (ec.length >= 11 && fatByCnpj[ec]) data = fatByCnpj[ec];
         if (!data) {
             const nomeNorm = normSimple(emp.nome);
-            const cands = fatRecs.filter(({ nome }) => {
-                const sh = Math.min(nomeNorm.length, nome.length);
-                return nomeNorm === nome || (sh >= 5 && (nomeNorm.startsWith(nome) || nome.startsWith(nomeNorm)));
-            });
-            if (cands.length) data = cands.reduce((b, c) => addToBucket(b, c.rec), emptyBucket());
+            for (const [brand, bd] of Object.entries(fatByName)) {
+                if (brand.length < 4) continue;
+                const sh = Math.min(nomeNorm.length, brand.length);
+                if (nomeNorm === brand || (sh >= 5 && (nomeNorm.startsWith(brand) || brand.startsWith(nomeNorm)))) { data = bd; break; }
+            }
         }
         if (data) {
             const faturasSorted = [...data.faturas].sort((a, b) => (b.due || '').localeCompare(a.due || ''));
