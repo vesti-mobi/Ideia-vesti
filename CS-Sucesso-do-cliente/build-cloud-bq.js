@@ -201,6 +201,19 @@ async function main() {
         } catch (e) { console.log('  WARN: marcas_gabi.json: ' + e.message); }
         console.log('  Gabi plataformas: ' + Object.keys(gabiPlataforma).length + ' marcas');
     }
+    // Integração/plataforma: snapshot commitado de Cadastros Empresas.csv (o CSV está no
+    // .gitignore e não existe no runner do CI; o BQ odbc_integrations vem vazio). Atualizar
+    // com: node _refresh_integracoes.js  (requer o CSV local).
+    let integ = { byCompany: {}, byDominio: {}, byCnpj: {} };
+    const integPath = path.join(DIR, 'integracoes.json');
+    if (fs.existsSync(integPath)) {
+        try {
+            const j = JSON.parse(fs.readFileSync(integPath, 'utf-8'));
+            integ = { byCompany: j.byCompany || {}, byDominio: j.byDominio || {}, byCnpj: j.byCnpj || {} };
+        } catch (e) { console.log('  WARN: integracoes.json: ' + e.message); }
+        console.log('  Integrações (snapshot): ' + Object.keys(integ.byCompany).length + ' empresas');
+    }
+
     // Observações por marca (editadas no painel/celular via stark-admin, commitadas em
     // observacoes.json). Mapa por companyId.
     const obsMap = {};
@@ -434,6 +447,20 @@ async function main() {
         const ctrl = controleMap[e.id] || controleByNome[(nome || '').toLowerCase().trim()];
         const oracTkt = oraculoByEmpId[e.id];
 
+        // Tino (planilha Google)
+        const tino = lookupByNome(nome, tinoSet, null) ? 'Sim' : 'Não';
+        // Plataforma de integração: BQ (vazio hoje) > snapshot do cadastro por
+        // companyId/domínio/CNPJ > Gabi (fallback por nome). Resolvido aqui (antes do
+        // churn, que usa "sem integração" como sinal).
+        const cnpjInteg = digits(e.cnpj);
+        let integracaoPlat = (e.integracao || '').trim()
+            || integ.byCompany[e.id]
+            || integ.byDominio[String(e.idDominio)]
+            || (cnpjInteg.length >= 11 ? integ.byCnpj[cnpjInteg] : '')
+            || '';
+        if (!integracaoPlat) { const gp = lookupByNome(nome, null, gabiPlataforma); if (gp) integracaoPlat = gp; }
+        const temIntegracaoFinal = (e.temIntegracao === 'Sim' || !!integracaoPlat) ? 'Sim' : (e.temIntegracao || '');
+
         let mensalidade = '';
         if (ctrl && ctrl.mensalidade) mensalidade = ctrl.mensalidade;
         else if (marca && marca.totalCobrado) mensalidade = 'R$ ' + marca.totalCobrado.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
@@ -468,7 +495,7 @@ async function main() {
         const currentMonth = recentMonthKeys[0];
         if (e.pedidos > 0 && (!empMonthly[currentMonth] || empMonthly[currentMonth].qtd === 0)) { churnScore += 25; churnMotivos.push('Zero pedidos no mês atual'); }
         if (e.pedidos > 10 && e.pedidosCancelados > e.pedidosPagos * 0.3) { churnScore += 15; churnMotivos.push('Alto cancelamento'); }
-        if (e.temIntegracao !== 'Sim') { churnScore += 10; churnMotivos.push('Sem integração'); }
+        if (temIntegracaoFinal !== 'Sim') { churnScore += 10; churnMotivos.push('Sem integração'); }
         if (oraculoEtapa === 'Churn') { churnScore += 30; churnMotivos.push('Oráculo: Churn'); }
         else if (oraculoEtapa === 'Parado') { churnScore += 20; churnMotivos.push('Oráculo: Parado'); }
         churnScore = Math.min(churnScore, 100);
@@ -493,11 +520,6 @@ async function main() {
             temVestiPago: vestiPagoSet.has(f.id), isMatriz: matrizIds.has(f.id),
         })).sort((a, b) => { if (a.isMatriz && !b.isMatriz) return -1; if (!a.isMatriz && b.isMatriz) return 1; return a.nome.localeCompare(b.nome); });
 
-        // Tino (planilha Google) + plataforma de integração (cadastro > Gabi fallback)
-        const tino = lookupByNome(nome, tinoSet, null) ? 'Sim' : 'Não';
-        let integracaoPlat = (e.integracao || '').trim();
-        if (!integracaoPlat) { const gp = lookupByNome(nome, null, gabiPlataforma); if (gp) integracaoPlat = gp; }
-
         return {
             i: idx, id: e.id, idDominio: e.idDominio, nome, canal: e.canal,
             tino, integracaoPlat, observacao: obsMap[e.id] || '',
@@ -511,8 +533,8 @@ async function main() {
             valPedidosPendentes: Math.round(e.valPedidosPendentes * 100) / 100,
             linksEnviados: (isMatriz || filiaisGroup.length <= 1) ? (linksByCompany[e.id] || 0) : 0,
             cliques: (isMatriz || filiaisGroup.length <= 1) ? (cliquesByCompany[e.id] || 0) : 0,
-            anjo: e.anjo, modulo: e.modulo, tags: e.tags, temIntegracao: e.temIntegracao,
-            integracao: e.integracao || '', tipoIntegracao: e.tipoIntegracao, criacao: e.criacao, valorPlano: e.valorPlano,
+            anjo: e.anjo, modulo: e.modulo, tags: e.tags, temIntegracao: temIntegracaoFinal,
+            integracao: integracaoPlat, tipoIntegracao: e.tipoIntegracao, criacao: e.criacao, valorPlano: e.valorPlano,
             plano: marca ? marca.plano : '', planoMensalidade: marca ? marca.mensalidade : 0,
             planoIntegracao: marca ? marca.integracao : 0, planoAssistente: marca ? marca.assistente : 0,
             planoFilial: marca ? marca.filial : 0, planoDescontos: marca ? marca.descontos : 0,
