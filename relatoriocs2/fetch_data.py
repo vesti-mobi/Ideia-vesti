@@ -194,6 +194,19 @@ TAB_MAP = {
 def cell(ws, r, c):
     return ws.cell(row=r, column=c).value if c else None
 
+def row_color(ws, r, col):
+    """Cor de fundo (hex #rrggbb) da celula empresa; '' se sem cor / branco."""
+    f = ws.cell(row=r, column=col).fill
+    if not f or not getattr(f, "patternType", None):
+        return ""
+    rgb = getattr(f.fgColor, "rgb", None)
+    if not isinstance(rgb, str) or len(rgb) != 8:
+        return ""
+    hexc = "#" + rgb[2:].upper()
+    if hexc in ("#FFFFFF", "#000000"):
+        return ""
+    return hexc
+
 def build_aba3():
     import openpyxl
     wb = openpyxl.load_workbook(os.path.join(HERE, "_sheet3.xlsx"), data_only=True)
@@ -226,6 +239,7 @@ def build_aba3():
             rows.append({
                 "cs_tab": m["cs_label"],
                 "empresa": str(empresa).strip(),
+                "color": row_color(ws, r, m["empresa"]),   # cor original da planilha
                 "cs": cell(ws, r, m["cs"]) or "",
                 "plano": cell(ws, r, m["plano"]) or "",
                 "gmv_ant": gmv_ant,
