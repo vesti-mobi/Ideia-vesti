@@ -1,0 +1,45 @@
+name: Atualizar Relatorio CS 2 diariamente
+
+on:
+  schedule:
+    - cron: '40 8 * * *'   # 08:40 UTC (~05:40 BRT)
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: pip install -r relatoriocs2/requirements.txt
+
+      - name: Gerar dashboard_data.js
+        env:
+          GOOGLE_SA_JSON: ${{ secrets.RELCS2_GOOGLE_SA_JSON }}
+          TINO_USER: ${{ secrets.RELCS2_TINO_USER }}
+          TINO_PASS: ${{ secrets.RELCS2_TINO_PASS }}
+        run: |
+          cd relatoriocs2
+          python fetch_data.py
+
+      - name: Commit se mudou
+        run: |
+          cd relatoriocs2
+          if [ -n "$(git status --porcelain dashboard_data.js)" ]; then
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            git add dashboard_data.js
+            git commit -m "chore(relatoriocs2): refresh dados $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "sem mudancas"
+          fi
