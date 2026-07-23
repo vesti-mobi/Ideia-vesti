@@ -50,7 +50,7 @@
         <span><span class="dot" style="background:var(--green)"></span>Verde = ativa</span>
         <span><span class="dot" style="background:var(--red)"></span>Vermelho = cancelada</span>
         <span><span class="dot" style="background:#eceef3;border:1px solid #ddd"></span>Sem cor = sem reunião (contatar)</span>
-        <span>⏰ alerta a cada 45 dias desde a data da coluna "25+"</span>
+        <span>⏰ alerta ao atingir <b>45</b> e <b>60 dias</b> desde o cadastro (Entrada)</span>
       </div>
       <div class="toolbar">
         <input type="text" id="q-a1" placeholder="Buscar marca...">
@@ -103,6 +103,20 @@
         <button class="btn-xls" onclick="exportTab('a3')">⬇ Excel</button>
       </div>
       <div class="tbl-wrap"><table class="grid" id="tbl-a3"></table></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="callModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">📞 Marcas para chamar <span class="pill" id="callCount">0</span></div>
+      <button class="modal-x" onclick="closeCallModal()">✕</button>
+    </div>
+    <div class="modal-body" id="callBody"></div>
+    <div class="modal-foot">
+      <label class="chk"><input type="checkbox" id="dontToday"> não mostrar de novo hoje</label>
+      <button class="btn-prim" onclick="closeCallModal()">Entendi</button>
     </div>
   </div>
 </div>
