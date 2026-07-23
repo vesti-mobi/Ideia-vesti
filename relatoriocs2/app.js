@@ -77,6 +77,10 @@ function newRowKey(tab){ return "new:"+tab+":"+Date.now().toString(36)+Math.floo
 /* CS efetiva (com override) */
 function effCs(key,orig){ var o=ov(key); return (o.cs!==undefined&&o.cs!==null&&o.cs!=="")?o.cs:(orig||""); }
 
+/* observação é ÚNICA por marca (compartilhada entre Passagem de Bastão e Ranking) */
+function normName(s){ return (s==null?"":s).toString().toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g,""); }
+function obsKey(name){ return "obs:"+normName(name); }
+
 /* ---------- célula editável: observação ---------- */
 function obsCell(key,orig){
   var o=ov(key); var val=(o.obs!==undefined&&o.obs!==null)?o.obs:(orig||"");
@@ -272,7 +276,7 @@ function renderA1(){
     tr.appendChild(cell(r.data25?fmtDate(r.data25):'<span class="dash">—</span>',"nowrap mut"));
     tr.appendChild(stCell(eff1(r)));
     tr.appendChild(alCell(alert1(r)));
-    tr.appendChild(obsCell(key,r.obs_orig));
+    tr.appendChild(obsCell(obsKey(r.marca),r.obs_orig));   // obs única por marca (compartilhada c/ Ranking)
     tr.appendChild(cell(""));
     tb.appendChild(tr);
   });
@@ -407,7 +411,7 @@ function renderA3(){
     tr.appendChild(cell(esc(r.mensalidade||"")||'<span class="dash">—</span>',"nowrap mut"));
     tr.appendChild(cell(boolPill(r.tino)));
     tr.appendChild(cell(boolPill(r.vestipago)));
-    tr.appendChild(obsCell(key,r.obs_orig));
+    tr.appendChild(obsCell(obsKey(r.empresa),r.obs_orig));   // obs única por marca (compartilhada c/ Passagem de Bastão)
     tr.appendChild(cell(""));
     tb.appendChild(tr);
   });
