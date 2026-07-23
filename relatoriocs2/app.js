@@ -141,14 +141,15 @@ function eff1(row){ // status efetivo considerando recolorização manual
   }
   return row.status;
 }
-function alert1(row){ // {level,text} ou null
+function alert1(row){ // {level,text} ou null — marcos únicos aos 45 e 60 dias do cadastro
   var st=eff1(row);
   if(st==="cancelada") return null;
   if(st==="sem_reuniao") return {level:"alert",text:"⏰ sem reunião — contatar"};
-  var anchor=pdate(row.data25)||pdate(row.entrada);
-  if(!anchor) return null;
-  var d=daysBetween(today(),anchor);
-  if(d>=45){ var cyc=Math.floor(d/45); return {level:"warn",text:"⏰ 45d+"+(cyc>1?" ("+cyc+"x)":"")}; }
+  var cad=pdate(row.entrada);   // data de cadastro (Entrada)
+  if(!cad) return null;
+  var d=daysBetween(today(),cad);
+  if(d>=60) return {level:"warn",text:"⏰ 60 dias"};
+  if(d>=45) return {level:"warn",text:"⏰ 45 dias"};
   return null;
 }
 function defColor1(row){ var st=row.status;
@@ -345,6 +346,40 @@ function exportTab(which){
 }
 window.exportTab=exportTab;
 
+/* ---------- modal "marcas para chamar" ---------- */
+function callItems(){
+  var items=[];
+  D.aba1.forEach(function(r){ var a=alert1(r); if(a) items.push({tab:"a1",marca:r.marca,cs:r.cs,
+    motivo:a.text.replace(/^⏰ ?/,"").replace(/^🚫 ?/,""),level:a.level}); });
+  D.aba2.forEach(function(r){ var a=alert2(r); if(a) items.push({tab:"a2",marca:r.nome,cs:"",
+    motivo:a.text.replace(/^⏰ ?/,"").replace(/^🚫 ?/,""),level:a.level}); });
+  return items;
+}
+function mitem(i){ return '<div class="mitem" data-go="'+i.tab+'"><span class="mmarca">'+esc(i.marca)+'</span>'+
+  (i.cs?'<span class="mcs">'+esc(i.cs)+'</span>':"")+
+  '<span class="alertpill'+(i.level==="warn"?" warn":"")+'">'+esc(i.motivo)+'</span></div>'; }
+function buildCallModal(){
+  var items=callItems();
+  document.getElementById("callCount").textContent=items.length;
+  var body=document.getElementById("callBody");
+  if(!items.length){ body.innerHTML='<div class="empty">Nenhuma marca para chamar agora 🎉</div>'; return; }
+  var g1=items.filter(function(i){return i.tab==="a1";}), g2=items.filter(function(i){return i.tab==="a2";});
+  var html="";
+  if(g1.length) html+='<div class="mgroup"><h4>📋 Passagem de bastão · '+g1.length+'</h4>'+g1.map(mitem).join("")+'</div>';
+  if(g2.length) html+='<div class="mgroup"><h4>🔑 Acessos Tino · '+g2.length+'</h4>'+g2.map(mitem).join("")+'</div>';
+  body.innerHTML=html;
+  body.querySelectorAll("[data-go]").forEach(function(el){
+    el.addEventListener("click",function(){ showTab(el.getAttribute("data-go")); closeCallModal(); });
+  });
+  var hideKey=localStorage.getItem("cs2_callmodal_hide");
+  if(hideKey!==(D.hoje||"")) document.getElementById("callModal").classList.add("open");
+}
+function closeCallModal(){
+  document.getElementById("callModal").classList.remove("open");
+  if(document.getElementById("dontToday").checked) localStorage.setItem("cs2_callmodal_hide", D.hoje||"");
+}
+window.closeCallModal=closeCallModal;
+
 /* ---------- tabs / boot ---------- */
 function showTab(t){
   ["a1","a2","a3"].forEach(function(x){
@@ -376,6 +411,7 @@ window.__cs2_boot=function(){
   loadOverlays().then(function(){
     renderA1(); renderA2(); renderA3();
     cardsA1(); cardsA2(); cardsA3(); pills();
+    buildCallModal();
   });
 };
 })();
