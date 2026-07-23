@@ -147,9 +147,10 @@ function alert1(row){ // {level,text} ou null
   var cad=pdate(row.entrada);   // data de cadastro (Entrada)
   if(!cad) return null;
   var d=daysBetween(today(),cad);
-  // rótulo sempre "sem reunião" (com dias reais); dispara aos 45d (warn) e fica urgente após 60d (alert)
-  if(d>=60) return {level:"alert",text:"⏰ sem reunião ("+d+" dias)"};
-  if(d>=45) return {level:"warn", text:"⏰ sem reunião ("+d+" dias)"};
+  // marcos do cadastro: 45d (laranja) e 60d (vermelho); muito atrasada (90+) vira "sem reunião"
+  if(d>=90) return {level:"alert",text:"⏰ sem reunião ("+d+" dias)"};
+  if(d>=60) return {level:"alert",text:"⏰ 60 dias"};
+  if(d>=45) return {level:"warn", text:"⏰ 45 dias"};
   return null;
 }
 function defColor1(row){ var st=row.status;
