@@ -147,8 +147,9 @@ function alert1(row){ // {level,text} ou null
   var cad=pdate(row.entrada);   // data de cadastro (Entrada)
   if(!cad) return null;
   var d=daysBetween(today(),cad);
-  if(d>=60) return {level:"alert",text:"⏰ 60 dias — chamar"};
-  if(d>=45) return {level:"warn", text:"⏰ 45 dias — chamar"};
+  // rótulo sempre "sem reunião" (com dias reais); dispara aos 45d (warn) e fica urgente após 60d (alert)
+  if(d>=60) return {level:"alert",text:"⏰ sem reunião ("+d+" dias)"};
+  if(d>=45) return {level:"warn", text:"⏰ sem reunião ("+d+" dias)"};
   return null;
 }
 function defColor1(row){ var st=row.status;
