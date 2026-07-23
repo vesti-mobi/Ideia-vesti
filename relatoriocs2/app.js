@@ -55,10 +55,27 @@ function saveOverlay(key,patch){
   try{ localStorage.setItem(LS,JSON.stringify(overlays)); }catch(e){}
   if(API){
     fetch(API+"/api/overlays",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ns:NS,key:key,obs:overlays[key].obs,color:overlays[key].color})})
+      body:JSON.stringify({ns:NS,key:key,value:overlays[key]})})
       .then(function(){flash();}).catch(function(){flash("salvo local (offline)");});
   } else flash("salvo local");
 }
+function deleteOverlay(key){
+  delete overlays[key];
+  try{ localStorage.setItem(LS,JSON.stringify(overlays)); }catch(e){}
+  if(API){
+    fetch(API+"/api/overlays?ns="+NS+"&key="+encodeURIComponent(key),{method:"DELETE"})
+      .then(function(){flash("removido");}).catch(function(){flash("removido local");});
+  } else flash("removido local");
+}
+/* linhas adicionadas manualmente: overlays com chave "new:<tab>:<id>" */
+function addedRows(tab){
+  var pre="new:"+tab+":", out=[];
+  Object.keys(overlays).forEach(function(k){ if(k.indexOf(pre)===0) out.push(Object.assign({__key:k},overlays[k])); });
+  return out.sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+}
+function newRowKey(tab){ return "new:"+tab+":"+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36); }
+/* CS efetiva (com override) */
+function effCs(key,orig){ var o=ov(key); return (o.cs!==undefined&&o.cs!==null&&o.cs!=="")?o.cs:(orig||""); }
 
 /* ---------- célula editável: observação ---------- */
 function obsCell(key,orig){
@@ -92,6 +109,10 @@ function colorCell(key,defColor,onChange){
       sw.style.background=cur||"repeating-linear-gradient(45deg,#fff,#fff 4px,#eee 4px,#eee 8px)";
       pop.classList.remove("open");
       saveOverlay(key,{color:col.c});
+      // atualiza o fundo da linha na hora (funciona em todas as abas, sem re-render)
+      var tr=td.closest("tr");
+      if(tr){ if(col.c){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",col.c); }
+              else { tr.removeAttribute("data-c"); tr.style.removeProperty("--rowc"); } }
       if(onChange) onChange(col.c);
     });
     pop.appendChild(b);
@@ -102,6 +123,32 @@ function colorCell(key,defColor,onChange){
   td.appendChild(sw); td.appendChild(pop); return td;
 }
 document.addEventListener("click",function(){ document.querySelectorAll(".pop.open").forEach(function(p){p.classList.remove("open");}); });
+
+/* ---------- célula editável: CS (select) ---------- */
+function csCell(key,orig,options,onChange){
+  var td=document.createElement("td");
+  var cur=effCs(key,orig);
+  var sel=document.createElement("select"); sel.className="csedit";
+  var opts=options.slice();
+  if(cur && opts.indexOf(cur)<0) opts.unshift(cur);
+  opts.forEach(function(o){ var op=document.createElement("option"); op.value=o; op.textContent=o; if(o===cur)op.selected=true; sel.appendChild(op); });
+  sel.addEventListener("change",function(){ saveOverlay(key,{cs:sel.value}); if(onChange)onChange(sel.value); });
+  td.appendChild(sel); return td;
+}
+/* ---------- célula editável: texto genérico (linhas novas) ---------- */
+function textCell(key,field,value,cls,ph){
+  var td=document.createElement("td"); if(cls)td.className=cls;
+  var inp=document.createElement("input"); inp.type="text"; inp.className="txtedit"; inp.value=(value==null?"":value);
+  inp.placeholder=ph||"";
+  inp.addEventListener("blur",function(){ var p={}; p[field]=inp.value; saveOverlay(key,p); });
+  td.appendChild(inp); return td;
+}
+function delCell(key,rerender){
+  var td=document.createElement("td"); td.className="colorcell";
+  var b=document.createElement("button"); b.className="delrow"; b.title="remover linha"; b.textContent="🗑";
+  b.addEventListener("click",function(){ if(confirm("Remover esta linha adicionada?")){ deleteOverlay(key); rerender(); } });
+  td.appendChild(b); return td;
+}
 
 /* ---------- header com sort ---------- */
 function makeHead(cols,state,rerender){
@@ -131,30 +178,35 @@ function sortRows(rows,state,accessors){
 
 /* ================= ABA 1 — Passagem de bastão ================= */
 var s1={sort:"dias",dir:-1};
-function eff1(row){ // status efetivo considerando recolorização manual
-  var o=ov("a1:"+row.marca);
-  if(o.color!==undefined&&o.color!==null){
-    if(o.color==="") return "sem_reuniao";
-    if(isGreen(o.color)) return "ativa";
-    if(isRed(o.color))   return "cancelada";
-    return row.status;
-  }
-  return row.status;
+var CS1_OPTS=["Luana","Thamiris","Gabriella Busto","Elisa","Alexia","Tatiane"];
+function statusFromColor(c,fallback){
+  if(c===undefined||c===null) return fallback;
+  if(c==="") return "sem_reuniao";
+  if(isGreen(c)) return "ativa";
+  if(isRed(c))   return "cancelada";
+  return fallback||"sem_reuniao";
 }
-function alert1(row){ // {level,text} ou null
-  // alerta de reunião só p/ marcas EM BRANCO (sem reunião). Verde=reunião feita, vermelho=cancelada -> nunca alertam.
-  if(eff1(row)!=="sem_reuniao") return null;
-  var cad=pdate(row.entrada);   // data de cadastro (Entrada)
+function eff1(row,key){ // status efetivo considerando recolorização manual
+  return statusFromColor(ov(key||("a1:"+row.marca)).color, row.status||"sem_reuniao");
+}
+// alerta só p/ marcas EM BRANCO (sem reunião); marcos 45d(laranja)/60d(vermelho); 90+ vira "sem reunião"
+function alertFor1(entradaStr,status){
+  if(status!=="sem_reuniao") return null;
+  var cad=pdate(entradaStr);
   if(!cad) return null;
   var d=daysBetween(today(),cad);
-  // marcos do cadastro: 45d (laranja) e 60d (vermelho); muito atrasada (90+) vira "sem reunião"
   if(d>=90) return {level:"alert",text:"⏰ sem reunião ("+d+" dias)"};
   if(d>=60) return {level:"alert",text:"⏰ 60 dias"};
   if(d>=45) return {level:"warn", text:"⏰ 45 dias"};
   return null;
 }
+function alert1(row){ return alertFor1(row.entrada, eff1(row)); }
 function defColor1(row){ var st=row.status;
   return st==="ativa"?"#B6D7A8":st==="cancelada"?"#F4C7C3":""; }
+
+var STLABEL={ativa:"Ativa",cancelada:"Cancelada",sem_reuniao:"Sem reunião"};
+function stCell(stx){ return cell('<span class="st '+stx+'">'+STLABEL[stx]+"</span>"); }
+function alCell(al){ return cell(al?'<span class="alertpill'+(al.level==="warn"?" warn":"")+'">'+al.text+"</span>":'<span class="dash">—</span>'); }
 
 function renderA1(){
   var q=(document.getElementById("q-a1").value||"").toLowerCase();
@@ -163,13 +215,13 @@ function renderA1(){
   var onlyAl=document.getElementById("al-a1").checked;
   var rows=D.aba1.filter(function(r){
     if(q && (r.marca||"").toLowerCase().indexOf(q)<0) return false;
-    if(cs && r.cs!==cs) return false;
+    if(cs && effCs("a1:"+r.marca,r.cs)!==cs) return false;
     if(st && eff1(r)!==st) return false;
     if(onlyAl && !alert1(r)) return false;
     return true;
   });
   var acc={ marca:function(r){return r.marca;}, entrada:function(r){return pdate(r.entrada)?pdate(r.entrada).getTime():null;},
-    dias:function(r){var d=pdate(r.entrada);return d?daysBetween(today(),d):null;}, cs:function(r){return r.cs;},
+    dias:function(r){var d=pdate(r.entrada);return d?daysBetween(today(),d):null;}, cs:function(r){return effCs("a1:"+r.marca,r.cs);},
     impl:function(r){return r.implementador;}, data25:function(r){var d=pdate(r.data25);return d?d.getTime():null;} };
   rows=sortRows(rows,s1,acc);
 
@@ -181,40 +233,66 @@ function renderA1(){
     {label:"Implementador",key:"impl",sort:1},
     {label:"CS",key:"cs",sort:1},
     {label:"25+ / Últ. marco",key:"data25",sort:1},
-    {label:"Status"},{label:"Alerta"},{label:"Observação"}
+    {label:"Status"},{label:"Alerta"},{label:"Observação"},{label:""}
   ];
   var tbl=document.getElementById("tbl-a1"); tbl.innerHTML="";
   var thead=document.createElement("thead"); thead.appendChild(makeHead(cols,s1,renderA1)); tbl.appendChild(thead);
   var tb=document.createElement("tbody");
+
+  // linhas adicionadas manualmente (topo)
+  var re=function(){ renderA1(); cardsA1(); pills(); };
+  addedRows("a1").forEach(function(r){
+    var key=r.__key, tr=document.createElement("tr"); tr.className="addedrow";
+    if(r.color){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",r.color); }
+    tr.appendChild(colorCell(key,"",re));
+    tr.appendChild(textCell(key,"marca",r.marca,"marca","nova marca"));
+    tr.appendChild(textCell(key,"entrada",r.entrada,"nowrap","AAAA-MM-DD"));
+    var d=pdate(r.entrada); tr.appendChild(cell(d?daysBetween(today(),d):'<span class="dash">—</span>',"num"));
+    tr.appendChild(textCell(key,"implementador",r.implementador,"","impl."));
+    tr.appendChild(csCell(key,r.cs,CS1_OPTS,re));
+    tr.appendChild(textCell(key,"data25",r.data25,"nowrap","25+"));
+    var stx=statusFromColor(ov(key).color,"sem_reuniao"); tr.appendChild(stCell(stx));
+    tr.appendChild(alCell(alertFor1(r.entrada,stx)));
+    tr.appendChild(obsCell(key,""));
+    tr.appendChild(delCell(key,re));
+    tb.appendChild(tr);
+  });
+
   rows.forEach(function(r){
-    var tr=document.createElement("tr");
-    var oc=ov("a1:"+r.marca); var rc=(oc.color!==undefined&&oc.color!==null)?oc.color:defColor1(r);
+    var key="a1:"+r.marca, tr=document.createElement("tr");
+    var oc=ov(key); var rc=(oc.color!==undefined&&oc.color!==null)?oc.color:defColor1(r);
     if(rc){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",rc); }
-    tr.appendChild(colorCell("a1:"+r.marca,defColor1(r),function(){ renderA1(); cardsA1(); pills(); }));
+    tr.appendChild(colorCell(key,defColor1(r),re));
     var d=pdate(r.entrada), dias=d?daysBetween(today(),d):"";
     tr.appendChild(cell('<span class="marca">'+esc(r.marca)+"</span>"));
     tr.appendChild(cell(fmtDate(r.entrada),"nowrap mut"));
     tr.appendChild(cell(dias===""?'<span class="dash">—</span>':dias,"num"));
     tr.appendChild(cell(esc(r.implementador||"")||'<span class="dash">—</span>'));
-    tr.appendChild(cell(esc(r.cs||"")||'<span class="dash">—</span>'));
+    tr.appendChild(csCell(key,r.cs,CS1_OPTS,re));
     tr.appendChild(cell(r.data25?fmtDate(r.data25):'<span class="dash">—</span>',"nowrap mut"));
-    var stx=eff1(r); tr.appendChild(cell('<span class="st '+stx+'">'+({ativa:"Ativa",cancelada:"Cancelada",sem_reuniao:"Sem reunião"}[stx])+"</span>"));
-    var al=alert1(r); tr.appendChild(cell(al?'<span class="alertpill'+(al.level==="warn"?" warn":"")+'">'+al.text+"</span>":'<span class="dash">—</span>'));
-    tr.appendChild(obsCell("a1:"+r.marca,r.obs_orig));
+    tr.appendChild(stCell(eff1(r)));
+    tr.appendChild(alCell(alert1(r)));
+    tr.appendChild(obsCell(key,r.obs_orig));
+    tr.appendChild(cell(""));
     tb.appendChild(tr);
   });
   tbl.appendChild(tb);
-  if(!rows.length) tbl.innerHTML+='<tbody><tr><td colspan="10" class="empty">Nenhuma marca com esses filtros.</td></tr></tbody>';
-  document.getElementById("cnt-a1").textContent=rows.length+" marca(s)";
+  if(!rows.length && !addedRows("a1").length) tbl.innerHTML+='<tbody><tr><td colspan="11" class="empty">Nenhuma marca com esses filtros.</td></tr></tbody>';
+  document.getElementById("cnt-a1").textContent=(rows.length+addedRows("a1").length)+" marca(s)";
 }
 function cell(html,cls){ var td=document.createElement("td"); if(cls)td.className=cls; td.innerHTML=html; return td; }
 
 function cardsA1(){
   var a=D.aba1, ativa=0,canc=0,sem=0,al=0;
   a.forEach(function(r){ var s=eff1(r); if(s==="ativa")ativa++;else if(s==="cancelada")canc++;else sem++; if(alert1(r))al++; });
+  addedRows("a1").forEach(function(r){ var s=statusFromColor(ov(r.__key).color,"sem_reuniao");
+    if(s==="ativa")ativa++;else if(s==="cancelada")canc++;else sem++; if(alertFor1(r.entrada,s))al++; });
   document.getElementById("cards-a1").innerHTML=
-    card(a.length,"Marcas")+card(ativa,"Ativas")+card(canc,"Canceladas")+card(sem,"Sem reunião")+card(al,"Com alerta ⏰",true);
+    card(a.length+addedRows("a1").length,"Marcas")+card(ativa,"Ativas")+card(canc,"Canceladas")+card(sem,"Sem reunião")+card(al,"Com alerta ⏰",true);
 }
+function addRow(tab){ saveOverlay(newRowKey(tab),{ts:Date.now()});
+  if(tab==="a1"){renderA1();cardsA1();pills();} else if(tab==="a3"){renderA3();cardsA3();} }
+window.addRow=addRow;
 
 /* ================= ABA 2 — Tino ================= */
 var s2={sort:"dias",dir:-1};
@@ -273,31 +351,54 @@ function cardsA2(){
 
 /* ================= ABA 3 — Ranking Upsell ================= */
 var s3={sort:"cresc_rs",dir:-1};
+var CS3_OPTS=["Busto","Luana","Thamiris"];
 function renderA3(){
   var q=(document.getElementById("q-a3").value||"").toLowerCase();
   var csBtn=document.querySelector("#cs-a3 button.active"); var cs=csBtn?csBtn.getAttribute("data-cs"):"";
   var rows=D.aba3.filter(function(r){
-    if(cs && r.cs_tab!==cs) return false;
+    if(cs && effCs("a3:"+r.cs_tab+":"+r.empresa,r.cs_tab)!==cs) return false;
     if(q && (r.empresa||"").toLowerCase().indexOf(q)<0) return false;
     return true;
   });
-  var acc={ empresa:function(r){return r.empresa;}, cs:function(r){return r.cs_tab;}, plano:function(r){return r.plano;},
+  var acc={ empresa:function(r){return r.empresa;}, cs:function(r){return effCs("a3:"+r.cs_tab+":"+r.empresa,r.cs_tab);}, plano:function(r){return r.plano;},
     gmv_ant:function(r){return r.gmv_ant;}, gmv_atual:function(r){return r.gmv_atual;},
     cresc_rs:function(r){return r.cresc_rs;}, cresc_pct:function(r){return r.cresc_pct;} };
   rows=sortRows(rows,s3,acc);
   var cols=[{label:"Cor"},{label:"Empresa",key:"empresa",sort:1,def:1},{label:"CS",key:"cs",sort:1},
     {label:"Plano",key:"plano",sort:1},{label:"GMV anterior",key:"gmv_ant",sort:1,num:1},
     {label:"GMV atual",key:"gmv_atual",sort:1,num:1},{label:"Cresc. R$",key:"cresc_rs",sort:1,num:1},
-    {label:"Cresc. %",key:"cresc_pct",sort:1,num:1},{label:"Mensalidade"},{label:"Tino"},{label:"VestiPago"},{label:"Observação"}];
+    {label:"Cresc. %",key:"cresc_pct",sort:1,num:1},{label:"Mensalidade"},{label:"Tino"},{label:"VestiPago"},{label:"Observação"},{label:""}];
   var tbl=document.getElementById("tbl-a3"); tbl.innerHTML="";
   var thead=document.createElement("thead"); thead.appendChild(makeHead(cols,s3,renderA3)); tbl.appendChild(thead);
   var tb=document.createElement("tbody");
+  var re=function(){ renderA3(); cardsA3(); };
+
+  addedRows("a3").forEach(function(r){
+    var key=r.__key, tr=document.createElement("tr"); tr.className="addedrow";
+    if(r.color){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",r.color); }
+    tr.appendChild(colorCell(key,"",re));
+    tr.appendChild(textCell(key,"empresa",r.empresa,"marca","nova empresa"));
+    tr.appendChild(csCell(key,r.cs_tab||"Busto",CS3_OPTS,re));
+    tr.appendChild(textCell(key,"plano",r.plano,"","plano"));
+    tr.appendChild(textCell(key,"gmv_ant",r.gmv_ant,"num","0"));
+    tr.appendChild(textCell(key,"gmv_atual",r.gmv_atual,"num","0"));
+    tr.appendChild(textCell(key,"cresc_rs",r.cresc_rs,"num","0"));
+    tr.appendChild(textCell(key,"cresc_pct",r.cresc_pct,"num","%"));
+    tr.appendChild(textCell(key,"mensalidade",r.mensalidade,"","R$"));
+    tr.appendChild(textCell(key,"tino",r.tino,"","Sim/Não"));
+    tr.appendChild(textCell(key,"vestipago",r.vestipago,"","Sim/Não"));
+    tr.appendChild(obsCell(key,""));
+    tr.appendChild(delCell(key,re));
+    tb.appendChild(tr);
+  });
+
   rows.forEach(function(r){
     var key="a3:"+r.cs_tab+":"+r.empresa; var tr=document.createElement("tr");
-    var oc=ov(key); if(oc.color){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",oc.color); }
-    tr.appendChild(colorCell(key,"",function(){}));
+    var oc=ov(key); var rc=(oc.color!==undefined&&oc.color!==null)?oc.color:(r.color||"");
+    if(rc){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",rc); }
+    tr.appendChild(colorCell(key,r.color||"",re));
     tr.appendChild(cell('<span class="marca">'+esc(r.empresa)+'</span>'));
-    tr.appendChild(cell(esc(r.cs_tab)));
+    tr.appendChild(csCell(key,r.cs_tab,CS3_OPTS,re));
     tr.appendChild(cell(esc(r.plano||"")||'<span class="dash">—</span>'));
     tr.appendChild(cell(money(r.gmv_ant),"num mut"));
     tr.appendChild(cell(money(r.gmv_atual),"num"));
@@ -307,11 +408,12 @@ function renderA3(){
     tr.appendChild(cell(boolPill(r.tino)));
     tr.appendChild(cell(boolPill(r.vestipago)));
     tr.appendChild(obsCell(key,r.obs_orig));
+    tr.appendChild(cell(""));
     tb.appendChild(tr);
   });
   tbl.appendChild(tb);
-  if(!rows.length) tbl.innerHTML+='<tbody><tr><td colspan="12" class="empty">Nenhuma empresa com esses filtros.</td></tr></tbody>';
-  document.getElementById("cnt-a3").textContent=rows.length+" empresa(s)";
+  if(!rows.length && !addedRows("a3").length) tbl.innerHTML+='<tbody><tr><td colspan="13" class="empty">Nenhuma empresa com esses filtros.</td></tr></tbody>';
+  document.getElementById("cnt-a3").textContent=(rows.length+addedRows("a3").length)+" empresa(s)";
 }
 function boolPill(v){ if(v===true) return '<span class="st on">Sim</span>';
   if(v===false) return '<span class="st off">Não</span>';
@@ -349,11 +451,11 @@ window.exportTab=exportTab;
 
 /* ---------- modal "marcas para chamar" ---------- */
 function callItems(){
-  var items=[];
-  D.aba1.forEach(function(r){ var a=alert1(r); if(a) items.push({tab:"a1",marca:r.marca,cs:r.cs,
-    motivo:a.text.replace(/^⏰ ?/,"").replace(/^🚫 ?/,""),level:a.level}); });
-  D.aba2.forEach(function(r){ var a=alert2(r); if(a) items.push({tab:"a2",marca:r.nome,cs:"",
-    motivo:a.text.replace(/^⏰ ?/,"").replace(/^🚫 ?/,""),level:a.level}); });
+  var items=[], cl=function(t){return t.replace(/^⏰ ?/,"").replace(/^🚫 ?/,"");};
+  D.aba1.forEach(function(r){ var a=alert1(r); if(a) items.push({tab:"a1",marca:r.marca,cs:effCs("a1:"+r.marca,r.cs),motivo:cl(a.text),level:a.level}); });
+  addedRows("a1").forEach(function(r){ var a=alertFor1(r.entrada,statusFromColor(ov(r.__key).color,"sem_reuniao"));
+    if(a&&r.marca) items.push({tab:"a1",marca:r.marca,cs:effCs(r.__key,r.cs),motivo:cl(a.text),level:a.level}); });
+  D.aba2.forEach(function(r){ var a=alert2(r); if(a) items.push({tab:"a2",marca:r.nome,cs:"",motivo:cl(a.text),level:a.level}); });
   return items;
 }
 function mitem(i){ return '<div class="mitem" data-go="'+i.tab+'"><span class="mmarca">'+esc(i.marca)+'</span>'+
