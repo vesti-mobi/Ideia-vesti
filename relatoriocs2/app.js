@@ -141,15 +141,14 @@ function eff1(row){ // status efetivo considerando recolorização manual
   }
   return row.status;
 }
-function alert1(row){ // {level,text} ou null — marcos únicos aos 45 e 60 dias do cadastro
-  var st=eff1(row);
-  if(st==="cancelada") return null;
-  if(st==="sem_reuniao") return {level:"alert",text:"⏰ sem reunião — contatar"};
+function alert1(row){ // {level,text} ou null
+  // alerta de reunião só p/ marcas EM BRANCO (sem reunião). Verde=reunião feita, vermelho=cancelada -> nunca alertam.
+  if(eff1(row)!=="sem_reuniao") return null;
   var cad=pdate(row.entrada);   // data de cadastro (Entrada)
   if(!cad) return null;
   var d=daysBetween(today(),cad);
-  if(d>=60) return {level:"warn",text:"⏰ 60 dias"};
-  if(d>=45) return {level:"warn",text:"⏰ 45 dias"};
+  if(d>=60) return {level:"alert",text:"⏰ 60 dias — chamar"};
+  if(d>=45) return {level:"warn", text:"⏰ 45 dias — chamar"};
   return null;
 }
 function defColor1(row){ var st=row.status;
