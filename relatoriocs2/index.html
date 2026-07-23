@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>Relatório CS · Passagem de Bastão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="box">
+    <div class="logo">Relatório <span style="color:#00B894">CS</span></div>
+    <div class="sub">Passagem de Bastão · Tino · Upsell</div>
+    <input type="password" id="loginPass" placeholder="Digite a senha..." onkeydown="if(event.key==='Enter')doLogin()">
+    <div id="loginError">Senha incorreta</div>
+    <button onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<div id="app">
+  <div class="top">
+    <div class="wrap">
+      <div class="row">
+        <div class="brand">Relatório <span>CS</span>
+          <small>Passagem de Bastão · Acessos Tino · Ranking Upsell</small>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div class="gen" id="gen">—</div>
+          <button id="logout" onclick="logout()">sair</button>
+        </div>
+      </div>
+      <div class="tabs">
+        <button data-tab="a1" class="active" onclick="showTab('a1')">📋 Passagem de Bastão <span class="pill zero" id="pill-a1">0</span></button>
+        <button data-tab="a2" onclick="showTab('a2')">🔑 Acessos Tino <span class="pill zero" id="pill-a2">0</span></button>
+        <button data-tab="a3" onclick="showTab('a3')">📈 Ranking Upsell</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- ABA 1 -->
+    <div class="panel active" id="panel-a1">
+      <div class="cards" id="cards-a1"></div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--green)"></span>Verde = ativa</span>
+        <span><span class="dot" style="background:var(--red)"></span>Vermelho = cancelada</span>
+        <span><span class="dot" style="background:#eceef3;border:1px solid #ddd"></span>Sem cor = sem reunião (contatar)</span>
+        <span>⏰ alerta a cada 45 dias desde a data da coluna "25+"</span>
+      </div>
+      <div class="toolbar">
+        <input type="text" id="q-a1" placeholder="Buscar marca...">
+        <select id="cs-a1"><option value="">CS: todas</option></select>
+        <select id="st-a1">
+          <option value="">Status: todos</option>
+          <option value="ativa">Ativa</option>
+          <option value="cancelada">Cancelada</option>
+          <option value="sem_reuniao">Sem reunião</option>
+        </select>
+        <label class="chk"><input type="checkbox" id="al-a1"> só com alerta ⏰</label>
+        <div class="spacer"></div>
+        <span class="count" id="cnt-a1"></span>
+        <button class="btn-xls" onclick="exportTab('a1')">⬇ Excel</button>
+      </div>
+      <div class="tbl-wrap"><table class="grid" id="tbl-a1"></table></div>
+    </div>
+
+    <!-- ABA 2 -->
+    <div class="panel" id="panel-a2">
+      <div class="cards" id="cards-a2"></div>
+      <div class="legend">
+        <span>⏰ alerta: mais de <b>15 dias</b> sem acessar</span>
+        <span>🚫 alerta: <b>nunca acessou</b></span>
+      </div>
+      <div class="toolbar">
+        <input type="text" id="q-a2" placeholder="Buscar marca...">
+        <select id="st-a2"><option value="">Status: todos</option><option value="active">active</option><option value="inactive">inactive</option></select>
+        <label class="chk"><input type="checkbox" id="al-a2"> só com alerta ⏰</label>
+        <div class="spacer"></div>
+        <span class="count" id="cnt-a2"></span>
+        <button class="btn-xls" onclick="exportTab('a2')">⬇ Excel</button>
+      </div>
+      <div class="tbl-wrap"><table class="grid" id="tbl-a2"></table></div>
+    </div>
+
+    <!-- ABA 3 -->
+    <div class="panel" id="panel-a3">
+      <div class="cards" id="cards-a3"></div>
+      <div class="toolbar">
+        <div class="seg" id="cs-a3">
+          <button data-cs="" class="active">Todas</button>
+          <button data-cs="Busto">Busto</button>
+          <button data-cs="Luana">Luana</button>
+          <button data-cs="Thamiris">Thamiris</button>
+        </div>
+        <input type="text" id="q-a3" placeholder="Buscar empresa...">
+        <div class="spacer"></div>
+        <span class="count" id="cnt-a3"></span>
+        <button class="btn-xls" onclick="exportTab('a3')">⬇ Excel</button>
+      </div>
+      <div class="tbl-wrap"><table class="grid" id="tbl-a3"></table></div>
+    </div>
+  </div>
+</div>
+
+<div class="save-flash" id="flash">salvo ✓</div>
+
+<script>
+function doLogin(){
+  if(document.getElementById('loginPass').value==='Mudar123'){
+    sessionStorage.setItem('cs2_auth','1'); enter();
+  } else {
+    document.getElementById('loginError').style.display='block';
+    document.getElementById('loginPass').style.borderColor='#E17055';
+  }
+}
+function logout(){ sessionStorage.removeItem('cs2_auth'); location.reload(); }
+function enter(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  if(window.__cs2_boot) window.__cs2_boot();
+}
+if(sessionStorage.getItem('cs2_auth')==='1'){
+  document.addEventListener('DOMContentLoaded',enter);
+}
+</script>
+<script src="dashboard_data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
