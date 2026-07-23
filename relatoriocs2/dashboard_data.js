@@ -1,5 +1,5 @@
 window.CS2_DATA = {
- "gerado_em": "23/07/2026 16:42",
+ "gerado_em": "23/07/2026 16:46",
  "hoje": "2026-07-23",
  "aba1": [
   {
@@ -698,15 +698,6 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "vestidoteca",
-   "nome": "Vestidoteca",
-   "created_at": "2026-04-29T18:02:54Z",
-   "last_login": "2026-07-21",
-   "dias_sem_acesso": 2,
-   "login_days": 7,
-   "status": "active"
-  },
-  {
    "company": "kelly_rodrigues_store",
    "nome": "Kelly Rodrigues Store",
    "created_at": "2026-03-31T00:51:59Z",
@@ -721,6 +712,15 @@ window.CS2_DATA = {
    "created_at": "2026-07-07T13:45:10Z",
    "last_login": "2026-07-23",
    "dias_sem_acesso": 0,
+   "login_days": 7,
+   "status": "active"
+  },
+  {
+   "company": "vestidoteca",
+   "nome": "Vestidoteca",
+   "created_at": "2026-04-29T18:02:54Z",
+   "last_login": "2026-07-21",
+   "dias_sem_acesso": 2,
    "login_days": 7,
    "status": "active"
   },
@@ -761,6 +761,42 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
+   "company": "tuba_plus",
+   "nome": "Tuba Plus",
+   "created_at": "2026-07-13T20:13:43Z",
+   "last_login": "2026-07-17",
+   "dias_sem_acesso": 6,
+   "login_days": 2,
+   "status": "active"
+  },
+  {
+   "company": "black_jeans",
+   "nome": "Black Jeans",
+   "created_at": "2026-07-07T12:58:19Z",
+   "last_login": "2026-07-18",
+   "dias_sem_acesso": 5,
+   "login_days": 2,
+   "status": "active"
+  },
+  {
+   "company": "incentive",
+   "nome": "Incentive",
+   "created_at": "2026-05-06T20:20:17Z",
+   "last_login": "2026-06-24",
+   "dias_sem_acesso": 29,
+   "login_days": 2,
+   "status": "active"
+  },
+  {
+   "company": "brytch_jeans",
+   "nome": "Brytch Jeans",
+   "created_at": "2026-07-13T16:15:21Z",
+   "last_login": "2026-07-16",
+   "dias_sem_acesso": 7,
+   "login_days": 2,
+   "status": "active"
+  },
+  {
    "company": "conceito_mika",
    "nome": "Conceito Mika",
    "created_at": "2026-06-24T12:58:49Z",
@@ -779,47 +815,11 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "incentive",
-   "nome": "Incentive",
-   "created_at": "2026-05-06T20:20:17Z",
-   "last_login": "2026-06-24",
-   "dias_sem_acesso": 29,
-   "login_days": 2,
-   "status": "active"
-  },
-  {
    "company": "nova_versao_roupas",
    "nome": "Nova Versao Roupas",
    "created_at": "2026-07-13T21:04:11Z",
    "last_login": "2026-07-22",
    "dias_sem_acesso": 1,
-   "login_days": 2,
-   "status": "active"
-  },
-  {
-   "company": "brytch_jeans",
-   "nome": "Brytch Jeans",
-   "created_at": "2026-07-13T16:15:21Z",
-   "last_login": "2026-07-16",
-   "dias_sem_acesso": 7,
-   "login_days": 2,
-   "status": "active"
-  },
-  {
-   "company": "black_jeans",
-   "nome": "Black Jeans",
-   "created_at": "2026-07-07T12:58:19Z",
-   "last_login": "2026-07-18",
-   "dias_sem_acesso": 5,
-   "login_days": 2,
-   "status": "active"
-  },
-  {
-   "company": "tuba_plus",
-   "nome": "Tuba Plus",
-   "created_at": "2026-07-13T20:13:43Z",
-   "last_login": "2026-07-17",
-   "dias_sem_acesso": 6,
    "login_days": 2,
    "status": "active"
   },
@@ -833,36 +833,27 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
+   "company": "maria_chica",
+   "nome": "Maria Chica",
+   "created_at": "2026-05-13T13:20:32Z",
+   "last_login": "2026-07-15",
+   "dias_sem_acesso": 8,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "amofany",
+   "nome": "Amofany",
+   "created_at": "2026-06-09T15:20:02Z",
+   "last_login": "2026-07-15",
+   "dias_sem_acesso": 8,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
    "company": "petit_enfant_confeccao_de_pecas_do_vestuario_ltda",
    "nome": "Petit Enfant Confeccao De Pecas Do Vestuario Ltda",
    "created_at": "2026-03-11T21:27:52Z",
-   "last_login": "2026-07-08",
-   "dias_sem_acesso": 15,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "stick_lingerie",
-   "nome": "Stick Lingerie",
-   "created_at": "2026-07-15T17:56:03Z",
-   "last_login": "2026-07-22",
-   "dias_sem_acesso": 1,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "john_cunningham",
-   "nome": "John Cunningham",
-   "created_at": "2026-07-13T16:23:46Z",
-   "last_login": "2026-07-14",
-   "dias_sem_acesso": 9,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "dolps",
-   "nome": "Dolps",
-   "created_at": "2026-03-08T22:07:26Z",
    "last_login": "2026-07-08",
    "dias_sem_acesso": 15,
    "login_days": 1,
@@ -887,56 +878,11 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "zoe_sport",
-   "nome": "Zoe Sport",
-   "created_at": "2026-07-13T16:20:33Z",
-   "last_login": "2026-07-14",
-   "dias_sem_acesso": 9,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "biotipo_jeans",
-   "nome": "Biotipo Jeans",
-   "created_at": "2026-06-29T14:57:22Z",
-   "last_login": "2026-07-07",
-   "dias_sem_acesso": 16,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "maria_chica",
-   "nome": "Maria Chica",
-   "created_at": "2026-05-13T13:20:32Z",
-   "last_login": "2026-07-15",
-   "dias_sem_acesso": 8,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "optimist_jeans",
-   "nome": "Optimist Jeans",
-   "created_at": "2026-07-13T21:19:10Z",
-   "last_login": "2026-07-15",
-   "dias_sem_acesso": 8,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "amofany",
-   "nome": "Amofany",
-   "created_at": "2026-06-09T15:20:02Z",
-   "last_login": "2026-07-15",
-   "dias_sem_acesso": 8,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "john_jones_jeans_confeccoes_ltda",
-   "nome": "John Jones Jeans Confeccoes Ltda",
-   "created_at": "2026-06-12T15:20:57Z",
-   "last_login": "2026-07-02",
-   "dias_sem_acesso": 21,
+   "company": "stick_lingerie",
+   "nome": "Stick Lingerie",
+   "created_at": "2026-07-15T17:56:03Z",
+   "last_login": "2026-07-22",
+   "dias_sem_acesso": 1,
    "login_days": 1,
    "status": "active"
   },
@@ -950,6 +896,15 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
+   "company": "zoe_sport",
+   "nome": "Zoe Sport",
+   "created_at": "2026-07-13T16:20:33Z",
+   "last_login": "2026-07-14",
+   "dias_sem_acesso": 9,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
    "company": "gitaa",
    "nome": "Gitaa",
    "created_at": "2026-07-06T12:10:55Z",
@@ -959,30 +914,48 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "crocker_jeans",
-   "nome": "Crocker Jeans",
-   "created_at": "2026-07-02T14:22:42Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
+   "company": "biotipo_jeans",
+   "nome": "Biotipo Jeans",
+   "created_at": "2026-06-29T14:57:22Z",
+   "last_login": "2026-07-07",
+   "dias_sem_acesso": 16,
+   "login_days": 1,
    "status": "active"
   },
   {
-   "company": "cvl_moda",
-   "nome": "Cvl Moda",
-   "created_at": "2026-03-11T21:10:09Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "inactive"
+   "company": "john_jones_jeans_confeccoes_ltda",
+   "nome": "John Jones Jeans Confeccoes Ltda",
+   "created_at": "2026-06-12T15:20:57Z",
+   "last_login": "2026-07-02",
+   "dias_sem_acesso": 21,
+   "login_days": 1,
+   "status": "active"
   },
   {
-   "company": "imagivan",
-   "nome": "Imagivan",
-   "created_at": "2026-06-23T15:12:57Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
+   "company": "optimist_jeans",
+   "nome": "Optimist Jeans",
+   "created_at": "2026-07-13T21:19:10Z",
+   "last_login": "2026-07-15",
+   "dias_sem_acesso": 8,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "dolps",
+   "nome": "Dolps",
+   "created_at": "2026-03-08T22:07:26Z",
+   "last_login": "2026-07-08",
+   "dias_sem_acesso": 15,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "john_cunningham",
+   "nome": "John Cunningham",
+   "created_at": "2026-07-13T16:23:46Z",
+   "last_login": "2026-07-14",
+   "dias_sem_acesso": 9,
+   "login_days": 1,
    "status": "active"
   },
   {
@@ -995,9 +968,18 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "egoiste",
-   "nome": "Egoiste",
-   "created_at": "2026-06-09T15:20:02Z",
+   "company": "imagivan",
+   "nome": "Imagivan",
+   "created_at": "2026-06-23T15:12:57Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "crocker_jeans",
+   "nome": "Crocker Jeans",
+   "created_at": "2026-07-02T14:22:42Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
@@ -1013,15 +995,6 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "barraca_do_willinha",
-   "nome": "Barraca Do Willinha",
-   "created_at": "2026-03-24T01:28:10Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
    "company": "bella_donna",
    "nome": "Bella Donna",
    "created_at": "2026-05-04T21:13:55Z",
@@ -1029,12 +1002,40 @@ window.CS2_DATA = {
    "dias_sem_acesso": null,
    "login_days": 0,
    "status": "inactive"
+  },
+  {
+   "company": "cvl_moda",
+   "nome": "Cvl Moda",
+   "created_at": "2026-03-11T21:10:09Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "inactive"
+  },
+  {
+   "company": "egoiste",
+   "nome": "Egoiste",
+   "created_at": "2026-06-09T15:20:02Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "barraca_do_willinha",
+   "nome": "Barraca Do Willinha",
+   "created_at": "2026-03-24T01:28:10Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
   }
  ],
  "aba3": [
   {
    "cs_tab": "Busto",
    "empresa": "Malhas Di Bom Gosto",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "PRO",
    "gmv_ant": 30382.8,
@@ -1049,6 +1050,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "DeMissy",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Filial Atacado",
    "gmv_ant": 10917.64,
@@ -1063,6 +1065,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Niran Confeccoes",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "avançado",
    "gmv_ant": 236342.95,
@@ -1077,6 +1080,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Ana Gonçalves Tricot",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Profissional",
    "gmv_ant": 733679.93,
@@ -1091,6 +1095,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Crisfael",
+   "color": "#FFFF00",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 44578.53,
@@ -1105,6 +1110,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Brytch Jeans",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 218657.01,
@@ -1119,6 +1125,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Bauarte",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 362876.83,
@@ -1133,6 +1140,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Tango Fantasias",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 146320.21,
@@ -1147,6 +1155,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Manacá",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Profissional",
    "gmv_ant": 301181.22,
@@ -1161,6 +1170,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "BYZ Premium",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "avançado",
    "gmv_ant": 1679383.98,
@@ -1175,6 +1185,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Trimix",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Profissional",
    "gmv_ant": 925349.31,
@@ -1189,6 +1200,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Camboriu",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "PRO",
    "gmv_ant": 187612.01,
@@ -1203,6 +1215,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Alpelo",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 293925.98,
@@ -1217,6 +1230,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Trama Villon",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "avançado I",
    "gmv_ant": 603990.97,
@@ -1231,6 +1245,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Tricotez",
+   "color": "#FFFF00",
    "cs": "Gabriella Busto",
    "plano": "PRO",
    "gmv_ant": 49256.3,
@@ -1245,6 +1260,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Estilo Coy",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 23467.9,
@@ -1259,6 +1275,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Balum Baby",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 215788.21,
@@ -1273,6 +1290,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Mary Acessórios",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 2833775.86,
@@ -1287,6 +1305,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Vistamy Jeans",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 1273095.55,
@@ -1301,6 +1320,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Gule Gule",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Profissional",
    "gmv_ant": 650737.85,
@@ -1315,6 +1335,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Venoro",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 666394.8,
@@ -1329,6 +1350,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Egoiste",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 12823788.22,
@@ -1343,6 +1365,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "República Caipira",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 841863.99,
@@ -1357,6 +1380,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Equivoco",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 1149812.5,
@@ -1371,6 +1395,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Apoá",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "avançado",
    "gmv_ant": 616760.15,
@@ -1385,6 +1410,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Lesto",
+   "color": "#FF0000",
    "cs": "Gabriella Busto",
    "plano": "Essencial",
    "gmv_ant": 778876.5,
@@ -1399,6 +1425,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Sauê",
+   "color": "#FFFF00",
    "cs": "Gabriella Busto",
    "plano": "avançado",
    "gmv_ant": 1678272.06,
@@ -1413,6 +1440,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Sensual Fetiche",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 74257.23,
@@ -1427,6 +1455,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Danque",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Profissional",
    "gmv_ant": 890634.99,
@@ -1441,6 +1470,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Elice Fitness",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "essencial",
    "gmv_ant": 1162862.9,
@@ -1455,6 +1485,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Sedução Dress",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 277351.81,
@@ -1469,6 +1500,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "SML Modas",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 628797.31,
@@ -1483,6 +1515,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Imagivan",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "PRO",
    "gmv_ant": 1198438.4,
@@ -1497,6 +1530,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Modas Condor",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 144232.23,
@@ -1511,6 +1545,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Beigë Store",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "PRO",
    "gmv_ant": 560643.98,
@@ -1525,6 +1560,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Nn Atacados",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "PRO",
    "gmv_ant": 639728.28,
@@ -1539,6 +1575,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Tricomix",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 1459835.7,
@@ -1553,6 +1590,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Valentina Sirrah",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "PRO",
    "gmv_ant": 736549.1,
@@ -1567,6 +1605,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Modas GMF",
+   "color": "#FFFF00",
    "cs": "Gabriella Busto",
    "plano": "Enterprise",
    "gmv_ant": 5155463.05,
@@ -1581,6 +1620,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Gitaa",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "PRO",
    "gmv_ant": 3617937.72,
@@ -1595,6 +1635,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "SunWeek",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 1756946.24,
@@ -1609,6 +1650,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Amicia",
+   "color": "#FFFF00",
    "cs": "Gabriella Busto",
    "plano": "Essencial",
    "gmv_ant": 259878.15,
@@ -1623,6 +1665,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Valentins Fashion",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "essencial",
    "gmv_ant": 345558.48,
@@ -1637,6 +1680,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Lucibella Modas",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 904951.57,
@@ -1651,6 +1695,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Modas Carla",
+   "color": "#B4A7D6",
    "cs": "Gabriella Busto",
    "plano": "PRO",
    "gmv_ant": 1613097.28,
@@ -1665,6 +1710,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Martt",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 812368.69,
@@ -1679,6 +1725,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Gringa",
+   "color": "#FFFF00",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 74360.37,
@@ -1693,6 +1740,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Gabyanna",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "essencial",
    "gmv_ant": 360179.01,
@@ -1707,6 +1755,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Sheslaine Brand",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 576711.75,
@@ -1721,6 +1770,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Menina Gata",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "AvançadoII",
    "gmv_ant": 4336537.09,
@@ -1735,6 +1785,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Josh Menswear",
+   "color": "#FFFF00",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 2655607.09,
@@ -1749,6 +1800,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Okey Store e Lov Club",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "",
    "gmv_ant": 439098.0,
@@ -1763,6 +1815,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Clomee",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 842322.39,
@@ -1777,6 +1830,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Sigui Atacado",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 364268.8,
@@ -1791,6 +1845,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Júlia Plus",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Essencial",
    "gmv_ant": 166775.47,
@@ -1805,6 +1860,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Villa Forte Jeans",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Essencial",
    "gmv_ant": 818786.6,
@@ -1819,6 +1875,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Soror Clothing",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Essencial",
    "gmv_ant": 387697.4,
@@ -1833,6 +1890,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Join Curves",
+   "color": "#FFFF00",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 2156832.41,
@@ -1847,6 +1905,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Rosa Fina",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "PRO",
    "gmv_ant": 218141.13,
@@ -1861,6 +1920,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "V.r Moda Plus",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "PRO",
    "gmv_ant": 1873261.13,
@@ -1875,6 +1935,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Bolovo",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 1214147.99,
@@ -1889,6 +1950,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Pianeta",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Profissional",
    "gmv_ant": 793514.04,
@@ -1903,6 +1965,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Donna Da Lua",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 650837.0,
@@ -1917,6 +1980,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "ALINE ROLIM",
+   "color": "#FFFF00",
    "cs": "Gabriella Busto",
    "plano": "essencial",
    "gmv_ant": 677424.18,
@@ -1931,6 +1995,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Pieta",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 3832164.66,
@@ -1945,6 +2010,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Vida Bela",
+   "color": "#FFFF00",
    "cs": "Gabriella Busto",
    "plano": "Essencial",
    "gmv_ant": 691519.27,
@@ -1959,6 +2025,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Boladinhos Kids",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 2390270.14,
@@ -1973,6 +2040,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Anemone",
+   "color": "#FFFF00",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 1642324.99,
@@ -1987,6 +2055,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Aline Mesari",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Profissional",
    "gmv_ant": 453831.34,
@@ -2001,6 +2070,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Wish Brand",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 2091209.05,
@@ -2015,6 +2085,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "In Love Clothing",
+   "color": "#FFFF00",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 1549621.58,
@@ -2029,6 +2100,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Badocky",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 200151.0,
@@ -2043,6 +2115,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Copine",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 313157.3,
@@ -2057,6 +2130,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Stefani",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 1191615.0,
@@ -2071,6 +2145,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Ousadia Feminina",
+   "color": "#FF0000",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 130933.63,
@@ -2085,6 +2160,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Riviera Clothing",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "avançado",
    "gmv_ant": 2082255.63,
@@ -2099,6 +2175,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Other Girls",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "avançado",
    "gmv_ant": 943225.4,
@@ -2113,6 +2190,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Mottive",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Profissional",
    "gmv_ant": 425647.5,
@@ -2127,6 +2205,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Egoíste Plus",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 1371765.0,
@@ -2141,6 +2220,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "RCR Original Clothing",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 4584612.48,
@@ -2155,6 +2235,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Exinia",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 312821.63,
@@ -2169,6 +2250,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Teaser All Style",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "upgrade profissional",
    "gmv_ant": 3261238.6,
@@ -2183,6 +2265,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Daiany Confecções",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Básico",
    "gmv_ant": 618119.5,
@@ -2197,6 +2280,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "FB Exclusive CO",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "basico",
    "gmv_ant": 2716595.0,
@@ -2211,6 +2295,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Amofany",
+   "color": "",
    "cs": "Gabriella Busto",
    "plano": "Profissional",
    "gmv_ant": 1267537.06,
@@ -2225,6 +2310,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Egoiste Collection Mega Polo",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Avançado",
    "gmv_ant": 718.8,
@@ -2239,6 +2325,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "QueBela",
+   "color": "#00FF00",
    "cs": "Gabriella Busto",
    "plano": "Essencial",
    "gmv_ant": 999796.08,
@@ -2253,6 +2340,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Kalli",
+   "color": "#00FF00",
    "cs": "Atta",
    "plano": "Avançado",
    "gmv_ant": 1636080.21,
@@ -2267,6 +2355,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Confecções Mauricio",
+   "color": "#FFFF00",
    "cs": "Shirley Silva",
    "plano": "",
    "gmv_ant": 732489.6,
@@ -2281,6 +2370,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Trama Jeans",
+   "color": "#FFFF00",
    "cs": "N/A",
    "plano": "assistente",
    "gmv_ant": 3901352.55,
@@ -2295,6 +2385,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Cocci",
+   "color": "",
    "cs": "Shirley Silva",
    "plano": "Avançado",
    "gmv_ant": 823260.34,
@@ -2309,6 +2400,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Incentive",
+   "color": "#00FF00",
    "cs": "Shirley Silva",
    "plano": "Essencial",
    "gmv_ant": 1300697.51,
@@ -2323,6 +2415,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Lm Dream Shop",
+   "color": "#00FF00",
    "cs": "Shirley Silva",
    "plano": "Básico",
    "gmv_ant": 498671.74,
@@ -2337,6 +2430,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Karmani",
+   "color": "",
    "cs": "Shirley Silva",
    "plano": "Profissional",
    "gmv_ant": 7200876.8,
@@ -2351,6 +2445,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Busto",
    "empresa": "Kesses",
+   "color": "",
    "cs": "Shirley Silva",
    "plano": "Profissional",
    "gmv_ant": 3430837.0,
@@ -2365,6 +2460,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Pijamas Lua Cheia",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 25.0,
@@ -2379,6 +2475,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Vintage Style",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 6778.0,
@@ -2393,6 +2490,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Kaylane Naybe",
+   "color": "#D9EAD3",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 100987.16,
@@ -2407,6 +2505,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Volpy Girls",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 27666.63,
@@ -2421,6 +2520,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "ZOE SPORT",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Essencial",
    "gmv_ant": 232988.76,
@@ -2435,6 +2535,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Happy Boy",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 1327482.76,
@@ -2449,6 +2550,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Santo Vício",
+   "color": "#D9D9D9",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 282868.12,
@@ -2463,6 +2565,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Nega Maluca",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 222853.82,
@@ -2477,6 +2580,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "K- OFFICIAL JEANS",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 70563.2,
@@ -2491,6 +2595,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Maria Chica",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 808367.98,
@@ -2505,6 +2610,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "ART E COR",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 458232.84,
@@ -2519,6 +2625,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Gilkai Modas",
+   "color": "#B6D7A8",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 117285.03,
@@ -2533,6 +2640,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Taju",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 51067.0,
@@ -2547,6 +2655,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Optimist Jeans",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "Enterprise",
    "gmv_ant": 508570.48,
@@ -2561,6 +2670,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Crocker",
+   "color": "#D9D9D9",
    "cs": "Luana Coutinho",
    "plano": "Profissional",
    "gmv_ant": 1748114.2,
@@ -2575,6 +2685,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Magda Fitness Filial",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 184195.95,
@@ -2589,6 +2700,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Nasmah",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 306139.88,
@@ -2603,6 +2715,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Bela Gaia",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 83330.58,
@@ -2617,6 +2730,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Miliore",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 81965.38,
@@ -2631,6 +2745,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "BE EIGHT",
+   "color": "#B6D7A8",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 100422.2,
@@ -2645,6 +2760,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Mafia Fitness",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 3699864.52,
@@ -2659,6 +2775,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Carmila Moda",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 324958.8,
@@ -2673,6 +2790,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Agarre & Use Varejo",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "",
    "gmv_ant": 58358.0,
@@ -2687,6 +2805,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "PRS JEANS",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 24100.4,
@@ -2701,6 +2820,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "P.A Concept",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 1419394.57,
@@ -2715,6 +2835,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "SARD",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 1356951.31,
@@ -2729,6 +2850,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Florita",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 167068.3,
@@ -2743,6 +2865,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Spot Shoes",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 68217.73,
@@ -2757,6 +2880,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Nova Versão Roupas",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 2542930.17,
@@ -2771,6 +2895,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Peran Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 1042108.0,
@@ -2785,6 +2910,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "TNW Jeans",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "Profissional",
    "gmv_ant": 640172.19,
@@ -2799,6 +2925,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "VICTORIA FASHION",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "",
    "gmv_ant": 6424.7,
@@ -2813,6 +2940,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "FIRE",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 619690.23,
@@ -2827,6 +2955,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Biotipo",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 646961.03,
@@ -2841,6 +2970,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "SN Acessórios",
+   "color": "#D9EAD3",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 396109.33,
@@ -2855,6 +2985,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Nanaminze",
+   "color": "#F4CCCC",
    "cs": "Luana Coutinho",
    "plano": "Profissional",
    "gmv_ant": 6155090.12,
@@ -2869,6 +3000,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "ZUA - Apucarana",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 176295.2,
@@ -2883,6 +3015,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Oxigênio Modas",
+   "color": "#F4CCCC",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 696552.1,
@@ -2897,6 +3030,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Rosa Chick",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 285140.9,
@@ -2911,6 +3045,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Bella Moda Intima",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 84911.47,
@@ -2925,6 +3060,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Rosie Lingerie",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 244807.2,
@@ -2939,6 +3075,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "MJ FASHION",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "",
    "gmv_ant": 40011.01,
@@ -2953,6 +3090,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Ricca Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 316590.73,
@@ -2967,6 +3105,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Linha Cruzada",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "avançado",
    "gmv_ant": 5956749.65,
@@ -2981,6 +3120,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "MALUE",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 60207.74,
@@ -2995,6 +3135,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Kativeiro Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "avançado",
    "gmv_ant": 558708.27,
@@ -3009,6 +3150,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Klic Kids",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 119834.33,
@@ -3023,6 +3165,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Shyros",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 864836.07,
@@ -3037,6 +3180,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Kafka Baby",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Starter",
    "gmv_ant": 1131234.06,
@@ -3051,6 +3195,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Boise",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 5455192.95,
@@ -3065,6 +3210,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Uezz",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 89399.8,
@@ -3079,6 +3225,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Kelly Rodrigues Store",
+   "color": "#D9EAD3",
    "cs": "Luana Coutinho",
    "plano": "avançado",
    "gmv_ant": 16656064.36,
@@ -3093,6 +3240,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Jeans & Peptuchy",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Essencial",
    "gmv_ant": 617730.97,
@@ -3107,6 +3255,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Jilem Modas",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 669529.13,
@@ -3121,6 +3270,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Charisma",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 455276.65,
@@ -3135,6 +3285,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Encantto Estilo",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 218003.91,
@@ -3149,6 +3300,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Anne Blanc",
+   "color": "#D9EAD3",
    "cs": "Luana Coutinho",
    "plano": "Basico",
    "gmv_ant": 3110399.17,
@@ -3163,6 +3315,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Benesh",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "profissional",
    "gmv_ant": 1598884.62,
@@ -3177,6 +3330,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Magda Moda Íntima",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 2769422.57,
@@ -3191,6 +3345,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Estação Fit integração",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "",
    "gmv_ant": 741503.11,
@@ -3205,6 +3360,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Patacho Integração",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 3844123.54,
@@ -3219,6 +3375,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Agarreuse",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 2568878.02,
@@ -3233,6 +3390,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Sisal Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 28512.12,
@@ -3247,6 +3405,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "MISSMEL",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 2023169.78,
@@ -3261,6 +3420,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Nega Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 1853678.33,
@@ -3275,6 +3435,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Maria Bella",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 994764.0,
@@ -3289,6 +3450,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Begkids",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "",
    "gmv_ant": 1705639.4,
@@ -3303,6 +3465,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Vout",
+   "color": "#F4CCCC",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 448589.86,
@@ -3317,6 +3480,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Laleskaa",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 54394.01,
@@ -3331,6 +3495,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Morena Charme",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 614768.68,
@@ -3345,6 +3510,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Vip Fashion",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 1040995.22,
@@ -3359,6 +3525,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Camerata",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 528628.96,
@@ -3373,6 +3540,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "STRANGER COMPANY",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 811263.24,
@@ -3387,6 +3555,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Tanker Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Enterprise",
    "gmv_ant": 1282372.6,
@@ -3401,6 +3570,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Penssy Rodeo",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 414385.33,
@@ -3415,6 +3585,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Lesly Modas",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 309095.0,
@@ -3429,6 +3600,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Izus Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 33984.9,
@@ -3443,6 +3615,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Andrietta",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 760136.73,
@@ -3457,6 +3630,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Marcelo Medeiros",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 1968464.12,
@@ -3471,6 +3645,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Meiatrês",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "",
    "gmv_ant": 44679.85,
@@ -3485,6 +3660,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Que Coisa Linda Oficial",
+   "color": "#FFF2CC",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 547802.6,
@@ -3499,6 +3675,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Aurore Clothing",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 1203745.25,
@@ -3513,6 +3690,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Kokada",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "avançado",
    "gmv_ant": 40792.28,
@@ -3527,6 +3705,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Pijamas Lua Cheia",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 25.0,
@@ -3541,6 +3720,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Vintage Style",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 6778.0,
@@ -3555,6 +3735,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Kaylane Naybe",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 100987.16,
@@ -3569,6 +3750,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Volpy Girls",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 27666.63,
@@ -3583,6 +3765,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "ZOE SPORT",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Essencial",
    "gmv_ant": 232988.76,
@@ -3597,6 +3780,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Happy Boy",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 1327482.76,
@@ -3611,6 +3795,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Santo Vício",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 282868.12,
@@ -3625,6 +3810,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Nega Maluca",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 222853.82,
@@ -3639,6 +3825,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "K- OFFICIAL JEANS",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 70563.2,
@@ -3653,6 +3840,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Maria Chica",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 808367.98,
@@ -3667,6 +3855,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "ART E COR",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 458232.84,
@@ -3681,6 +3870,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Gilkai Modas",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 117285.03,
@@ -3695,6 +3885,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Taju",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 51067.0,
@@ -3709,6 +3900,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Optimist Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Enterprise",
    "gmv_ant": 508570.48,
@@ -3723,6 +3915,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Crocker",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Profissional",
    "gmv_ant": 1748114.2,
@@ -3737,6 +3930,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Magda Fitness Filial",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 184195.95,
@@ -3751,6 +3945,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Masmah",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 306139.88,
@@ -3765,6 +3960,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Bela Gaia",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 83330.58,
@@ -3779,6 +3975,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Miliore",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 81965.38,
@@ -3793,6 +3990,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "BE EIGHT",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 100422.2,
@@ -3807,6 +4005,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Mafia Fitness",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 3699864.52,
@@ -3821,6 +4020,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Carmila Moda",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 324958.8,
@@ -3835,6 +4035,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Agarre & Use Varejo",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "",
    "gmv_ant": 58358.0,
@@ -3849,6 +4050,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "PRS JEANS",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 24100.4,
@@ -3863,6 +4065,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "P.A Concept",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 1419394.57,
@@ -3877,6 +4080,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "SARD",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 1356951.31,
@@ -3891,6 +4095,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Florita",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 167068.3,
@@ -3905,6 +4110,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Spot Shoes",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 68217.73,
@@ -3919,6 +4125,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Nova Versão Roupas",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 2542930.17,
@@ -3933,6 +4140,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Peran Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 1042108.0,
@@ -3947,6 +4155,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "TNW Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Profissional",
    "gmv_ant": 640172.19,
@@ -3961,6 +4170,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "VICTORIA FASHION",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "",
    "gmv_ant": 6424.7,
@@ -3975,6 +4185,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "FIRE",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 619690.23,
@@ -3989,6 +4200,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Biotipo",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 646961.03,
@@ -4003,6 +4215,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "SN Acessórios",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 396109.33,
@@ -4017,6 +4230,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Nanaminze",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Profissional",
    "gmv_ant": 6155090.12,
@@ -4031,6 +4245,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "ZUA - Apucarana",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 176295.2,
@@ -4045,6 +4260,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Oxigênio Modas",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 696552.1,
@@ -4059,6 +4275,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Rosa Chick",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 285140.9,
@@ -4073,6 +4290,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Bella Moda Intima",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 84911.47,
@@ -4087,6 +4305,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Rosie Lingerie",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 244807.2,
@@ -4101,6 +4320,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "MJ FASHION",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "",
    "gmv_ant": 40011.01,
@@ -4115,6 +4335,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Ricca Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 316590.73,
@@ -4129,6 +4350,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Linha Cruzada",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "avançado",
    "gmv_ant": 5956749.65,
@@ -4143,6 +4365,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "MALUE",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 60207.74,
@@ -4157,6 +4380,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Kativeiro Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "avançado",
    "gmv_ant": 558708.27,
@@ -4171,6 +4395,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Klic Kids",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 119834.33,
@@ -4185,6 +4410,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Shyros",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 864836.07,
@@ -4199,6 +4425,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Kafka Baby",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Starter",
    "gmv_ant": 1131234.06,
@@ -4213,6 +4440,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Boise",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 5455192.95,
@@ -4227,6 +4455,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Uezz",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 89399.8,
@@ -4241,6 +4470,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Kelly Rodrigues Store",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "avançado",
    "gmv_ant": 16656064.36,
@@ -4255,6 +4485,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Jeans & Peptuchy",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Essencial",
    "gmv_ant": 617730.97,
@@ -4269,6 +4500,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Jilem Modas",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 669529.13,
@@ -4283,6 +4515,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Charisma",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 455276.65,
@@ -4297,6 +4530,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "AF MAN & WOMAN",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "avançado I",
    "gmv_ant": 2001085.16,
@@ -4311,6 +4545,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Encantto Estilo",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 218003.91,
@@ -4325,6 +4560,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Anne Blanc",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Basico",
    "gmv_ant": 3110399.17,
@@ -4339,6 +4575,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Benesh",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "profissional",
    "gmv_ant": 1598884.62,
@@ -4353,6 +4590,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Magda Moda Íntima",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 2769422.57,
@@ -4367,6 +4605,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Estação Fit integração",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "",
    "gmv_ant": 741503.11,
@@ -4381,6 +4620,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Patacho Integração",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 3844123.54,
@@ -4395,6 +4635,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Agarreuse",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 2568878.02,
@@ -4409,6 +4650,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Sisal Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 28512.12,
@@ -4423,6 +4665,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "MISSMEL",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 2023169.78,
@@ -4437,6 +4680,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Nega Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 1853678.33,
@@ -4451,6 +4695,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "MFITGYN",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Enterprise",
    "gmv_ant": 1664859.75,
@@ -4465,6 +4710,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Maria Bella",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 994764.0,
@@ -4479,6 +4725,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Begkids",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "",
    "gmv_ant": 1705639.4,
@@ -4493,6 +4740,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Vout",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 448589.86,
@@ -4507,6 +4755,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Laleskaa",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 54394.01,
@@ -4521,6 +4770,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Morena Charme",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 614768.68,
@@ -4535,6 +4785,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Pietra Confecções",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 21622.17,
@@ -4549,6 +4800,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Vip Fashion",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Avançado",
    "gmv_ant": 1040995.22,
@@ -4563,6 +4815,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Camerata",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 528628.96,
@@ -4577,6 +4830,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "STRANGER COMPANY",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 811263.24,
@@ -4591,6 +4845,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "G&B Bros",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 97506.0,
@@ -4605,6 +4860,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Tanker Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Enterprise",
    "gmv_ant": 1282372.6,
@@ -4619,6 +4875,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Penssy Rodeo",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 414385.33,
@@ -4633,6 +4890,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Lesly Modas",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 309095.0,
@@ -4647,6 +4905,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Izus Jeans",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 33984.9,
@@ -4661,6 +4920,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Andrietta",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 760136.73,
@@ -4675,6 +4935,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Marcelo Medeiros",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 1968464.12,
@@ -4689,6 +4950,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Meiatrês",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "",
    "gmv_ant": 44679.85,
@@ -4703,6 +4965,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Que Coisa Linda Oficial",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "PRO",
    "gmv_ant": 547802.6,
@@ -4717,6 +4980,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Aurore Clothing",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "Básico",
    "gmv_ant": 1203745.25,
@@ -4731,6 +4995,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Kokada",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "avançado",
    "gmv_ant": 40792.28,
@@ -4745,6 +5010,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Luana",
    "empresa": "Upper Concept",
+   "color": "",
    "cs": "Luana Coutinho",
    "plano": "avançado",
    "gmv_ant": 227452.74,
@@ -4759,6 +5025,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "CVL Moda",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 18438.91,
@@ -4773,6 +5040,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "FLORENCE",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 48097.97,
@@ -4787,6 +5055,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "JDL Filial",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "",
    "gmv_ant": 15032.0,
@@ -4801,6 +5070,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Consciência Jeans",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 40036.48,
@@ -4815,6 +5085,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Groovy Forever",
+   "color": "#EA9999",
    "cs": "Thamiris Ribeiro",
    "plano": "Assistente do Vendedor",
    "gmv_ant": 885280.97,
@@ -4829,6 +5100,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Mokkai Jeans",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 63258.24,
@@ -4843,6 +5115,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Adizza",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Essencial",
    "gmv_ant": 11528.7,
@@ -4857,6 +5130,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Malvada Night",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 323820.3,
@@ -4871,6 +5145,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "PUSCO",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 107417.29,
@@ -4885,6 +5160,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "CÓDIGO ZERO",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Avançado",
    "gmv_ant": 83868.49,
@@ -4899,6 +5175,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Dona Charme",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 298725.6,
@@ -4913,6 +5190,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Nono Modas",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 827446.76,
@@ -4927,6 +5205,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "MARBELLA ATACADISTA",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 230390.96,
@@ -4941,6 +5220,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Eagle Rock",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Enterprise",
    "gmv_ant": 32110.0,
@@ -4955,6 +5235,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Jeanseria",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "Profissional",
    "gmv_ant": 158974.1,
@@ -4969,6 +5250,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Luciana Pais",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "Profissional",
    "gmv_ant": 133514.6,
@@ -4983,6 +5265,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "PCA Moda Masculina",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Enterprise",
    "gmv_ant": 437852.65,
@@ -4997,6 +5280,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Anderson Atacado",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Profissional",
    "gmv_ant": 473309.01,
@@ -5011,6 +5295,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Nicoboco pronta entrega",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Totvs Moda",
    "gmv_ant": 155390.92,
@@ -5025,6 +5310,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Diamantes Lingerie",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "Profissional",
    "gmv_ant": 3485563.83,
@@ -5039,6 +5325,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Barraca Willinha Tátil",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "essencial",
    "gmv_ant": 2377655.85,
@@ -5053,6 +5340,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Santa Prata",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "Enterprise",
    "gmv_ant": 4183563.83,
@@ -5067,6 +5355,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Brascol",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "Avançado",
    "gmv_ant": 822380.41,
@@ -5081,6 +5370,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Cambos Jeans",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 799945.66,
@@ -5095,6 +5385,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Skenn",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "Avançado",
    "gmv_ant": 899890.31,
@@ -5109,6 +5400,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "DOLPS",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "Profissional",
    "gmv_ant": 2245614.2,
@@ -5123,6 +5415,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Dicollani",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "Profissional",
    "gmv_ant": 1445678.2,
@@ -5137,6 +5430,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Mon Clos",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Avançado",
    "gmv_ant": 3282837.0,
@@ -5151,6 +5445,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Imporio Fitness",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "",
    "gmv_ant": 1507990.13,
@@ -5165,6 +5460,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Ankor Design",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 9359507.36,
@@ -5179,6 +5475,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Sawary Jeans",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "profissional",
    "gmv_ant": 3414590.7,
@@ -5193,6 +5490,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Mixxon",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "profissional",
    "gmv_ant": 202356.33,
@@ -5207,6 +5505,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Amiska",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "Essencial",
    "gmv_ant": 774482.0,
@@ -5221,6 +5520,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "JDL MODAS",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 12831907.27,
@@ -5235,6 +5535,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "S.E Moda",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 762887.09,
@@ -5249,6 +5550,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Nicoboco Pedido",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "Totvs Moda",
    "gmv_ant": 1590144.1,
@@ -5263,6 +5565,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "PIT BULL JEANS",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Avançado",
    "gmv_ant": 20468084.18,
@@ -5277,6 +5580,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Sanreed",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Essencial",
    "gmv_ant": 20254.6,
@@ -5291,6 +5595,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Melanina",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 571252.97,
@@ -5305,6 +5610,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Per Pochi",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 527614.79,
@@ -5319,6 +5625,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "John Cunningham",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Essencial",
    "gmv_ant": 1538020.6,
@@ -5333,6 +5640,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "MARIA DUTRA JEANS",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 1733357.15,
@@ -5347,6 +5655,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Maria Lima",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 1066675.01,
@@ -5361,6 +5670,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Aero Summer",
+   "color": "#EA9999",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 1888902.72,
@@ -5375,6 +5685,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Grupo Eixo NTK",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Avançado",
    "gmv_ant": 2379615.21,
@@ -5389,6 +5700,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "FASHION GIRL ATACADO",
+   "color": "#EA9999",
    "cs": "Thamiris Ribeiro",
    "plano": "basico",
    "gmv_ant": 3101048.35,
@@ -5403,6 +5715,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Arary",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 1263785.08,
@@ -5417,6 +5730,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Actually Jeans",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 4764277.21,
@@ -5431,6 +5745,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Infini Mega",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Avançado",
    "gmv_ant": 487235.05,
@@ -5445,6 +5760,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Vida Marinha Atacado",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 407540.5,
@@ -5459,6 +5775,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "LARAS MODA FITNESS",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 881593.48,
@@ -5473,6 +5790,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Ópera Kids",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 1703630.0,
@@ -5487,6 +5805,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Refúgio Modas",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 1281805.98,
@@ -5501,6 +5820,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Petit Enfant",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "Enterprise",
    "gmv_ant": 4308346.78,
@@ -5515,6 +5835,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "J&R Modas Feminina",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 863970.19,
@@ -5529,6 +5850,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Tee Fashion Newmall",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 1947573.91,
@@ -5543,6 +5865,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Vila Sol",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "avançado",
    "gmv_ant": 874963.96,
@@ -5557,6 +5880,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "UNDERFASHION MODA INTIMA LTDA",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 35273.75,
@@ -5571,6 +5895,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Muna",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "profissional",
    "gmv_ant": 1024454.53,
@@ -5585,6 +5910,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "MAMANI",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 6927475.71,
@@ -5599,6 +5925,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Lemier",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 1076373.8,
@@ -5613,6 +5940,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Lolly Polly",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 285113.98,
@@ -5627,6 +5955,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Layza Aguiar",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 384867.79,
@@ -5641,6 +5970,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Deslum...",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 410492.2,
@@ -5655,6 +5985,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Imagine Jeans",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 27157.35,
@@ -5669,6 +6000,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Bella Donna Moda Bras",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "Avançado",
    "gmv_ant": 7152736.18,
@@ -5683,6 +6015,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Ave Rara",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "Profissional",
    "gmv_ant": 5523284.41,
@@ -5697,6 +6030,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Délia Modas",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 832287.7,
@@ -5711,6 +6045,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Dots",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Starter",
    "gmv_ant": 6841.0,
@@ -5725,6 +6060,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Jay Jones",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "Profissional",
    "gmv_ant": 14031906.91,
@@ -5739,6 +6075,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Infini Miller",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Avançado",
    "gmv_ant": 165268.67,
@@ -5753,6 +6090,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "USE BUH",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "",
    "gmv_ant": 926172.33,
@@ -5767,6 +6105,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "HANDARA",
+   "color": "#FFF2CC",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 35913859.6,
@@ -5781,6 +6120,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Colly Atacado",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 685153.41,
@@ -5795,6 +6135,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Rekim",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 840965.57,
@@ -5809,6 +6150,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "L2M",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "Avançado",
    "gmv_ant": 2143741.54,
@@ -5823,6 +6165,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Melove",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "basico",
    "gmv_ant": 1063948.76,
@@ -5837,6 +6180,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "HAPPY CAT",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "basico",
    "gmv_ant": 417608.82,
@@ -5851,6 +6195,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Toque Secreto Lingerie",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 16083.5,
@@ -5865,6 +6210,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Hellen Carolina",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Avançado",
    "gmv_ant": 20300.0,
@@ -5879,6 +6225,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Four One Jeans",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Avançado",
    "gmv_ant": 464058.32,
@@ -5893,6 +6240,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Paraiso",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 420794.13,
@@ -5907,6 +6255,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Califor",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Básico",
    "gmv_ant": 48620.0,
@@ -5921,6 +6270,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Tutti Sposa",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 45.54,
@@ -5935,6 +6285,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Záfira",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "",
    "gmv_ant": 85062.56,
@@ -5949,6 +6300,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Entretons",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 931114.65,
@@ -5963,6 +6315,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Murano",
+   "color": "#B6D7A8",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 500146.49,
@@ -5977,6 +6330,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Limone",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "só vestipago",
    "gmv_ant": 196600.96,
@@ -5991,6 +6345,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Conceito MIKA",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "PRO",
    "gmv_ant": 69725.97,
@@ -6005,6 +6360,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Jay & Co",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "",
    "gmv_ant": 61807.73,
@@ -6019,6 +6375,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "EJD Calizaya Estilos",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "Starter",
    "gmv_ant": 3907.0,
@@ -6033,6 +6390,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Just Denim Confecções Ltda VESTIPAGO",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "só vestipago",
    "gmv_ant": 2290.0,
@@ -6047,6 +6405,7 @@ window.CS2_DATA = {
   {
    "cs_tab": "Thamiris",
    "empresa": "Doce Deleite",
+   "color": "",
    "cs": "Thamiris Ribeiro",
    "plano": "",
    "gmv_ant": null,
