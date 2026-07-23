@@ -123,5 +123,29 @@ td.obs{min-width:230px;max-width:360px}
   border-radius:10px;font-size:13px;opacity:0;transform:translateY(10px);transition:.25s;z-index:99;pointer-events:none}
 .save-flash.show{opacity:1;transform:none}
 .empty{padding:40px;text-align:center;color:var(--mut);font-size:14px}
+
+/* modal marcas para chamar */
+.modal-back{display:none;position:fixed;inset:0;z-index:200;background:rgba(45,52,54,.55);
+  align-items:center;justify-content:center;padding:20px}
+.modal-back.open{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:82vh;display:flex;flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line)}
+.modal-title{font-size:17px;font-weight:800;display:flex;align-items:center;gap:10px}
+.modal-title .pill{background:var(--alert);color:#fff;border-radius:20px;font-size:12px;font-weight:700;padding:2px 9px}
+.modal-x{background:none;border:none;font-size:18px;color:var(--mut);cursor:pointer;line-height:1}
+.modal-body{padding:10px 22px;overflow:auto}
+.mgroup{margin:12px 0}
+.mgroup h4{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);margin:0 0 8px}
+.mitem{display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;
+  margin-bottom:6px;cursor:pointer;transition:.12s}
+.mitem:hover{border-color:var(--p);background:rgba(108,92,231,.04)}
+.mitem .mmarca{font-weight:600;font-size:13.5px;flex:1}
+.mitem .mcs{font-size:12px;color:var(--mut)}
+.modal-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 22px;border-top:1px solid var(--line)}
+.modal-foot .chk{font-size:12.5px;color:var(--mut);display:flex;gap:6px;align-items:center;cursor:pointer}
+.btn-prim{background:var(--p);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:13.5px;
+  font-weight:600;font-family:inherit;cursor:pointer}
+.btn-prim:hover{background:#5a4bd6}
 .legend{font-size:11.5px;color:var(--mut);margin:2px 0 12px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
 .legend .dot{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px}
