@@ -1,4 +1,15 @@
 {
- "atualizadoEm": "2026-07-24T11:44:33.485Z",
- "overlays": {}
+ "atualizadoEm": "2026-07-24T11:45:26.135Z",
+ "overlays": {
+  "obs:divadonna": {
+   "obs": "EDITADO NO NAVEGADOR A 11:45:24",
+   "ts": 1784893524274,
+   "up": 1784893526396
+  },
+  "a1:Diva Donna": {
+   "color": "#B6D7A8",
+   "ts": 1784893524324,
+   "up": 1784893526396
+  }
+ }
 }
