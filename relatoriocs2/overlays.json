@@ -1,0 +1,14 @@
+{
+ "atualizadoEm": "2026-07-24T11:43:26.177Z",
+ "overlays": {
+  "teste:a": {
+   "obs": "ola",
+   "color": "#B6D7A8",
+   "up": 1784893406410
+  },
+  "teste:b": {
+   "obs": "segunda",
+   "up": 1784893406410
+  }
+ }
+}
