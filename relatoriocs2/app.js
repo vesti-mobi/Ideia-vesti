@@ -1,5 +1,9 @@
-/* Relatório CS 2 — front. Renderiza 3 abas estilo planilha com edição de
-   observação + cor por linha (compartilhado) e alertas recalculados ao vivo. */
+/* Relatório CS 2 — front. 3 abas estilo planilha.
+   - TODA célula é editável (clique) em TODAS as abas; overrides salvos em overlays.
+   - Observação é ÚNICA por marca: junta o texto original da Passagem de Bastão
+     com o da aba Ranking Upsell e é compartilhada entre as duas abas.
+   - Cor da linha na aba 1 (verde/vermelho/branco) manda no status e, por
+     consequência, no quadro "Marcas para chamar", que é recalculado ao vivo. */
 (function () {
 "use strict";
 
@@ -12,16 +16,52 @@ function today(){ var n=new Date(); return new Date(n.getFullYear(),n.getMonth()
 function pdate(s){ if(!s) return null; var p=String(s).slice(0,10).split("-"); if(p.length!==3) return null;
   var d=new Date(+p[0],+p[1]-1,+p[2]); return isNaN(d)?null:d; }
 function daysBetween(a,b){ return Math.floor((a-b)/86400000); }
-function fmtDate(s){ var d=pdate(s); if(!d) return ""; var D2=String(d.getDate()).padStart(2,"0"),
-  M=String(d.getMonth()+1).padStart(2,"0"); return D2+"/"+M+"/"+d.getFullYear(); }
+function pad2(n){ return String(n).padStart(2,"0"); }
+function fmtDate(s){ var d=pdate(s); if(!d) return ""; return pad2(d.getDate())+"/"+pad2(d.getMonth()+1)+"/"+d.getFullYear(); }
 function money(v){ if(v===null||v===undefined||v==="") return "";
+  if(typeof v!=="number") return String(v);
   return "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:0,maximumFractionDigits:0}); }
-function pct(v){ if(v===null||v===undefined||v==="") return ""; return Number(v).toLocaleString("pt-BR",{maximumFractionDigits:1})+"%"; }
+function pct(v){ if(v===null||v===undefined||v==="") return "";
+  if(typeof v!=="number") return String(v);
+  return Number(v).toLocaleString("pt-BR",{maximumFractionDigits:1})+"%"; }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function deaccent(s){ return String(s==null?"":s).normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+
+/* ---------- parsers (edição) ---------- */
+function parseNumBR(s){
+  if(s===null||s===undefined) return null;
+  var t=String(s).trim(); if(t==="") return null;
+  t=t.replace(/R\$/gi,"").replace(/%/g,"").replace(/[\s\u00a0]/g,"");
+  if(t.indexOf(",")>=0) t=t.replace(/\./g,"").replace(",",".");
+  var n=parseFloat(t);
+  return isNaN(n) ? String(s).trim() : n;      // não numérico? guarda o texto
+}
+function parseDateBR(s){
+  if(!s) return "";
+  var t=String(s).trim(), m;
+  m=t.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+  if(m){ var y=+m[3]; if(y<100) y+=2000; return y+"-"+pad2(+m[2])+"-"+pad2(+m[1]); }
+  m=t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m) return m[1]+"-"+pad2(+m[2])+"-"+pad2(+m[3]);
+  return t;
+}
+function parseBool(s){
+  var t=deaccent(String(s==null?"":s)).trim().toLowerCase();
+  if(t==="") return null;
+  if(["sim","ok","true","1","x","ativo","s"].indexOf(t)>=0) return true;
+  if(["nao","false","0","-","n"].indexOf(t)>=0) return false;
+  return String(s).trim();
+}
+function toNum(v){
+  if(v===null||v===undefined||v==="") return null;
+  if(typeof v==="number") return isNaN(v)?null:v;
+  var n=parseNumBR(v); return typeof n==="number"?n:null;
+}
 
 /* ---------- cores ---------- */
 var COLORS=[
-  {k:"",         c:""},                 // sem cor
+  {k:"sem cor",  c:""},
+  {k:"branco",   c:"#FFFFFF"},
   {k:"verde",    c:"#B6D7A8"},
   {k:"vermelho", c:"#F4C7C3"},
   {k:"amarelo",  c:"#FFE599"},
@@ -29,43 +69,144 @@ var COLORS=[
   {k:"roxo",     c:"#D9D2E9"},
   {k:"laranja",  c:"#FCE5CD"}
 ];
-var GREENS=["#B6D7A8","#D9EAD3","#93C47D"];
-var REDS  =["#F4C7C3","#E06666","#EA9999","#EA6666"];
+var GREENS=["#B6D7A8","#D9EAD3","#93C47D","#6AA84F","#38761D"];
+var REDS  =["#F4C7C3","#E06666","#EA9999","#EA6666","#F4CCCC","#CC0000"];
 function isGreen(h){ return GREENS.indexOf((h||"").toUpperCase())>=0; }
 function isRed(h){   return REDS.indexOf((h||"").toUpperCase())>=0; }
+function isWhite(h){ var u=(h||"").toUpperCase(); return u==="#FFFFFF"||u==="#FFF"; }
 
-/* ---------- store (compartilhado + cache local) ---------- */
-var LS="cs2_overlays_v1", overlays={};
-function loadOverlays(){
-  return new Promise(function(res){
-    function local(){ try{overlays=JSON.parse(localStorage.getItem(LS)||"{}");}catch(e){overlays={};} res(); }
-    if(!API) return local();
-    fetch(API+"/api/overlays?ns="+NS,{cache:"no-store"})
-      .then(function(r){return r.json();})
-      .then(function(j){ overlays=(j&&j.overlays)||{}; try{localStorage.setItem(LS,JSON.stringify(overlays));}catch(e){} res(); })
-      .catch(local);
-  });
-}
+/* ================= store: edições compartilhadas entre navegadores =================
+   Fonte da verdade = relatoriocs2/overlays.json no repo, via API do stark-admin.
+   localStorage é só cache (e salva-vidas quando a API está fora do ar).
+   - escrita: as edições entram numa FILA e vão em lote 1,2s depois da última tecla
+     (senão cada célula digitada viraria um commit);
+   - leitura: poll a cada 25s traz o que as outras pessoas mudaram. */
+var LS="cs2_overlays_v1", overlays={}, srvStamp="";
+var fila={}, filaT=null, salvando=false, pollT=null;
+
+function persistLocal(){ try{ localStorage.setItem(LS,JSON.stringify(overlays)); }catch(e){} }
+function lerLocal(){ try{ overlays=JSON.parse(localStorage.getItem(LS)||"{}"); }catch(e){ overlays={}; } }
+function senha(){ try{ return sessionStorage.getItem("cs2_pass")||""; }catch(e){ return ""; } }
+
 var flashT;
 function flash(msg){ var f=document.getElementById("flash"); f.textContent=msg||"salvo ✓"; f.classList.add("show");
-  clearTimeout(flashT); flashT=setTimeout(function(){f.classList.remove("show");},1200); }
+  clearTimeout(flashT); flashT=setTimeout(function(){f.classList.remove("show");},1600); }
+var SYNC={pend:["● salvando…","p"],ok:["✓ salvo para todos","ok"],
+          off:["⚠ sem conexão — guardado aqui","er"],err:["⚠ não salvou para todos","er"],
+          only:["salvando só neste navegador","er"]};
+function setSync(st){ var e=document.getElementById("sync"); if(!e) return;
+  var s=SYNC[st]||["",""]; e.textContent=s[0]; e.className="sync "+s[1]; }
+
 function ov(key){ return overlays[key]||{}; }
+function enfileirar(key,valor){
+  if(!API){ flash("salvo só neste navegador"); setSync("only"); return; }
+  fila[key]=valor; setSync("pend"); agendarFlush();
+}
 function saveOverlay(key,patch){
-  overlays[key]=Object.assign({},overlays[key],patch,{ts:Date.now()});
-  try{ localStorage.setItem(LS,JSON.stringify(overlays)); }catch(e){}
-  if(API){
-    fetch(API+"/api/overlays",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ns:NS,key:key,value:overlays[key]})})
-      .then(function(){flash();}).catch(function(){flash("salvo local (offline)");});
-  } else flash("salvo local");
+  overlays[key]=Object.assign({},overlays[key],patch,{ts:(overlays[key]&&overlays[key].ts)||Date.now()});
+  persistLocal(); enfileirar(key,overlays[key]);
 }
 function deleteOverlay(key){
-  delete overlays[key];
-  try{ localStorage.setItem(LS,JSON.stringify(overlays)); }catch(e){}
-  if(API){
-    fetch(API+"/api/overlays?ns="+NS+"&key="+encodeURIComponent(key),{method:"DELETE"})
-      .then(function(){flash("removido");}).catch(function(){flash("removido local");});
-  } else flash("removido local");
+  delete overlays[key]; persistLocal(); enfileirar(key,null);   // null = apagar no servidor
+}
+
+function agendarFlush(ms){ if(!API) return; clearTimeout(filaT); filaT=setTimeout(flush,ms===undefined?1200:ms); }
+function devolver(lote){ Object.keys(lote).forEach(function(k){ if(fila[k]===undefined) fila[k]=lote[k]; }); }
+function flush(){
+  if(!API||salvando) return;
+  var keys=Object.keys(fila); if(!keys.length) return;
+  var lote={}; keys.forEach(function(k){ lote[k]=fila[k]; delete fila[k]; });   // tira da fila já
+  var items=keys.map(function(k){ return {key:k,value:lote[k]}; });
+  salvando=true;
+  fetch(API+"/api/overlays",{method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+senha()},
+      body:JSON.stringify({ns:NS,items:items})})
+    .then(function(r){ return r.json().catch(function(){return null;}).then(function(j){ return {st:r.status,j:j}; }); })
+    .then(function(res){
+      salvando=false;
+      if(!res.j||!res.j.ok){
+        devolver(lote); setSync("err");
+        flash("⚠ "+((res.j&&res.j.erro)||"não consegui salvar para todos"));
+        if(res.st!==401) agendarFlush(8000);           // 401 = senha errada: não adianta insistir
+        return;
+      }
+      // aplica o que o servidor gravou (com o carimbo `up` dele, que é quem desempata)
+      Object.keys(res.j.salvos||{}).forEach(function(k){
+        if(fila[k]!==undefined) return;                 // já foi editado de novo aqui: não sobrescreve
+        if(res.j.salvos[k]===null) delete overlays[k]; else overlays[k]=res.j.salvos[k];
+      });
+      srvStamp=res.j.atualizadoEm||srvStamp;
+      persistLocal(); setSync("ok"); flash("salvo para todos ✓");
+      if(Object.keys(fila).length) agendarFlush(300);
+    })
+    .catch(function(){
+      salvando=false; devolver(lote); setSync("off");
+      flash("sem conexão — guardei aqui e tento de novo"); agendarFlush(8000);
+    });
+}
+
+/* junta o que veio do servidor sem atropelar o que ainda não foi salvo daqui */
+function mergeRemote(remoto){
+  var mudou=false;
+  Object.keys(remoto).forEach(function(k){
+    if(fila[k]!==undefined) return;                     // edição local pendente vence
+    var loc=overlays[k];
+    if(!loc || (remoto[k].up||0)>=(loc.up||0)){
+      if(JSON.stringify(loc)!==JSON.stringify(remoto[k])){ overlays[k]=remoto[k]; mudou=true; }
+    }
+  });
+  Object.keys(overlays).forEach(function(k){
+    if(fila[k]!==undefined) return;
+    // `up` só existe em chave que já passou pelo servidor: sumiu de lá = alguém apagou
+    if(remoto[k]===undefined && overlays[k].up){ delete overlays[k]; mudou=true; }
+  });
+  if(mudou) persistLocal();
+  return mudou;
+}
+/* edições antigas que só existiam neste navegador (sem `up`) sobem na primeira chance */
+function subirPendentesLocais(){
+  var n=0;
+  Object.keys(overlays).forEach(function(k){ if(!overlays[k].up){ fila[k]=overlays[k]; n++; } });
+  if(n){ setSync("pend"); flash("enviando "+n+" edição(ões) deste navegador…"); agendarFlush(200); }
+}
+function loadOverlays(){
+  return new Promise(function(res){
+    lerLocal();
+    if(!API){ setSync("only"); return res(); }
+    fetch(API+"/api/overlays?ns="+NS,{cache:"no-store"})
+      .then(function(r){return r.json();})
+      .then(function(j){
+        if(!j||!j.ok) throw new Error("resposta inválida");
+        srvStamp=j.atualizadoEm||"";
+        mergeRemote(j.overlays||{});
+        subirPendentesLocais();
+        setSync(Object.keys(fila).length?"pend":"ok");
+        res();
+      })
+      .catch(function(){ setSync("off"); res(); });   // segue com o cache local
+  });
+}
+function editandoCelula(){
+  var a=document.activeElement;
+  return !!(a && a.closest && a.closest(".tbl-wrap") && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));
+}
+function pollOnce(){
+  if(!API||document.hidden||salvando||Object.keys(fila).length||editandoCelula()) return;
+  fetch(API+"/api/overlays?ns="+NS,{cache:"no-store"})
+    .then(function(r){return r.json();})
+    .then(function(j){
+      if(!j||!j.ok) return;
+      if(j.atualizadoEm && j.atualizadoEm===srvStamp) return;   // nada novo
+      srvStamp=j.atualizadoEm||"";
+      if(mergeRemote(j.overlays||{})){ reAll(); flash("atualizado por outra pessoa ↻"); }
+    })
+    .catch(function(){});
+}
+function startPoll(){
+  if(!API) return;
+  clearInterval(pollT); pollT=setInterval(pollOnce,25000);
+  document.addEventListener("visibilitychange",function(){ if(!document.hidden) pollOnce(); });
+  window.addEventListener("beforeunload",function(){ if(Object.keys(fila).length) flush(); });
 }
 /* linhas adicionadas manualmente: overlays com chave "new:<tab>:<id>" */
 function addedRows(tab){
@@ -74,12 +215,37 @@ function addedRows(tab){
   return out.sort(function(a,b){return (a.ts||0)-(b.ts||0);});
 }
 function newRowKey(tab){ return "new:"+tab+":"+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36); }
+/* linhas ocultas (originais "removidas" pelo usuário) */
+function hiddenCount(pre){ var n=0; Object.keys(overlays).forEach(function(k){
+  if(k.indexOf(pre)===0 && overlays[k].hidden) n++; }); return n; }
+function restoreTab(tab){
+  var pre=tab+":";
+  Object.keys(overlays).forEach(function(k){ if(k.indexOf(pre)===0 && overlays[k].hidden) saveOverlay(k,{hidden:false}); });
+  reAll();
+}
+window.restoreTab=restoreTab;
+
+/* ---------- valor efetivo ---------- */
+function pick(a,b){ return (a!==undefined&&a!==null) ? a : (b===undefined||b===null?"":b); }
 /* CS efetiva (com override) */
 function effCs(key,orig){ var o=ov(key); return (o.cs!==undefined&&o.cs!==null&&o.cs!=="")?o.cs:(orig||""); }
 
-/* observação é ÚNICA por marca (compartilhada entre Passagem de Bastão e Ranking) */
+/* ---------- observação ÚNICA por marca (Passagem de Bastão + Ranking Upsell) ---------- */
 function normName(s){ return (s==null?"":s).toString().toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g,""); }
 function obsKey(name){ return "obs:"+normName(name); }
+var OBS_ORIG={};
+function buildObsIndex(){
+  OBS_ORIG={};
+  function add(name,txt){
+    var k=normName(name); if(!k) return;
+    if(!OBS_ORIG[k]) OBS_ORIG[k]=[];
+    txt=(txt==null?"":String(txt)).trim();
+    if(txt && OBS_ORIG[k].indexOf(txt)<0) OBS_ORIG[k].push(txt);
+  }
+  D.aba1.forEach(function(r){ add(r.marca,r.obs_orig); });   // obs da Passagem de Bastão
+  D.aba3.forEach(function(r){ add(r.empresa,r.obs_orig); }); // obs da Ranking Upsell
+}
+function obsOrig(name){ var a=OBS_ORIG[normName(name)]; return (a&&a.length)?a.join(" | "):""; }
 
 /* ---------- célula editável: observação ---------- */
 function obsCell(key,orig){
@@ -97,6 +263,53 @@ function obsCell(key,orig){
   td.appendChild(ta); setTimeout(autos,0); return td;
 }
 
+/* ---------- célula editável genérica (clique p/ editar) ---------- */
+function editCell(key,field,orig,opt){
+  opt=opt||{};
+  var td=document.createElement("td"); td.className="edit"+(opt.cls?" "+opt.cls:"");
+  var span=document.createElement("span"); span.className="cv";
+  function cur(){ return pick(ov(key)[field],orig); }
+  function paint(){
+    var v=cur();
+    var html=opt.fmt?opt.fmt(v):(v===""?"":esc(v));
+    if(html===""||html===null||html===undefined)
+      html=opt.ph?'<span class="ph">'+esc(opt.ph)+"</span>":'<span class="dash">—</span>';
+    span.innerHTML=html;
+  }
+  paint(); td.appendChild(span);
+  td.addEventListener("click",function(){
+    if(td.querySelector("input")) return;
+    var before=cur();
+    var raw=(before===null||before===undefined)?"":String(before);
+    if(opt.type==="date") raw=fmtDate(before)||raw;
+    if(opt.type==="bool") raw=(before===true?"Sim":before===false?"Não":raw);
+    var inp=document.createElement("input"); inp.type="text";
+    inp.className="cellinp"+(opt.cls&&opt.cls.indexOf("num")>=0?" num":"");
+    inp.value=raw; inp.placeholder=opt.ph||"";
+    td.innerHTML=""; td.appendChild(inp); inp.focus(); inp.select();
+    var closed=false;
+    function close(save){
+      if(closed) return; closed=true;
+      var nv=inp.value;
+      td.innerHTML=""; td.appendChild(span);
+      if(save && nv!==raw){
+        var parsed = opt.type==="num"  ? parseNumBR(nv)
+                   : opt.type==="date" ? parseDateBR(nv)
+                   : opt.type==="bool" ? parseBool(nv)  : nv;
+        var p={}; p[field]=parsed; saveOverlay(key,p);
+        paint();
+        if(opt.onChange) opt.onChange(parsed);
+      } else paint();
+    }
+    inp.addEventListener("blur",function(){close(true);});
+    inp.addEventListener("keydown",function(e){
+      if(e.key==="Enter"){ e.preventDefault(); close(true); }
+      else if(e.key==="Escape"){ e.preventDefault(); close(false); }
+    });
+  });
+  return td;
+}
+
 /* ---------- célula editável: cor ---------- */
 function colorCell(key,defColor,onChange){
   var o=ov(key);
@@ -107,13 +320,12 @@ function colorCell(key,defColor,onChange){
   var pop=document.createElement("div"); pop.className="pop";
   COLORS.forEach(function(col){
     var b=document.createElement("div"); b.className="opt"+(col.c?"":" none");
-    if(col.c) b.style.background=col.c; b.title=col.k||"sem cor";
+    if(col.c) b.style.background=col.c; b.title=col.k;
     b.addEventListener("click",function(e){
       e.stopPropagation(); cur=col.c;
       sw.style.background=cur||"repeating-linear-gradient(45deg,#fff,#fff 4px,#eee 4px,#eee 8px)";
       pop.classList.remove("open");
       saveOverlay(key,{color:col.c});
-      // atualiza o fundo da linha na hora (funciona em todas as abas, sem re-render)
       var tr=td.closest("tr");
       if(tr){ if(col.c){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",col.c); }
               else { tr.removeAttribute("data-c"); tr.style.removeProperty("--rowc"); } }
@@ -135,24 +347,25 @@ function csCell(key,orig,options,onChange){
   var sel=document.createElement("select"); sel.className="csedit";
   var opts=options.slice();
   if(cur && opts.indexOf(cur)<0) opts.unshift(cur);
-  opts.forEach(function(o){ var op=document.createElement("option"); op.value=o; op.textContent=o; if(o===cur)op.selected=true; sel.appendChild(op); });
+  if(opts.indexOf("")<0) opts.unshift("");
+  opts.forEach(function(o){ var op=document.createElement("option"); op.value=o; op.textContent=o||"—"; if(o===cur)op.selected=true; sel.appendChild(op); });
   sel.addEventListener("change",function(){ saveOverlay(key,{cs:sel.value}); if(onChange)onChange(sel.value); });
   td.appendChild(sel); return td;
 }
-/* ---------- célula editável: texto genérico (linhas novas) ---------- */
-function textCell(key,field,value,cls,ph){
-  var td=document.createElement("td"); if(cls)td.className=cls;
-  var inp=document.createElement("input"); inp.type="text"; inp.className="txtedit"; inp.value=(value==null?"":value);
-  inp.placeholder=ph||"";
-  inp.addEventListener("blur",function(){ var p={}; p[field]=inp.value; saveOverlay(key,p); });
-  td.appendChild(inp); return td;
-}
-function delCell(key,rerender){
-  var td=document.createElement("td"); td.className="colorcell";
-  var b=document.createElement("button"); b.className="delrow"; b.title="remover linha"; b.textContent="🗑";
-  b.addEventListener("click",function(){ if(confirm("Remover esta linha adicionada?")){ deleteOverlay(key); rerender(); } });
+/* ---------- célula de ações (remover / ocultar linha) ---------- */
+function actCell(key,added,rerender){
+  var td=document.createElement("td"); td.className="actcell";
+  var b=document.createElement("button"); b.className="delrow"; b.textContent="🗑";
+  b.title=added?"remover linha adicionada":"ocultar esta linha";
+  b.addEventListener("click",function(e){
+    e.stopPropagation();
+    if(added){ if(confirm("Remover esta linha adicionada?")){ deleteOverlay(key); rerender(); } }
+    else if(confirm("Ocultar esta linha? (dá para restaurar pelo botão ↺ da barra)")){
+      saveOverlay(key,{hidden:true}); rerender(); }
+  });
   td.appendChild(b); return td;
 }
+function cell(html,cls){ var td=document.createElement("td"); if(cls)td.className=cls; td.innerHTML=html; return td; }
 
 /* ---------- header com sort ---------- */
 function makeHead(cols,state,rerender){
@@ -179,21 +392,25 @@ function sortRows(rows,state,accessors){
     return String(x).localeCompare(String(y),"pt-BR")*state.dir;
   });
 }
+function undelBtn(tab){
+  var b=document.getElementById("und-"+tab); if(!b) return;
+  var n=hiddenCount(tab+":");
+  b.style.display=n?"inline-block":"none";
+  b.textContent="↺ restaurar "+n+" oculta(s)";
+}
 
 /* ================= ABA 1 — Passagem de bastão ================= */
 var s1={sort:"dias",dir:-1};
 var CS1_OPTS=["Luana","Thamiris","Gabriella Busto","Elisa","Alexia","Tatiane"];
-function statusFromColor(c,fallback){
-  if(c===undefined||c===null) return fallback;
-  if(c==="") return "sem_reuniao";
+/* branco / sem cor => sem reunião (entra no quadro de avisos)
+   verde => ativa · vermelho => cancelada (saem do quadro de avisos) */
+function statusFromColor(c){
+  if(!c || isWhite(c)) return "sem_reuniao";
   if(isGreen(c)) return "ativa";
   if(isRed(c))   return "cancelada";
-  return fallback||"sem_reuniao";
+  return "sem_reuniao";
 }
-function eff1(row,key){ // status efetivo considerando recolorização manual
-  return statusFromColor(ov(key||("a1:"+row.marca)).color, row.status||"sem_reuniao");
-}
-// alerta só p/ marcas EM BRANCO (sem reunião); marcos 45d(laranja)/60d(vermelho); 90+ vira "sem reunião"
+// alerta só p/ marcas SEM REUNIÃO (branco/sem cor); 45d (warn) / 60d / 90+d
 function alertFor1(entradaStr,status){
   if(status!=="sem_reuniao") return null;
   var cad=pdate(entradaStr);
@@ -204,30 +421,52 @@ function alertFor1(entradaStr,status){
   if(d>=45) return {level:"warn", text:"⏰ 45 dias"};
   return null;
 }
-function alert1(row){ return alertFor1(row.entrada, eff1(row)); }
-function defColor1(row){ var st=row.status;
+function defColor1(r){ var st=r.status;
   return st==="ativa"?"#B6D7A8":st==="cancelada"?"#F4C7C3":""; }
 
-var STLABEL={ativa:"Ativa",cancelada:"Cancelada",sem_reuniao:"Sem reunião"};
-function stCell(stx){ return cell('<span class="st '+stx+'">'+STLABEL[stx]+"</span>"); }
-function alCell(al){ return cell(al?'<span class="alertpill'+(al.level==="warn"?" warn":"")+'">'+al.text+"</span>":'<span class="dash">—</span>'); }
+/* linha efetiva da aba 1 (original ou adicionada), já com todos os overrides */
+function eff1row(r){
+  var k=r.__key||("a1:"+r.marca), o=ov(k);
+  var color=(o.color!==undefined&&o.color!==null)?o.color:defColor1(r);
+  var entrada=pick(o.entrada,r.entrada), d=pdate(entrada);
+  var st=statusFromColor(color);
+  return { key:k, added:!!r.__key, src:r, hidden:!!o.hidden,
+    marca:pick(o.marca,r.marca), entrada:entrada, dias:d?daysBetween(today(),d):null,
+    implementador:pick(o.implementador,r.implementador), cs:effCs(k,r.cs),
+    data25:pick(o.data25,r.data25), color:color, status:st, alert:alertFor1(entrada,st) };
+}
+function all1(){
+  var out=[];
+  addedRows("a1").forEach(function(r){ out.push(eff1row(r)); });
+  D.aba1.forEach(function(r){ out.push(eff1row(r)); });
+  return out.filter(function(r){ return !r.hidden; });
+}
 
+var STLABEL={ativa:"Ativa",cancelada:"Cancelada",sem_reuniao:"Sem reunião"};
+function stCell(stx){ return cell('<span class="st '+stx+'">'+STLABEL[stx]+"</span>","derived"); }
+function alCell(al){ return cell(al?'<span class="alertpill'+(al.level==="warn"?" warn":"")+'">'+al.text+"</span>":'<span class="dash">—</span>',"derived"); }
+
+var re1=function(){ renderA1(); cardsA1(); syncAlerts(); };
 function renderA1(){
   var q=(document.getElementById("q-a1").value||"").toLowerCase();
   var cs=document.getElementById("cs-a1").value;
   var st=document.getElementById("st-a1").value;
   var onlyAl=document.getElementById("al-a1").checked;
-  var rows=D.aba1.filter(function(r){
-    if(q && (r.marca||"").toLowerCase().indexOf(q)<0) return false;
-    if(cs && effCs("a1:"+r.marca,r.cs)!==cs) return false;
-    if(st && eff1(r)!==st) return false;
-    if(onlyAl && !alert1(r)) return false;
+  var rows=all1().filter(function(r){
+    if(q && String(r.marca||"").toLowerCase().indexOf(q)<0) return false;
+    if(cs && r.cs!==cs) return false;
+    if(st && r.status!==st) return false;
+    if(onlyAl && !r.alert) return false;
     return true;
   });
-  var acc={ marca:function(r){return r.marca;}, entrada:function(r){return pdate(r.entrada)?pdate(r.entrada).getTime():null;},
-    dias:function(r){var d=pdate(r.entrada);return d?daysBetween(today(),d):null;}, cs:function(r){return effCs("a1:"+r.marca,r.cs);},
-    impl:function(r){return r.implementador;}, data25:function(r){var d=pdate(r.data25);return d?d.getTime():null;} };
-  rows=sortRows(rows,s1,acc);
+  var added=rows.filter(function(r){return r.added;});
+  var base =rows.filter(function(r){return !r.added;});
+  var acc={ marca:function(r){return r.marca;},
+    entrada:function(r){var d=pdate(r.entrada);return d?d.getTime():null;},
+    dias:function(r){return r.dias;}, cs:function(r){return r.cs;},
+    impl:function(r){return r.implementador;},
+    data25:function(r){var d=pdate(r.data25);return d?d.getTime():null;} };
+  base=sortRows(base,s1,acc);
 
   var cols=[
     {label:"Cor"},
@@ -243,112 +482,120 @@ function renderA1(){
   var thead=document.createElement("thead"); thead.appendChild(makeHead(cols,s1,renderA1)); tbl.appendChild(thead);
   var tb=document.createElement("tbody");
 
-  // linhas adicionadas manualmente (topo)
-  var re=function(){ renderA1(); cardsA1(); pills(); };
-  addedRows("a1").forEach(function(r){
-    var key=r.__key, tr=document.createElement("tr"); tr.className="addedrow";
+  added.concat(base).forEach(function(r){
+    var key=r.key, tr=document.createElement("tr");
+    if(r.added) tr.className="addedrow";
     if(r.color){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",r.color); }
-    tr.appendChild(colorCell(key,"",re));
-    tr.appendChild(textCell(key,"marca",r.marca,"marca","nova marca"));
-    tr.appendChild(textCell(key,"entrada",r.entrada,"nowrap","AAAA-MM-DD"));
-    var d=pdate(r.entrada); tr.appendChild(cell(d?daysBetween(today(),d):'<span class="dash">—</span>',"num"));
-    tr.appendChild(textCell(key,"implementador",r.implementador,"","impl."));
-    tr.appendChild(csCell(key,r.cs,CS1_OPTS,re));
-    tr.appendChild(textCell(key,"data25",r.data25,"nowrap","25+"));
-    var stx=statusFromColor(ov(key).color,"sem_reuniao"); tr.appendChild(stCell(stx));
-    tr.appendChild(alCell(alertFor1(r.entrada,stx)));
-    tr.appendChild(obsCell(key,""));
-    tr.appendChild(delCell(key,re));
-    tb.appendChild(tr);
-  });
-
-  rows.forEach(function(r){
-    var key="a1:"+r.marca, tr=document.createElement("tr");
-    var oc=ov(key); var rc=(oc.color!==undefined&&oc.color!==null)?oc.color:defColor1(r);
-    if(rc){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",rc); }
-    tr.appendChild(colorCell(key,defColor1(r),re));
-    var d=pdate(r.entrada), dias=d?daysBetween(today(),d):"";
-    tr.appendChild(cell('<span class="marca">'+esc(r.marca)+"</span>"));
-    tr.appendChild(cell(fmtDate(r.entrada),"nowrap mut"));
-    tr.appendChild(cell(dias===""?'<span class="dash">—</span>':dias,"num"));
-    tr.appendChild(cell(esc(r.implementador||"")||'<span class="dash">—</span>'));
-    tr.appendChild(csCell(key,r.cs,CS1_OPTS,re));
-    tr.appendChild(cell(r.data25?fmtDate(r.data25):'<span class="dash">—</span>',"nowrap mut"));
-    tr.appendChild(stCell(eff1(r)));
-    tr.appendChild(alCell(alert1(r)));
-    tr.appendChild(obsCell(obsKey(r.marca),r.obs_orig));   // obs única por marca (compartilhada c/ Ranking)
-    tr.appendChild(cell(""));
+    tr.appendChild(colorCell(key,defColor1(r.src),re1));
+    tr.appendChild(editCell(key,"marca",r.src.marca,{cls:"marca",ph:r.added?"nova marca":"",
+      fmt:function(v){return v===""?"":'<span class="marca">'+esc(v)+"</span>";},onChange:re1}));
+    tr.appendChild(editCell(key,"entrada",r.src.entrada,{cls:"nowrap mut",type:"date",ph:"dd/mm/aaaa",
+      fmt:function(v){return fmtDate(v)||(v?esc(v):"");},onChange:re1}));
+    tr.appendChild(cell(r.dias===null?'<span class="dash">—</span>':r.dias,"num derived"));
+    tr.appendChild(editCell(key,"implementador",r.src.implementador,{ph:"implementador"}));
+    tr.appendChild(csCell(key,r.src.cs,CS1_OPTS,re1));
+    tr.appendChild(editCell(key,"data25",r.src.data25,{cls:"nowrap mut",type:"date",ph:"dd/mm/aaaa",
+      fmt:function(v){return fmtDate(v)||(v?esc(v):"");}}));
+    tr.appendChild(stCell(r.status));
+    tr.appendChild(alCell(r.alert));
+    tr.appendChild(obsCell(obsKey(r.marca),obsOrig(r.marca)));   // obs única por marca (Bastão + Ranking)
+    tr.appendChild(actCell(key,r.added,re1));
     tb.appendChild(tr);
   });
   tbl.appendChild(tb);
-  if(!rows.length && !addedRows("a1").length) tbl.innerHTML+='<tbody><tr><td colspan="11" class="empty">Nenhuma marca com esses filtros.</td></tr></tbody>';
-  document.getElementById("cnt-a1").textContent=(rows.length+addedRows("a1").length)+" marca(s)";
+  if(!rows.length) tbl.innerHTML+='<tbody><tr><td colspan="11" class="empty">Nenhuma marca com esses filtros.</td></tr></tbody>';
+  document.getElementById("cnt-a1").textContent=rows.length+" marca(s)";
+  undelBtn("a1");
 }
-function cell(html,cls){ var td=document.createElement("td"); if(cls)td.className=cls; td.innerHTML=html; return td; }
 
 function cardsA1(){
-  var a=D.aba1, ativa=0,canc=0,sem=0,al=0;
-  a.forEach(function(r){ var s=eff1(r); if(s==="ativa")ativa++;else if(s==="cancelada")canc++;else sem++; if(alert1(r))al++; });
-  addedRows("a1").forEach(function(r){ var s=statusFromColor(ov(r.__key).color,"sem_reuniao");
-    if(s==="ativa")ativa++;else if(s==="cancelada")canc++;else sem++; if(alertFor1(r.entrada,s))al++; });
+  var a=all1(), ativa=0,canc=0,sem=0,al=0;
+  a.forEach(function(r){ if(r.status==="ativa")ativa++;else if(r.status==="cancelada")canc++;else sem++; if(r.alert)al++; });
   document.getElementById("cards-a1").innerHTML=
-    card(a.length+addedRows("a1").length,"Marcas")+card(ativa,"Ativas")+card(canc,"Canceladas")+card(sem,"Sem reunião")+card(al,"Com alerta ⏰",true);
+    card(a.length,"Marcas")+card(ativa,"Ativas")+card(canc,"Canceladas")+card(sem,"Sem reunião")+card(al,"Com alerta ⏰",true);
 }
-function addRow(tab){ saveOverlay(newRowKey(tab),{ts:Date.now()});
-  if(tab==="a1"){renderA1();cardsA1();pills();} else if(tab==="a3"){renderA3();cardsA3();} }
+function addRow(tab){
+  saveOverlay(newRowKey(tab),{ts:Date.now()});
+  if(tab==="a1") re1(); else if(tab==="a2") re2(); else if(tab==="a3") re3();
+}
 window.addRow=addRow;
 
 /* ================= ABA 2 — Tino ================= */
 var s2={sort:"dias",dir:-1};
-function dias2(r){ return r.dias_sem_acesso; } // null = nunca
-function alert2(r){
-  if(r.dias_sem_acesso===null||r.dias_sem_acesso===undefined) return {level:"alert",text:"🚫 nunca acessou"};
-  if(r.dias_sem_acesso>15) return {level:"warn",text:"⏰ "+r.dias_sem_acesso+"d sem acessar"};
+function alert2(dias){
+  if(dias===null||dias===undefined) return {level:"alert",text:"🚫 nunca acessou"};
+  if(dias>15) return {level:"warn",text:"⏰ "+dias+"d sem acessar"};
   return null;
 }
+function eff2row(r){
+  var k=r.__key||("a2:"+r.company), o=ov(k);
+  var last=pick(o.last_login,r.last_login), d=pdate(last);
+  var dias=d?daysBetween(today(),d):null;
+  return { key:k, added:!!r.__key, src:r, hidden:!!o.hidden,
+    nome:pick(o.nome,r.nome), company:r.company||"",
+    status:pick(o.status,r.status), created_at:pick(o.created_at,r.created_at),
+    last_login:last, dias:dias, login_days:pick(o.login_days,r.login_days),
+    color:pick(o.color,""), alert:alert2(dias) };
+}
+function all2(){
+  var out=[];
+  addedRows("a2").forEach(function(r){ out.push(eff2row(r)); });
+  D.aba2.forEach(function(r){ out.push(eff2row(r)); });
+  return out.filter(function(r){ return !r.hidden; });
+}
+var re2=function(){ renderA2(); cardsA2(); syncAlerts(); };
 function renderA2(){
   var q=(document.getElementById("q-a2").value||"").toLowerCase();
   var st=document.getElementById("st-a2").value;
   var onlyAl=document.getElementById("al-a2").checked;
-  var rows=D.aba2.filter(function(r){
-    if(q && (r.nome||"").toLowerCase().indexOf(q)<0 && (r.company||"").toLowerCase().indexOf(q)<0) return false;
+  var rows=all2().filter(function(r){
+    if(q && String(r.nome||"").toLowerCase().indexOf(q)<0 && String(r.company||"").toLowerCase().indexOf(q)<0) return false;
     if(st && r.status!==st) return false;
-    if(onlyAl && !alert2(r)) return false;
+    if(onlyAl && !r.alert) return false;
     return true;
   });
-  var acc={ nome:function(r){return r.nome;},
-    dias:function(r){return r.dias_sem_acesso===null?99999:r.dias_sem_acesso;}, // nunca no topo
+  var added=rows.filter(function(r){return r.added;});
+  var base =sortRows(rows.filter(function(r){return !r.added;}),s2,{
+    nome:function(r){return r.nome;},
+    dias:function(r){return r.dias===null?99999:r.dias;},          // nunca acessou no topo
     last:function(r){var d=pdate(r.last_login);return d?d.getTime():-1;},
-    login:function(r){return r.login_days;}, created:function(r){var d=pdate(r.created_at);return d?d.getTime():null;} };
-  rows=sortRows(rows,s2,acc);
+    login:function(r){return toNum(r.login_days);},
+    created:function(r){var d=pdate(r.created_at);return d?d.getTime():null;} });
   var cols=[{label:"Cor"},{label:"Marca",key:"nome",sort:1,def:1},{label:"Status"},
     {label:"Criado em",key:"created",sort:1},{label:"Último acesso",key:"last",sort:1},
     {label:"Dias sem acessar",key:"dias",sort:1,num:1},{label:"Dias c/ login",key:"login",sort:1,num:1},
-    {label:"Alerta"},{label:"Observação"}];
+    {label:"Alerta"},{label:"Observação"},{label:""}];
   var tbl=document.getElementById("tbl-a2"); tbl.innerHTML="";
   var thead=document.createElement("thead"); thead.appendChild(makeHead(cols,s2,renderA2)); tbl.appendChild(thead);
   var tb=document.createElement("tbody");
-  rows.forEach(function(r){
-    var key="a2:"+r.company; var tr=document.createElement("tr");
-    var oc=ov(key); if(oc.color){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",oc.color); }
+  added.concat(base).forEach(function(r){
+    var key=r.key, tr=document.createElement("tr");
+    if(r.added) tr.className="addedrow";
+    if(r.color){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",r.color); }
     tr.appendChild(colorCell(key,"",function(){}));
-    tr.appendChild(cell('<span class="marca">'+esc(r.nome)+'</span>'));
-    tr.appendChild(cell('<span class="st '+(r.status==="active"?"on":"off")+'">'+esc(r.status||"")+'</span>'));
-    tr.appendChild(cell(fmtDate(r.created_at)||'<span class="dash">—</span>',"nowrap mut"));
-    tr.appendChild(cell(r.last_login?fmtDate(r.last_login):'<span class="dash">nunca</span>',"nowrap"));
-    tr.appendChild(cell(r.dias_sem_acesso===null?'<span class="dash">—</span>':r.dias_sem_acesso,"num"));
-    tr.appendChild(cell(r.login_days==null?'<span class="dash">—</span>':r.login_days,"num mut"));
-    var al=alert2(r); tr.appendChild(cell(al?'<span class="alertpill'+(al.level==="warn"?" warn":"")+'">'+al.text+"</span>":'<span class="dash">—</span>'));
+    tr.appendChild(editCell(key,"nome",r.src.nome,{cls:"marca",ph:r.added?"nova marca":"",
+      fmt:function(v){return v===""?"":'<span class="marca">'+esc(v)+"</span>";},onChange:re2}));
+    tr.appendChild(editCell(key,"status",r.src.status,{ph:"active/inactive",
+      fmt:function(v){return v===""?"":'<span class="st '+(v==="active"?"on":"off")+'">'+esc(v)+"</span>";},onChange:re2}));
+    tr.appendChild(editCell(key,"created_at",r.src.created_at,{cls:"nowrap mut",type:"date",ph:"dd/mm/aaaa",
+      fmt:function(v){return fmtDate(v)||(v?esc(v):"");}}));
+    tr.appendChild(editCell(key,"last_login",r.src.last_login,{cls:"nowrap",type:"date",ph:"nunca",
+      fmt:function(v){return fmtDate(v)||(v?esc(v):"");},onChange:re2}));
+    tr.appendChild(cell(r.dias===null?'<span class="dash">nunca</span>':r.dias,"num derived"));
+    tr.appendChild(editCell(key,"login_days",r.src.login_days,{cls:"num mut",type:"num",ph:"0"}));
+    tr.appendChild(cell(r.alert?'<span class="alertpill'+(r.alert.level==="warn"?" warn":"")+'">'+r.alert.text+"</span>":'<span class="dash">—</span>',"derived"));
     tr.appendChild(obsCell(key,""));
+    tr.appendChild(actCell(key,r.added,re2));
     tb.appendChild(tr);
   });
   tbl.appendChild(tb);
-  if(!rows.length) tbl.innerHTML+='<tbody><tr><td colspan="9" class="empty">Nenhuma marca com esses filtros.</td></tr></tbody>';
+  if(!rows.length) tbl.innerHTML+='<tbody><tr><td colspan="10" class="empty">Nenhuma marca com esses filtros.</td></tr></tbody>';
   document.getElementById("cnt-a2").textContent=rows.length+" marca(s)";
+  undelBtn("a2");
 }
 function cardsA2(){
-  var a=D.aba2, nunca=0,mais15=0;
-  a.forEach(function(r){ if(r.dias_sem_acesso===null)nunca++; else if(r.dias_sem_acesso>15)mais15++; });
+  var a=all2(), nunca=0,mais15=0;
+  a.forEach(function(r){ if(r.dias===null)nunca++; else if(r.dias>15)mais15++; });
   document.getElementById("cards-a2").innerHTML=
     card(a.length,"Marcas c/ Tino")+card(mais15,">15d sem acessar",true)+card(nunca,"Nunca acessaram",true)+card(mais15+nunca,"Total alertas ⏰",true);
 }
@@ -356,96 +603,109 @@ function cardsA2(){
 /* ================= ABA 3 — Ranking Upsell ================= */
 var s3={sort:"cresc_rs",dir:-1};
 var CS3_OPTS=["Busto","Luana","Thamiris"];
+function eff3row(r){
+  var k=r.__key||("a3:"+r.cs_tab+":"+r.empresa), o=ov(k);
+  var gA=toNum(pick(o.gmv_ant,r.gmv_ant)), gB=toNum(pick(o.gmv_atual,r.gmv_atual));
+  var cr = (o.cresc_rs!==undefined&&o.cresc_rs!==null&&o.cresc_rs!=="") ? toNum(o.cresc_rs)
+         : (gA!==null&&gB!==null ? gB-gA : toNum(r.cresc_rs));
+  var cp = (o.cresc_pct!==undefined&&o.cresc_pct!==null&&o.cresc_pct!=="") ? toNum(o.cresc_pct)
+         : (gA ? (cr!==null?cr/gA*100:null) : toNum(r.cresc_pct));
+  return { key:k, added:!!r.__key, src:r, hidden:!!o.hidden,
+    empresa:pick(o.empresa,r.empresa), cs:effCs(k,r.cs_tab||""),
+    plano:pick(o.plano,r.plano), gmv_ant:gA, gmv_atual:gB, cresc_rs:cr, cresc_pct:cp,
+    mensalidade:pick(o.mensalidade,r.mensalidade),
+    tino:(o.tino!==undefined?o.tino:(r.tino===undefined?null:r.tino)),
+    vestipago:(o.vestipago!==undefined?o.vestipago:(r.vestipago===undefined?null:r.vestipago)),
+    color:(o.color!==undefined&&o.color!==null)?o.color:(r.color||"") };
+}
+function all3(){
+  var out=[];
+  addedRows("a3").forEach(function(r){ out.push(eff3row(r)); });
+  D.aba3.forEach(function(r){ out.push(eff3row(r)); });
+  return out.filter(function(r){ return !r.hidden; });
+}
+var re3=function(){ renderA3(); cardsA3(); };
 function renderA3(){
   var q=(document.getElementById("q-a3").value||"").toLowerCase();
   var csBtn=document.querySelector("#cs-a3 button.active"); var cs=csBtn?csBtn.getAttribute("data-cs"):"";
-  var rows=D.aba3.filter(function(r){
-    if(cs && effCs("a3:"+r.cs_tab+":"+r.empresa,r.cs_tab)!==cs) return false;
-    if(q && (r.empresa||"").toLowerCase().indexOf(q)<0) return false;
+  var rows=all3().filter(function(r){
+    if(cs && r.cs!==cs) return false;
+    if(q && String(r.empresa||"").toLowerCase().indexOf(q)<0) return false;
     return true;
   });
-  var acc={ empresa:function(r){return r.empresa;}, cs:function(r){return effCs("a3:"+r.cs_tab+":"+r.empresa,r.cs_tab);}, plano:function(r){return r.plano;},
+  var added=rows.filter(function(r){return r.added;});
+  var base =sortRows(rows.filter(function(r){return !r.added;}),s3,{
+    empresa:function(r){return r.empresa;}, cs:function(r){return r.cs;}, plano:function(r){return r.plano;},
     gmv_ant:function(r){return r.gmv_ant;}, gmv_atual:function(r){return r.gmv_atual;},
-    cresc_rs:function(r){return r.cresc_rs;}, cresc_pct:function(r){return r.cresc_pct;} };
-  rows=sortRows(rows,s3,acc);
+    cresc_rs:function(r){return r.cresc_rs;}, cresc_pct:function(r){return r.cresc_pct;} });
   var cols=[{label:"Cor"},{label:"Empresa",key:"empresa",sort:1,def:1},{label:"CS",key:"cs",sort:1},
     {label:"Plano",key:"plano",sort:1},{label:"GMV anterior",key:"gmv_ant",sort:1,num:1},
     {label:"GMV atual",key:"gmv_atual",sort:1,num:1},{label:"Cresc. R$",key:"cresc_rs",sort:1,num:1},
-    {label:"Cresc. %",key:"cresc_pct",sort:1,num:1},{label:"Mensalidade"},{label:"Tino"},{label:"VestiPago"},{label:"Observação"},{label:""}];
+    {label:"Cresc. %",key:"cresc_pct",sort:1,num:1},{label:"Mensalidade"},{label:"Tino"},{label:"VestiPago"},
+    {label:"Observação"},{label:""}];
   var tbl=document.getElementById("tbl-a3"); tbl.innerHTML="";
   var thead=document.createElement("thead"); thead.appendChild(makeHead(cols,s3,renderA3)); tbl.appendChild(thead);
   var tb=document.createElement("tbody");
-  var re=function(){ renderA3(); cardsA3(); };
 
-  addedRows("a3").forEach(function(r){
-    var key=r.__key, tr=document.createElement("tr"); tr.className="addedrow";
+  added.concat(base).forEach(function(r){
+    var key=r.key, tr=document.createElement("tr");
+    if(r.added) tr.className="addedrow";
     if(r.color){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",r.color); }
-    tr.appendChild(colorCell(key,"",re));
-    tr.appendChild(textCell(key,"empresa",r.empresa,"marca","nova empresa"));
-    tr.appendChild(csCell(key,r.cs_tab||"Busto",CS3_OPTS,re));
-    tr.appendChild(textCell(key,"plano",r.plano,"","plano"));
-    tr.appendChild(textCell(key,"gmv_ant",r.gmv_ant,"num","0"));
-    tr.appendChild(textCell(key,"gmv_atual",r.gmv_atual,"num","0"));
-    tr.appendChild(textCell(key,"cresc_rs",r.cresc_rs,"num","0"));
-    tr.appendChild(textCell(key,"cresc_pct",r.cresc_pct,"num","%"));
-    tr.appendChild(textCell(key,"mensalidade",r.mensalidade,"","R$"));
-    tr.appendChild(textCell(key,"tino",r.tino,"","Sim/Não"));
-    tr.appendChild(textCell(key,"vestipago",r.vestipago,"","Sim/Não"));
-    tr.appendChild(obsCell(key,""));
-    tr.appendChild(delCell(key,re));
-    tb.appendChild(tr);
-  });
-
-  rows.forEach(function(r){
-    var key="a3:"+r.cs_tab+":"+r.empresa; var tr=document.createElement("tr");
-    var oc=ov(key); var rc=(oc.color!==undefined&&oc.color!==null)?oc.color:(r.color||"");
-    if(rc){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",rc); }
-    tr.appendChild(colorCell(key,r.color||"",re));
-    tr.appendChild(cell('<span class="marca">'+esc(r.empresa)+'</span>'));
-    tr.appendChild(csCell(key,r.cs_tab,CS3_OPTS,re));
-    tr.appendChild(cell(esc(r.plano||"")||'<span class="dash">—</span>'));
-    tr.appendChild(cell(money(r.gmv_ant),"num mut"));
-    tr.appendChild(cell(money(r.gmv_atual),"num"));
-    tr.appendChild(cell(money(r.cresc_rs),"num"));
-    tr.appendChild(cell(r.cresc_pct==null?'<span class="dash">—</span>':pct(r.cresc_pct),"num"));
-    tr.appendChild(cell(esc(r.mensalidade||"")||'<span class="dash">—</span>',"nowrap mut"));
-    tr.appendChild(cell(boolPill(r.tino)));
-    tr.appendChild(cell(boolPill(r.vestipago)));
-    tr.appendChild(obsCell(obsKey(r.empresa),r.obs_orig));   // obs única por marca (compartilhada c/ Passagem de Bastão)
-    tr.appendChild(cell(""));
+    tr.appendChild(colorCell(key,r.src.color||"",re3));
+    tr.appendChild(editCell(key,"empresa",r.src.empresa,{cls:"marca",ph:r.added?"nova empresa":"",
+      fmt:function(v){return v===""?"":'<span class="marca">'+esc(v)+"</span>";},onChange:re3}));
+    tr.appendChild(csCell(key,r.src.cs_tab,CS3_OPTS,re3));
+    tr.appendChild(editCell(key,"plano",r.src.plano,{ph:"plano"}));
+    tr.appendChild(editCell(key,"gmv_ant",r.src.gmv_ant,{cls:"num mut",type:"num",ph:"0",fmt:money,onChange:re3}));
+    tr.appendChild(editCell(key,"gmv_atual",r.src.gmv_atual,{cls:"num",type:"num",ph:"0",fmt:money,onChange:re3}));
+    tr.appendChild(editCell(key,"cresc_rs",r.cresc_rs,{cls:"num",type:"num",ph:"0",fmt:money,onChange:re3}));
+    tr.appendChild(editCell(key,"cresc_pct",r.cresc_pct,{cls:"num",type:"num",ph:"%",fmt:pct,onChange:re3}));
+    tr.appendChild(editCell(key,"mensalidade",r.src.mensalidade,{cls:"nowrap mut",ph:"R$"}));
+    tr.appendChild(editCell(key,"tino",r.src.tino,{type:"bool",ph:"Sim/Não",fmt:boolPill}));
+    tr.appendChild(editCell(key,"vestipago",r.src.vestipago,{type:"bool",ph:"Sim/Não",fmt:boolPill}));
+    tr.appendChild(obsCell(obsKey(r.empresa),obsOrig(r.empresa)));  // mesma obs da Passagem de Bastão
+    tr.appendChild(actCell(key,r.added,re3));
     tb.appendChild(tr);
   });
   tbl.appendChild(tb);
-  if(!rows.length && !addedRows("a3").length) tbl.innerHTML+='<tbody><tr><td colspan="13" class="empty">Nenhuma empresa com esses filtros.</td></tr></tbody>';
-  document.getElementById("cnt-a3").textContent=(rows.length+addedRows("a3").length)+" empresa(s)";
+  if(!rows.length) tbl.innerHTML+='<tbody><tr><td colspan="13" class="empty">Nenhuma empresa com esses filtros.</td></tr></tbody>';
+  document.getElementById("cnt-a3").textContent=rows.length+" empresa(s)";
+  undelBtn("a3");
 }
 function boolPill(v){ if(v===true) return '<span class="st on">Sim</span>';
   if(v===false) return '<span class="st off">Não</span>';
-  if(v===null||v===undefined||v==="") return '<span class="dash">—</span>';
+  if(v===null||v===undefined||v==="") return "";
   return '<span class="mut">'+esc(v)+'</span>'; }
 function cardsA3(){
-  var a=D.aba3;
-  var by={Busto:0,Luana:0,Thamiris:0}; a.forEach(function(r){ if(by[r.cs_tab]!=null)by[r.cs_tab]++; });
+  var a=all3();
+  var by={Busto:0,Luana:0,Thamiris:0}; a.forEach(function(r){ if(by[r.cs]!=null)by[r.cs]++; });
   document.getElementById("cards-a3").innerHTML=
     card(a.length,"Empresas")+card(by.Busto,"Busto")+card(by.Luana,"Luana")+card(by.Thamiris,"Thamiris");
 }
 
+function reAll(){ re1(); re2(); re3(); }
+
 /* ---------- cards / pills ---------- */
 function card(v,l,alert){ return '<div class="card'+(alert?" alert":"")+'"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>'; }
+/* pills das abas saem da MESMA lista do quadro de avisos (sempre batem) */
 function pills(){
-  var a1=D.aba1.reduce(function(n,r){return n+(alert1(r)?1:0);},0);
-  var a2=D.aba2.reduce(function(n,r){return n+(alert2(r)?1:0);},0);
-  setPill("pill-a1",a1); setPill("pill-a2",a2);
+  var it=callItems();
+  setPill("pill-a1",it.filter(function(i){return i.tab==="a1";}).length);
+  setPill("pill-a2",it.filter(function(i){return i.tab==="a2";}).length);
 }
-function setPill(id,n){ var e=document.getElementById(id); e.textContent=n; e.classList.toggle("zero",n===0); }
+function setPill(id,n){ var e=document.getElementById(id); if(!e) return; e.textContent=n; e.classList.toggle("zero",n===0); }
 
 /* ---------- export ---------- */
 function exportTab(which){
   var tbl=document.getElementById("tbl-"+which).cloneNode(true);
-  // remove coluna Cor e transforma textarea/pop em texto
   tbl.querySelectorAll(".pop").forEach(function(p){p.remove();});
-  tbl.querySelectorAll("textarea").forEach(function(t){ var s=document.createElement("span"); s.textContent=t.value; t.parentNode.replaceChild(s,t); });
-  tbl.querySelectorAll("tr").forEach(function(tr){ if(tr.cells&&tr.cells.length) tr.deleteCell(0); });
+  tbl.querySelectorAll("textarea,input").forEach(function(t){ var s=document.createElement("span"); s.textContent=t.value; t.parentNode.replaceChild(s,t); });
+  tbl.querySelectorAll("select").forEach(function(t){ var s=document.createElement("span"); s.textContent=t.value; t.parentNode.replaceChild(s,t); });
+  tbl.querySelectorAll("tr").forEach(function(tr){
+    if(!tr.cells||!tr.cells.length) return;
+    tr.deleteCell(tr.cells.length-1);   // ações
+    tr.deleteCell(0);                   // cor
+  });
   var html='<html><head><meta charset="utf-8"></head><body>'+tbl.outerHTML+'</body></html>';
   var blob=new Blob(["﻿"+html],{type:"application/vnd.ms-excel"});
   var url=URL.createObjectURL(blob), a=document.createElement("a");
@@ -453,23 +713,23 @@ function exportTab(which){
 }
 window.exportTab=exportTab;
 
-/* ---------- modal "marcas para chamar" ---------- */
+/* ---------- quadro de aviso "marcas para chamar" (ligado às cores da aba 1) ---------- */
 function callItems(){
   var items=[], cl=function(t){return t.replace(/^⏰ ?/,"").replace(/^🚫 ?/,"");};
-  D.aba1.forEach(function(r){ var a=alert1(r); if(a) items.push({tab:"a1",marca:r.marca,cs:effCs("a1:"+r.marca,r.cs),motivo:cl(a.text),level:a.level}); });
-  addedRows("a1").forEach(function(r){ var a=alertFor1(r.entrada,statusFromColor(ov(r.__key).color,"sem_reuniao"));
-    if(a&&r.marca) items.push({tab:"a1",marca:r.marca,cs:effCs(r.__key,r.cs),motivo:cl(a.text),level:a.level}); });
-  D.aba2.forEach(function(r){ var a=alert2(r); if(a) items.push({tab:"a2",marca:r.nome,cs:"",motivo:cl(a.text),level:a.level}); });
+  all1().forEach(function(r){ if(r.alert && r.marca) items.push({tab:"a1",marca:r.marca,cs:r.cs,motivo:cl(r.alert.text),level:r.alert.level}); });
+  all2().forEach(function(r){ if(r.alert && r.nome) items.push({tab:"a2",marca:r.nome,cs:"",motivo:cl(r.alert.text),level:r.alert.level}); });
   return items;
 }
 function mitem(i){ return '<div class="mitem" data-go="'+i.tab+'"><span class="mmarca">'+esc(i.marca)+'</span>'+
   (i.cs?'<span class="mcs">'+esc(i.cs)+'</span>':"")+
   '<span class="alertpill'+(i.level==="warn"?" warn":"")+'">'+esc(i.motivo)+'</span></div>'; }
-function buildCallModal(){
+/* recalcula o quadro AO VIVO — chamado sempre que uma cor/data muda */
+function refreshCallPanel(){
   var items=callItems();
-  document.getElementById("callCount").textContent=items.length;
+  setPill("callCount",items.length);
+  setPill("callBadge",items.length);
   var body=document.getElementById("callBody");
-  if(!items.length){ body.innerHTML='<div class="empty">Nenhuma marca para chamar agora 🎉</div>'; return; }
+  if(!items.length){ body.innerHTML='<div class="empty">Nenhuma marca para chamar agora 🎉</div>'; return items; }
   var g1=items.filter(function(i){return i.tab==="a1";}), g2=items.filter(function(i){return i.tab==="a2";});
   var html="";
   if(g1.length) html+='<div class="mgroup"><h4>📋 Passagem de bastão · '+g1.length+'</h4>'+g1.map(mitem).join("")+'</div>';
@@ -478,14 +738,21 @@ function buildCallModal(){
   body.querySelectorAll("[data-go]").forEach(function(el){
     el.addEventListener("click",function(){ showTab(el.getAttribute("data-go")); closeCallModal(); });
   });
-  var hideKey=localStorage.getItem("cs2_callmodal_hide");
-  if(hideKey!==(D.hoje||"")) document.getElementById("callModal").classList.add("open");
+  return items;
 }
+function syncAlerts(){ pills(); refreshCallPanel(); }
+function openCallModal(){ refreshCallPanel(); document.getElementById("callModal").classList.add("open"); }
+window.openCallModal=openCallModal;
 function closeCallModal(){
   document.getElementById("callModal").classList.remove("open");
   if(document.getElementById("dontToday").checked) localStorage.setItem("cs2_callmodal_hide", D.hoje||"");
 }
 window.closeCallModal=closeCallModal;
+function bootCallModal(){
+  var items=refreshCallPanel();
+  var hideKey=localStorage.getItem("cs2_callmodal_hide");
+  if(items.length && hideKey!==(D.hoje||"")) document.getElementById("callModal").classList.add("open");
+}
 
 /* ---------- tabs / boot ---------- */
 function showTab(t){
@@ -498,6 +765,7 @@ window.showTab=showTab;
 
 function fillCS1(){
   var set={}; D.aba1.forEach(function(r){ if(r.cs) set[r.cs]=1; });
+  CS1_OPTS.forEach(function(c){ set[c]=1; });
   var sel=document.getElementById("cs-a1");
   Object.keys(set).sort().forEach(function(cs){ var o=document.createElement("option"); o.value=cs; o.textContent="CS: "+cs; sel.appendChild(o); });
 }
@@ -514,11 +782,11 @@ var booted=false;
 window.__cs2_boot=function(){
   if(booted) return; booted=true;
   document.getElementById("gen").textContent="Atualizado "+(D.gerado_em||"");
-  fillCS1(); wire();
+  buildObsIndex(); fillCS1(); wire();
   loadOverlays().then(function(){
     renderA1(); renderA2(); renderA3();
     cardsA1(); cardsA2(); cardsA3(); pills();
-    buildCallModal();
+    bootCallModal(); startPoll();
   });
 };
 })();

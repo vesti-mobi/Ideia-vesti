@@ -30,7 +30,11 @@
           <small>Passagem de Bastão · Acessos Tino · Ranking Upsell</small>
         </div>
         <div style="display:flex;align-items:center;gap:16px">
-          <div class="gen" id="gen">—</div>
+          <button class="btn-call" onclick="openCallModal()">📞 Marcas para chamar <span class="pill" id="callBadge">0</span></button>
+          <div>
+            <div class="gen" id="gen">—</div>
+            <div class="sync" id="sync"></div>
+          </div>
           <button id="logout" onclick="logout()">sair</button>
         </div>
       </div>
@@ -49,8 +53,9 @@
       <div class="legend">
         <span><span class="dot" style="background:var(--green)"></span>Verde = ativa</span>
         <span><span class="dot" style="background:var(--red)"></span>Vermelho = cancelada</span>
-        <span><span class="dot" style="background:#eceef3;border:1px solid #ddd"></span>Sem cor = sem reunião (contatar)</span>
+        <span><span class="dot" style="background:#eceef3;border:1px solid #ddd"></span>Branco / sem cor = sem reunião (contatar)</span>
         <span>⏰ marcas em branco: <b>45 dias</b> (45–59d), <b>60 dias</b> (60–89d), <b>sem reunião</b> (90+d) — do cadastro; verde/vermelho não alertam</span>
+        <span>✏️ clique em qualquer célula para editar — a cor da linha atualiza o quadro 📞 na hora</span>
       </div>
       <div class="toolbar">
         <input type="text" id="q-a1" placeholder="Buscar marca...">
@@ -64,6 +69,7 @@
         <label class="chk"><input type="checkbox" id="al-a1"> só com alerta ⏰</label>
         <div class="spacer"></div>
         <span class="count" id="cnt-a1"></span>
+        <button class="btn-ghost" id="und-a1" onclick="restoreTab('a1')" style="display:none"></button>
         <button class="btn-add" onclick="addRow('a1')">＋ Linha</button>
         <button class="btn-xls" onclick="exportTab('a1')">⬇ Excel</button>
       </div>
@@ -83,6 +89,8 @@
         <label class="chk"><input type="checkbox" id="al-a2"> só com alerta ⏰</label>
         <div class="spacer"></div>
         <span class="count" id="cnt-a2"></span>
+        <button class="btn-ghost" id="und-a2" onclick="restoreTab('a2')" style="display:none"></button>
+        <button class="btn-add" onclick="addRow('a2')">＋ Linha</button>
         <button class="btn-xls" onclick="exportTab('a2')">⬇ Excel</button>
       </div>
       <div class="tbl-wrap"><table class="grid" id="tbl-a2"></table></div>
@@ -101,6 +109,7 @@
         <input type="text" id="q-a3" placeholder="Buscar empresa...">
         <div class="spacer"></div>
         <span class="count" id="cnt-a3"></span>
+        <button class="btn-ghost" id="und-a3" onclick="restoreTab('a3')" style="display:none"></button>
         <button class="btn-add" onclick="addRow('a3')">＋ Linha</button>
         <button class="btn-xls" onclick="exportTab('a3')">⬇ Excel</button>
       </div>
@@ -127,14 +136,17 @@
 
 <script>
 function doLogin(){
-  if(document.getElementById('loginPass').value==='Mudar123'){
-    sessionStorage.setItem('cs2_auth','1'); enter();
+  var pass=document.getElementById('loginPass').value;
+  if(pass==='Mudar123'){
+    sessionStorage.setItem('cs2_auth','1');
+    sessionStorage.setItem('cs2_pass',pass);   // usada p/ autorizar as edições na API
+    enter();
   } else {
     document.getElementById('loginError').style.display='block';
     document.getElementById('loginPass').style.borderColor='#E17055';
   }
 }
-function logout(){ sessionStorage.removeItem('cs2_auth'); location.reload(); }
+function logout(){ sessionStorage.removeItem('cs2_auth'); sessionStorage.removeItem('cs2_pass'); location.reload(); }
 function enter(){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('app').style.display='block';
@@ -144,6 +156,7 @@ if(sessionStorage.getItem('cs2_auth')==='1'){
   document.addEventListener('DOMContentLoaded',enter);
 }
 </script>
+<script src="config.js"></script>
 <script src="dashboard_data.js"></script>
 <script src="app.js"></script>
 </body>
