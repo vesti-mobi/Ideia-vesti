@@ -313,7 +313,7 @@ window.CNPJ_MARCAS = (function(){
         "carmem soares":                                     "590.923.608-30",
         "carmen":                                            "013.255.028-80",
         "carmen jeans":                                      "41107278000140",
-        "carmila":                                           "8482963000180",
+        "carmila":                                           "08.482.963/0001-80",
         "caroll collection":                                 "02.683.338/0001-10",
         "caronly":                                           "08127619442",
         "carpiem":                                           "30.837.002/0001-09",

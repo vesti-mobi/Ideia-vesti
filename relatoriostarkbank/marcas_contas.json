@@ -1,7 +1,7 @@
 {
   "_leia": "Fonte da verdade das contas das marcas (CNPJ, razao social, chave PIX). Editado pelo painel StarkBank / celular (app stark-admin). Os 3 arquivos pix_marcas.js, cnpj_marcas.js e razao_marcas.js sao GERADOS a partir daqui — nao edite eles na mao.",
-  "atualizadoEm": "2026-07-24T13:25:49.773Z",
-  "atualizadoPor": "painel",
+  "atualizadoEm": "2026-07-24T14:02:29.660Z",
+  "atualizadoPor": "celular",
   "marcas": {
     "2 wave": {
       "pix": "",
@@ -1540,10 +1540,10 @@
     },
     "carmila": {
       "pix": "08482963000180",
-      "cnpj": "8482963000180",
+      "cnpj": "08.482.963/0001-80",
       "razao": "CONFECCOES IRMAS BRISOLLA LTDA",
-      "editadoEm": "2026-07-24T13:25:49.773Z",
-      "origem": "painel"
+      "editadoEm": "2026-07-24T14:02:29.660Z",
+      "origem": "celular"
     },
     "caroll collection": {
       "pix": "",
