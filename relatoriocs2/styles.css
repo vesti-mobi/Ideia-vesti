@@ -39,15 +39,26 @@ body{margin:0;font-family:'Inter',system-ui,sans-serif;color:var(--tx);backgroun
 #logout{background:none;border:none;color:var(--mut);font-size:12px;cursor:pointer;text-decoration:underline}
 
 /* tabs */
-.tabs{display:flex;gap:4px;margin-top:14px;flex-wrap:wrap}
-.tabs button{border:1px solid var(--line);background:#fff;color:var(--mut);font-family:inherit;
-  font-size:13.5px;font-weight:600;padding:9px 16px;border-radius:10px 10px 0 0;cursor:pointer;
-  display:flex;align-items:center;gap:8px}
-.tabs button.active{color:var(--p);border-color:var(--line);border-bottom-color:#fff;background:#fff;
-  box-shadow:0 -2px 0 var(--p) inset}
-.tabs .pill{background:var(--alert);color:#fff;border-radius:20px;font-size:11px;font-weight:700;
+/* Cada aba tem a sua cor. Inativa = contorno na cor da aba; ativa = preenchida,
+   com sombra e um degrau a mais de altura — dá pra ver de longe onde você está. */
+.tabs{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:flex-end}
+.tabs button{--c:var(--p);
+  border:2px solid var(--line);background:#fff;color:var(--mut);font-family:inherit;
+  font-size:13.5px;font-weight:700;padding:9px 16px;border-radius:12px 12px 0 0;cursor:pointer;
+  display:flex;align-items:center;gap:8px;transition:.15s;position:relative;top:2px}
+.tabs button[data-tab="a1"]{--c:#6C5CE7}
+.tabs button[data-tab="a2"]{--c:#00B894}
+.tabs button[data-tab="a3"]{--c:#0984E3}
+.tabs button:hover{color:var(--c);border-color:var(--c);background:#fff}
+.tabs button.active{background:var(--c);border-color:var(--c);color:#fff;top:0;
+  padding:12px 20px;box-shadow:0 -5px 16px -12px var(--c),0 -1px 0 rgba(0,0,0,.06) inset}
+.tabs button.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--c)}
+.tabs .pill{background:var(--alert);color:#fff;border-radius:20px;font-size:11px;font-weight:800;
   padding:1px 7px;min-width:18px;text-align:center}
 .tabs .pill.zero{background:#B2BEC3}
+/* na aba ativa o contador ganha um anel branco pra nao sumir no fundo colorido */
+.tabs button.active .pill{box-shadow:0 0 0 2px #fff}
+.tabs button.active .pill.zero{background:rgba(255,255,255,.35);color:#fff;box-shadow:none}
 
 .panel{display:none;padding:18px 0 60px}
 .panel.active{display:block}
