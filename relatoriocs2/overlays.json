@@ -1,5 +1,5 @@
 {
- "atualizadoEm": "2026-07-24T20:57:24.660Z",
+ "atualizadoEm": "2026-07-24T20:57:44.162Z",
  "overlays": {
   "a2:crocker_jeans": {
    "color": "",
@@ -45,6 +45,11 @@
    "obs": "Iniciando integração Totvs",
    "ts": 1784926643501,
    "up": 1784926644922
+  },
+  "obs:donacharme": {
+   "obs": "Não tem interesse em automação",
+   "ts": 1784926663005,
+   "up": 1784926664480
   }
  }
 }
