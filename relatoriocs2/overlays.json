@@ -1,5 +1,5 @@
 {
- "atualizadoEm": "2026-07-24T14:14:14.627Z",
+ "atualizadoEm": "2026-07-24T14:15:20.190Z",
  "overlays": {
   "a2:crocker_jeans": {
    "color": "",
@@ -25,6 +25,11 @@
    "obs": "CANCELADA\n",
    "ts": 1784901327402,
    "up": 1784902454880
+  },
+  "obs:elascharmosa": {
+   "obs": "CANCELADO\n",
+   "ts": 1784902518534,
+   "up": 1784902520499
   }
  }
 }
