@@ -1,5 +1,5 @@
 {
- "atualizadoEm": "2026-07-24T14:15:20.190Z",
+ "atualizadoEm": "2026-07-24T20:43:30.013Z",
  "overlays": {
   "a2:crocker_jeans": {
    "color": "",
@@ -30,6 +30,11 @@
    "obs": "CANCELADO\n",
    "ts": 1784902518534,
    "up": 1784902520499
+  },
+  "obs:hotvanilla": {
+   "obs": "Cadastrando produtos",
+   "ts": 1784925808707,
+   "up": 1784925810272
   }
  }
 }
