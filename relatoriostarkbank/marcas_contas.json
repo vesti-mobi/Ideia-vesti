@@ -1,7 +1,7 @@
 {
   "_leia": "Fonte da verdade das contas das marcas (CNPJ, razao social, chave PIX). Editado pelo painel StarkBank / celular (app stark-admin). Os 3 arquivos pix_marcas.js, cnpj_marcas.js e razao_marcas.js sao GERADOS a partir daqui — nao edite eles na mao.",
-  "atualizadoEm": "2026-07-16T18:01:14.952Z",
-  "atualizadoPor": "celular",
+  "atualizadoEm": "2026-07-24T13:25:49.773Z",
+  "atualizadoPor": "painel",
   "marcas": {
     "2 wave": {
       "pix": "",
@@ -1539,9 +1539,11 @@
       "razao": "CAREAMN INDUSTRIA E COMERCIO LTDA"
     },
     "carmila": {
-      "pix": "8482963000180",
+      "pix": "08482963000180",
       "cnpj": "8482963000180",
-      "razao": "CONFECCOES IRMAS BRISOLLA LTDA"
+      "razao": "CONFECCOES IRMAS BRISOLLA LTDA",
+      "editadoEm": "2026-07-24T13:25:49.773Z",
+      "origem": "painel"
     },
     "caroll collection": {
       "pix": "",
