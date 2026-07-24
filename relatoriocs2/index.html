@@ -7,14 +7,32 @@
 <meta http-equiv="Cache-Control" content="no-store">
 <title>Relatório CS · Passagem de Bastão</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+<!-- sprite de ícones: inline, sem CDN — o painel roda no GitHub Pages e precisa
+     funcionar sem depender de rede externa -->
+<svg style="display:none" aria-hidden="true">
+  <symbol id="ic-list" viewBox="0 0 24 24"><path d="M8 4h8v3H8z"/><path d="M8 5.5H6a1 1 0 0 0-1 1V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6.5a1 1 0 0 0-1-1h-2"/><path d="M9 12h6M9 16h4"/></symbol>
+  <symbol id="ic-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l2.5 2.5M14.5 8.5 17 11"/></symbol>
+  <symbol id="ic-chart" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 7-7"/><path d="M16 8h5v5"/></symbol>
+  <symbol id="ic-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="ic-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/></symbol>
+  <symbol id="ic-phone" viewBox="0 0 24 24"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11 11 0 0 0 3.5.56 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11 11 0 0 0 .56 3.5 1 1 0 0 1-.25 1z"/></symbol>
+  <symbol id="ic-download" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M8 11l4 4 4-4"/><path d="M4 19h16"/></symbol>
+  <symbol id="ic-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="ic-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="ic-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></symbol>
+  <symbol id="ic-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/></symbol>
+  <symbol id="ic-check" viewBox="0 0 24 24"><path d="M4.5 12.5 9 17l10.5-10.5"/></symbol>
+  <symbol id="ic-alert" viewBox="0 0 24 24"><path d="M12 4.5 21 20H3z"/><path d="M12 10v4.5M12 17.2h.01"/></symbol>
+</svg>
+
 <div id="loginScreen">
   <div class="box">
-    <div class="logo">Relatório <span style="color:#00B894">CS</span></div>
+    <div class="logo">Relatório <span>CS</span></div>
     <div class="sub">Passagem de Bastão · Tino · Upsell</div>
     <input type="password" id="loginPass" placeholder="Digite a senha..." onkeydown="if(event.key==='Enter')doLogin()">
     <div id="loginError">Senha incorreta</div>
@@ -29,19 +47,16 @@
         <div class="brand">Relatório <span>CS</span>
           <small>Passagem de Bastão · Acessos Tino · Ranking Upsell</small>
         </div>
-        <div style="display:flex;align-items:center;gap:16px">
-          <button class="btn-call" onclick="openCallModal()">📞 Marcas para chamar <span class="pill" id="callBadge">0</span></button>
-          <div>
-            <div class="gen" id="gen">—</div>
-            <div class="sync" id="sync"></div>
-          </div>
+        <div class="headright">
+          <div class="sync" id="sync"></div>
+          <div class="gen" id="gen">—</div>
           <button id="logout" onclick="logout()">sair</button>
         </div>
       </div>
       <div class="tabs">
-        <button data-tab="a1" class="active" onclick="showTab('a1')">📋 Passagem de Bastão <span class="pill zero" id="pill-a1">0</span></button>
-        <button data-tab="a2" onclick="showTab('a2')">🔑 Acessos Tino <span class="pill zero" id="pill-a2">0</span></button>
-        <button data-tab="a3" onclick="showTab('a3')">📈 Ranking Upsell</button>
+        <button data-tab="a1" class="active" onclick="showTab('a1')"><svg class="ic"><use href="#ic-list"/></svg>Passagem de Bastão <span class="pill zero" id="pill-a1">0</span></button>
+        <button data-tab="a2" onclick="showTab('a2')"><svg class="ic"><use href="#ic-key"/></svg>Acessos Tino <span class="pill zero" id="pill-a2">0</span></button>
+        <button data-tab="a3" onclick="showTab('a3')"><svg class="ic"><use href="#ic-chart"/></svg>Ranking Upsell</button>
       </div>
     </div>
   </div>
@@ -50,13 +65,6 @@
     <!-- ABA 1 -->
     <div class="panel active" id="panel-a1">
       <div class="cards" id="cards-a1"></div>
-      <div class="legend">
-        <span><span class="dot" style="background:var(--green)"></span>Verde = ativa</span>
-        <span><span class="dot" style="background:var(--red)"></span>Vermelho = cancelada</span>
-        <span><span class="dot" style="background:#eceef3;border:1px solid #ddd"></span>Branco / sem cor = sem reunião (contatar)</span>
-        <span>⏰ marcas em branco: <b>45 dias</b> (45–59d), <b>60 dias</b> (60–89d), <b>sem reunião</b> (90+d) — do cadastro; verde/vermelho não alertam</span>
-        <span>✏️ clique em qualquer célula para editar — a cor da linha atualiza o quadro 📞 na hora</span>
-      </div>
       <div class="toolbar">
         <input type="text" id="q-a1" placeholder="Buscar marca...">
         <select id="cs-a1"><option value="">CS: todas</option></select>
@@ -66,12 +74,11 @@
           <option value="cancelada">Cancelada</option>
           <option value="sem_reuniao">Sem reunião</option>
         </select>
-        <label class="chk"><input type="checkbox" id="al-a1"> só com alerta ⏰</label>
         <div class="spacer"></div>
         <span class="count" id="cnt-a1"></span>
         <button class="btn-ghost" id="und-a1" onclick="restoreTab('a1')" style="display:none"></button>
-        <button class="btn-add" onclick="addRow('a1')">＋ Linha</button>
-        <button class="btn-xls" onclick="exportTab('a1')">⬇ Excel</button>
+        <button class="btn-add" onclick="addRow('a1')"><svg class="ic"><use href="#ic-plus"/></svg>Linha</button>
+        <button class="btn-xls" onclick="exportTab('a1')"><svg class="ic"><use href="#ic-download"/></svg>Excel</button>
       </div>
       <div class="tbl-wrap"><table class="grid" id="tbl-a1"></table></div>
     </div>
@@ -79,21 +86,16 @@
     <!-- ABA 2 -->
     <div class="panel" id="panel-a2">
       <div class="cards" id="cards-a2"></div>
-      <div class="legend">
-        <span>⏰ alerta: mais de <b>15 dias</b> sem acessar</span>
-        <span>🚫 alerta: <b>nunca acessou</b></span>
-        <span class="tinost" id="tino-st"></span>
-      </div>
       <div class="toolbar">
         <input type="text" id="q-a2" placeholder="Buscar marca...">
         <select id="st-a2"><option value="">Status: todos</option><option value="active">active</option><option value="inactive">inactive</option></select>
-        <label class="chk"><input type="checkbox" id="al-a2"> só com alerta ⏰</label>
+        <span class="sync" id="tino-st"></span>
         <div class="spacer"></div>
         <span class="count" id="cnt-a2"></span>
         <button class="btn-ghost" id="und-a2" onclick="restoreTab('a2')" style="display:none"></button>
-        <button class="btn-ghost" onclick="refreshTino(true)" title="busca agora na API do Tino, ignorando o cache de 5 min">↻ Atualizar Tino</button>
-        <button class="btn-add" onclick="addRow('a2')">＋ Linha</button>
-        <button class="btn-xls" onclick="exportTab('a2')">⬇ Excel</button>
+        <button class="btn-ghost" onclick="refreshTino(true)" title="busca agora na API do Tino, ignorando o cache de 5 min"><svg class="ic"><use href="#ic-refresh"/></svg>Atualizar Tino</button>
+        <button class="btn-add" onclick="addRow('a2')"><svg class="ic"><use href="#ic-plus"/></svg>Linha</button>
+        <button class="btn-xls" onclick="exportTab('a2')"><svg class="ic"><use href="#ic-download"/></svg>Excel</button>
       </div>
       <div class="tbl-wrap"><table class="grid" id="tbl-a2"></table></div>
     </div>
@@ -101,7 +103,6 @@
     <!-- ABA 3 -->
     <div class="panel" id="panel-a3">
       <div class="cards" id="cards-a3"></div>
-      <div class="legend" id="lg-a3"></div>
       <div class="toolbar">
         <div class="seg" id="cs-a3">
           <button data-cs="" class="active">Todas</button>
@@ -113,8 +114,8 @@
         <div class="spacer"></div>
         <span class="count" id="cnt-a3"></span>
         <button class="btn-ghost" id="und-a3" onclick="restoreTab('a3')" style="display:none"></button>
-        <button class="btn-add" onclick="addRow('a3')">＋ Linha</button>
-        <button class="btn-xls" onclick="exportTab('a3')">⬇ Excel</button>
+        <button class="btn-add" onclick="addRow('a3')"><svg class="ic"><use href="#ic-plus"/></svg>Linha</button>
+        <button class="btn-xls" onclick="exportTab('a3')"><svg class="ic"><use href="#ic-download"/></svg>Excel</button>
       </div>
       <div class="tbl-wrap"><table class="grid" id="tbl-a3"></table></div>
     </div>
@@ -124,8 +125,8 @@
 <div class="modal-back" id="callModal">
   <div class="modal">
     <div class="modal-head">
-      <div class="modal-title">📞 Marcas para chamar <span class="pill" id="callCount">0</span></div>
-      <button class="modal-x" onclick="closeCallModal()">✕</button>
+      <div class="modal-title"><svg class="ic"><use href="#ic-phone"/></svg>Marcas para chamar <span class="pill" id="callCount">0</span></div>
+      <button class="modal-x" onclick="closeCallModal()"><svg class="ic"><use href="#ic-x"/></svg></button>
     </div>
     <div class="modal-body" id="callBody"></div>
     <div class="modal-foot">
@@ -135,7 +136,7 @@
   </div>
 </div>
 
-<div class="save-flash" id="flash">salvo ✓</div>
+<div class="save-flash" id="flash">salvo</div>
 
 <script>
 function doLogin(){
@@ -146,7 +147,7 @@ function doLogin(){
     enter();
   } else {
     document.getElementById('loginError').style.display='block';
-    document.getElementById('loginPass').style.borderColor='#E17055';
+    document.getElementById('loginPass').style.borderColor='#E24B4A';
   }
 }
 function logout(){ sessionStorage.removeItem('cs2_auth'); sessionStorage.removeItem('cs2_pass'); location.reload(); }

@@ -25,6 +25,15 @@ function pct(v){ if(v===null||v===undefined||v==="") return "";
   if(typeof v!=="number") return String(v);
   return Number(v).toLocaleString("pt-BR",{maximumFractionDigits:1})+"%"; }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+/* ícone do sprite inline (index.html). Sempre separado do texto: o texto puro é
+   o que vai para o Excel e para o modal de marcas para chamar. */
+function ic(nome,cls){ return nome?'<svg class="ic'+(cls?" "+cls:"")+'"><use href="#'+nome+'"/></svg>':""; }
+function icEl(nome,cls){
+  var s=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  s.setAttribute("class","ic"+(cls?" "+cls:""));
+  var u=document.createElementNS("http://www.w3.org/2000/svg","use");
+  u.setAttribute("href","#"+nome); s.appendChild(u); return s;
+}
 function deaccent(s){ return String(s==null?"":s).normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
 
 /* ---------- parsers (edição) ---------- */
@@ -91,11 +100,12 @@ function senha(){ try{ return sessionStorage.getItem("cs2_pass")||""; }catch(e){
 var flashT;
 function flash(msg){ var f=document.getElementById("flash"); f.textContent=msg||"salvo ✓"; f.classList.add("show");
   clearTimeout(flashT); flashT=setTimeout(function(){f.classList.remove("show");},1600); }
-var SYNC={pend:["● salvando…","p"],ok:["✓ salvo para todos","ok"],
-          off:["⚠ sem conexão — guardado aqui","er"],err:["⚠ não salvou para todos","er"],
-          only:["salvando só neste navegador","er"]};
+var SYNC={pend:["salvando…","p","ic-refresh"],ok:["salvo para todos","ok","ic-check"],
+          off:["sem conexão — guardado aqui","er","ic-alert"],err:["não salvou para todos","er","ic-alert"],
+          only:["salvando só neste navegador","er","ic-alert"]};
 function setSync(st){ var e=document.getElementById("sync"); if(!e) return;
-  var s=SYNC[st]||["",""]; e.textContent=s[0]; e.className="sync "+s[1]; }
+  var s=SYNC[st]; if(!s){ e.innerHTML=""; e.className="sync"; return; }
+  e.innerHTML=ic(s[2])+"<span>"+s[0]+"</span>"; e.className="sync "+s[1]; }
 
 function ov(key){ return overlays[key]||{}; }
 function enfileirar(key,valor){
@@ -198,7 +208,7 @@ function pollOnce(){
       if(!j||!j.ok) return;
       if(j.atualizadoEm && j.atualizadoEm===srvStamp) return;   // nada novo
       srvStamp=j.atualizadoEm||"";
-      if(mergeRemote(j.overlays||{})){ reAll(); flash("atualizado por outra pessoa ↻"); }
+      if(mergeRemote(j.overlays||{})){ reAll(); flash("atualizado por outra pessoa"); }
     })
     .catch(function(){});
 }
@@ -247,20 +257,43 @@ function buildObsIndex(){
 }
 function obsOrig(name){ var a=OBS_ORIG[normName(name)]; return (a&&a.length)?a.join(" | "):""; }
 
-/* ---------- célula editável: observação ---------- */
+/* ---------- célula editável: observação ----------
+   Mostra o texto numa linha só (ellipsis + title). O textarea só nasce no clique
+   — é ele que engordava toda linha da tabela. Salvamento e autosize preservados. */
 function obsCell(key,orig){
-  var o=ov(key); var val=(o.obs!==undefined&&o.obs!==null)?o.obs:(orig||"");
   var td=document.createElement("td"); td.className="obs";
-  var ta=document.createElement("textarea"); ta.className="obsedit"; ta.value=val; ta.rows=1;
-  ta.placeholder="observação...";
-  function autos(){ ta.style.height="auto"; ta.style.height=(ta.scrollHeight)+"px"; }
-  ta.addEventListener("input",autos);
-  ta.addEventListener("focus",autos);
-  ta.addEventListener("blur",function(){
-    if(ta.value!==val){ val=ta.value; saveOverlay(key,{obs:ta.value}); ta.classList.remove("dirty"); }
+  function val(){ var o=ov(key); return (o.obs!==undefined&&o.obs!==null)?o.obs:(orig||""); }
+  var span=document.createElement("span"); span.className="obsview";
+  function paint(){
+    var v=val();
+    span.textContent=v||"observação";
+    span.classList.toggle("ph",!v);
+    td.title=v||"";
+  }
+  paint(); td.appendChild(span);
+  td.addEventListener("click",function(){
+    if(td.querySelector("textarea")) return;
+    var antes=val();
+    var ta=document.createElement("textarea"); ta.className="obsedit"; ta.value=antes; ta.rows=1;
+    ta.placeholder="observação...";
+    td.innerHTML=""; td.appendChild(ta);
+    function autos(){ ta.style.height="auto"; ta.style.height=ta.scrollHeight+"px"; }
+    ta.addEventListener("input",autos); autos(); ta.focus();
+    var fechado=false;
+    function fecha(salvar){
+      if(fechado) return; fechado=true;
+      var nv=ta.value;
+      td.innerHTML=""; td.appendChild(span);
+      if(salvar && nv!==antes) saveOverlay(key,{obs:nv});
+      paint();
+    }
+    ta.addEventListener("blur",function(){ fecha(true); });
+    ta.addEventListener("keydown",function(e){
+      if(e.key==="Escape"){ e.preventDefault(); fecha(false); }
+      else if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){ e.preventDefault(); fecha(true); }
+    });
   });
-  ta.addEventListener("input",function(){ ta.classList.toggle("dirty",ta.value!==val); });
-  td.appendChild(ta); setTimeout(autos,0); return td;
+  return td;
 }
 
 /* ---------- célula editável genérica (clique p/ editar) ---------- */
@@ -310,20 +343,23 @@ function editCell(key,field,orig,opt){
   return td;
 }
 
-/* ---------- célula editável: cor ---------- */
-function colorCell(key,defColor,onChange){
-  var o=ov(key);
-  var cur=(o.color!==undefined&&o.color!==null)?o.color:(defColor||"");
-  var td=document.createElement("td"); td.className="colorcell";
-  var sw=document.createElement("span"); sw.className="swatch";
-  sw.style.background=cur||"repeating-linear-gradient(45deg,#fff,#fff 4px,#eee 4px,#eee 8px)";
+/* ---------- cor da linha: faixa de 3px na borda esquerda ----------
+   A mesma faixa carrega DOIS sinais que não se anulam:
+     - a cor dela = alerta automático (vermelho/âmbar), vindo de `alerta`;
+     - clicar nela abre o seletor da cor MANUAL, que tinge o fundo da linha.
+   A célula tem 6px de largura só pra dar área de clique; visualmente ela é a
+   borda da linha, não uma coluna. */
+function colorCell(key,defColor,onChange,alerta){
+  var cur=(ov(key).color!==undefined&&ov(key).color!==null)?ov(key).color:(defColor||"");
+  var td=document.createElement("td"); td.className="strip";
+  td.title="cor da linha";
+  if(alerta) td.style.setProperty("--stripc", alerta.level==="warn"?"var(--warn)":"var(--alert)");
   var pop=document.createElement("div"); pop.className="pop";
   COLORS.forEach(function(col){
     var b=document.createElement("div"); b.className="opt"+(col.c?"":" none");
     if(col.c) b.style.background=col.c; b.title=col.k;
     b.addEventListener("click",function(e){
       e.stopPropagation(); cur=col.c;
-      sw.style.background=cur||"repeating-linear-gradient(45deg,#fff,#fff 4px,#eee 4px,#eee 8px)";
       pop.classList.remove("open");
       saveOverlay(key,{color:col.c});
       var tr=td.closest("tr");
@@ -333,10 +369,10 @@ function colorCell(key,defColor,onChange){
     });
     pop.appendChild(b);
   });
-  sw.addEventListener("click",function(e){ e.stopPropagation();
+  td.addEventListener("click",function(e){ e.stopPropagation();
     document.querySelectorAll(".pop.open").forEach(function(p){if(p!==pop)p.classList.remove("open");});
     pop.classList.toggle("open"); });
-  td.appendChild(sw); td.appendChild(pop); return td;
+  td.appendChild(pop); return td;
 }
 document.addEventListener("click",function(){ document.querySelectorAll(".pop.open").forEach(function(p){p.classList.remove("open");}); });
 
@@ -355,7 +391,7 @@ function csCell(key,orig,options,onChange){
 /* ---------- célula de ações (remover / ocultar linha) ---------- */
 function actCell(key,added,rerender){
   var td=document.createElement("td"); td.className="actcell";
-  var b=document.createElement("button"); b.className="delrow"; b.textContent="🗑";
+  var b=document.createElement("button"); b.className="delrow"; b.appendChild(icEl("ic-trash"));
   b.title=added?"remover linha adicionada":"ocultar esta linha";
   b.addEventListener("click",function(e){
     e.stopPropagation();
@@ -372,11 +408,13 @@ function makeHead(cols,state,rerender){
   var tr=document.createElement("tr");
   cols.forEach(function(c){
     var th=document.createElement("th"); th.textContent=c.label;
-    if(c.sort){ th.style.cursor="pointer";
+    if(c.cls) th.className=c.cls;
+    if(c.title) th.title=c.title;
+    if(c.sort){ th.classList.add("sortable");
       if(state.sort===c.key){ var ar=document.createElement("span"); ar.className="ar";
-        ar.textContent=state.dir>0?" ▲":" ▼"; th.appendChild(ar); }
+        ar.textContent=state.dir>0?" ↑":" ↓"; th.appendChild(ar); }
       th.addEventListener("click",function(){ if(state.sort===c.key)state.dir*=-1; else {state.sort=c.key;state.dir=c.def||-1;} rerender(); });
-    } else th.style.cursor="default";
+    }
     if(c.num) th.style.textAlign="right";
     tr.appendChild(th);
   });
@@ -395,8 +433,8 @@ function sortRows(rows,state,accessors){
 function undelBtn(tab){
   var b=document.getElementById("und-"+tab); if(!b) return;
   var n=hiddenCount(tab+":");
-  b.style.display=n?"inline-block":"none";
-  b.textContent="↺ restaurar "+n+" oculta(s)";
+  b.style.display=n?"inline-flex":"none";
+  b.innerHTML=ic("ic-refresh")+"restaurar "+n+" oculta(s)";
 }
 
 /* ================= ABA 1 — Passagem de bastão ================= */
@@ -416,9 +454,10 @@ function alertFor1(entradaStr,status){
   var cad=pdate(entradaStr);
   if(!cad) return null;
   var d=daysBetween(today(),cad);
-  if(d>=90) return {level:"alert",text:"⏰ sem reunião ("+d+" dias)"};
-  if(d>=60) return {level:"alert",text:"⏰ 60 dias"};
-  if(d>=45) return {level:"warn", text:"⏰ 45 dias"};
+  // texto limpo (vai pro Excel e pro modal); o ícone é montado só na célula
+  if(d>=90) return {level:"alert",icon:"ic-clock",text:"sem reunião ("+d+" dias)"};
+  if(d>=60) return {level:"alert",icon:"ic-clock",text:"60 dias"};
+  if(d>=45) return {level:"warn", icon:"ic-clock",text:"45 dias"};
   return null;
 }
 function defColor1(r){ var st=r.status;
@@ -444,19 +483,20 @@ function all1(){
 
 var STLABEL={ativa:"Ativa",cancelada:"Cancelada",sem_reuniao:"Sem reunião"};
 function stCell(stx){ return cell('<span class="st '+stx+'">'+STLABEL[stx]+"</span>","derived"); }
-function alCell(al){ return cell(al?'<span class="alertpill'+(al.level==="warn"?" warn":"")+'">'+al.text+"</span>":'<span class="dash">—</span>',"derived"); }
+function alPill(al){ return al?'<span class="alertpill'+(al.level==="warn"?" warn":"")+'">'+ic(al.icon)+esc(al.text)+"</span>":""; }
+function alCell(al){ return cell(alPill(al),"derived"); }   /* sem alerta = célula vazia */
 
 var re1=function(){ renderA1(); cardsA1(); syncAlerts(); };
 function renderA1(){
   var q=(document.getElementById("q-a1").value||"").toLowerCase();
   var cs=document.getElementById("cs-a1").value;
   var st=document.getElementById("st-a1").value;
-  var onlyAl=document.getElementById("al-a1").checked;
+  var cf=cardFiltro.a1;                                   // filtro vindo do card clicado
   var rows=all1().filter(function(r){
     if(q && String(r.marca||"").toLowerCase().indexOf(q)<0) return false;
     if(cs && r.cs!==cs) return false;
     if(st && r.status!==st) return false;
-    if(onlyAl && !r.alert) return false;
+    if(cf==="alerta" ? !r.alert : (cf && r.status!==cf)) return false;
     return true;
   });
   var added=rows.filter(function(r){return r.added;});
@@ -469,7 +509,7 @@ function renderA1(){
   base=sortRows(base,s1,acc);
 
   var cols=[
-    {label:"Cor"},
+    {label:"",cls:"strip",title:"clique na faixa para pintar a linha"},
     {label:"Marca",key:"marca",sort:1,def:1},
     {label:"Entrada",key:"entrada",sort:1},
     {label:"Dias",key:"dias",sort:1,num:1},
@@ -486,12 +526,12 @@ function renderA1(){
     var key=r.key, tr=document.createElement("tr");
     if(r.added) tr.className="addedrow";
     if(r.color){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",r.color); }
-    tr.appendChild(colorCell(key,defColor1(r.src),re1));
+    tr.appendChild(colorCell(key,defColor1(r.src),re1,r.alert));
     tr.appendChild(editCell(key,"marca",r.src.marca,{cls:"marca",ph:r.added?"nova marca":"",
-      fmt:function(v){return v===""?"":'<span class="marca">'+esc(v)+"</span>";},onChange:re1}));
+      fmt:function(v){return v===""?"":'<span class="marca trunc" title="'+esc(v)+'">'+esc(v)+"</span>";},onChange:re1}));
     tr.appendChild(editCell(key,"entrada",r.src.entrada,{cls:"nowrap mut",type:"date",ph:"dd/mm/aaaa",
       fmt:function(v){return fmtDate(v)||(v?esc(v):"");},onChange:re1}));
-    tr.appendChild(cell(r.dias===null?'<span class="dash">—</span>':r.dias,"num derived"));
+    tr.appendChild(cell(r.dias===null?"":r.dias,"num derived"));
     tr.appendChild(editCell(key,"implementador",r.src.implementador,{ph:"implementador"}));
     tr.appendChild(csCell(key,r.src.cs,CS1_OPTS,re1));
     tr.appendChild(editCell(key,"data25",r.src.data25,{cls:"nowrap mut",type:"date",ph:"dd/mm/aaaa",
@@ -511,8 +551,12 @@ function renderA1(){
 function cardsA1(){
   var a=all1(), ativa=0,canc=0,sem=0,al=0;
   a.forEach(function(r){ if(r.status==="ativa")ativa++;else if(r.status==="cancelada")canc++;else sem++; if(r.alert)al++; });
-  document.getElementById("cards-a1").innerHTML=
-    card(a.length,"Marcas")+card(ativa,"Ativas")+card(canc,"Canceladas")+card(sem,"Sem reunião")+card(al,"Com alerta ⏰",true);
+  var el=document.getElementById("cards-a1");
+  el.innerHTML=
+    card(a.length,"Marcas",{f:""})+card(ativa,"Ativas",{f:"ativa"})+card(canc,"Canceladas",{f:"cancelada"})+
+    card(sem,"Sem reunião",{f:"sem_reuniao"})+card(al,"Com alerta",{f:"alerta",al:1})+
+    card(callItems().length,"Para chamar",{acao:"modal",al:1});
+  wireCards(el,"a1",re1);
 }
 function addRow(tab){
   saveOverlay(newRowKey(tab),{ts:Date.now()});
@@ -523,8 +567,9 @@ window.addRow=addRow;
 /* ================= ABA 2 — Tino ================= */
 var s2={sort:"dias",dir:-1};
 function alert2(dias){
-  if(dias===null||dias===undefined) return {level:"alert",text:"🚫 nunca acessou"};
-  if(dias>15) return {level:"warn",text:"⏰ "+dias+"d sem acessar"};
+  // texto limpo: ele é reaproveitado no Excel e no modal de marcas para chamar
+  if(dias===null||dias===undefined) return {level:"alert",icon:"ic-ban",text:"nunca acessou"};
+  if(dias>15) return {level:"warn",icon:"ic-clock",text:dias+"d sem acessar"};
   return null;
 }
 function eff2row(r){
@@ -548,11 +593,13 @@ var re2=function(){ renderA2(); cardsA2(); syncAlerts(); renderA3(); cardsA3(); 
 function renderA2(){
   var q=(document.getElementById("q-a2").value||"").toLowerCase();
   var st=document.getElementById("st-a2").value;
-  var onlyAl=document.getElementById("al-a2").checked;
+  var cf=cardFiltro.a2;
   var rows=all2().filter(function(r){
     if(q && String(r.nome||"").toLowerCase().indexOf(q)<0 && String(r.company||"").toLowerCase().indexOf(q)<0) return false;
     if(st && r.status!==st) return false;
-    if(onlyAl && !r.alert) return false;
+    if(cf==="alerta" && !r.alert) return false;
+    if(cf==="nunca"  && r.dias!==null) return false;
+    if(cf==="mais15" && !(r.dias!==null && r.dias>15)) return false;
     return true;
   });
   var added=rows.filter(function(r){return r.added;});
@@ -562,9 +609,11 @@ function renderA2(){
     last:function(r){var d=pdate(r.last_login);return d?d.getTime():-1;},
     login:function(r){return toNum(r.login_days);},
     created:function(r){var d=pdate(r.created_at);return d?d.getTime():null;} });
-  var cols=[{label:"Cor"},{label:"Marca",key:"nome",sort:1,def:1},{label:"Status"},
-    {label:"Criado em",key:"created",sort:1},{label:"Último acesso",key:"last",sort:1},
-    {label:"Dias sem acessar",key:"dias",sort:1,num:1},{label:"Dias c/ login",key:"login",sort:1,num:1},
+  var cols=[{label:"",cls:"strip",title:"clique na faixa para pintar a linha"},
+    {label:"Marca",key:"nome",sort:1,def:1},{label:"Status"},
+    {label:"Criado em",key:"created",sort:1},
+    {label:"Último acesso",key:"dias",sort:1,title:"data do último acesso · dias desde então"},
+    {label:"Dias c/ login",key:"login",sort:1,num:1},
     {label:"Alerta"},{label:"Observação"},{label:""}];
   var tbl=document.getElementById("tbl-a2"); tbl.innerHTML="";
   var thead=document.createElement("thead"); thead.appendChild(makeHead(cols,s2,renderA2)); tbl.appendChild(thead);
@@ -573,24 +622,28 @@ function renderA2(){
     var key=r.key, tr=document.createElement("tr");
     if(r.added) tr.className="addedrow";
     if(r.color){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",r.color); }
-    tr.appendChild(colorCell(key,"",function(){}));
+    tr.appendChild(colorCell(key,"",re2,r.alert));
     tr.appendChild(editCell(key,"nome",r.src.nome,{cls:"marca",ph:r.added?"nova marca":"",
-      fmt:function(v){return v===""?"":'<span class="marca">'+esc(v)+"</span>";},onChange:re2}));
+      fmt:function(v){return v===""?"":'<span class="marca trunc" title="'+esc(v)+'">'+esc(v)+"</span>";},onChange:re2}));
     tr.appendChild(editCell(key,"status",r.src.status,{ph:"active/inactive",
       fmt:function(v){return v===""?"":'<span class="st '+(v==="active"?"on":"off")+'">'+esc(v)+"</span>";},onChange:re2}));
     tr.appendChild(editCell(key,"created_at",r.src.created_at,{cls:"nowrap mut",type:"date",ph:"dd/mm/aaaa",
       fmt:function(v){return fmtDate(v)||(v?esc(v):"");}}));
+    // "Último acesso" e "Dias sem acessar" numa coluna só: 02/07 · 22d
     tr.appendChild(editCell(key,"last_login",r.src.last_login,{cls:"nowrap",type:"date",ph:"nunca",
-      fmt:function(v){return fmtDate(v)||(v?esc(v):"");},onChange:re2}));
-    tr.appendChild(cell(r.dias===null?'<span class="dash">nunca</span>':r.dias,"num derived"));
+      fmt:function(v){
+        var d=fmtDate(v);
+        if(!d) return '<span class="dash">nunca</span>';
+        return esc(d.slice(0,5))+' <span class="mut">· '+(r.dias===null?"":r.dias+"d")+"</span>";
+      },onChange:re2}));
     tr.appendChild(editCell(key,"login_days",r.src.login_days,{cls:"num mut",type:"num",ph:"0"}));
-    tr.appendChild(cell(r.alert?'<span class="alertpill'+(r.alert.level==="warn"?" warn":"")+'">'+r.alert.text+"</span>":'<span class="dash">—</span>',"derived"));
+    tr.appendChild(cell(alPill(r.alert),"derived"));
     tr.appendChild(obsCell(key,""));
     tr.appendChild(actCell(key,r.added,re2));
     tb.appendChild(tr);
   });
   tbl.appendChild(tb);
-  if(!rows.length) tbl.innerHTML+='<tbody><tr><td colspan="10" class="empty">Nenhuma marca com esses filtros.</td></tr></tbody>';
+  if(!rows.length) tbl.innerHTML+='<tbody><tr><td colspan="9" class="empty">Nenhuma marca com esses filtros.</td></tr></tbody>';
   document.getElementById("cnt-a2").textContent=rows.length+" marca(s)";
   undelBtn("a2");
 }
@@ -602,24 +655,24 @@ function renderA2(){
 var tinoT=null, tinoEm="";
 function fmtHora(iso){ var d=new Date(iso); return isNaN(d)?"":
   String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
-function statusTino(txt,cls){ var e=document.getElementById("tino-st"); if(e){ e.textContent=txt; e.className="tinost "+(cls||""); } }
+function statusTino(txt,cls,icone){ var e=document.getElementById("tino-st");
+  if(e){ e.innerHTML=ic(icone||"ic-key")+"<span>"+esc(txt)+"</span>"; e.className="sync "+(cls||""); } }
 function refreshTino(forcado){
-  if(!API){ statusTino("Tino: dado do build diário",""); return; }
-  statusTino(forcado?"buscando no Tino…":"atualizando Tino…","p");
+  if(!API){ statusTino("dado do build diário","","ic-key"); return; }
+  statusTino(forcado?"buscando no Tino…":"atualizando…","p","ic-refresh");
   fetch(API+"/api/tino"+(forcado?"?fresh=1":""),{cache:"no-store"})
     .then(function(r){ return r.json(); })
     .then(function(j){
       if(!j||!j.ok||!j.marcas||!j.marcas.length){
-        statusTino("Tino: não consegui atualizar — mostrando o dado do build","er"); return;
+        statusTino("não consegui atualizar — dado do build","er","ic-alert"); return;
       }
       D.aba2=j.marcas; tinoEm=j.atualizadoEm||"";
       renderA2(); cardsA2(); syncAlerts();
       renderA3(); cardsA3();                 // muda a coluna Tino automática da aba 3
-      statusTino(j.obsoleto
-        ? "Tino: última leitura que o servidor tinha (origem fora do ar)"
-        : "Tino atualizado às "+fmtHora(tinoEm)+" · "+j.total+" marcas", j.obsoleto?"er":"ok");
+      if(j.obsoleto) statusTino("última leitura do servidor (origem fora do ar)","er","ic-alert");
+      else statusTino("atualizado às "+fmtHora(tinoEm)+" · "+j.total+" marcas","ok","ic-key");
     })
-    .catch(function(){ statusTino("Tino: sem conexão — mostrando o dado do build","er"); });
+    .catch(function(){ statusTino("sem conexão — dado do build","er","ic-alert"); });
 }
 window.refreshTino=refreshTino;
 function startTino(){
@@ -632,8 +685,12 @@ function startTino(){
 function cardsA2(){
   var a=all2(), nunca=0,mais15=0;
   a.forEach(function(r){ if(r.dias===null)nunca++; else if(r.dias>15)mais15++; });
-  document.getElementById("cards-a2").innerHTML=
-    card(a.length,"Marcas c/ Tino")+card(mais15,">15d sem acessar",true)+card(nunca,"Nunca acessaram",true)+card(mais15+nunca,"Total alertas ⏰",true);
+  var el=document.getElementById("cards-a2");
+  el.innerHTML=
+    card(a.length,"Marcas c/ Tino",{f:""})+card(mais15,"+15d sem acessar",{f:"mais15",al:1})+
+    card(nunca,"Nunca acessaram",{f:"nunca",al:1})+card(mais15+nunca,"Total alertas",{f:"alerta",al:1})+
+    card(callItems().length,"Para chamar",{acao:"modal",al:1});
+  wireCards(el,"a2",re2);
 }
 
 /* ================= ABA 3 — Ranking Upsell ================= */
@@ -697,11 +754,13 @@ function renderA3(){
     empresa:function(r){return r.empresa;}, cs:function(r){return r.cs;}, plano:function(r){return r.plano;},
     gmv_ant:function(r){return r.gmv_ant;}, gmv_atual:function(r){return r.gmv_atual;},
     cresc_rs:function(r){return r.cresc_rs;}, cresc_pct:function(r){return r.cresc_pct;} });
-  var cols=[{label:"Cor"},{label:"Empresa",key:"empresa",sort:1,def:1},{label:"CS",key:"cs",sort:1},
+  var cols=[{label:"",cls:"strip",title:"clique na faixa para pintar a linha"},
+    {label:"Empresa",key:"empresa",sort:1,def:1},{label:"CS",key:"cs",sort:1},
     {label:"Plano",key:"plano",sort:1},{label:"GMV anterior",key:"gmv_ant",sort:1,num:1},
     {label:"GMV atual",key:"gmv_atual",sort:1,num:1},{label:"Cresc. R$",key:"cresc_rs",sort:1,num:1},
-    {label:"Cresc. %",key:"cresc_pct",sort:1,num:1},{label:"Mensalidade"},{label:"Tino"},{label:"VestiPago"},
-    {label:"Observação"},{label:""}];
+    {label:"Cresc. %",key:"cresc_pct",sort:1,num:1},{label:"Mensalidade"},
+    {label:"Tino",title:'Preenchido automaticamente quando a marca aparece na aba Acessos Tino. Digite na célula para forçar outro valor; apagando, volta ao automático. Não estar na lista nunca vira "Não" sozinho.'},
+    {label:"VestiPago"},{label:"Observação"},{label:""}];
   var tbl=document.getElementById("tbl-a3"); tbl.innerHTML="";
   var thead=document.createElement("thead"); thead.appendChild(makeHead(cols,s3,renderA3)); tbl.appendChild(thead);
   var tb=document.createElement("tbody");
@@ -710,9 +769,9 @@ function renderA3(){
     var key=r.key, tr=document.createElement("tr");
     if(r.added) tr.className="addedrow";
     if(r.color){ tr.setAttribute("data-c","1"); tr.style.setProperty("--rowc",r.color); }
-    tr.appendChild(colorCell(key,r.src.color||"",re3));
+    tr.appendChild(colorCell(key,r.src.color||"",re3,null));
     tr.appendChild(editCell(key,"empresa",r.src.empresa,{cls:"marca",ph:r.added?"nova empresa":"",
-      fmt:function(v){return v===""?"":'<span class="marca">'+esc(v)+"</span>";},onChange:re3}));
+      fmt:function(v){return v===""?"":'<span class="marca trunc" title="'+esc(v)+'">'+esc(v)+"</span>";},onChange:re3}));
     tr.appendChild(csCell(key,r.src.cs_tab,CS3_OPTS,re3));
     tr.appendChild(editCell(key,"plano",r.src.plano,{ph:"plano"}));
     tr.appendChild(editCell(key,"gmv_ant",r.src.gmv_ant,{cls:"num mut",type:"num",ph:"0",fmt:money,onChange:re3}));
@@ -722,7 +781,7 @@ function renderA3(){
     tr.appendChild(editCell(key,"mensalidade",r.src.mensalidade,{cls:"nowrap mut",ph:"R$"}));
     tr.appendChild(editCell(key,"tino",r.tinoBase,{type:"bool",onChange:re3,fmt:function(v){
       if(v===true && r.tinoAuto && ov(key).tino==null)
-        return '<span class="st on auto" title="Automático: esta marca aparece na aba Acessos Tino. Para forçar outro valor, digite aqui; apagando a célula ela volta ao automático.">Sim 🔑</span>';
+        return '<span class="st on auto" title="Automático: esta marca aparece na aba Acessos Tino. Para forçar outro valor, digite aqui; apagando a célula ela volta ao automático.">'+ic("ic-key")+"Sim</span>";
       return boolPill(v);
     }}));
     tr.appendChild(editCell(key,"vestipago",r.src.vestipago,{type:"bool",fmt:boolPill}));
@@ -734,31 +793,55 @@ function renderA3(){
   if(!rows.length) tbl.innerHTML+='<tbody><tr><td colspan="13" class="empty">Nenhuma empresa com esses filtros.</td></tr></tbody>';
   document.getElementById("cnt-a3").textContent=rows.length+" empresa(s)";
   undelBtn("a3");
-  var lg=document.getElementById("lg-a3");
-  if(lg){
-    var auto=rows.filter(function(r){ return r.tinoAuto && ov(r.key).tino==null; }).length;
-    var forcado=rows.filter(function(r){ return r.tinoAuto && ov(r.key).tino===false; }).length;
-    lg.innerHTML='<span><b>🔑 Sim</b> = automático: a marca aparece na aba Acessos Tino ('+auto+' linha(s))</span>'+
-      '<span>digite na célula para forçar outro valor; apagando, volta ao automático'+
-      (forcado?' — <b>'+forcado+'</b> forçada(s) para Não':'')+'</span>'+
-      '<span>não estar na lista do Tino não vira "Não" sozinho: vale o que está na planilha</span>';
-  }
 }
 function boolPill(v){ if(v===true) return '<span class="st on">Sim</span>';
   if(v===false) return '<span class="st off">Não</span>';
   if(v===null||v===undefined||v==="") return "";
   return '<span class="mut">'+esc(v)+'</span>'; }
+/* Os cards da aba 3 comandam o MESMO seletor de CS da barra (não um segundo
+   estado paralelo, que poderia contradizer o segmentado). */
 function cardsA3(){
   var a=all3();
   var by={Busto:0,Luana:0,Thamiris:0}; a.forEach(function(r){ if(by[r.cs]!=null)by[r.cs]++; });
-  document.getElementById("cards-a3").innerHTML=
-    card(a.length,"Empresas")+card(by.Busto,"Busto")+card(by.Luana,"Luana")+card(by.Thamiris,"Thamiris");
+  var el=document.getElementById("cards-a3");
+  el.innerHTML=
+    cardCs(a.length,"Empresas","")+cardCs(by.Busto,"Busto","Busto")+
+    cardCs(by.Luana,"Luana","Luana")+cardCs(by.Thamiris,"Thamiris","Thamiris");
+  el.querySelectorAll("[data-cs]").forEach(function(c){
+    var cs=c.getAttribute("data-cs");
+    var btn=document.querySelector('#cs-a3 button[data-cs="'+cs+'"]');
+    if(btn && btn.classList.contains("active")) c.classList.add("on");
+    c.addEventListener("click",function(){ if(btn) btn.click(); });
+  });
+}
+function cardCs(v,l,cs){
+  return '<div class="card" data-cs="'+esc(cs)+'"><div class="v">'+v+'</div>'+
+         '<div class="l">'+esc(l)+ic("ic-x","x")+'</div></div>';
 }
 
 function reAll(){ re1(); re2(); re3(); }
 
-/* ---------- cards / pills ---------- */
-function card(v,l,alert){ return '<div class="card'+(alert?" alert":"")+'"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>'; }
+/* ---------- cards = filtros ----------
+   Cada card guarda o critério em data-f; clicar filtra a tabela e marca o card,
+   clicar de novo limpa. O estado fica em cardFiltro[aba] e é aplicado dentro do
+   filter() do render. O card "Para chamar" não filtra: abre o modal. */
+var cardFiltro={a1:"",a2:"",a3:""};
+function card(v,l,o){
+  o=o||{};
+  var attr=o.acao?' data-acao="'+o.acao+'"':(o.f!==undefined?' data-f="'+esc(o.f)+'"':"");
+  return '<div class="card'+(o.al?" al":"")+'"'+attr+'><div class="v">'+v+'</div>'+
+         '<div class="l">'+esc(l)+ic("ic-x","x")+'</div></div>';
+}
+function wireCards(el,tab,re){
+  el.querySelectorAll("[data-f]").forEach(function(c){
+    var f=c.getAttribute("data-f");
+    if((cardFiltro[tab]||"")===f) c.classList.add("on");
+    c.addEventListener("click",function(){ cardFiltro[tab]=(cardFiltro[tab]===f)?"":f; re(); });
+  });
+  el.querySelectorAll('[data-acao="modal"]').forEach(function(c){
+    c.addEventListener("click",openCallModal);
+  });
+}
 /* pills das abas saem da MESMA lista do quadro de avisos (sempre batem) */
 function pills(){
   var it=callItems();
@@ -771,6 +854,8 @@ function setPill(id,n){ var e=document.getElementById(id); if(!e) return; e.text
 function exportTab(which){
   var tbl=document.getElementById("tbl-"+which).cloneNode(true);
   tbl.querySelectorAll(".pop").forEach(function(p){p.remove();});
+  tbl.querySelectorAll("svg").forEach(function(s){s.remove();});   // ícone não vai pro Excel
+  tbl.querySelectorAll(".ar").forEach(function(s){s.remove();});   // nem a setinha de ordenação
   tbl.querySelectorAll("textarea,input").forEach(function(t){ var s=document.createElement("span"); s.textContent=t.value; t.parentNode.replaceChild(s,t); });
   tbl.querySelectorAll("select").forEach(function(t){ var s=document.createElement("span"); s.textContent=t.value; t.parentNode.replaceChild(s,t); });
   tbl.querySelectorAll("tr").forEach(function(tr){
@@ -787,25 +872,24 @@ window.exportTab=exportTab;
 
 /* ---------- quadro de aviso "marcas para chamar" (ligado às cores da aba 1) ---------- */
 function callItems(){
-  var items=[], cl=function(t){return t.replace(/^⏰ ?/,"").replace(/^🚫 ?/,"");};
-  all1().forEach(function(r){ if(r.alert && r.marca) items.push({tab:"a1",marca:r.marca,cs:r.cs,motivo:cl(r.alert.text),level:r.alert.level}); });
-  all2().forEach(function(r){ if(r.alert && r.nome) items.push({tab:"a2",marca:r.nome,cs:"",motivo:cl(r.alert.text),level:r.alert.level}); });
+  var items=[];   // o texto do alerta já vem limpo (ícone é separado)
+  all1().forEach(function(r){ if(r.alert && r.marca) items.push({tab:"a1",marca:r.marca,cs:r.cs,al:r.alert}); });
+  all2().forEach(function(r){ if(r.alert && r.nome) items.push({tab:"a2",marca:r.nome,cs:"",al:r.alert}); });
   return items;
 }
 function mitem(i){ return '<div class="mitem" data-go="'+i.tab+'"><span class="mmarca">'+esc(i.marca)+'</span>'+
-  (i.cs?'<span class="mcs">'+esc(i.cs)+'</span>':"")+
-  '<span class="alertpill'+(i.level==="warn"?" warn":"")+'">'+esc(i.motivo)+'</span></div>'; }
+  (i.cs?'<span class="mcs">'+esc(i.cs)+'</span>':"")+alPill(i.al)+'</div>'; }
 /* recalcula o quadro AO VIVO — chamado sempre que uma cor/data muda */
 function refreshCallPanel(){
   var items=callItems();
   setPill("callCount",items.length);
   setPill("callBadge",items.length);
   var body=document.getElementById("callBody");
-  if(!items.length){ body.innerHTML='<div class="empty">Nenhuma marca para chamar agora 🎉</div>'; return items; }
+  if(!items.length){ body.innerHTML='<div class="empty">Nenhuma marca para chamar agora.</div>'; return items; }
   var g1=items.filter(function(i){return i.tab==="a1";}), g2=items.filter(function(i){return i.tab==="a2";});
   var html="";
-  if(g1.length) html+='<div class="mgroup"><h4>📋 Passagem de bastão · '+g1.length+'</h4>'+g1.map(mitem).join("")+'</div>';
-  if(g2.length) html+='<div class="mgroup"><h4>🔑 Acessos Tino · '+g2.length+'</h4>'+g2.map(mitem).join("")+'</div>';
+  if(g1.length) html+='<div class="mgroup"><h4>'+ic("ic-list")+'Passagem de bastão · '+g1.length+'</h4>'+g1.map(mitem).join("")+'</div>';
+  if(g2.length) html+='<div class="mgroup"><h4>'+ic("ic-key")+'Acessos Tino · '+g2.length+'</h4>'+g2.map(mitem).join("")+'</div>';
   body.innerHTML=html;
   body.querySelectorAll("[data-go]").forEach(function(el){
     el.addEventListener("click",function(){ showTab(el.getAttribute("data-go")); closeCallModal(); });
@@ -842,13 +926,20 @@ function fillCS1(){
   Object.keys(set).sort().forEach(function(cs){ var o=document.createElement("option"); o.value=cs; o.textContent="CS: "+cs; sel.appendChild(o); });
 }
 function wire(){
-  ["q-a1","cs-a1","st-a1","al-a1"].forEach(function(id){ var e=document.getElementById(id);
+  ["q-a1","cs-a1","st-a1"].forEach(function(id){ var e=document.getElementById(id);
     e.addEventListener(id.indexOf("q-")===0?"input":"change",renderA1); });
-  ["q-a2","st-a2","al-a2"].forEach(function(id){ var e=document.getElementById(id);
+  ["q-a2","st-a2"].forEach(function(id){ var e=document.getElementById(id);
     e.addEventListener(id.indexOf("q-")===0?"input":"change",renderA2); });
   document.getElementById("q-a3").addEventListener("input",renderA3);
   document.querySelectorAll("#cs-a3 button").forEach(function(b){ b.addEventListener("click",function(){
-    document.querySelectorAll("#cs-a3 button").forEach(function(x){x.classList.remove("active");}); b.classList.add("active"); renderA3(); }); });
+    document.querySelectorAll("#cs-a3 button").forEach(function(x){x.classList.remove("active");}); b.classList.add("active");
+    renderA3(); cardsA3(); }); });
+  fixSticky(); window.addEventListener("resize",fixSticky);
+}
+/* o cabeçalho é sticky; o <th> precisa colar logo abaixo dele, não por cima */
+function fixSticky(){
+  var t=document.querySelector(".top");
+  if(t) document.documentElement.style.setProperty("--topH",t.offsetHeight+"px");
 }
 var booted=false;
 window.__cs2_boot=function(){
