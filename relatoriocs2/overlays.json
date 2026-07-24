@@ -1,5 +1,5 @@
 {
- "atualizadoEm": "2026-07-24T11:43:26.177Z",
+ "atualizadoEm": "2026-07-24T11:43:39.490Z",
  "overlays": {
   "teste:a": {
    "obs": "ola",
@@ -9,6 +9,10 @@
   "teste:b": {
    "obs": "segunda",
    "up": 1784893406410
+  },
+  "teste:d": {
+   "obs": "simultanea 2",
+   "up": 1784893419710
   }
  }
 }
