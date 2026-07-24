@@ -450,7 +450,7 @@ window.CNPJ_MARCAS = (function(){
         "deeper":                                            "37.848.614/0001-38",
         "delas plus size":                                   "46.148.727/0001-11",
         "deleite":                                           "44.051.247/0001-02",
-        "delia modas":                                       "34647856000175",
+        "delia modas":                                       "34.647.856/0001-75",
         "delia modas fashion":                               "34.647.856/0002-56",
         "delia modas varejo":                                "34.647.856/0002-56",
         "delight":                                           "21.520.947/0001-01",
