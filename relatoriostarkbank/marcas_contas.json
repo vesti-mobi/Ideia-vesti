@@ -1,6 +1,6 @@
 {
   "_leia": "Fonte da verdade das contas das marcas (CNPJ, razao social, chave PIX). Editado pelo painel StarkBank / celular (app stark-admin). Os 3 arquivos pix_marcas.js, cnpj_marcas.js e razao_marcas.js sao GERADOS a partir daqui — nao edite eles na mao.",
-  "atualizadoEm": "2026-07-24T21:41:22.656Z",
+  "atualizadoEm": "2026-07-24T21:42:02.681Z",
   "atualizadoPor": "celular",
   "marcas": {
     "2 wave": {
@@ -8006,9 +8006,11 @@
       "razao": "Traffos Confecções LTDA"
     },
     "trama jeans": {
-      "pix": "Sem chave PIX",
-      "cnpj": "37737298000127",
-      "razao": "BWR TRAMA COMERCIO DE CONFECCOES LTDA"
+      "pix": "pixtramabomretiro@gmail.com",
+      "cnpj": "37.737.298/0001-27",
+      "razao": "BWR TRAMA COMERCIO DE CONFECCOES LTDA",
+      "editadoEm": "2026-07-24T21:42:02.681Z",
+      "origem": "celular"
     },
     "transby shop": {
       "pix": "",

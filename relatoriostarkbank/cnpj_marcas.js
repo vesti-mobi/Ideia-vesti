@@ -1602,7 +1602,7 @@ window.CNPJ_MARCAS = (function(){
         "toque secreto lingerie":                            "27.070.927/0001-54",
         "traffos":                                           "06890443000181",
         "traffos atacado":                                   "06.890.443/0001-81",
-        "trama jeans":                                       "37737298000127",
+        "trama jeans":                                       "37.737.298/0001-27",
         "transby shop":                                      "05.299.785/0001-69",
         "tratto jeans":                                      "11.431.832/0001-89",
         "trendy":                                            "05.959.748/0001-30",

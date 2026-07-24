@@ -230,7 +230,7 @@ window.PIX_MARCAS = (function(){
         "the lion confec (zoe sport)":                       "zoesportsoficial@gmail.com",
         "the lion confeccoes":                               "zoesportsoficial@gmail.com",
         "traffos":                                           "06890443000181",
-        "trama jeans":                                       "Sem chave PIX",
+        "trama jeans":                                       "pixtramabomretiro@gmail.com",
         "ttng":                                              "12292902000128",
         "ttng matriz":                                       "12292902000128",
         "ttng varejo":                                       "12292902000128",
