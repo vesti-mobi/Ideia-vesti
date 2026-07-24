@@ -1,5 +1,5 @@
 {
- "atualizadoEm": "2026-07-24T20:44:32.541Z",
+ "atualizadoEm": "2026-07-24T20:57:24.660Z",
  "overlays": {
   "a2:crocker_jeans": {
    "color": "",
@@ -40,6 +40,11 @@
    "obs": "Cadastrando produtos ",
    "ts": 1784925871379,
    "up": 1784925872867
+  },
+  "obs:monclos": {
+   "obs": "Iniciando integração Totvs",
+   "ts": 1784926643501,
+   "up": 1784926644922
   }
  }
 }
