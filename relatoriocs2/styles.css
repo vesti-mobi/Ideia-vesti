@@ -52,6 +52,7 @@ body{margin:0;font-family:'Inter',system-ui,sans-serif;color:var(--tx);backgroun
 .sync.ok{background:var(--ok-bg);color:var(--ok-tx)}
 .sync.er{background:var(--warn-bg);color:var(--warn-tx)}
 .sync:empty{display:none}
+.sync.clicavel{cursor:pointer;text-decoration:underline}
 
 /* abas: sublinhado, sem preenchimento */
 .tabs{display:flex;gap:2px;margin-top:12px;flex-wrap:wrap;border-bottom:1px solid var(--line)}

@@ -102,10 +102,25 @@ function flash(msg){ var f=document.getElementById("flash"); f.textContent=msg||
   clearTimeout(flashT); flashT=setTimeout(function(){f.classList.remove("show");},1600); }
 var SYNC={pend:["salvando…","p","ic-refresh"],ok:["salvo para todos","ok","ic-check"],
           off:["sem conexão — guardado aqui","er","ic-alert"],err:["não salvou para todos","er","ic-alert"],
+          auth:["sessão expirada — clique para entrar","er","ic-alert"],
           only:["salvando só neste navegador","er","ic-alert"]};
-function setSync(st){ var e=document.getElementById("sync"); if(!e) return;
+var estadoSync="";
+function setSync(st){ estadoSync=st; var e=document.getElementById("sync"); if(!e) return;
   var s=SYNC[st]; if(!s){ e.innerHTML=""; e.className="sync"; return; }
-  e.innerHTML=ic(s[2])+"<span>"+s[0]+"</span>"; e.className="sync "+s[1]; }
+  e.innerHTML=ic(s[2])+"<span>"+s[0]+"</span>";
+  e.className="sync "+s[1]+(st==="auth"?" clicavel":""); }
+/* 401: nada foi perdido (a edição já está no navegador e a fila continua de pé).
+   Pede a senha e reenvia o mesmo lote. */
+var pedindoSenha=false;
+function pedirSenha(){
+  if(pedindoSenha) return; pedindoSenha=true;
+  var p=window.prompt("Sua sessão expirou. Digite a senha do painel para salvar as edições — nada foi perdido:");
+  pedindoSenha=false;
+  if(!p) return;
+  try{ sessionStorage.setItem("cs2_pass",p); sessionStorage.setItem("cs2_auth","1"); }catch(e){}
+  setSync("pend"); agendarFlush(200);
+}
+window.pedirSenha=pedirSenha;
 
 function ov(key){ return overlays[key]||{}; }
 function enfileirar(key,valor){
@@ -135,9 +150,11 @@ function flush(){
     .then(function(res){
       salvando=false;
       if(!res.j||!res.j.ok){
-        devolver(lote); setSync("err");
-        flash("⚠ "+((res.j&&res.j.erro)||"não consegui salvar para todos"));
-        if(res.st!==401) agendarFlush(8000);           // 401 = senha errada: não adianta insistir
+        devolver(lote);                                 // volta pra fila: nada se perde
+        if(res.st===401){ setSync("auth"); flash("sessão expirada — entre de novo para salvar"); pedirSenha(); return; }
+        setSync("err");
+        flash((res.j&&res.j.erro)||"não consegui salvar para todos");
+        agendarFlush(8000);
         return;
       }
       // aplica o que o servidor gravou (com o carimbo `up` dele, que é quem desempata)
@@ -161,6 +178,10 @@ function mergeRemote(remoto){
   Object.keys(remoto).forEach(function(k){
     if(fila[k]!==undefined) return;                     // edição local pendente vence
     var loc=overlays[k];
+    // chave sem `up` = editada aqui e ainda NÃO aceita pelo servidor (ex.: falhou
+    // por sessão expirada). Ela vence o valor remoto e sobe depois — senão a
+    // edição da pessoa sumiria na primeira recarga.
+    if(loc && !loc.up) return;
     if(!loc || (remoto[k].up||0)>=(loc.up||0)){
       if(JSON.stringify(loc)!==JSON.stringify(remoto[k])){ overlays[k]=remoto[k]; mudou=true; }
     }
@@ -934,6 +955,8 @@ function wire(){
   document.querySelectorAll("#cs-a3 button").forEach(function(b){ b.addEventListener("click",function(){
     document.querySelectorAll("#cs-a3 button").forEach(function(x){x.classList.remove("active");}); b.classList.add("active");
     renderA3(); cardsA3(); }); });
+  var sy=document.getElementById("sync");
+  if(sy) sy.addEventListener("click",function(){ if(estadoSync==="auth") pedirSenha(); });
   fixSticky(); window.addEventListener("resize",fixSticky);
 }
 /* o cabeçalho é sticky; o <th> precisa colar logo abaixo dele, não por cima */
@@ -944,7 +967,8 @@ function fixSticky(){
 var booted=false;
 window.__cs2_boot=function(){
   if(booted) return; booted=true;
-  document.getElementById("gen").textContent="Atualizado "+(D.gerado_em||"");
+  // (sem "Atualizado em" no topo: as edições são manuais e a aba Tino tem o
+  //  próprio indicador de quando foi buscada)
   buildObsIndex(); fillCS1(); wire();
   loadOverlays().then(function(){
     renderA1(); renderA2(); renderA3();
