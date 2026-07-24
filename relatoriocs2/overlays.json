@@ -1,4 +1,30 @@
 {
- "atualizadoEm": "2026-07-24T14:02:00.550Z",
- "overlays": {}
+ "atualizadoEm": "2026-07-24T14:14:14.627Z",
+ "overlays": {
+  "a2:crocker_jeans": {
+   "color": "",
+   "ts": 1784835591977,
+   "up": 1784902454880
+  },
+  "a1:Art&Cor": {
+   "color": "#B6D7A8",
+   "ts": 1784834946474,
+   "up": 1784902454880
+  },
+  "a3:Luana:Happy Boy": {
+   "tino": true,
+   "ts": 1784894399173,
+   "up": 1784902454880
+  },
+  "a3:Luana:Pijamas Lua Cheia": {
+   "tino": true,
+   "ts": 1784894420140,
+   "up": 1784902454880
+  },
+  "obs:baubaki": {
+   "obs": "CANCELADA\n",
+   "ts": 1784901327402,
+   "up": 1784902454880
+  }
+ }
 }
