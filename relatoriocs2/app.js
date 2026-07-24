@@ -680,6 +680,7 @@ function statusTino(txt,cls,icone){ var e=document.getElementById("tino-st");
   if(e){ e.innerHTML=ic(icone||"ic-key")+"<span>"+esc(txt)+"</span>"; e.className="sync "+(cls||""); } }
 function refreshTino(forcado){
   if(!API){ statusTino("dado do build diário","","ic-key"); return; }
+  ultimoTino=Date.now();
   statusTino(forcado?"buscando no Tino…":"atualizando…","p","ic-refresh");
   fetch(API+"/api/tino"+(forcado?"?fresh=1":""),{cache:"no-store"})
     .then(function(r){ return r.json(); })
@@ -696,11 +697,16 @@ function refreshTino(forcado){
     .catch(function(){ statusTino("sem conexão — dado do build","er","ic-alert"); });
 }
 window.refreshTino=refreshTino;
+var ultimoTino=0;
 function startTino(){
   if(!API) return;
   refreshTino(false);
   clearInterval(tinoT);
   tinoT=setInterval(function(){ if(!document.hidden) refreshTino(false); },5*60*1000);
+  // voltou pra aba depois de um tempo? busca na hora, em vez de esperar o tique
+  document.addEventListener("visibilitychange",function(){
+    if(!document.hidden && Date.now()-ultimoTino>2*60*1000) refreshTino(false);
+  });
 }
 
 function cardsA2(){
