@@ -594,6 +594,41 @@ function renderA2(){
   document.getElementById("cnt-a2").textContent=rows.length+" marca(s)";
   undelBtn("a2");
 }
+/* ---------- Tino ao vivo (rota /api/tino, com cache na CDN) ----------
+   O dado da aba 2 nasce do build diário; aqui ele é substituído pelo que a API
+   devolve agora. A API do Tino demora 4-9s, por isso o servidor cacheia 5 min e
+   o painel só pede de 5 em 5 min — nada a ver com o poll de 25s das edições.
+   Se falhar ou vier vazio, MANTÉM o dado do build (nunca zera a aba). */
+var tinoT=null, tinoEm="";
+function fmtHora(iso){ var d=new Date(iso); return isNaN(d)?"":
+  String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+function statusTino(txt,cls){ var e=document.getElementById("tino-st"); if(e){ e.textContent=txt; e.className="tinost "+(cls||""); } }
+function refreshTino(forcado){
+  if(!API){ statusTino("Tino: dado do build diário",""); return; }
+  statusTino(forcado?"buscando no Tino…":"atualizando Tino…","p");
+  fetch(API+"/api/tino"+(forcado?"?fresh=1":""),{cache:"no-store"})
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if(!j||!j.ok||!j.marcas||!j.marcas.length){
+        statusTino("Tino: não consegui atualizar — mostrando o dado do build","er"); return;
+      }
+      D.aba2=j.marcas; tinoEm=j.atualizadoEm||"";
+      renderA2(); cardsA2(); syncAlerts();
+      renderA3(); cardsA3();                 // muda a coluna Tino automática da aba 3
+      statusTino(j.obsoleto
+        ? "Tino: última leitura que o servidor tinha (origem fora do ar)"
+        : "Tino atualizado às "+fmtHora(tinoEm)+" · "+j.total+" marcas", j.obsoleto?"er":"ok");
+    })
+    .catch(function(){ statusTino("Tino: sem conexão — mostrando o dado do build","er"); });
+}
+window.refreshTino=refreshTino;
+function startTino(){
+  if(!API) return;
+  refreshTino(false);
+  clearInterval(tinoT);
+  tinoT=setInterval(function(){ if(!document.hidden) refreshTino(false); },5*60*1000);
+}
+
 function cardsA2(){
   var a=all2(), nunca=0,mais15=0;
   a.forEach(function(r){ if(r.dias===null)nunca++; else if(r.dias>15)mais15++; });
@@ -823,7 +858,7 @@ window.__cs2_boot=function(){
   loadOverlays().then(function(){
     renderA1(); renderA2(); renderA3();
     cardsA1(); cardsA2(); cardsA3(); pills();
-    bootCallModal(); startPoll();
+    bootCallModal(); startPoll(); startTino();
   });
 };
 })();

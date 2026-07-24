@@ -150,8 +150,15 @@ def build_aba1():
 
 # ---------------------------------------------------------------- Aba 2 (Tino)
 def build_aba2():
+    # Sem valor padrao de proposito: este repo e PUBLICO. Se faltar credencial,
+    # o job falha na cara em vez de embutir a senha no codigo.
     user = os.environ.get("TINO_USER", "admin")
-    pw   = os.environ.get("TINO_PASS", "hGh180#y")
+    pw   = os.environ.get("TINO_PASS")
+    if not pw:
+        raise RuntimeError(
+            "TINO_PASS nao definido. Em CI vem do secret RELCS2_TINO_PASS; "
+            "local, exporte a variavel antes de rodar."
+        )
     req = urllib.request.Request(TINO_URL, headers={
         "X-Dashboard-User": user, "X-Dashboard-Password": pw})
     with urllib.request.urlopen(req, timeout=45) as resp:

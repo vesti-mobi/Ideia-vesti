@@ -82,6 +82,7 @@
       <div class="legend">
         <span>⏰ alerta: mais de <b>15 dias</b> sem acessar</span>
         <span>🚫 alerta: <b>nunca acessou</b></span>
+        <span class="tinost" id="tino-st"></span>
       </div>
       <div class="toolbar">
         <input type="text" id="q-a2" placeholder="Buscar marca...">
@@ -90,6 +91,7 @@
         <div class="spacer"></div>
         <span class="count" id="cnt-a2"></span>
         <button class="btn-ghost" id="und-a2" onclick="restoreTab('a2')" style="display:none"></button>
+        <button class="btn-ghost" onclick="refreshTino(true)" title="busca agora na API do Tino, ignorando o cache de 5 min">↻ Atualizar Tino</button>
         <button class="btn-add" onclick="addRow('a2')">＋ Linha</button>
         <button class="btn-xls" onclick="exportTab('a2')">⬇ Excel</button>
       </div>
