@@ -1,22 +1,4 @@
 {
- "atualizadoEm": "2026-07-24T11:43:39.879Z",
- "overlays": {
-  "teste:a": {
-   "obs": "ola",
-   "color": "#B6D7A8",
-   "up": 1784893406410
-  },
-  "teste:b": {
-   "obs": "segunda",
-   "up": 1784893406410
-  },
-  "teste:d": {
-   "obs": "simultanea 2",
-   "up": 1784893419710
-  },
-  "teste:c": {
-   "obs": "simultanea 1",
-   "up": 1784893422036
-  }
- }
+ "atualizadoEm": "2026-07-24T11:44:33.485Z",
+ "overlays": {}
 }
