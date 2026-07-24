@@ -502,7 +502,7 @@ window.CNPJ_MARCAS = (function(){
         "djiele moda bebe":                                  "10.262.638/0001-54",
         "dmrx":                                              "14.813.517/0001-04",
         "doce danca":                                        "15.393.274/0001-65",
-        "doce deleite":                                      "44051247000102",
+        "doce deleite":                                      "44.051.247/0001-02",
         "doce flor":                                         "07.002.438/0001-58",
         "doce infancia kids teen":                           "020.572.381-05",
         "docevida":                                          "10.817.976/0001-05",

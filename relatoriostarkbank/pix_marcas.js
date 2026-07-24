@@ -78,6 +78,7 @@ window.PIX_MARCAS = (function(){
         "deslum":                                            "48067277842",
         "deslum...":                                         "48067277842",
         "divas vero":                                        "MP",
+        "doce deleite":                                      "theju@docedeleitefashion.com",
         "dream shop":                                        "11946448597",
         "dreamshop":                                         "11946448597",
         "drica ly":                                          "12808054000167",

@@ -1,6 +1,6 @@
 {
   "_leia": "Fonte da verdade das contas das marcas (CNPJ, razao social, chave PIX). Editado pelo painel StarkBank / celular (app stark-admin). Os 3 arquivos pix_marcas.js, cnpj_marcas.js e razao_marcas.js sao GERADOS a partir daqui — nao edite eles na mao.",
-  "atualizadoEm": "2026-07-24T18:48:32.507Z",
+  "atualizadoEm": "2026-07-24T21:41:22.656Z",
   "atualizadoPor": "celular",
   "marcas": {
     "2 wave": {
@@ -2488,9 +2488,11 @@
       "razao": "C. C CHASSOT"
     },
     "doce deleite": {
-      "pix": "",
-      "cnpj": "44051247000102",
-      "razao": "CONFECCOES DE ROUPAS THEJU LTDA"
+      "pix": "theju@docedeleitefashion.com",
+      "cnpj": "44.051.247/0001-02",
+      "razao": "CONFECCOES DE ROUPAS THEJU LTDA",
+      "editadoEm": "2026-07-24T21:41:22.656Z",
+      "origem": "celular"
     },
     "doce flor": {
       "pix": "",
