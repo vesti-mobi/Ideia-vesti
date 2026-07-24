@@ -100,6 +100,7 @@ table.grid tr[data-c]:hover td{filter:brightness(.97)}
 .st.cancelada{background:#fbe0de;color:#c0392b}
 .st.sem_reuniao{background:#eceef3;color:#636E72}
 .st.on{background:#e4f3da;color:#4f8a2f}
+.st.auto{box-shadow:0 0 0 1px #7cb342 inset}
 .st.off{background:#fbe0de;color:#c0392b}
 .alertpill{display:inline-flex;align-items:center;gap:5px;background:var(--alert);color:#fff;font-size:10.5px;
   font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;box-shadow:0 1px 4px rgba(225,112,85,.4)}

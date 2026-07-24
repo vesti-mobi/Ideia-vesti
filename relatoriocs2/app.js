@@ -543,7 +543,8 @@ function all2(){
   D.aba2.forEach(function(r){ out.push(eff2row(r)); });
   return out.filter(function(r){ return !r.hidden; });
 }
-var re2=function(){ renderA2(); cardsA2(); syncAlerts(); };
+/* mexer na aba 2 muda a coluna Tino automática da aba 3 — por isso re-renderiza as duas */
+var re2=function(){ renderA2(); cardsA2(); syncAlerts(); renderA3(); cardsA3(); };
 function renderA2(){
   var q=(document.getElementById("q-a2").value||"").toLowerCase();
   var st=document.getElementById("st-a2").value;
@@ -603,6 +604,23 @@ function cardsA2(){
 /* ================= ABA 3 — Ranking Upsell ================= */
 var s3={sort:"cresc_rs",dir:-1};
 var CS3_OPTS=["Busto","Luana","Thamiris"];
+
+/* Coluna Tino automática: se a marca aparece na aba "Acessos Tino", a coluna Tino
+   da Ranking Upsell vira "Sim" sozinha (o slug da API casa com o nome da planilha:
+   nova_versao_roupas -> "Nova Versão Roupas").
+   NUNCA vira "Não" sozinha: nem toda marca do Tino casa por nome, então NÃO estar
+   na lista não prova que a marca não tem Tino — nesse caso vale o que diz a planilha.
+   Edição manual sempre vence; apagar a célula devolve o valor automático. */
+var TINO_IDX=null;
+function buildTinoIdx(){
+  TINO_IDX={};
+  all2().forEach(function(r){
+    [r.company,r.nome].forEach(function(n){ var k=normName(n); if(k) TINO_IDX[k]=true; });
+  });
+  return TINO_IDX;
+}
+function temTino(nome){ var k=normName(nome); return !!(k && (TINO_IDX||buildTinoIdx())[k]); }
+
 function eff3row(r){
   var k=r.__key||("a3:"+r.cs_tab+":"+r.empresa), o=ov(k);
   var gA=toNum(pick(o.gmv_ant,r.gmv_ant)), gB=toNum(pick(o.gmv_atual,r.gmv_atual));
@@ -610,15 +628,21 @@ function eff3row(r){
          : (gA!==null&&gB!==null ? gB-gA : toNum(r.cresc_rs));
   var cp = (o.cresc_pct!==undefined&&o.cresc_pct!==null&&o.cresc_pct!=="") ? toNum(o.cresc_pct)
          : (gA ? (cr!==null?cr/gA*100:null) : toNum(r.cresc_pct));
+  var empresa=pick(o.empresa,r.empresa);
+  var tinoAuto=temTino(empresa);                        // marca está na aba Acessos Tino?
+  var tinoBase=tinoAuto?true:(r.tino===undefined?null:r.tino);
   return { key:k, added:!!r.__key, src:r, hidden:!!o.hidden,
-    empresa:pick(o.empresa,r.empresa), cs:effCs(k,r.cs_tab||""),
+    empresa:empresa, cs:effCs(k,r.cs_tab||""),
     plano:pick(o.plano,r.plano), gmv_ant:gA, gmv_atual:gB, cresc_rs:cr, cresc_pct:cp,
     mensalidade:pick(o.mensalidade,r.mensalidade),
-    tino:(o.tino!==undefined?o.tino:(r.tino===undefined?null:r.tino)),
+    tinoAuto:tinoAuto, tinoBase:tinoBase,
+    // override null (célula apagada) cai de volta no automático — de propósito
+    tino:(o.tino!==undefined&&o.tino!==null)?o.tino:tinoBase,
     vestipago:(o.vestipago!==undefined?o.vestipago:(r.vestipago===undefined?null:r.vestipago)),
     color:(o.color!==undefined&&o.color!==null)?o.color:(r.color||"") };
 }
 function all3(){
+  buildTinoIdx();                                       // reflete edições feitas na aba 2
   var out=[];
   addedRows("a3").forEach(function(r){ out.push(eff3row(r)); });
   D.aba3.forEach(function(r){ out.push(eff3row(r)); });
@@ -661,8 +685,12 @@ function renderA3(){
     tr.appendChild(editCell(key,"cresc_rs",r.cresc_rs,{cls:"num",type:"num",ph:"0",fmt:money,onChange:re3}));
     tr.appendChild(editCell(key,"cresc_pct",r.cresc_pct,{cls:"num",type:"num",ph:"%",fmt:pct,onChange:re3}));
     tr.appendChild(editCell(key,"mensalidade",r.src.mensalidade,{cls:"nowrap mut",ph:"R$"}));
-    tr.appendChild(editCell(key,"tino",r.src.tino,{type:"bool",ph:"Sim/Não",fmt:boolPill}));
-    tr.appendChild(editCell(key,"vestipago",r.src.vestipago,{type:"bool",ph:"Sim/Não",fmt:boolPill}));
+    tr.appendChild(editCell(key,"tino",r.tinoBase,{type:"bool",onChange:re3,fmt:function(v){
+      if(v===true && r.tinoAuto && ov(key).tino==null)
+        return '<span class="st on auto" title="Automático: esta marca aparece na aba Acessos Tino. Para forçar outro valor, digite aqui; apagando a célula ela volta ao automático.">Sim 🔑</span>';
+      return boolPill(v);
+    }}));
+    tr.appendChild(editCell(key,"vestipago",r.src.vestipago,{type:"bool",fmt:boolPill}));
     tr.appendChild(obsCell(obsKey(r.empresa),obsOrig(r.empresa)));  // mesma obs da Passagem de Bastão
     tr.appendChild(actCell(key,r.added,re3));
     tb.appendChild(tr);
@@ -671,6 +699,15 @@ function renderA3(){
   if(!rows.length) tbl.innerHTML+='<tbody><tr><td colspan="13" class="empty">Nenhuma empresa com esses filtros.</td></tr></tbody>';
   document.getElementById("cnt-a3").textContent=rows.length+" empresa(s)";
   undelBtn("a3");
+  var lg=document.getElementById("lg-a3");
+  if(lg){
+    var auto=rows.filter(function(r){ return r.tinoAuto && ov(r.key).tino==null; }).length;
+    var forcado=rows.filter(function(r){ return r.tinoAuto && ov(r.key).tino===false; }).length;
+    lg.innerHTML='<span><b>🔑 Sim</b> = automático: a marca aparece na aba Acessos Tino ('+auto+' linha(s))</span>'+
+      '<span>digite na célula para forçar outro valor; apagando, volta ao automático'+
+      (forcado?' — <b>'+forcado+'</b> forçada(s) para Não':'')+'</span>'+
+      '<span>não estar na lista do Tino não vira "Não" sozinho: vale o que está na planilha</span>';
+  }
 }
 function boolPill(v){ if(v===true) return '<span class="st on">Sim</span>';
   if(v===false) return '<span class="st off">Não</span>';
