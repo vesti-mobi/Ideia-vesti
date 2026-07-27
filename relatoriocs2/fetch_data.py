@@ -293,9 +293,19 @@ def main():
         print(f"[aba1/aba3] planilhas indisponiveis — preservando snapshot "
               f"({len(aba1)}/{len(aba3)} linhas). Configure GOOGLE_SA_JSON p/ refresh automatico.")
 
+    # BigQuery: linha nova na aba1/aba3 pra cada loja nova + GMV dos 3 periodos.
+    # Nunca derruba o fetcher: sem credencial ou com erro, devolve o que entrou.
+    try:
+        import bq_enrich
+        aba1, aba3, bq_meta = bq_enrich.enriquecer(aba1, aba3, prev)
+    except Exception as e:
+        print(f"[bq] enriquecimento falhou ({e}) — seguindo sem ele")
+        bq_meta = {"ok": False, "p3_dias": 1, "periodos": {}}
+
     data = {
         "gerado_em": datetime.datetime.now().strftime("%d/%m/%Y %H:%M"),
         "hoje": iso(today()),
+        "bq": bq_meta,
         "aba1": aba1,
         "aba2": build_aba2(),   # Tino sempre atualiza (so precisa das credenciais da API)
         "aba3": aba3,
