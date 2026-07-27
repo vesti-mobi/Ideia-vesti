@@ -119,7 +119,7 @@ window.PIX_MARCAS = (function(){
         "izzat jeans":                                       "64020772000178",
         "jay jones":                                         "11231043000102",
         "jayjones":                                          "11231043000102",
-        "jilem modas":                                       "+5511964321282",
+        "jilem modas":                                       "45860676000193",
         "join casemiro":                                     "11 95947 1781",
         "jubora":                                            "05161584000109",
         "kaessi":                                            "24091573000136",
