@@ -1,5 +1,5 @@
 {
- "atualizadoEm": "2026-07-27T20:43:00.427Z",
+ "atualizadoEm": "2026-07-27T20:43:46.500Z",
  "overlays": {
   "a2:crocker_jeans": {
    "color": "",
@@ -55,6 +55,11 @@
    "tino": true,
    "ts": 1785184978953,
    "up": 1785184980714
+  },
+  "a3:Thamiris:Nicoboco Pedido": {
+   "vestipago": true,
+   "ts": 1785185025196,
+   "up": 1785185026771
   }
  }
 }
