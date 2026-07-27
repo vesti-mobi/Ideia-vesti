@@ -1,0 +1,58 @@
+name: Debug BQ freshness
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        run: npm install @google-cloud/bigquery
+
+      - name: Configurar credencial BigQuery
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
+
+      - name: Checar frescor das tabelas
+        run: |
+          cat > check.js <<'EOF'
+          const { BigQuery } = require('@google-cloud/bigquery');
+          const bq = new BigQuery({ projectId: 'vesti-data-499015' });
+          const DS = 'vestilake_BI';
+          (async () => {
+            const q1 = `
+              SELECT FORMAT_TIMESTAMP('%Y-%m-%d', CAST(settings_createdAt AS TIMESTAMP)) dia,
+                     COUNT(*) pedidos,
+                     ROUND(SUM(CAST(summary_total AS FLOAT64)),2) gmv
+              FROM ${DS}.MongoDB_Pedidos_Geral
+              WHERE settings_createdAt IS NOT NULL
+                AND CAST(settings_createdAt AS TIMESTAMP) >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 12 DAY)
+              GROUP BY dia ORDER BY dia`;
+            const [r1] = await bq.query({ query: q1 });
+            console.log('=== MongoDB_Pedidos_Geral por dia ===');
+            for (const r of r1) console.log(r.dia, String(r.pedidos).padStart(7), r.gmv);
+
+            const [r2] = await bq.query({ query:
+              `SELECT MAX(CAST(settings_createdAt AS TIMESTAMP)) max_ts FROM ${DS}.MongoDB_Pedidos_Geral` });
+            console.log('MAX settings_createdAt =', r2[0].max_ts && r2[0].max_ts.value);
+
+            for (const t of ['MongoDB_Pedidos_Geral','odbc_domains','odbc_companies']) {
+              try {
+                const [m] = await bq.query({ query:
+                  `SELECT TIMESTAMP_MILLIS(last_modified_time) lm, row_count
+                   FROM ${DS}.__TABLES__ WHERE table_id='${t}'` });
+                console.log('TABELA', t, '=> last_modified', m[0] && m[0].lm.value, 'rows', m[0] && m[0].row_count);
+              } catch (e) { console.log('TABELA', t, 'ERRO', e.message.slice(0,120)); }
+            }
+          })().catch(e => { console.error(e); process.exit(1); });
+          EOF
+          node check.js
