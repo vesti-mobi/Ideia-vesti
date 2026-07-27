@@ -257,6 +257,12 @@ def _aba1(aba1, novas, prev, idx, marco_por_id):
     """
     hoje = datetime.date.today()
     aba1 = [dict(r) for r in aba1]
+
+    # ORDEM IMPORTA: cria/repoe as linhas ANTES de enriquecer, senao a linha de
+    # loja nova (que volta do build anterior a cada dia) nunca passaria pelo
+    # calculo do marco — entraria sem 25 pedidos e ficaria sem data pra sempre.
+    aba1, add, mantidas = _aba1_novas(aba1, novas, prev)
+
     casou = com_marco = 0
     for r in aba1:
         loja = idx.get(norm(r.get("marca")))
@@ -281,15 +287,18 @@ def _aba1(aba1, novas, prev, idx, marco_por_id):
             # que a CS digitou — so registra quantos pedidos ja tem
             r["pedidos_pagos"] = m.get("pedidos")
 
-    aba1, add, mantidas = _aba1_novas(aba1, novas, prev, marco_por_id)
     print(f"[bq] aba1: {casou} casaram com o cadastro, {com_marco} com data de "
           f"{MARCO_PEDIDOS}o pedido pago; +{add} loja(s) nova(s) "
           f"(mantidas {mantidas} de execucoes anteriores)", flush=True)
     return aba1
 
 
-def _aba1_novas(aba1, novas, prev, marco_por_id):
-    """Acrescenta linha em branco por loja nova; repoe as geradas antes."""
+def _aba1_novas(aba1, novas, prev):
+    """Acrescenta linha em branco por loja nova; repoe as geradas antes.
+
+    Nao preenche data25/pedidos_pagos: quem faz isso e o loop de enriquecimento
+    em _aba1(), que roda depois e passa por TODAS as linhas — inclusive estas.
+    """
     vistos = {norm(r.get("marca")) for r in aba1}
     antigas_bq = [r for r in prev.get("aba1", []) if r.get("origem") == "bq"]
     for r in antigas_bq:
@@ -304,15 +313,13 @@ def _aba1_novas(aba1, novas, prev, marco_por_id):
         if not nome or norm(nome) in vistos:
             continue
         vistos.add(norm(nome))
-        m = marco_por_id.get(l["id"], {})
         aba1.append({
             "marca": nome,
             "entrada": l["criada"].isoformat(),
             "dias": (hoje - l["criada"]).days,
             "implementador": "",
             "cs": _cs_de(l.get("anjo"), CS_ABA1),
-            "data25": m["marco"].isoformat() if m.get("marco") else None,
-            "pedidos_pagos": m.get("pedidos"),
+            "data25": None,
             "cadastro_bq": l["criada"].isoformat(),
             "obs_orig": "",
             "status": "sem_reuniao",
