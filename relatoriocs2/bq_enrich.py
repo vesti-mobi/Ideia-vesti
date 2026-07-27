@@ -2,17 +2,16 @@
 """
 Enriquecimento do relatoriocs2 via BigQuery (roda 1x/dia junto do fetch_data.py).
 
-Faz duas coisas:
-  1. ABA 1 - a data de entrada (e os dias derivados dela) vem do cadastro real
-     no BQ, nao do que esta digitado na planilha.
-  2. ABA 3 - o GMV das empresas vem do BQ em tres periodos, todo dia.
+Faz quatro coisas:
+  1. ABA 1 - toda LOJA nova (dominio com modulo de vendas) criada nos ultimos
+     JANELA_DIAS vira uma linha em branco na Passagem de Bastao.
+  2. ABA 1 - a coluna "25+ / Ult. marco" (data25) e a data em que a marca bateu
+     o 25o PEDIDO PAGO acumulado, medida no BQ.
+  3. ABA 3 - o GMV das empresas vem do BQ em tres periodos, todo dia.
+  4. ABA 3 - loja nova tambem entra aqui, com o CS do anjo quando ele e um dos
+     tres CS do ranking.
 
-O UNIVERSO DE MARCAS E O DA PLANILHA (decisao da Laura, 27/07/2026): este modulo
-NUNCA cria linha. Loja nova so entra no painel quando a CS a coloca na planilha
-das 3 CS — o BQ enriquece quem ja esta la, e nada mais. Ate 27/07 o modulo
-adicionava toda loja nova dos ultimos 30 dias; isso foi removido de proposito.
-
-DECISOES QUE VALEM A PENA SABER (medidas no BQ em 24/07/2026):
+DECISOES QUE VALEM A PENA SABER (medidas no BQ em 24 e 27/07/2026):
 
   * Periodo 1 e jul-dez/2025, NAO jun-dez/2025: o lake nao tem nada antes de
     2025-07. Junho/2025 simplesmente nao existe pra ser somado.
@@ -31,9 +30,19 @@ DECISOES QUE VALEM A PENA SABER (medidas no BQ em 24/07/2026):
     nao prova que a data esta errada — so que nao achamos o cadastro. Mesmo
     principio do GMV e da coluna Tino.
 
-  * Linhas com origem="bq" criadas antes de 27/07/2026 continuam sendo lidas do
-    build anterior pelo fetch_data.py; elas ja estao no painel e podem ter sido
-    preenchidas pelo time. O que nao acontece mais e a criacao de novas.
+  * Linha adicionada aqui NUNCA e removida depois. As linhas geradas ficam
+    marcadas com origem="bq" e sao relidas do dashboard_data.js anterior a cada
+    execucao. Sem isso, uma loja que saisse da janela de 30 dias sumiria do
+    painel levando junto o que o CS ja tivesse preenchido.
+
+  * data25 = 25o pedido PAGO acumulado. Medido em 27/07/2026 contra as 19 marcas
+    que tinham a data preenchida na planilha: a data digitada vem SEMPRE depois
+    da medida, com lag mediano de 19 dias (34 se contar todos os status). Ou
+    seja, a planilha registra quando a CS percebeu o marco, nao quando ele
+    aconteceu — por isso o BQ passa a mandar aqui. A data que estava na planilha
+    fica guardada em data25_planilha. Um caso ilustra o problema: Dona Charme
+    estava com 2026-11-11, data no FUTURO (ano digitado errado); o marco real
+    foi 2025-11-05.
 
 Credencial: GOOGLE_APPLICATION_CREDENTIALS (arquivo) ou GCP_SA_KEY (json inline).
 Sem credencial o modulo nao quebra o fetcher: devolve os dados como estavam.
@@ -53,9 +62,11 @@ DATASET = "vestilake_BI"
 DS = f"`{PROJECT}.{DATASET}`"
 
 TETO_PEDIDO = 1_000_000        # acima disso e lixo de origem, nao venda
+JANELA_DIAS = 30               # quanto tempo pra tras procuramos "loja nova"
+MARCO_PEDIDOS = 25             # o "25+" da aba 1
 
 # A data de entrada da aba 1 vem do BQ? Desligado de proposito — veja o porque
-# em _aba1_entrada(): `entrada` (passagem de bastao) e `created_at` (cadastro do
+# em _aba1(): `entrada` (passagem de bastao) e `created_at` (cadastro do
 # dominio) sao grandezas diferentes, e trocar quebra o alerta de 45/60 dias.
 ENTRADA_DO_BQ = False
 
@@ -63,6 +74,21 @@ P1_INI, P1_FIM = "2025-07-01", "2025-12-31"   # piso do lake: nao existe jun/202
 P2_INI, P2_FIM = "2026-01-01", "2026-06-30"
 P3_INI = "2026-07-01"
 P3_FIM = "2026-12-31"
+
+# anjo (odbc_angels.name) -> como o CS aparece em cada aba
+CS_ABA1 = {
+    "luana coutinho": "Luana",
+    "thamiris ribeiro": "Thamiris",
+    "gabriella busto": "Gabriella Busto",
+    "elisa marques": "Elisa",
+    "alexia oliveira": "Alexia",
+    "tatiane ayres": "Tatiane",
+}
+CS_ABA3 = {
+    "gabriella busto": "Busto",
+    "luana coutinho": "Luana",
+    "thamiris ribeiro": "Thamiris",
+}
 
 
 def norm(s) -> str:
@@ -130,6 +156,29 @@ GROUP BY id
 """
 
 
+SQL_MARCO25 = f"""
+SELECT id, MIN(CASE WHEN n = {MARCO_PEDIDOS} THEN dia END) marco, MAX(n) pedidos
+FROM (
+  SELECT domainId id,
+         DATE(CAST(settings_createdAt AS TIMESTAMP)) dia,
+         ROW_NUMBER() OVER (PARTITION BY domainId
+                            ORDER BY CAST(settings_createdAt AS TIMESTAMP)) n
+  FROM {DS}.MongoDB_Pedidos_Geral
+  WHERE settings_createdAt IS NOT NULL
+    AND payment_isPaid = 'True'
+)
+GROUP BY id
+"""
+
+
+def _cs_de(anjo, mapa):
+    return mapa.get(norm_nome_anjo(anjo), "")
+
+
+def norm_nome_anjo(a):
+    return re.sub(r"\s+", " ", str(a or "").strip().lower())
+
+
 def _indice_lojas(lojas, gmv):
     """norm(nome) -> loja. Nome repetido entre lojas e ambiguo: fica a que mais
     vendeu (a outra costuma ser cadastro morto homonimo)."""
@@ -158,17 +207,24 @@ def enriquecer(aba1, aba3, prev):
     try:
         lojas = _rows(client, SQL_LOJAS, "lojas (dominios com modulo de vendas)")
         gmv = _rows(client, SQL_GMV, "GMV por loja nos 3 periodos")
+        marco = _rows(client, SQL_MARCO25, f"data do {MARCO_PEDIDOS}o pedido pago")
     except Exception as e:
         print(f"[bq] consulta falhou ({e}) — mantendo os dados como estavam", flush=True)
         return aba1, aba3, meta
 
     idx = _indice_lojas(lojas, gmv)
     gmv_por_id = {g["id"]: g for g in gmv}
+    marco_por_id = {m["id"]: m for m in marco}
     print(f"[bq] {len(lojas)} lojas, {len(idx)} nomes unicos, {len(gmv)} com GMV", flush=True)
 
-    aba1 = _aba1_entrada(aba1, idx)
-    aba3 = _aba3_com_gmv(aba3, idx, gmv_por_id)
+    hoje = datetime.date.today()
+    corte = hoje - datetime.timedelta(days=JANELA_DIAS)
+    novas = [l for l in lojas if l.get("criada") and l["criada"] >= corte]
+
+    aba1 = _aba1(aba1, novas, prev, idx, marco_por_id)
+    aba3 = _aba3_com_gmv(aba3, novas, prev, idx, gmv_por_id)
     meta["ok"] = True
+    meta["marco_pedidos"] = MARCO_PEDIDOS
     return aba1, aba3, meta
 
 
@@ -178,9 +234,15 @@ def _dias_p3():
     return max(1, (fim - ini).days + 1)
 
 
-def _aba1_entrada(aba1, idx):
-    """Anexa a data de cadastro do dominio (odbc_domains.created_at) como
-    `cadastro_bq`, SEM tocar em `entrada`/`dias`.
+def _aba1(aba1, novas, prev, idx, marco_por_id):
+    """Enriquece a aba 1 e acrescenta uma linha em branco por loja nova.
+
+    Enriquecimento (em quem casa por nome):
+      * data25 <- data do 25o pedido pago (a da planilha vai p/ data25_planilha)
+      * cadastro_bq <- created_at do dominio (NAO substitui `entrada`, ver abaixo)
+
+    Linhas ja geradas antes (origem=bq no dashboard anterior) sao preservadas
+    mesmo depois de sair da janela de JANELA_DIAS.
 
     Por que nao sobrescreve (medido em 27/07/2026): as duas datas nao sao a
     mesma coisa. `entrada` na planilha e quando a marca entrou na Passagem de
@@ -195,28 +257,74 @@ def _aba1_entrada(aba1, idx):
     """
     hoje = datetime.date.today()
     aba1 = [dict(r) for r in aba1]
-    casou = difere = 0
+    casou = com_marco = 0
     for r in aba1:
         loja = idx.get(norm(r.get("marca")))
-        if not loja or not loja.get("criada"):
+        if not loja:
             continue          # sem cadastro achado: a planilha continua valendo
         casou += 1
-        cad = loja["criada"].isoformat()
-        r["cadastro_bq"] = cad
-        if r.get("entrada") != cad:
-            difere += 1
-        if ENTRADA_DO_BQ:
-            r["entrada"] = cad
-            r["dias"] = (hoje - loja["criada"]).days
-    modo = "sobrescrevendo entrada" if ENTRADA_DO_BQ else "so anexando cadastro_bq"
-    print(f"[bq] aba1: {casou}/{len(aba1)} casaram com o cadastro "
-          f"({difere} com data diferente da planilha) — {modo}", flush=True)
+        if loja.get("criada"):
+            r["cadastro_bq"] = loja["criada"].isoformat()
+            if ENTRADA_DO_BQ:
+                r["entrada"] = loja["criada"].isoformat()
+                r["dias"] = (hoje - loja["criada"]).days
+        m = marco_por_id.get(loja["id"], {})
+        if m.get("marco"):
+            # guarda o que a CS digitou antes de trocar (uma vez so)
+            if not r.get("data25_planilha"):
+                r["data25_planilha"] = r.get("data25")
+            r["data25"] = m["marco"].isoformat()
+            r["pedidos_pagos"] = m.get("pedidos")
+            com_marco += 1
+        elif m.get("pedidos") is not None:
+            # casou, mas ainda nao chegou aos 25: nao inventa data nem apaga a
+            # que a CS digitou — so registra quantos pedidos ja tem
+            r["pedidos_pagos"] = m.get("pedidos")
+
+    aba1, add, mantidas = _aba1_novas(aba1, novas, prev, marco_por_id)
+    print(f"[bq] aba1: {casou} casaram com o cadastro, {com_marco} com data de "
+          f"{MARCO_PEDIDOS}o pedido pago; +{add} loja(s) nova(s) "
+          f"(mantidas {mantidas} de execucoes anteriores)", flush=True)
     return aba1
 
 
-def _aba3_com_gmv(aba3, idx, gmv_por_id):
-    """GMV dos 3 periodos em toda linha que casar por nome. Quem nao casa fica
-    com GMV None (nunca zero). Nao cria linha: o universo e o da planilha."""
+def _aba1_novas(aba1, novas, prev, marco_por_id):
+    """Acrescenta linha em branco por loja nova; repoe as geradas antes."""
+    vistos = {norm(r.get("marca")) for r in aba1}
+    antigas_bq = [r for r in prev.get("aba1", []) if r.get("origem") == "bq"]
+    for r in antigas_bq:
+        if norm(r.get("marca")) not in vistos:
+            aba1.append(dict(r))
+            vistos.add(norm(r.get("marca")))
+
+    hoje = datetime.date.today()
+    add = 0
+    for l in novas:
+        nome = str(l["name"]).strip()
+        if not nome or norm(nome) in vistos:
+            continue
+        vistos.add(norm(nome))
+        m = marco_por_id.get(l["id"], {})
+        aba1.append({
+            "marca": nome,
+            "entrada": l["criada"].isoformat(),
+            "dias": (hoje - l["criada"]).days,
+            "implementador": "",
+            "cs": _cs_de(l.get("anjo"), CS_ABA1),
+            "data25": m["marco"].isoformat() if m.get("marco") else None,
+            "pedidos_pagos": m.get("pedidos"),
+            "cadastro_bq": l["criada"].isoformat(),
+            "obs_orig": "",
+            "status": "sem_reuniao",
+            "origem": "bq",
+        })
+        add += 1
+    return aba1, add, len(antigas_bq)
+
+
+def _aba3_com_gmv(aba3, novas, prev, idx, gmv_por_id):
+    """GMV dos 3 periodos em toda linha que casar por nome; loja nova entra no
+    fim. Quem nao casa fica com GMV None (nunca zero)."""
     aba3 = [dict(r) for r in aba3]
     casou = 0
     for r in aba3:
@@ -231,7 +339,38 @@ def _aba3_com_gmv(aba3, idx, gmv_por_id):
         r["gmv_p2"] = g.get("p2")
         r["gmv_p3"] = g.get("p3")
         casou += 1
-    print(f"[bq] aba3: {casou}/{len(aba3)} com GMV do BQ", flush=True)
+
+    vistos = {norm(r.get("empresa")) for r in aba3}
+    antigas_bq = [r for r in prev.get("aba3", []) if r.get("origem") == "bq"]
+    for r in antigas_bq:
+        if norm(r.get("empresa")) not in vistos:
+            loja = idx.get(norm(r.get("empresa")))
+            g = gmv_por_id.get(loja["id"], {}) if loja else {}
+            r = dict(r)
+            r["gmv_p1"], r["gmv_p2"], r["gmv_p3"] = g.get("p1"), g.get("p2"), g.get("p3")
+            aba3.append(r)
+            vistos.add(norm(r.get("empresa")))
+
+    add = 0
+    for l in novas:
+        nome = str(l["name"]).strip()
+        if not nome or norm(nome) in vistos:
+            continue
+        vistos.add(norm(nome))
+        g = gmv_por_id.get(l["id"], {})
+        aba3.append({
+            "cs_tab": _cs_de(l.get("anjo"), CS_ABA3),
+            "empresa": nome,
+            "color": "",
+            "cs": _cs_de(l.get("anjo"), CS_ABA1),
+            "plano": "",
+            "gmv_p1": g.get("p1"), "gmv_p2": g.get("p2"), "gmv_p3": g.get("p3"),
+            "bq_id": l["id"],
+            "mensalidade": None, "tino": None, "vestipago": None,
+            "obs_orig": "", "origem": "bq",
+        })
+        add += 1
+    print(f"[bq] aba3: {casou}/{len(aba3)} com GMV do BQ, +{add} empresa(s) nova(s)", flush=True)
     return aba3
 
 
@@ -245,9 +384,11 @@ if __name__ == "__main__":   # execucao solta = so mostra o que faria
         "ok": meta["ok"], "p3_dias": meta["p3_dias"],
         "aba1": len(a1), "aba3": len(a3),
         "aba3_com_gmv": sum(1 for r in a3 if r.get("gmv_p2") is not None),
-        "aba1_entrada_do_bq": sum(1 for r in a1 if r.get("entrada_planilha")),
-        "entrada_divergente": [
-            {"marca": r["marca"], "planilha": r["entrada_planilha"], "bq": r["entrada"]}
-            for r in a1 if r.get("entrada_planilha") and r["entrada_planilha"] != r["entrada"]
-        ][:10],
+        "novas_aba1": [r["marca"] for r in a1 if r.get("origem") == "bq"][:10],
+        "aba1_com_data25_do_bq": sum(1 for r in a1 if r.get("data25_planilha") or
+                                     (r.get("data25") and r.get("pedidos_pagos"))),
+        "data25_corrigida": [
+            {"marca": r["marca"], "planilha": r["data25_planilha"], "bq": r["data25"]}
+            for r in a1 if r.get("data25_planilha") and r["data25_planilha"] != r["data25"]
+        ][:8],
     }, ensure_ascii=False, indent=1))
