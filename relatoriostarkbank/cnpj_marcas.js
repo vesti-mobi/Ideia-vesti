@@ -280,7 +280,7 @@ window.CNPJ_MARCAS = (function(){
         "bruna modas":                                       "20.685.574/0001-58",
         "bruno mendes":                                      "381.964.878-00",
         "bruno representante":                               "32.865.055/0001-50",
-        "brytch jeans":                                      "11594485000105",
+        "brytch jeans":                                      "11.594.485/0001-05",
         "brytch jeans loja fisica":                          "39.514.947/0001-56",
         "buccanes":                                          "55.251.292/0001-27",
         "buddha spa uniformes e insumos":                    "09.040.083/0001-17",

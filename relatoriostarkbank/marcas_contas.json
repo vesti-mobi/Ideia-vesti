@@ -1,6 +1,6 @@
 {
   "_leia": "Fonte da verdade das contas das marcas (CNPJ, razao social, chave PIX). Editado pelo painel StarkBank / celular (app stark-admin). Os 3 arquivos pix_marcas.js, cnpj_marcas.js e razao_marcas.js sao GERADOS a partir daqui — nao edite eles na mao.",
-  "atualizadoEm": "2026-07-24T21:42:02.681Z",
+  "atualizadoEm": "2026-07-27T12:46:37.045Z",
   "atualizadoPor": "celular",
   "marcas": {
     "2 wave": {
@@ -1374,9 +1374,11 @@
       "razao": "Bruno"
     },
     "brytch jeans": {
-      "pix": "CEF",
-      "cnpj": "11594485000105",
-      "razao": "NDUSTRIA DE CONFECCAO KDM LTDA"
+      "pix": "81989932776",
+      "cnpj": "11.594.485/0001-05",
+      "razao": "NDUSTRIA DE CONFECCAO KDM LTDA",
+      "editadoEm": "2026-07-27T12:46:37.045Z",
+      "origem": "celular"
     },
     "brytch jeans loja fisica": {
       "pix": "",

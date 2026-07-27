@@ -35,7 +35,7 @@ window.PIX_MARCAS = (function(){
         "bina midsize":                                      "57567135000150",
         "boise var":                                         "59894452000107",
         "brilho trend":                                      "44851232000129",
-        "brytch jeans":                                      "CEF",
+        "brytch jeans":                                      "81989932776",
         "by mi tomazela":                                    "37266456000108",
         "bymitomazela":                                      "37266456000108",
         "califor":                                           "51256997000186",
