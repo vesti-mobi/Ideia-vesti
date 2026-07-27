@@ -1,5 +1,5 @@
 {
- "atualizadoEm": "2026-07-24T20:57:44.162Z",
+ "atualizadoEm": "2026-07-27T20:43:00.427Z",
  "overlays": {
   "a2:crocker_jeans": {
    "color": "",
@@ -50,6 +50,11 @@
    "obs": "Não tem interesse em automação",
    "ts": 1784926663005,
    "up": 1784926664480
+  },
+  "a3:Thamiris:Jay Jones": {
+   "tino": true,
+   "ts": 1785184978953,
+   "up": 1785184980714
   }
  }
 }
