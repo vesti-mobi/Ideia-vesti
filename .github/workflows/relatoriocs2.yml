@@ -27,6 +27,7 @@ jobs:
           GOOGLE_SA_JSON: ${{ secrets.RELCS2_GOOGLE_SA_JSON }}
           TINO_USER: ${{ secrets.RELCS2_TINO_USER }}
           TINO_PASS: ${{ secrets.RELCS2_TINO_PASS }}
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
         run: |
           cd relatoriocs2
           python fetch_data.py
