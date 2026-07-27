@@ -1,6 +1,24 @@
 window.CS2_DATA = {
- "gerado_em": "27/07/2026 11:57",
+ "gerado_em": "27/07/2026 17:08",
  "hoje": "2026-07-27",
+ "bq": {
+  "ok": true,
+  "p3_dias": 27,
+  "periodos": {
+   "p1": [
+    "2025-07-01",
+    "2025-12-31"
+   ],
+   "p2": [
+    "2026-01-01",
+    "2026-06-30"
+   ],
+   "p3": [
+    "2026-07-01",
+    "2026-12-31"
+   ]
+  }
+ },
  "aba1": [
   {
    "marca": "Diva Donna",
@@ -10,7 +28,8 @@ window.CS2_DATA = {
    "cs": "Luana",
    "data25": null,
    "obs_orig": "Importar dados pra planilha - clientes",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2024-03-07"
   },
   {
    "marca": "Art&Cor",
@@ -30,7 +49,8 @@ window.CS2_DATA = {
    "cs": "Luana",
    "data25": "2026-07-02",
    "obs_orig": "Tino feito",
-   "status": "ativa"
+   "status": "ativa",
+   "cadastro_bq": "2025-09-22"
   },
   {
    "marca": "Baubaki",
@@ -80,7 +100,8 @@ window.CS2_DATA = {
    "cs": "Gabriella Busto",
    "data25": "2026-05-05",
    "obs_orig": "Marcando reunião com a Dany proprietária para colocarmos o Tino e apresentarmos o Oráculo",
-   "status": "ativa"
+   "status": "ativa",
+   "cadastro_bq": "2025-10-13"
   },
   {
    "marca": "Elas charmosa",
@@ -100,7 +121,8 @@ window.CS2_DATA = {
    "cs": "Thamiris",
    "data25": "2026-11-11",
    "obs_orig": "",
-   "status": "ativa"
+   "status": "ativa",
+   "cadastro_bq": "2025-10-23"
   },
   {
    "marca": "D'Veras Moda",
@@ -110,7 +132,8 @@ window.CS2_DATA = {
    "cs": "Luana",
    "data25": "2026-03-02",
    "obs_orig": "",
-   "status": "ativa"
+   "status": "ativa",
+   "cadastro_bq": "2025-10-28"
   },
   {
    "marca": "TransbyShop",
@@ -120,7 +143,8 @@ window.CS2_DATA = {
    "cs": "Thamiris",
    "data25": "2026-03-02",
    "obs_orig": "CANCELADO",
-   "status": "cancelada"
+   "status": "cancelada",
+   "cadastro_bq": "2025-10-31"
   },
   {
    "marca": "Exprim",
@@ -130,7 +154,8 @@ window.CS2_DATA = {
    "cs": "Gabriella Busto",
    "data25": null,
    "obs_orig": "Estou tentando entrar em contato, já liguei para Lidiane gerente da loja ainda não me atendeu",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2025-11-04"
   },
   {
    "marca": "Joelik",
@@ -140,7 +165,8 @@ window.CS2_DATA = {
    "cs": "Gabriella Busto",
    "data25": "2026-04-27",
    "obs_orig": "CANCELADO",
-   "status": "cancelada"
+   "status": "cancelada",
+   "cadastro_bq": "2022-09-08"
   },
   {
    "marca": "Fagian",
@@ -150,7 +176,8 @@ window.CS2_DATA = {
    "cs": "Luana",
    "data25": null,
    "obs_orig": "Implantado - Taty vai seguir com eles e pediu pra segurar 22/07",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2019-07-31"
   },
   {
    "marca": "Florence",
@@ -160,7 +187,8 @@ window.CS2_DATA = {
    "cs": "Thamiris",
    "data25": "2026-01-07",
    "obs_orig": "",
-   "status": "ativa"
+   "status": "ativa",
+   "cadastro_bq": "2023-08-12"
   },
   {
    "marca": "Happy Boy",
@@ -170,7 +198,8 @@ window.CS2_DATA = {
    "cs": "Luana",
    "data25": "2026-01-08",
    "obs_orig": "Tino feito",
-   "status": "ativa"
+   "status": "ativa",
+   "cadastro_bq": "2025-10-13"
   },
   {
    "marca": "Tendenza",
@@ -180,7 +209,8 @@ window.CS2_DATA = {
    "cs": "Luana",
    "data25": null,
    "obs_orig": "",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2025-11-28"
   },
   {
    "marca": "Clovis",
@@ -230,7 +260,8 @@ window.CS2_DATA = {
    "cs": "Luana",
    "data25": null,
    "obs_orig": "CHAMAR",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-01-26"
   },
   {
    "marca": "Entretons",
@@ -240,7 +271,8 @@ window.CS2_DATA = {
    "cs": "Thamiris",
    "data25": "2026-05-18",
    "obs_orig": "",
-   "status": "ativa"
+   "status": "ativa",
+   "cadastro_bq": "2026-01-30"
   },
   {
    "marca": "Murano",
@@ -250,7 +282,8 @@ window.CS2_DATA = {
    "cs": "Thamiris",
    "data25": "2026-05-26",
    "obs_orig": "",
-   "status": "ativa"
+   "status": "ativa",
+   "cadastro_bq": "2016-09-13"
   },
   {
    "marca": "Lazarf",
@@ -280,7 +313,8 @@ window.CS2_DATA = {
    "cs": "Thamiris",
    "data25": null,
    "obs_orig": "Alinhando essa marca com a Tati",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-02-23"
   },
   {
    "marca": "Terra Mãe",
@@ -290,7 +324,8 @@ window.CS2_DATA = {
    "cs": "Gabriella Busto",
    "data25": "2026-05-05",
    "obs_orig": "Chamei a gerente pra marcar uma reunião 22/07",
-   "status": "ativa"
+   "status": "ativa",
+   "cadastro_bq": "2026-02-25"
   },
   {
    "marca": "Miss Manu",
@@ -300,7 +335,8 @@ window.CS2_DATA = {
    "cs": "Thamiris",
    "data25": null,
    "obs_orig": "Implantando Oráculo",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-02-27"
   },
   {
    "marca": "Practory",
@@ -320,7 +356,8 @@ window.CS2_DATA = {
    "cs": "Gabriella Busto",
    "data25": null,
    "obs_orig": "Estou marcando uma reunião presencial, marca fica no Bom Retiro",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-03-10"
   },
   {
    "marca": "Sol e Energia",
@@ -330,7 +367,8 @@ window.CS2_DATA = {
    "cs": "Thamiris",
    "data25": null,
    "obs_orig": "Alinhando essa marca com a Tati",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-03-19"
   },
   {
    "marca": "Folle Moda Feminina",
@@ -340,7 +378,8 @@ window.CS2_DATA = {
    "cs": "Gabriella Busto",
    "data25": null,
    "obs_orig": "Está em processo de cadastrar os produtos ainda.",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-03-25"
   },
   {
    "marca": "Amicca",
@@ -360,7 +399,8 @@ window.CS2_DATA = {
    "cs": "Luana",
    "data25": null,
    "obs_orig": "CHAMAR - assumi dia 20/07 pelo grupo",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-04-16"
   },
   {
    "marca": "Versally",
@@ -380,7 +420,8 @@ window.CS2_DATA = {
    "cs": "Thamiris",
    "data25": null,
    "obs_orig": "Chamei pra agendar reunião",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-04-27"
   },
   {
    "marca": "His",
@@ -390,7 +431,8 @@ window.CS2_DATA = {
    "cs": "Thamiris",
    "data25": null,
    "obs_orig": "Pausa da Vesti - Implantando ERP na loja",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-04-30"
   },
   {
    "marca": "Aline Mezzari",
@@ -400,7 +442,8 @@ window.CS2_DATA = {
    "cs": "Gabriella Busto",
    "data25": null,
    "obs_orig": "Falta ajustarem algumas fotos, estou falando com o André proprietário",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2018-01-29"
   },
   {
    "marca": "Eclética Z",
@@ -410,7 +453,8 @@ window.CS2_DATA = {
    "cs": "Luana",
    "data25": null,
    "obs_orig": "Marca tá bloqueada - Taty pediu pra aguardar",
-   "status": "cancelada"
+   "status": "cancelada",
+   "cadastro_bq": "2026-03-11"
   },
   {
    "marca": "Céu de algodão",
@@ -420,7 +464,8 @@ window.CS2_DATA = {
    "cs": "Gabriella Busto",
    "data25": null,
    "obs_orig": "Lançou o catálogo 21/07",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-05-14"
   },
   {
    "marca": "Valentina brand",
@@ -430,7 +475,8 @@ window.CS2_DATA = {
    "cs": "Luana",
    "data25": null,
    "obs_orig": "CANCELADO",
-   "status": "cancelada"
+   "status": "cancelada",
+   "cadastro_bq": "2026-05-13"
   },
   {
    "marca": "Via Corpus",
@@ -440,7 +486,8 @@ window.CS2_DATA = {
    "cs": "Thamiris",
    "data25": null,
    "obs_orig": "Configurando integração com a Totvs",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-05-19"
   },
   {
    "marca": "Paty Lady",
@@ -470,7 +517,8 @@ window.CS2_DATA = {
    "cs": "Thamiris",
    "data25": null,
    "obs_orig": "Finalizou treinamento de vendas 17 - Acompanhando | Implantando Oráculo",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-05-29"
   },
   {
    "marca": "Pau a Pique",
@@ -480,7 +528,8 @@ window.CS2_DATA = {
    "cs": "Luana",
    "data25": "2026-06-16",
    "obs_orig": "Já chamei - vão agilizar o que precisa para o Tino até sexta",
-   "status": "ativa"
+   "status": "ativa",
+   "cadastro_bq": "2026-05-30"
   },
   {
    "marca": "DB Brand",
@@ -490,7 +539,8 @@ window.CS2_DATA = {
    "cs": "Gabriella Busto",
    "data25": null,
    "obs_orig": "Tati não consegue contato com a Smart Hub para seguir com a integração, vai ver o que fará",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-05-27"
   },
   {
    "marca": "Hotvanilla",
@@ -500,7 +550,8 @@ window.CS2_DATA = {
    "cs": "Thamiris",
    "data25": null,
    "obs_orig": "",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-06-18"
   },
   {
    "marca": "Santho Pano",
@@ -510,7 +561,8 @@ window.CS2_DATA = {
    "cs": "Luana",
    "data25": null,
    "obs_orig": "Tino feito",
-   "status": "ativa"
+   "status": "ativa",
+   "cadastro_bq": "2025-10-24"
   },
   {
    "marca": "Ouriço",
@@ -520,7 +572,8 @@ window.CS2_DATA = {
    "cs": "Luana",
    "data25": null,
    "obs_orig": "",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-06-17"
   },
   {
    "marca": "Crifitop Kids",
@@ -530,7 +583,8 @@ window.CS2_DATA = {
    "cs": "Gabriella Busto",
    "data25": null,
    "obs_orig": "Estão em processo de cadastro ainda",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-06-21"
   },
   {
    "marca": "Riquezzi Jeans",
@@ -580,7 +634,8 @@ window.CS2_DATA = {
    "cs": "Gabriella Busto",
    "data25": null,
    "obs_orig": "",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-07-13"
   },
   {
    "marca": "Terceira Via Jeans",
@@ -630,7 +685,8 @@ window.CS2_DATA = {
    "cs": "Gabriella Busto",
    "data25": null,
    "obs_orig": "",
-   "status": "sem_reuniao"
+   "status": "sem_reuniao",
+   "cadastro_bq": "2026-07-23"
   }
  ],
  "aba2": [
@@ -647,9 +703,9 @@ window.CS2_DATA = {
    "company": "opera_kids",
    "nome": "Opera Kids",
    "created_at": "2026-03-11T20:38:40Z",
-   "last_login": "2026-07-25",
-   "dias_sem_acesso": 2,
-   "login_days": 22,
+   "last_login": "2026-07-27",
+   "dias_sem_acesso": 0,
+   "login_days": 23,
    "status": "active"
   },
   {
@@ -683,9 +739,9 @@ window.CS2_DATA = {
    "company": "le_ricard",
    "nome": "Le Ricard",
    "created_at": "2026-07-07T13:45:10Z",
-   "last_login": "2026-07-24",
-   "dias_sem_acesso": 3,
-   "login_days": 8,
+   "last_login": "2026-07-27",
+   "dias_sem_acesso": 0,
+   "login_days": 9,
    "status": "active"
   },
   {
@@ -698,30 +754,21 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
+   "company": "doce_deleite",
+   "nome": "Doce Deleite",
+   "created_at": "2026-06-18T21:17:44Z",
+   "last_login": "2026-07-27",
+   "dias_sem_acesso": 0,
+   "login_days": 7,
+   "status": "active"
+  },
+  {
    "company": "anemone",
    "nome": "Anemone",
    "created_at": "2026-06-18T19:02:07Z",
    "last_login": "2026-07-24",
    "dias_sem_acesso": 3,
    "login_days": 7,
-   "status": "active"
-  },
-  {
-   "company": "doce_deleite",
-   "nome": "Doce Deleite",
-   "created_at": "2026-06-18T21:17:44Z",
-   "last_login": "2026-07-22",
-   "dias_sem_acesso": 5,
-   "login_days": 6,
-   "status": "active"
-  },
-  {
-   "company": "soror_clothing",
-   "nome": "Soror Clothing",
-   "created_at": "2026-06-01T17:32:33Z",
-   "last_login": "2026-07-16",
-   "dias_sem_acesso": 11,
-   "login_days": 5,
    "status": "active"
   },
   {
@@ -743,21 +790,21 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
+   "company": "soror_clothing",
+   "nome": "Soror Clothing",
+   "created_at": "2026-06-01T17:32:33Z",
+   "last_login": "2026-07-16",
+   "dias_sem_acesso": 11,
+   "login_days": 5,
+   "status": "active"
+  },
+  {
    "company": "miss_misses",
    "nome": "Miss Misses",
    "created_at": "2026-07-03T16:06:17Z",
    "last_login": "2026-07-17",
    "dias_sem_acesso": 10,
    "login_days": 4,
-   "status": "active"
-  },
-  {
-   "company": "murano",
-   "nome": "Murano",
-   "created_at": "2026-04-15T13:07:44Z",
-   "last_login": "2026-07-24",
-   "dias_sem_acesso": 3,
-   "login_days": 3,
    "status": "active"
   },
   {
@@ -770,12 +817,48 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
+   "company": "murano",
+   "nome": "Murano",
+   "created_at": "2026-04-15T13:07:44Z",
+   "last_login": "2026-07-24",
+   "dias_sem_acesso": 3,
+   "login_days": 3,
+   "status": "active"
+  },
+  {
    "company": "conceito_mika",
    "nome": "Conceito Mika",
    "created_at": "2026-06-24T12:58:49Z",
    "last_login": "2026-07-24",
    "dias_sem_acesso": 3,
    "login_days": 3,
+   "status": "active"
+  },
+  {
+   "company": "black_jeans",
+   "nome": "Black Jeans",
+   "created_at": "2026-07-07T12:58:19Z",
+   "last_login": "2026-07-27",
+   "dias_sem_acesso": 0,
+   "login_days": 3,
+   "status": "active"
+  },
+  {
+   "company": "nova_versao_roupas",
+   "nome": "Nova Versao Roupas",
+   "created_at": "2026-07-13T21:04:11Z",
+   "last_login": "2026-07-22",
+   "dias_sem_acesso": 5,
+   "login_days": 2,
+   "status": "active"
+  },
+  {
+   "company": "dolps",
+   "nome": "Dolps",
+   "created_at": "2026-03-08T22:07:26Z",
+   "last_login": "2026-07-27",
+   "dias_sem_acesso": 0,
+   "login_days": 2,
    "status": "active"
   },
   {
@@ -797,38 +880,11 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "nova_versao_roupas",
-   "nome": "Nova Versao Roupas",
-   "created_at": "2026-07-13T21:04:11Z",
+   "company": "stick_lingerie",
+   "nome": "Stick Lingerie",
+   "created_at": "2026-07-15T17:56:03Z",
    "last_login": "2026-07-22",
    "dias_sem_acesso": 5,
-   "login_days": 2,
-   "status": "active"
-  },
-  {
-   "company": "black_jeans",
-   "nome": "Black Jeans",
-   "created_at": "2026-07-07T12:58:19Z",
-   "last_login": "2026-07-18",
-   "dias_sem_acesso": 9,
-   "login_days": 2,
-   "status": "active"
-  },
-  {
-   "company": "petit_enfant_confeccao_de_pecas_do_vestuario_ltda",
-   "nome": "Petit Enfant Confeccao De Pecas Do Vestuario Ltda",
-   "created_at": "2026-03-11T21:27:52Z",
-   "last_login": "2026-07-08",
-   "dias_sem_acesso": 19,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "john_cunningham",
-   "nome": "John Cunningham",
-   "created_at": "2026-07-13T16:23:46Z",
-   "last_login": "2026-07-14",
-   "dias_sem_acesso": 13,
    "login_days": 1,
    "status": "active"
   },
@@ -842,74 +898,11 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "stick_lingerie",
-   "nome": "Stick Lingerie",
-   "created_at": "2026-07-15T17:56:03Z",
-   "last_login": "2026-07-22",
-   "dias_sem_acesso": 5,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "alcance_jeans",
-   "nome": "Alcance Jeans",
-   "created_at": "2026-06-17T19:36:52Z",
-   "last_login": "2026-07-13",
-   "dias_sem_acesso": 14,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "john_jones_jeans_confeccoes_ltda",
-   "nome": "John Jones Jeans Confeccoes Ltda",
-   "created_at": "2026-06-12T15:20:57Z",
-   "last_login": "2026-07-02",
-   "dias_sem_acesso": 25,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "tricomix",
-   "nome": "Tricomix",
-   "created_at": "2026-06-10T19:16:10Z",
-   "last_login": "2026-07-21",
-   "dias_sem_acesso": 6,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "dolps",
-   "nome": "Dolps",
-   "created_at": "2026-03-08T22:07:26Z",
-   "last_login": "2026-07-08",
-   "dias_sem_acesso": 19,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "maria_chica",
-   "nome": "Maria Chica",
-   "created_at": "2026-05-13T13:20:32Z",
+   "company": "amofany",
+   "nome": "Amofany",
+   "created_at": "2026-06-09T15:20:02Z",
    "last_login": "2026-07-15",
    "dias_sem_acesso": 12,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "biotipo_jeans",
-   "nome": "Biotipo Jeans",
-   "created_at": "2026-06-29T14:57:22Z",
-   "last_login": "2026-07-07",
-   "dias_sem_acesso": 20,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "gitaa",
-   "nome": "Gitaa",
-   "created_at": "2026-07-06T12:10:55Z",
-   "last_login": "2026-07-13",
-   "dias_sem_acesso": 14,
    "login_days": 1,
    "status": "active"
   },
@@ -917,15 +910,6 @@ window.CS2_DATA = {
    "company": "optimist_jeans",
    "nome": "Optimist Jeans",
    "created_at": "2026-07-13T21:19:10Z",
-   "last_login": "2026-07-15",
-   "dias_sem_acesso": 12,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "amofany",
-   "nome": "Amofany",
-   "created_at": "2026-06-09T15:20:02Z",
    "last_login": "2026-07-15",
    "dias_sem_acesso": 12,
    "login_days": 1,
@@ -941,6 +925,69 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
+   "company": "john_cunningham",
+   "nome": "John Cunningham",
+   "created_at": "2026-07-13T16:23:46Z",
+   "last_login": "2026-07-14",
+   "dias_sem_acesso": 13,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "maria_chica",
+   "nome": "Maria Chica",
+   "created_at": "2026-05-13T13:20:32Z",
+   "last_login": "2026-07-15",
+   "dias_sem_acesso": 12,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "gitaa",
+   "nome": "Gitaa",
+   "created_at": "2026-07-06T12:10:55Z",
+   "last_login": "2026-07-13",
+   "dias_sem_acesso": 14,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "tricomix",
+   "nome": "Tricomix",
+   "created_at": "2026-06-10T19:16:10Z",
+   "last_login": "2026-07-21",
+   "dias_sem_acesso": 6,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "john_jones_jeans_confeccoes_ltda",
+   "nome": "John Jones Jeans Confeccoes Ltda",
+   "created_at": "2026-06-12T15:20:57Z",
+   "last_login": "2026-07-02",
+   "dias_sem_acesso": 25,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "biotipo_jeans",
+   "nome": "Biotipo Jeans",
+   "created_at": "2026-06-29T14:57:22Z",
+   "last_login": "2026-07-07",
+   "dias_sem_acesso": 20,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "alcance_jeans",
+   "nome": "Alcance Jeans",
+   "created_at": "2026-06-17T19:36:52Z",
+   "last_login": "2026-07-13",
+   "dias_sem_acesso": 14,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
    "company": "bolsas_bauarte_acessorios_da_moda_ltda",
    "nome": "Bolsas Bauarte Acessorios Da Moda Ltda",
    "created_at": "2026-05-22T20:24:35Z",
@@ -950,18 +997,36 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "barraca_do_willinha",
-   "nome": "Barraca Do Willinha",
-   "created_at": "2026-03-24T01:28:10Z",
+   "company": "petit_enfant_confeccao_de_pecas_do_vestuario_ltda",
+   "nome": "Petit Enfant Confeccao De Pecas Do Vestuario Ltda",
+   "created_at": "2026-03-11T21:27:52Z",
+   "last_login": "2026-07-08",
+   "dias_sem_acesso": 19,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "cvl_moda",
+   "nome": "Cvl Moda",
+   "created_at": "2026-03-11T21:10:09Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "inactive"
+  },
+  {
+   "company": "crocker_jeans",
+   "nome": "Crocker Jeans",
+   "created_at": "2026-07-02T14:22:42Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
    "status": "active"
   },
   {
-   "company": "imagivan",
-   "nome": "Imagivan",
-   "created_at": "2026-06-23T15:12:57Z",
+   "company": "egoiste",
+   "nome": "Egoiste",
+   "created_at": "2026-06-09T15:20:02Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
@@ -977,45 +1042,9 @@ window.CS2_DATA = {
    "status": "inactive"
   },
   {
-   "company": "egoiste",
-   "nome": "Egoiste",
-   "created_at": "2026-06-09T15:20:02Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "crocker_jeans",
-   "nome": "Crocker Jeans",
-   "created_at": "2026-07-02T14:22:42Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "cvl_moda",
-   "nome": "Cvl Moda",
-   "created_at": "2026-03-11T21:10:09Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "inactive"
-  },
-  {
-   "company": "rosa_fina",
-   "nome": "Rosa Fina",
-   "created_at": "2026-07-17T14:59:59Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "bella_fe",
-   "nome": "Bella Fe",
-   "created_at": "2026-05-29T15:35:18Z",
+   "company": "daline",
+   "nome": "Daline",
+   "created_at": "2026-06-15T11:22:15Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
@@ -1031,9 +1060,9 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "daline",
-   "nome": "Daline",
-   "created_at": "2026-06-15T11:22:15Z",
+   "company": "barraca_do_willinha",
+   "nome": "Barraca Do Willinha",
+   "created_at": "2026-03-24T01:28:10Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
@@ -1043,6 +1072,33 @@ window.CS2_DATA = {
    "company": "pijamas_lua_cheia",
    "nome": "Pijamas Lua Cheia",
    "created_at": "2026-07-17T14:46:52Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "imagivan",
+   "nome": "Imagivan",
+   "created_at": "2026-06-23T15:12:57Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "rosa_fina",
+   "nome": "Rosa Fina",
+   "created_at": "2026-07-17T14:59:59Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "bella_fe",
+   "nome": "Bella Fe",
+   "created_at": "2026-05-29T15:35:18Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
@@ -1063,7 +1119,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.100",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Tem Agente, migrou para o plano PRO recentemente"
+   "obs_orig": "Tem Agente, migrou para o plano PRO recentemente",
+   "bq_id": "50443",
+   "gmv_p1": 30382.8,
+   "gmv_p2": 873813.01,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Busto",
@@ -1078,7 +1138,11 @@ window.CS2_DATA = {
    "mensalidade": "R$410 (filial Daqnue)",
    "tino": true,
    "vestipago": null,
-   "obs_orig": "Já tem Oráculo"
+   "obs_orig": "Já tem Oráculo",
+   "bq_id": "1074486",
+   "gmv_p1": 10917.64,
+   "gmv_p2": 145115.54,
+   "gmv_p3": 13522.39
   },
   {
    "cs_tab": "Busto",
@@ -1093,7 +1157,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.193",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "858226",
+   "gmv_p1": 236342.95,
+   "gmv_p2": 2276962.36,
+   "gmv_p3": 298994.0
   },
   {
    "cs_tab": "Busto",
@@ -1108,7 +1176,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.179",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Tem Assistente do vendedor, precisa da integração para contratar o oráculo, não querem por enquanto."
+   "obs_orig": "Tem Assistente do vendedor, precisa da integração para contratar o oráculo, não querem por enquanto.",
+   "bq_id": "70832",
+   "gmv_p1": 936520.53,
+   "gmv_p2": 9836992.22,
+   "gmv_p3": 209618.86
   },
   {
    "cs_tab": "Busto",
@@ -1123,7 +1195,11 @@ window.CS2_DATA = {
    "mensalidade": "R$425",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Fizemos apresentação e não teve interesse, sobrinho da Bauarte, pedi para o Paulo dar uma força"
+   "obs_orig": "Fizemos apresentação e não teve interesse, sobrinho da Bauarte, pedi para o Paulo dar uma força",
+   "bq_id": "126426",
+   "gmv_p1": 44578.53,
+   "gmv_p2": 381612.91,
+   "gmv_p3": 11301.09
   },
   {
    "cs_tab": "Busto",
@@ -1138,7 +1214,11 @@ window.CS2_DATA = {
    "mensalidade": "R$473",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Tem Bot, apresentamos o Oráculo, não querem por enquanto."
+   "obs_orig": "Tem Bot, apresentamos o Oráculo, não querem por enquanto.",
+   "bq_id": "312379",
+   "gmv_p1": 218657.01,
+   "gmv_p2": 1154686.68,
+   "gmv_p3": 266972.93
   },
   {
    "cs_tab": "Busto",
@@ -1153,7 +1233,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.231",
    "tino": true,
    "vestipago": null,
-   "obs_orig": "Tem Oráulo"
+   "obs_orig": "Tem Oráulo",
+   "bq_id": "105975",
+   "gmv_p1": 362876.83,
+   "gmv_p2": 1613968.62,
+   "gmv_p3": 133140.09
   },
   {
    "cs_tab": "Busto",
@@ -1168,7 +1252,11 @@ window.CS2_DATA = {
    "mensalidade": "R$724",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1234816",
+   "gmv_p1": 146320.21,
+   "gmv_p2": 571507.92,
+   "gmv_p3": 2846.84
   },
   {
    "cs_tab": "Busto",
@@ -1183,7 +1271,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.179",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Tem Oráulo"
+   "obs_orig": "Tem Oráulo",
+   "bq_id": "2602",
+   "gmv_p1": 301181.22,
+   "gmv_p2": 738604.5,
+   "gmv_p3": 591992.84
   },
   {
    "cs_tab": "Busto",
@@ -1198,7 +1290,11 @@ window.CS2_DATA = {
    "mensalidade": "R$734",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "135576",
+   "gmv_p1": 1679383.98,
+   "gmv_p2": 5443424.43,
+   "gmv_p3": 1276978.14
   },
   {
    "cs_tab": "Busto",
@@ -1213,7 +1309,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.643",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Tem Oráulo"
+   "obs_orig": "Tem Oráulo",
+   "bq_id": "317744",
+   "gmv_p1": 925349.31,
+   "gmv_p2": 2958558.55,
+   "gmv_p3": 422381.12
   },
   {
    "cs_tab": "Busto",
@@ -1228,7 +1328,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.100",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1790137",
+   "gmv_p1": 187612.01,
+   "gmv_p2": 536180.67,
+   "gmv_p3": 191937.36
   },
   {
    "cs_tab": "Busto",
@@ -1243,7 +1347,11 @@ window.CS2_DATA = {
    "mensalidade": "R$425",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Tem Agente, integração complicada, não quer investir no momento"
+   "obs_orig": "Tem Agente, integração complicada, não quer investir no momento",
+   "bq_id": "128065",
+   "gmv_p1": 293925.98,
+   "gmv_p2": 706111.3,
+   "gmv_p3": 139271.2
   },
   {
    "cs_tab": "Busto",
@@ -1258,7 +1366,11 @@ window.CS2_DATA = {
    "mensalidade": "R$328",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Tem Agente, não quer investir na integração por enquanto."
+   "obs_orig": "Tem Agente, não quer investir na integração por enquanto.",
+   "bq_id": "758201",
+   "gmv_p1": 603990.97,
+   "gmv_p2": 1325395.41,
+   "gmv_p3": 277874.3
   },
   {
    "cs_tab": "Busto",
@@ -1273,7 +1385,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.100",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Viu a apresentação mas não quis por conta de valores"
+   "obs_orig": "Viu a apresentação mas não quis por conta de valores",
+   "bq_id": "1584172",
+   "gmv_p1": 49256.3,
+   "gmv_p2": 111759.6,
+   "gmv_p3": 12064.2
   },
   {
    "cs_tab": "Busto",
@@ -1288,7 +1404,11 @@ window.CS2_DATA = {
    "mensalidade": "R$756",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "624129",
+   "gmv_p1": 23467.9,
+   "gmv_p2": 50414.2,
+   "gmv_p3": 2430.4
   },
   {
    "cs_tab": "Busto",
@@ -1303,7 +1423,11 @@ window.CS2_DATA = {
    "mensalidade": "R$712",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1030215",
+   "gmv_p1": 215788.21,
+   "gmv_p2": 376022.58,
+   "gmv_p3": 31751.09
   },
   {
    "cs_tab": "Busto",
@@ -1318,7 +1442,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.092",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Tem Oráulo"
+   "obs_orig": "Tem Oráulo",
+   "bq_id": "1058361",
+   "gmv_p1": 2833775.86,
+   "gmv_p2": 4770155.31,
+   "gmv_p3": 634510.18
   },
   {
    "cs_tab": "Busto",
@@ -1333,7 +1461,11 @@ window.CS2_DATA = {
    "mensalidade": "R$724",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1072349",
+   "gmv_p1": 1273095.55,
+   "gmv_p2": 2134750.77,
+   "gmv_p3": 213635.88
   },
   {
    "cs_tab": "Busto",
@@ -1348,7 +1480,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.179",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Tem Oráulo"
+   "obs_orig": "Tem Oráulo",
+   "bq_id": "185643",
+   "gmv_p1": 745670.1,
+   "gmv_p2": 1479966.39,
+   "gmv_p3": 98848.1
   },
   {
    "cs_tab": "Busto",
@@ -1363,7 +1499,11 @@ window.CS2_DATA = {
    "mensalidade": "R$712",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Tem Oráulo"
+   "obs_orig": "Tem Oráulo",
+   "bq_id": "119437",
+   "gmv_p1": 666394.8,
+   "gmv_p2": 974420.9,
+   "gmv_p3": 114886.7
   },
   {
    "cs_tab": "Busto",
@@ -1378,7 +1518,11 @@ window.CS2_DATA = {
    "mensalidade": "R41.193",
    "tino": true,
    "vestipago": null,
-   "obs_orig": "Tem Oráulo"
+   "obs_orig": "Tem Oráulo",
+   "bq_id": "203228",
+   "gmv_p1": 13584849.02,
+   "gmv_p2": 18357131.57,
+   "gmv_p3": 2071221.38
   },
   {
    "cs_tab": "Busto",
@@ -1393,7 +1537,11 @@ window.CS2_DATA = {
    "mensalidade": "R$813",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1169506",
+   "gmv_p1": 841863.99,
+   "gmv_p2": 1205924.88,
+   "gmv_p3": 266300.18
   },
   {
    "cs_tab": "Busto",
@@ -1408,7 +1556,11 @@ window.CS2_DATA = {
    "mensalidade": "R$425",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "155660",
+   "gmv_p1": 1149812.5,
+   "gmv_p2": 1575074.03,
+   "gmv_p3": 108559.94
   },
   {
    "cs_tab": "Busto",
@@ -1423,7 +1575,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.091",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "347376",
+   "gmv_p1": 616760.15,
+   "gmv_p2": 798711.57,
+   "gmv_p3": 56456.09
   },
   {
    "cs_tab": "Busto",
@@ -1438,7 +1594,11 @@ window.CS2_DATA = {
    "mensalidade": "R$298",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Tem Zax"
+   "obs_orig": "Tem Zax",
+   "bq_id": "50269",
+   "gmv_p1": 778876.5,
+   "gmv_p2": 1013888.05,
+   "gmv_p3": 115122.9
   },
   {
    "cs_tab": "Busto",
@@ -1453,7 +1613,11 @@ window.CS2_DATA = {
    "mensalidade": "R$423",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentação feita pelo Neto e Mourad, estavam em processo de restruturação"
+   "obs_orig": "Apresentação feita pelo Neto e Mourad, estavam em processo de restruturação",
+   "bq_id": "129809",
+   "gmv_p1": 1678272.06,
+   "gmv_p2": 1879260.74,
+   "gmv_p3": 426965.66
   },
   {
    "cs_tab": "Busto",
@@ -1468,7 +1632,11 @@ window.CS2_DATA = {
    "mensalidade": "R$667",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1220707",
+   "gmv_p1": 74257.23,
+   "gmv_p2": 86456.4,
+   "gmv_p3": 10938.35
   },
   {
    "cs_tab": "Busto",
@@ -1483,7 +1651,11 @@ window.CS2_DATA = {
    "mensalidade": "R$956",
    "tino": true,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "336",
+   "gmv_p1": 890634.99,
+   "gmv_p2": 996212.1,
+   "gmv_p3": 78456.4
   },
   {
    "cs_tab": "Busto",
@@ -1498,7 +1670,11 @@ window.CS2_DATA = {
    "mensalidade": "R$323",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "476639",
+   "gmv_p1": 1162862.9,
+   "gmv_p2": 1254252.23,
+   "gmv_p3": 154341.08
   },
   {
    "cs_tab": "Busto",
@@ -1513,7 +1689,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "57",
+   "gmv_p1": 277351.81,
+   "gmv_p2": 302853.76,
+   "gmv_p3": 23948.5
   },
   {
    "cs_tab": "Busto",
@@ -1528,7 +1708,11 @@ window.CS2_DATA = {
    "mensalidade": "R$725",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1114354",
+   "gmv_p1": 628797.31,
+   "gmv_p2": 689946.32,
+   "gmv_p3": 22575.32
   },
   {
    "cs_tab": "Busto",
@@ -1543,7 +1727,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.100",
    "tino": true,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1017092",
+   "gmv_p1": 1198438.4,
+   "gmv_p2": 1252105.0,
+   "gmv_p3": 177690.8
   },
   {
    "cs_tab": "Busto",
@@ -1558,7 +1746,11 @@ window.CS2_DATA = {
    "mensalidade": "R$759",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1071612",
+   "gmv_p1": 144232.23,
+   "gmv_p2": 146671.97,
+   "gmv_p3": 18247.18
   },
   {
    "cs_tab": "Busto",
@@ -1573,7 +1765,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.100",
    "tino": true,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1237877",
+   "gmv_p1": 560643.98,
+   "gmv_p2": 588215.64,
+   "gmv_p3": 68250.15
   },
   {
    "cs_tab": "Busto",
@@ -1588,7 +1784,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.149",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Busto",
@@ -1603,7 +1803,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.193",
    "tino": true,
    "vestipago": null,
-   "obs_orig": "Já tem Oráculo"
+   "obs_orig": "Já tem Oráculo",
+   "bq_id": "25804",
+   "gmv_p1": 1459835.7,
+   "gmv_p2": 1359259.15,
+   "gmv_p3": 286165.84
   },
   {
    "cs_tab": "Busto",
@@ -1618,7 +1822,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.100",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "619088",
+   "gmv_p1": 892327.1,
+   "gmv_p2": 724998.98,
+   "gmv_p3": 82408.9
   },
   {
    "cs_tab": "Busto",
@@ -1633,7 +1841,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.172",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Cancelou nas minhas férias, falta de entendimento como time do Oráculo"
+   "obs_orig": "Cancelou nas minhas férias, falta de entendimento como time do Oráculo",
+   "bq_id": "1524895",
+   "gmv_p1": 5155463.05,
+   "gmv_p2": 4979485.42,
+   "gmv_p3": 788148.27
   },
   {
    "cs_tab": "Busto",
@@ -1648,7 +1860,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.100",
    "tino": true,
    "vestipago": null,
-   "obs_orig": "Já tem Oráculo"
+   "obs_orig": "Já tem Oráculo",
+   "bq_id": "261508",
+   "gmv_p1": 3944697.22,
+   "gmv_p2": 3548989.4,
+   "gmv_p3": 533221.52
   },
   {
    "cs_tab": "Busto",
@@ -1663,7 +1879,11 @@ window.CS2_DATA = {
    "mensalidade": "R$793",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "940943",
+   "gmv_p1": 1756946.24,
+   "gmv_p2": 1652723.02,
+   "gmv_p3": 309846.94
   },
   {
    "cs_tab": "Busto",
@@ -1678,7 +1898,11 @@ window.CS2_DATA = {
    "mensalidade": "R$1.100",
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentamos, fizemos upgrade recentemente"
+   "obs_orig": "Apresentamos, fizemos upgrade recentemente",
+   "bq_id": "328841",
+   "gmv_p1": 259878.15,
+   "gmv_p2": 242547.2,
+   "gmv_p3": 40248.67
   },
   {
    "cs_tab": "Busto",
@@ -1693,7 +1917,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "549482",
+   "gmv_p1": 345558.48,
+   "gmv_p2": 324367.0,
+   "gmv_p3": 40453.0
   },
   {
    "cs_tab": "Busto",
@@ -1708,7 +1936,11 @@ window.CS2_DATA = {
    "mensalidade": "R$759",
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "878111",
+   "gmv_p1": 904951.57,
+   "gmv_p2": 871179.05,
+   "gmv_p3": 79400.5
   },
   {
    "cs_tab": "Busto",
@@ -1723,7 +1955,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1415574",
+   "gmv_p1": 1613097.28,
+   "gmv_p2": 1563471.36,
+   "gmv_p3": 117693.62
   },
   {
    "cs_tab": "Busto",
@@ -1738,7 +1974,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "965096",
+   "gmv_p1": 812368.69,
+   "gmv_p2": 746185.83,
+   "gmv_p3": 82597.97
   },
   {
    "cs_tab": "Busto",
@@ -1753,7 +1993,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentamos, estão falindo, fecharam muitas loja, sem dinheiro"
+   "obs_orig": "Apresentamos, estão falindo, fecharam muitas loja, sem dinheiro",
+   "bq_id": "918504",
+   "gmv_p1": 74360.37,
+   "gmv_p2": 68892.33,
+   "gmv_p3": 229.5
   },
   {
    "cs_tab": "Busto",
@@ -1768,7 +2012,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "646683",
+   "gmv_p1": 360179.01,
+   "gmv_p2": 325118.0,
+   "gmv_p3": 24435.0
   },
   {
    "cs_tab": "Busto",
@@ -1783,7 +2031,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "57825",
+   "gmv_p1": 576711.75,
+   "gmv_p2": 512824.58,
+   "gmv_p3": 31036.61
   },
   {
    "cs_tab": "Busto",
@@ -1798,7 +2050,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "812626",
+   "gmv_p1": 4503233.99,
+   "gmv_p2": 3641578.41,
+   "gmv_p3": 581903.92
   },
   {
    "cs_tab": "Busto",
@@ -1813,7 +2069,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentamos, mudanças internas por enquanto não querem"
+   "obs_orig": "Apresentamos, mudanças internas por enquanto não querem",
+   "bq_id": "1258736",
+   "gmv_p1": 2655607.09,
+   "gmv_p2": 2176149.5,
+   "gmv_p3": 370668.5
   },
   {
    "cs_tab": "Busto",
@@ -1828,7 +2088,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1264967",
+   "gmv_p1": 439098.0,
+   "gmv_p2": 344392.2,
+   "gmv_p3": 83809.0
   },
   {
    "cs_tab": "Busto",
@@ -1843,7 +2107,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "949606",
+   "gmv_p1": 842322.39,
+   "gmv_p2": 715132.61,
+   "gmv_p3": 66001.37
   },
   {
    "cs_tab": "Busto",
@@ -1858,7 +2126,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "196201",
+   "gmv_p1": 364268.8,
+   "gmv_p2": 295803.0,
+   "gmv_p3": 36541.2
   },
   {
    "cs_tab": "Busto",
@@ -1873,7 +2145,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "43629",
+   "gmv_p1": 166775.47,
+   "gmv_p2": 136592.0,
+   "gmv_p3": 14294.0
   },
   {
    "cs_tab": "Busto",
@@ -1888,7 +2164,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "187505",
+   "gmv_p1": 818786.6,
+   "gmv_p2": 661231.2,
+   "gmv_p3": 57464.8
   },
   {
    "cs_tab": "Busto",
@@ -1903,7 +2183,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": null,
-   "obs_orig": "Já tem Oráculo"
+   "obs_orig": "Já tem Oráculo",
+   "bq_id": "95387",
+   "gmv_p1": 387697.4,
+   "gmv_p2": 318124.52,
+   "gmv_p3": 11822.41
   },
   {
    "cs_tab": "Busto",
@@ -1918,7 +2202,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentamos, tem bot, não quer"
+   "obs_orig": "Apresentamos, tem bot, não quer",
+   "bq_id": "60671",
+   "gmv_p1": 2156832.41,
+   "gmv_p2": 1668140.87,
+   "gmv_p3": 209494.27
   },
   {
    "cs_tab": "Busto",
@@ -1933,7 +2221,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": null,
-   "obs_orig": "Já tem Oráculo"
+   "obs_orig": "Já tem Oráculo",
+   "bq_id": "15266",
+   "gmv_p1": 218141.13,
+   "gmv_p2": 160232.81,
+   "gmv_p3": 31811.13
   },
   {
    "cs_tab": "Busto",
@@ -1948,7 +2240,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Busto",
@@ -1963,7 +2259,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1080025",
+   "gmv_p1": 1390667.99,
+   "gmv_p2": 1054319.63,
+   "gmv_p3": 68939.5
   },
   {
    "cs_tab": "Busto",
@@ -1978,7 +2278,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "42652",
+   "gmv_p1": 793514.04,
+   "gmv_p2": 610283.21,
+   "gmv_p3": 63426.16
   },
   {
    "cs_tab": "Busto",
@@ -1993,7 +2297,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "240758",
+   "gmv_p1": 650837.0,
+   "gmv_p2": 472835.7,
+   "gmv_p3": 65482.4
   },
   {
    "cs_tab": "Busto",
@@ -2008,7 +2316,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Cancelou Agente de atendimento, fez upgrade para ter direito a intergração"
+   "obs_orig": "Cancelou Agente de atendimento, fez upgrade para ter direito a intergração",
+   "bq_id": "460703",
+   "gmv_p1": 677424.18,
+   "gmv_p2": 424272.36,
+   "gmv_p3": 174613.28
   },
   {
    "cs_tab": "Busto",
@@ -2023,7 +2335,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "368683",
+   "gmv_p1": 3832164.66,
+   "gmv_p2": 2852466.87,
+   "gmv_p3": 266302.35
   },
   {
    "cs_tab": "Busto",
@@ -2038,7 +2354,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Fizemos reunião, estão estruturando a empresa primeiro"
+   "obs_orig": "Fizemos reunião, estão estruturando a empresa primeiro",
+   "bq_id": "82263",
+   "gmv_p1": 691519.27,
+   "gmv_p2": 525816.85,
+   "gmv_p3": 31321.05
   },
   {
    "cs_tab": "Busto",
@@ -2053,7 +2373,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "683519",
+   "gmv_p1": 2503959.54,
+   "gmv_p2": 1714841.78,
+   "gmv_p3": 254026.09
   },
   {
    "cs_tab": "Busto",
@@ -2068,7 +2392,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": null,
-   "obs_orig": "Apresentamos, churn recuperado"
+   "obs_orig": "Apresentamos, churn recuperado",
+   "bq_id": "41496",
+   "gmv_p1": 1642324.99,
+   "gmv_p2": 1161638.65,
+   "gmv_p3": 121041.77
   },
   {
    "cs_tab": "Busto",
@@ -2083,7 +2411,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Busto",
@@ -2098,7 +2430,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1347965",
+   "gmv_p1": 2091209.05,
+   "gmv_p2": 1470646.99,
+   "gmv_p3": 139430.37
   },
   {
    "cs_tab": "Busto",
@@ -2113,7 +2449,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentamos, colocou uma sistema chamado Clik Chat"
+   "obs_orig": "Apresentamos, colocou uma sistema chamado Clik Chat",
+   "bq_id": "711696",
+   "gmv_p1": 1549621.58,
+   "gmv_p2": 1045789.35,
+   "gmv_p3": 145540.68
   },
   {
    "cs_tab": "Busto",
@@ -2128,7 +2468,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1278841",
+   "gmv_p1": 200151.0,
+   "gmv_p2": 132304.0,
+   "gmv_p3": 18104.0
   },
   {
    "cs_tab": "Busto",
@@ -2143,7 +2487,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Busto",
@@ -2158,7 +2506,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Já tem Oraculo"
+   "obs_orig": "Já tem Oraculo",
+   "bq_id": "713811",
+   "gmv_p1": 1191615.0,
+   "gmv_p2": 817022.0,
+   "gmv_p3": 95810.0
   },
   {
    "cs_tab": "Busto",
@@ -2173,7 +2525,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Cancelou Oráculo, não tem estrutura pra ter o produto, mas fez upgrad"
+   "obs_orig": "Cancelou Oráculo, não tem estrutura pra ter o produto, mas fez upgrad",
+   "bq_id": "1518181",
+   "gmv_p1": 130933.63,
+   "gmv_p2": 85855.79,
+   "gmv_p3": 6694.93
   },
   {
    "cs_tab": "Busto",
@@ -2188,7 +2544,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "693446",
+   "gmv_p1": 2147899.83,
+   "gmv_p2": 1193085.19,
+   "gmv_p3": 229548.35
   },
   {
    "cs_tab": "Busto",
@@ -2203,7 +2563,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "606820",
+   "gmv_p1": 943225.4,
+   "gmv_p2": 559718.0,
+   "gmv_p3": 41389.0
   },
   {
    "cs_tab": "Busto",
@@ -2218,7 +2582,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "34017",
+   "gmv_p1": 425647.5,
+   "gmv_p2": 247084.8,
+   "gmv_p3": 17503.2
   },
   {
    "cs_tab": "Busto",
@@ -2233,7 +2601,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": null,
-   "obs_orig": "Já tem Oráculo"
+   "obs_orig": "Já tem Oráculo",
+   "bq_id": "1126062",
+   "gmv_p1": 1371765.0,
+   "gmv_p2": 687153.15,
+   "gmv_p3": 81042.6
   },
   {
    "cs_tab": "Busto",
@@ -2248,7 +2620,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1407398",
+   "gmv_p1": 4771052.99,
+   "gmv_p2": 2483628.52,
+   "gmv_p3": 245818.79
   },
   {
    "cs_tab": "Busto",
@@ -2263,7 +2639,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "661636",
+   "gmv_p1": 312821.63,
+   "gmv_p2": 151335.91,
+   "gmv_p3": 7535.0
   },
   {
    "cs_tab": "Busto",
@@ -2278,7 +2658,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "646958",
+   "gmv_p1": 3261238.6,
+   "gmv_p2": 1447692.4,
+   "gmv_p3": 196518.96
   },
   {
    "cs_tab": "Busto",
@@ -2293,7 +2677,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1210327",
+   "gmv_p1": 618119.5,
+   "gmv_p2": 248582.95,
+   "gmv_p3": 26994.65
   },
   {
    "cs_tab": "Busto",
@@ -2308,7 +2696,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "629282",
+   "gmv_p1": 2771237.66,
+   "gmv_p2": 1047776.05,
+   "gmv_p3": 201204.92
   },
   {
    "cs_tab": "Busto",
@@ -2323,7 +2715,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "13160",
+   "gmv_p1": 1333900.66,
+   "gmv_p2": 172724.75,
+   "gmv_p3": 54115.2
   },
   {
    "cs_tab": "Busto",
@@ -2338,7 +2734,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": null,
-   "obs_orig": "Já tem Oráculo"
+   "obs_orig": "Já tem Oráculo",
+   "bq_id": "442162",
+   "gmv_p1": 718.8,
+   "gmv_p2": null,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Busto",
@@ -2353,7 +2753,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "33269",
+   "gmv_p1": 999796.08,
+   "gmv_p2": 672031.92,
+   "gmv_p3": 123345.96
   },
   {
    "cs_tab": "Busto",
@@ -2368,7 +2772,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Tem Campanhas + Eventos"
+   "obs_orig": "Tem Campanhas + Eventos",
+   "bq_id": "119716",
+   "gmv_p1": 1636080.21,
+   "gmv_p2": 1701506.12,
+   "gmv_p3": 132250.51
   },
   {
    "cs_tab": "Busto",
@@ -2383,7 +2791,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Cancelou, falta de entendimento time Oráculo"
+   "obs_orig": "Cancelou, falta de entendimento time Oráculo",
+   "bq_id": "336063",
+   "gmv_p1": 732489.6,
+   "gmv_p2": 812276.94,
+   "gmv_p3": 30367.0
   },
   {
    "cs_tab": "Busto",
@@ -2398,7 +2810,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentamos o Oráculo, preferiu continuar com o bot"
+   "obs_orig": "Apresentamos o Oráculo, preferiu continuar com o bot",
+   "bq_id": "632540",
+   "gmv_p1": 3901352.55,
+   "gmv_p2": 5318355.03,
+   "gmv_p3": 854796.66
   },
   {
    "cs_tab": "Busto",
@@ -2413,7 +2829,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "351565",
+   "gmv_p1": 823260.34,
+   "gmv_p2": 950063.73,
+   "gmv_p3": 198983.02
   },
   {
    "cs_tab": "Busto",
@@ -2428,7 +2848,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Já tem Oráculo"
+   "obs_orig": "Já tem Oráculo",
+   "bq_id": "38651",
+   "gmv_p1": 1300697.51,
+   "gmv_p2": 1831447.68,
+   "gmv_p3": 303793.7
   },
   {
    "cs_tab": "Busto",
@@ -2443,7 +2867,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Está em pausa restruturando a loja"
+   "obs_orig": "Está em pausa restruturando a loja",
+   "bq_id": "1299419",
+   "gmv_p1": 498671.74,
+   "gmv_p2": 419119.43,
+   "gmv_p3": 93831.44
   },
   {
    "cs_tab": "Busto",
@@ -2458,7 +2886,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "448792",
+   "gmv_p1": 8148418.4,
+   "gmv_p2": 9199582.44,
+   "gmv_p3": 932067.4
   },
   {
    "cs_tab": "Busto",
@@ -2473,7 +2905,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "449259",
+   "gmv_p1": 3481597.0,
+   "gmv_p2": 2683834.3,
+   "gmv_p3": 514051.0
   },
   {
    "cs_tab": "Luana",
@@ -2488,7 +2924,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1794660",
+   "gmv_p1": 25.0,
+   "gmv_p2": 148090.1,
+   "gmv_p3": 9540.6
   },
   {
    "cs_tab": "Luana",
@@ -2503,7 +2943,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentação realizada - achou caro"
+   "obs_orig": "Apresentação realizada - achou caro",
+   "bq_id": "481124",
+   "gmv_p1": 6778.0,
+   "gmv_p2": 232453.6,
+   "gmv_p3": 45685.59
   },
   {
    "cs_tab": "Luana",
@@ -2518,7 +2962,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Luana",
@@ -2533,7 +2981,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1431828",
+   "gmv_p1": 27666.63,
+   "gmv_p2": 109551.52,
+   "gmv_p3": 23618.19
   },
   {
    "cs_tab": "Luana",
@@ -2548,7 +3000,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "644061",
+   "gmv_p1": 232988.76,
+   "gmv_p2": 834775.51,
+   "gmv_p3": 169973.64
   },
   {
    "cs_tab": "Luana",
@@ -2563,7 +3019,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1819640",
+   "gmv_p1": 1327482.76,
+   "gmv_p2": 4358536.96,
+   "gmv_p3": 918747.66
   },
   {
    "cs_tab": "Luana",
@@ -2578,7 +3038,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Em negociação"
+   "obs_orig": "Em negociação",
+   "bq_id": "251048",
+   "gmv_p1": 282868.12,
+   "gmv_p2": 860151.49,
+   "gmv_p3": 111633.41
   },
   {
    "cs_tab": "Luana",
@@ -2593,7 +3057,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "731799",
+   "gmv_p1": 222853.82,
+   "gmv_p2": 646046.89,
+   "gmv_p3": 151506.7
   },
   {
    "cs_tab": "Luana",
@@ -2608,7 +3076,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentação realizada - achou caro"
+   "obs_orig": "Apresentação realizada - achou caro",
+   "bq_id": "831661",
+   "gmv_p1": 70563.2,
+   "gmv_p2": 204034.98,
+   "gmv_p3": 43165.7
   },
   {
    "cs_tab": "Luana",
@@ -2623,7 +3095,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "810439",
+   "gmv_p1": 808367.98,
+   "gmv_p2": 2490137.58,
+   "gmv_p3": 175299.13
   },
   {
    "cs_tab": "Luana",
@@ -2638,7 +3114,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Usam ZAX"
+   "obs_orig": "Usam ZAX",
+   "bq_id": "928822",
+   "gmv_p1": 458232.84,
+   "gmv_p2": 1281498.92,
+   "gmv_p3": 192229.7
   },
   {
    "cs_tab": "Luana",
@@ -2653,7 +3133,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1571077",
+   "gmv_p1": 117285.03,
+   "gmv_p2": 342248.85,
+   "gmv_p3": 18532.43
   },
   {
    "cs_tab": "Luana",
@@ -2668,7 +3152,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "724045",
+   "gmv_p1": 51067.0,
+   "gmv_p2": 137343.09,
+   "gmv_p3": 20506.74
   },
   {
    "cs_tab": "Luana",
@@ -2683,7 +3171,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "125339",
+   "gmv_p1": 508570.48,
+   "gmv_p2": 1273192.81,
+   "gmv_p3": 340381.72
   },
   {
    "cs_tab": "Luana",
@@ -2698,7 +3190,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Em negociação"
+   "obs_orig": "Em negociação",
+   "bq_id": "49554",
+   "gmv_p1": 1748114.2,
+   "gmv_p2": 4207372.6,
+   "gmv_p3": 308235.7
   },
   {
    "cs_tab": "Luana",
@@ -2713,7 +3209,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1275581",
+   "gmv_p1": 184195.95,
+   "gmv_p2": 393259.7,
+   "gmv_p3": 120593.4
   },
   {
    "cs_tab": "Luana",
@@ -2728,7 +3228,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentação realizada - achou caro"
+   "obs_orig": "Apresentação realizada - achou caro",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Luana",
@@ -2743,7 +3247,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1090412",
+   "gmv_p1": 83330.58,
+   "gmv_p2": 144316.26,
+   "gmv_p3": 23073.89
   },
   {
    "cs_tab": "Luana",
@@ -2758,7 +3266,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "46233",
+   "gmv_p1": 81965.38,
+   "gmv_p2": 153825.98,
+   "gmv_p3": 35029.43
   },
   {
    "cs_tab": "Luana",
@@ -2773,7 +3285,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "618541",
+   "gmv_p1": 100422.2,
+   "gmv_p2": 187071.48,
+   "gmv_p3": 8526.6
   },
   {
    "cs_tab": "Luana",
@@ -2788,7 +3304,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentação realizada - achou caro"
+   "obs_orig": "Apresentação realizada - achou caro",
+   "bq_id": "1178586",
+   "gmv_p1": 3699864.52,
+   "gmv_p2": 6417242.6,
+   "gmv_p3": 1361578.12
   },
   {
    "cs_tab": "Luana",
@@ -2803,7 +3323,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentação realizada - achou caro"
+   "obs_orig": "Apresentação realizada - achou caro",
+   "bq_id": "317136",
+   "gmv_p1": 324958.8,
+   "gmv_p2": 574731.84,
+   "gmv_p3": 71728.77
   },
   {
    "cs_tab": "Luana",
@@ -2818,7 +3342,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1712269",
+   "gmv_p1": 58358.0,
+   "gmv_p2": 83937.0,
+   "gmv_p3": 31354.06
   },
   {
    "cs_tab": "Luana",
@@ -2833,7 +3361,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "762660",
+   "gmv_p1": 24100.4,
+   "gmv_p2": 39931.41,
+   "gmv_p3": 7751.06
   },
   {
    "cs_tab": "Luana",
@@ -2848,7 +3380,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentação realizada - usam outra plataforma"
+   "obs_orig": "Apresentação realizada - usam outra plataforma",
+   "bq_id": "1316026",
+   "gmv_p1": 1419394.57,
+   "gmv_p2": 2310199.15,
+   "gmv_p3": 315911.0
   },
   {
    "cs_tab": "Luana",
@@ -2863,7 +3399,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1448441",
+   "gmv_p1": 1356951.31,
+   "gmv_p2": 2137551.23,
+   "gmv_p3": 418991.44
   },
   {
    "cs_tab": "Luana",
@@ -2878,7 +3418,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Em negociação"
+   "obs_orig": "Em negociação",
+   "bq_id": "1201385",
+   "gmv_p1": 167068.3,
+   "gmv_p2": 248569.15,
+   "gmv_p3": 18166.5
   },
   {
    "cs_tab": "Luana",
@@ -2893,7 +3437,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1036740",
+   "gmv_p1": 68217.73,
+   "gmv_p2": 102993.75,
+   "gmv_p3": 8790.35
   },
   {
    "cs_tab": "Luana",
@@ -2908,7 +3456,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentação realizada - achou caro"
+   "obs_orig": "Apresentação realizada - achou caro",
+   "bq_id": "65652",
+   "gmv_p1": 2542930.17,
+   "gmv_p2": 3514750.02,
+   "gmv_p3": 247945.43
   },
   {
    "cs_tab": "Luana",
@@ -2923,7 +3475,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1250065",
+   "gmv_p1": 1042108.0,
+   "gmv_p2": 1404462.5,
+   "gmv_p3": 164799.45
   },
   {
    "cs_tab": "Luana",
@@ -2938,7 +3494,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentação realizada - achou caro"
+   "obs_orig": "Apresentação realizada - achou caro",
+   "bq_id": "1733",
+   "gmv_p1": 640172.19,
+   "gmv_p2": 831146.94,
+   "gmv_p3": 148601.93
   },
   {
    "cs_tab": "Luana",
@@ -2953,7 +3513,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "917223",
+   "gmv_p1": 6424.7,
+   "gmv_p2": 5480.3,
+   "gmv_p3": 6118.5
   },
   {
    "cs_tab": "Luana",
@@ -2968,7 +3532,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1703736",
+   "gmv_p1": 619690.23,
+   "gmv_p2": 727039.2,
+   "gmv_p3": 124856.12
   },
   {
    "cs_tab": "Luana",
@@ -2983,7 +3551,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentação realizada"
+   "obs_orig": "Apresentação realizada",
+   "bq_id": "1544822",
+   "gmv_p1": 646961.03,
+   "gmv_p2": 787076.01,
+   "gmv_p3": 107589.34
   },
   {
    "cs_tab": "Luana",
@@ -2998,7 +3570,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1637938",
+   "gmv_p1": 396109.33,
+   "gmv_p2": 473641.88,
+   "gmv_p3": 57189.37
   },
   {
    "cs_tab": "Luana",
@@ -3013,7 +3589,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "27008",
+   "gmv_p1": 6617676.72,
+   "gmv_p2": 9270781.24,
+   "gmv_p3": 1461909.09
   },
   {
    "cs_tab": "Luana",
@@ -3028,7 +3608,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1078045",
+   "gmv_p1": 176295.2,
+   "gmv_p2": 150801.55,
+   "gmv_p3": 82647.24
   },
   {
    "cs_tab": "Luana",
@@ -3043,7 +3627,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1568965",
+   "gmv_p1": 696552.1,
+   "gmv_p2": 804213.79,
+   "gmv_p3": 177252.04
   },
   {
    "cs_tab": "Luana",
@@ -3058,7 +3646,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Luana",
@@ -3073,7 +3665,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "909617",
+   "gmv_p1": 84911.47,
+   "gmv_p2": 97902.57,
+   "gmv_p3": 12287.24
   },
   {
    "cs_tab": "Luana",
@@ -3088,7 +3684,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "998275",
+   "gmv_p1": 244807.2,
+   "gmv_p2": 274959.45,
+   "gmv_p3": 25670.2
   },
   {
    "cs_tab": "Luana",
@@ -3103,7 +3703,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1638551",
+   "gmv_p1": 40011.01,
+   "gmv_p2": 42995.88,
+   "gmv_p3": 7057.91
   },
   {
    "cs_tab": "Luana",
@@ -3118,7 +3722,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "24244",
+   "gmv_p1": 316590.73,
+   "gmv_p2": 329038.82,
+   "gmv_p3": 62859.87
   },
   {
    "cs_tab": "Luana",
@@ -3133,7 +3741,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "627689",
+   "gmv_p1": 6088122.65,
+   "gmv_p2": 6233643.1,
+   "gmv_p3": 1106600.5
   },
   {
    "cs_tab": "Luana",
@@ -3148,7 +3760,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1069425",
+   "gmv_p1": 60207.74,
+   "gmv_p2": 66307.1,
+   "gmv_p3": 5093.0
   },
   {
    "cs_tab": "Luana",
@@ -3163,7 +3779,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1468945",
+   "gmv_p1": 558708.27,
+   "gmv_p2": 583465.42,
+   "gmv_p3": 92814.4
   },
   {
    "cs_tab": "Luana",
@@ -3178,7 +3798,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1035659",
+   "gmv_p1": 119834.33,
+   "gmv_p2": 122655.06,
+   "gmv_p3": 23305.58
   },
   {
    "cs_tab": "Luana",
@@ -3193,7 +3817,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentação realizada - achou caro"
+   "obs_orig": "Apresentação realizada - achou caro",
+   "bq_id": "60719",
+   "gmv_p1": 864836.07,
+   "gmv_p2": 835680.11,
+   "gmv_p3": 152735.86
   },
   {
    "cs_tab": "Luana",
@@ -3208,7 +3836,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1541315",
+   "gmv_p1": 1131234.06,
+   "gmv_p2": 1142479.73,
+   "gmv_p3": 151957.45
   },
   {
    "cs_tab": "Luana",
@@ -3223,7 +3855,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "aguardando finalizar contrato com CRM"
+   "obs_orig": "aguardando finalizar contrato com CRM",
+   "bq_id": "828876",
+   "gmv_p1": 5455192.95,
+   "gmv_p2": 5362545.73,
+   "gmv_p3": 695236.77
   },
   {
    "cs_tab": "Luana",
@@ -3238,7 +3874,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "606611",
+   "gmv_p1": 89399.8,
+   "gmv_p2": 90386.1,
+   "gmv_p3": 2171.1
   },
   {
    "cs_tab": "Luana",
@@ -3253,7 +3893,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1272421",
+   "gmv_p1": 16656064.36,
+   "gmv_p2": 15997286.23,
+   "gmv_p3": 2401612.48
   },
   {
    "cs_tab": "Luana",
@@ -3268,7 +3912,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "712379",
+   "gmv_p1": 617730.97,
+   "gmv_p2": 596400.51,
+   "gmv_p3": 22014.56
   },
   {
    "cs_tab": "Luana",
@@ -3283,7 +3931,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1566528",
+   "gmv_p1": 669529.13,
+   "gmv_p2": 619647.35,
+   "gmv_p3": 94322.5
   },
   {
    "cs_tab": "Luana",
@@ -3298,7 +3950,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Usam ZAX"
+   "obs_orig": "Usam ZAX",
+   "bq_id": "1375391",
+   "gmv_p1": 455276.65,
+   "gmv_p2": 391646.27,
+   "gmv_p3": 72490.47
   },
   {
    "cs_tab": "Luana",
@@ -3313,7 +3969,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "157684",
+   "gmv_p1": 218003.91,
+   "gmv_p2": 189682.4,
+   "gmv_p3": 15299.7
   },
   {
    "cs_tab": "Luana",
@@ -3328,7 +3988,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "14035",
+   "gmv_p1": 3110399.17,
+   "gmv_p2": 2658691.89,
+   "gmv_p3": 359992.66
   },
   {
    "cs_tab": "Luana",
@@ -3343,7 +4007,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentação realizada - achou caro"
+   "obs_orig": "Apresentação realizada - achou caro",
+   "bq_id": "230413",
+   "gmv_p1": 1598884.62,
+   "gmv_p2": 1363040.01,
+   "gmv_p3": 141991.56
   },
   {
    "cs_tab": "Luana",
@@ -3358,7 +4026,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "991148",
+   "gmv_p1": 2830914.56,
+   "gmv_p2": 2345181.24,
+   "gmv_p3": 395350.6
   },
   {
    "cs_tab": "Luana",
@@ -3373,7 +4045,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "873969",
+   "gmv_p1": 741503.11,
+   "gmv_p2": 614081.92,
+   "gmv_p3": 60990.21
   },
   {
    "cs_tab": "Luana",
@@ -3388,7 +4064,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1372995",
+   "gmv_p1": 4093082.63,
+   "gmv_p2": 3219311.47,
+   "gmv_p3": 463374.94
   },
   {
    "cs_tab": "Luana",
@@ -3403,7 +4083,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "42595",
+   "gmv_p1": 2688131.74,
+   "gmv_p2": 2016744.29,
+   "gmv_p3": 223653.8
   },
   {
    "cs_tab": "Luana",
@@ -3418,7 +4102,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1329765",
+   "gmv_p1": 28512.12,
+   "gmv_p2": 23363.02,
+   "gmv_p3": 892.08
   },
   {
    "cs_tab": "Luana",
@@ -3433,7 +4121,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "350323",
+   "gmv_p1": 2023169.78,
+   "gmv_p2": 1559084.27,
+   "gmv_p3": 181180.35
   },
   {
    "cs_tab": "Luana",
@@ -3448,7 +4140,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Marcando"
+   "obs_orig": "Marcando",
+   "bq_id": "1098231",
+   "gmv_p1": 1853678.33,
+   "gmv_p2": 1371574.21,
+   "gmv_p3": 234180.99
   },
   {
    "cs_tab": "Luana",
@@ -3463,7 +4159,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "432686",
+   "gmv_p1": 994764.0,
+   "gmv_p2": 734110.0,
+   "gmv_p3": 57065.0
   },
   {
    "cs_tab": "Luana",
@@ -3478,7 +4178,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1345093",
+   "gmv_p1": 1705639.4,
+   "gmv_p2": 1138877.62,
+   "gmv_p3": 185918.52
   },
   {
    "cs_tab": "Luana",
@@ -3493,7 +4197,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1434710",
+   "gmv_p1": 448589.86,
+   "gmv_p2": 304987.78,
+   "gmv_p3": 26889.02
   },
   {
    "cs_tab": "Luana",
@@ -3508,7 +4216,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1350619",
+   "gmv_p1": 54394.01,
+   "gmv_p2": 35332.67,
+   "gmv_p3": 9629.01
   },
   {
    "cs_tab": "Luana",
@@ -3523,7 +4235,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "243791",
+   "gmv_p1": 614768.68,
+   "gmv_p2": 415711.38,
+   "gmv_p3": 71348.26
   },
   {
    "cs_tab": "Luana",
@@ -3538,7 +4254,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "334983",
+   "gmv_p1": 1040995.22,
+   "gmv_p2": 644445.85,
+   "gmv_p3": 128899.88
   },
   {
    "cs_tab": "Luana",
@@ -3553,7 +4273,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1170555",
+   "gmv_p1": 528628.96,
+   "gmv_p2": 354026.12,
+   "gmv_p3": 14032.7
   },
   {
    "cs_tab": "Luana",
@@ -3568,7 +4292,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1672566",
+   "gmv_p1": 811263.24,
+   "gmv_p2": 455233.14,
+   "gmv_p3": 96936.48
   },
   {
    "cs_tab": "Luana",
@@ -3583,7 +4311,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1514453",
+   "gmv_p1": 1282372.6,
+   "gmv_p2": 761022.3,
+   "gmv_p3": 60498.5
   },
   {
    "cs_tab": "Luana",
@@ -3598,7 +4330,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1409509",
+   "gmv_p1": 414385.33,
+   "gmv_p2": 235434.32,
+   "gmv_p3": 12524.12
   },
   {
    "cs_tab": "Luana",
@@ -3613,7 +4349,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1191066",
+   "gmv_p1": 309095.0,
+   "gmv_p2": 155170.0,
+   "gmv_p3": 43910.0
   },
   {
    "cs_tab": "Luana",
@@ -3628,7 +4368,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1370866",
+   "gmv_p1": 33984.9,
+   "gmv_p2": 15881.9,
+   "gmv_p3": 5389.6
   },
   {
    "cs_tab": "Luana",
@@ -3643,7 +4387,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1115487",
+   "gmv_p1": 760136.73,
+   "gmv_p2": 260566.62,
+   "gmv_p3": 67357.17
   },
   {
    "cs_tab": "Luana",
@@ -3658,7 +4406,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1240668",
+   "gmv_p1": 1968464.12,
+   "gmv_p2": 788981.0,
+   "gmv_p3": 164783.0
   },
   {
    "cs_tab": "Luana",
@@ -3673,7 +4425,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1140146",
+   "gmv_p1": 44679.85,
+   "gmv_p2": 17861.56,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Luana",
@@ -3688,7 +4444,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": "Apresentação realizada"
+   "obs_orig": "Apresentação realizada",
+   "bq_id": "12963",
+   "gmv_p1": 547802.6,
+   "gmv_p2": 131305.14,
+   "gmv_p3": 9064.6
   },
   {
    "cs_tab": "Luana",
@@ -3703,7 +4463,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1416343",
+   "gmv_p1": 1203745.25,
+   "gmv_p2": 154536.37,
+   "gmv_p3": 20352.29
   },
   {
    "cs_tab": "Luana",
@@ -3718,7 +4482,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "542723",
+   "gmv_p1": 40792.28,
+   "gmv_p2": 5200.97,
+   "gmv_p3": 500.0
   },
   {
    "cs_tab": "Luana",
@@ -3733,7 +4501,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1794660",
+   "gmv_p1": 25.0,
+   "gmv_p2": 148090.1,
+   "gmv_p3": 9540.6
   },
   {
    "cs_tab": "Luana",
@@ -3748,7 +4520,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "481124",
+   "gmv_p1": 6778.0,
+   "gmv_p2": 232453.6,
+   "gmv_p3": 45685.59
   },
   {
    "cs_tab": "Luana",
@@ -3763,7 +4539,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Luana",
@@ -3778,7 +4558,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1431828",
+   "gmv_p1": 27666.63,
+   "gmv_p2": 109551.52,
+   "gmv_p3": 23618.19
   },
   {
    "cs_tab": "Luana",
@@ -3793,7 +4577,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "644061",
+   "gmv_p1": 232988.76,
+   "gmv_p2": 834775.51,
+   "gmv_p3": 169973.64
   },
   {
    "cs_tab": "Luana",
@@ -3808,7 +4596,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1819640",
+   "gmv_p1": 1327482.76,
+   "gmv_p2": 4358536.96,
+   "gmv_p3": 918747.66
   },
   {
    "cs_tab": "Luana",
@@ -3823,7 +4615,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "251048",
+   "gmv_p1": 282868.12,
+   "gmv_p2": 860151.49,
+   "gmv_p3": 111633.41
   },
   {
    "cs_tab": "Luana",
@@ -3838,7 +4634,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "731799",
+   "gmv_p1": 222853.82,
+   "gmv_p2": 646046.89,
+   "gmv_p3": 151506.7
   },
   {
    "cs_tab": "Luana",
@@ -3853,7 +4653,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "831661",
+   "gmv_p1": 70563.2,
+   "gmv_p2": 204034.98,
+   "gmv_p3": 43165.7
   },
   {
    "cs_tab": "Luana",
@@ -3868,7 +4672,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "810439",
+   "gmv_p1": 808367.98,
+   "gmv_p2": 2490137.58,
+   "gmv_p3": 175299.13
   },
   {
    "cs_tab": "Luana",
@@ -3883,7 +4691,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "928822",
+   "gmv_p1": 458232.84,
+   "gmv_p2": 1281498.92,
+   "gmv_p3": 192229.7
   },
   {
    "cs_tab": "Luana",
@@ -3898,7 +4710,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1571077",
+   "gmv_p1": 117285.03,
+   "gmv_p2": 342248.85,
+   "gmv_p3": 18532.43
   },
   {
    "cs_tab": "Luana",
@@ -3913,7 +4729,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "724045",
+   "gmv_p1": 51067.0,
+   "gmv_p2": 137343.09,
+   "gmv_p3": 20506.74
   },
   {
    "cs_tab": "Luana",
@@ -3928,7 +4748,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "125339",
+   "gmv_p1": 508570.48,
+   "gmv_p2": 1273192.81,
+   "gmv_p3": 340381.72
   },
   {
    "cs_tab": "Luana",
@@ -3943,7 +4767,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "49554",
+   "gmv_p1": 1748114.2,
+   "gmv_p2": 4207372.6,
+   "gmv_p3": 308235.7
   },
   {
    "cs_tab": "Luana",
@@ -3958,7 +4786,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1275581",
+   "gmv_p1": 184195.95,
+   "gmv_p2": 393259.7,
+   "gmv_p3": 120593.4
   },
   {
    "cs_tab": "Luana",
@@ -3973,7 +4805,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "693434",
+   "gmv_p1": 306139.88,
+   "gmv_p2": 578810.19,
+   "gmv_p3": 94429.72
   },
   {
    "cs_tab": "Luana",
@@ -3988,7 +4824,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1090412",
+   "gmv_p1": 83330.58,
+   "gmv_p2": 144316.26,
+   "gmv_p3": 23073.89
   },
   {
    "cs_tab": "Luana",
@@ -4003,7 +4843,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "46233",
+   "gmv_p1": 81965.38,
+   "gmv_p2": 153825.98,
+   "gmv_p3": 35029.43
   },
   {
    "cs_tab": "Luana",
@@ -4018,7 +4862,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "618541",
+   "gmv_p1": 100422.2,
+   "gmv_p2": 187071.48,
+   "gmv_p3": 8526.6
   },
   {
    "cs_tab": "Luana",
@@ -4033,7 +4881,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1178586",
+   "gmv_p1": 3699864.52,
+   "gmv_p2": 6417242.6,
+   "gmv_p3": 1361578.12
   },
   {
    "cs_tab": "Luana",
@@ -4048,7 +4900,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "317136",
+   "gmv_p1": 324958.8,
+   "gmv_p2": 574731.84,
+   "gmv_p3": 71728.77
   },
   {
    "cs_tab": "Luana",
@@ -4063,7 +4919,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1712269",
+   "gmv_p1": 58358.0,
+   "gmv_p2": 83937.0,
+   "gmv_p3": 31354.06
   },
   {
    "cs_tab": "Luana",
@@ -4078,7 +4938,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "762660",
+   "gmv_p1": 24100.4,
+   "gmv_p2": 39931.41,
+   "gmv_p3": 7751.06
   },
   {
    "cs_tab": "Luana",
@@ -4093,7 +4957,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1316026",
+   "gmv_p1": 1419394.57,
+   "gmv_p2": 2310199.15,
+   "gmv_p3": 315911.0
   },
   {
    "cs_tab": "Luana",
@@ -4108,7 +4976,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1448441",
+   "gmv_p1": 1356951.31,
+   "gmv_p2": 2137551.23,
+   "gmv_p3": 418991.44
   },
   {
    "cs_tab": "Luana",
@@ -4123,7 +4995,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1201385",
+   "gmv_p1": 167068.3,
+   "gmv_p2": 248569.15,
+   "gmv_p3": 18166.5
   },
   {
    "cs_tab": "Luana",
@@ -4138,7 +5014,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1036740",
+   "gmv_p1": 68217.73,
+   "gmv_p2": 102993.75,
+   "gmv_p3": 8790.35
   },
   {
    "cs_tab": "Luana",
@@ -4153,7 +5033,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "65652",
+   "gmv_p1": 2542930.17,
+   "gmv_p2": 3514750.02,
+   "gmv_p3": 247945.43
   },
   {
    "cs_tab": "Luana",
@@ -4168,7 +5052,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1250065",
+   "gmv_p1": 1042108.0,
+   "gmv_p2": 1404462.5,
+   "gmv_p3": 164799.45
   },
   {
    "cs_tab": "Luana",
@@ -4183,7 +5071,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1733",
+   "gmv_p1": 640172.19,
+   "gmv_p2": 831146.94,
+   "gmv_p3": 148601.93
   },
   {
    "cs_tab": "Luana",
@@ -4198,7 +5090,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "917223",
+   "gmv_p1": 6424.7,
+   "gmv_p2": 5480.3,
+   "gmv_p3": 6118.5
   },
   {
    "cs_tab": "Luana",
@@ -4213,7 +5109,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1703736",
+   "gmv_p1": 619690.23,
+   "gmv_p2": 727039.2,
+   "gmv_p3": 124856.12
   },
   {
    "cs_tab": "Luana",
@@ -4228,7 +5128,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1544822",
+   "gmv_p1": 646961.03,
+   "gmv_p2": 787076.01,
+   "gmv_p3": 107589.34
   },
   {
    "cs_tab": "Luana",
@@ -4243,7 +5147,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1637938",
+   "gmv_p1": 396109.33,
+   "gmv_p2": 473641.88,
+   "gmv_p3": 57189.37
   },
   {
    "cs_tab": "Luana",
@@ -4258,7 +5166,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "27008",
+   "gmv_p1": 6617676.72,
+   "gmv_p2": 9270781.24,
+   "gmv_p3": 1461909.09
   },
   {
    "cs_tab": "Luana",
@@ -4273,7 +5185,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1078045",
+   "gmv_p1": 176295.2,
+   "gmv_p2": 150801.55,
+   "gmv_p3": 82647.24
   },
   {
    "cs_tab": "Luana",
@@ -4288,7 +5204,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1568965",
+   "gmv_p1": 696552.1,
+   "gmv_p2": 804213.79,
+   "gmv_p3": 177252.04
   },
   {
    "cs_tab": "Luana",
@@ -4303,7 +5223,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Luana",
@@ -4318,7 +5242,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "909617",
+   "gmv_p1": 84911.47,
+   "gmv_p2": 97902.57,
+   "gmv_p3": 12287.24
   },
   {
    "cs_tab": "Luana",
@@ -4333,7 +5261,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "998275",
+   "gmv_p1": 244807.2,
+   "gmv_p2": 274959.45,
+   "gmv_p3": 25670.2
   },
   {
    "cs_tab": "Luana",
@@ -4348,7 +5280,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1638551",
+   "gmv_p1": 40011.01,
+   "gmv_p2": 42995.88,
+   "gmv_p3": 7057.91
   },
   {
    "cs_tab": "Luana",
@@ -4363,7 +5299,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "24244",
+   "gmv_p1": 316590.73,
+   "gmv_p2": 329038.82,
+   "gmv_p3": 62859.87
   },
   {
    "cs_tab": "Luana",
@@ -4378,7 +5318,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "627689",
+   "gmv_p1": 6088122.65,
+   "gmv_p2": 6233643.1,
+   "gmv_p3": 1106600.5
   },
   {
    "cs_tab": "Luana",
@@ -4393,7 +5337,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1069425",
+   "gmv_p1": 60207.74,
+   "gmv_p2": 66307.1,
+   "gmv_p3": 5093.0
   },
   {
    "cs_tab": "Luana",
@@ -4408,7 +5356,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1468945",
+   "gmv_p1": 558708.27,
+   "gmv_p2": 583465.42,
+   "gmv_p3": 92814.4
   },
   {
    "cs_tab": "Luana",
@@ -4423,7 +5375,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1035659",
+   "gmv_p1": 119834.33,
+   "gmv_p2": 122655.06,
+   "gmv_p3": 23305.58
   },
   {
    "cs_tab": "Luana",
@@ -4438,7 +5394,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "60719",
+   "gmv_p1": 864836.07,
+   "gmv_p2": 835680.11,
+   "gmv_p3": 152735.86
   },
   {
    "cs_tab": "Luana",
@@ -4453,7 +5413,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1541315",
+   "gmv_p1": 1131234.06,
+   "gmv_p2": 1142479.73,
+   "gmv_p3": 151957.45
   },
   {
    "cs_tab": "Luana",
@@ -4468,7 +5432,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "828876",
+   "gmv_p1": 5455192.95,
+   "gmv_p2": 5362545.73,
+   "gmv_p3": 695236.77
   },
   {
    "cs_tab": "Luana",
@@ -4483,7 +5451,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "606611",
+   "gmv_p1": 89399.8,
+   "gmv_p2": 90386.1,
+   "gmv_p3": 2171.1
   },
   {
    "cs_tab": "Luana",
@@ -4498,7 +5470,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1272421",
+   "gmv_p1": 16656064.36,
+   "gmv_p2": 15997286.23,
+   "gmv_p3": 2401612.48
   },
   {
    "cs_tab": "Luana",
@@ -4513,7 +5489,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "712379",
+   "gmv_p1": 617730.97,
+   "gmv_p2": 596400.51,
+   "gmv_p3": 22014.56
   },
   {
    "cs_tab": "Luana",
@@ -4528,7 +5508,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1566528",
+   "gmv_p1": 669529.13,
+   "gmv_p2": 619647.35,
+   "gmv_p3": 94322.5
   },
   {
    "cs_tab": "Luana",
@@ -4543,7 +5527,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1375391",
+   "gmv_p1": 455276.65,
+   "gmv_p2": 391646.27,
+   "gmv_p3": 72490.47
   },
   {
    "cs_tab": "Luana",
@@ -4558,7 +5546,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Luana",
@@ -4573,7 +5565,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "157684",
+   "gmv_p1": 218003.91,
+   "gmv_p2": 189682.4,
+   "gmv_p3": 15299.7
   },
   {
    "cs_tab": "Luana",
@@ -4588,7 +5584,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "14035",
+   "gmv_p1": 3110399.17,
+   "gmv_p2": 2658691.89,
+   "gmv_p3": 359992.66
   },
   {
    "cs_tab": "Luana",
@@ -4603,7 +5603,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "230413",
+   "gmv_p1": 1598884.62,
+   "gmv_p2": 1363040.01,
+   "gmv_p3": 141991.56
   },
   {
    "cs_tab": "Luana",
@@ -4618,7 +5622,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "991148",
+   "gmv_p1": 2830914.56,
+   "gmv_p2": 2345181.24,
+   "gmv_p3": 395350.6
   },
   {
    "cs_tab": "Luana",
@@ -4633,7 +5641,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "873969",
+   "gmv_p1": 741503.11,
+   "gmv_p2": 614081.92,
+   "gmv_p3": 60990.21
   },
   {
    "cs_tab": "Luana",
@@ -4648,7 +5660,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1372995",
+   "gmv_p1": 4093082.63,
+   "gmv_p2": 3219311.47,
+   "gmv_p3": 463374.94
   },
   {
    "cs_tab": "Luana",
@@ -4663,7 +5679,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "42595",
+   "gmv_p1": 2688131.74,
+   "gmv_p2": 2016744.29,
+   "gmv_p3": 223653.8
   },
   {
    "cs_tab": "Luana",
@@ -4678,7 +5698,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1329765",
+   "gmv_p1": 28512.12,
+   "gmv_p2": 23363.02,
+   "gmv_p3": 892.08
   },
   {
    "cs_tab": "Luana",
@@ -4693,7 +5717,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "350323",
+   "gmv_p1": 2023169.78,
+   "gmv_p2": 1559084.27,
+   "gmv_p3": 181180.35
   },
   {
    "cs_tab": "Luana",
@@ -4708,7 +5736,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1098231",
+   "gmv_p1": 1853678.33,
+   "gmv_p2": 1371574.21,
+   "gmv_p3": 234180.99
   },
   {
    "cs_tab": "Luana",
@@ -4723,7 +5755,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Luana",
@@ -4738,7 +5774,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "432686",
+   "gmv_p1": 994764.0,
+   "gmv_p2": 734110.0,
+   "gmv_p3": 57065.0
   },
   {
    "cs_tab": "Luana",
@@ -4753,7 +5793,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1345093",
+   "gmv_p1": 1705639.4,
+   "gmv_p2": 1138877.62,
+   "gmv_p3": 185918.52
   },
   {
    "cs_tab": "Luana",
@@ -4768,7 +5812,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1434710",
+   "gmv_p1": 448589.86,
+   "gmv_p2": 304987.78,
+   "gmv_p3": 26889.02
   },
   {
    "cs_tab": "Luana",
@@ -4783,7 +5831,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1350619",
+   "gmv_p1": 54394.01,
+   "gmv_p2": 35332.67,
+   "gmv_p3": 9629.01
   },
   {
    "cs_tab": "Luana",
@@ -4798,7 +5850,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "243791",
+   "gmv_p1": 614768.68,
+   "gmv_p2": 415711.38,
+   "gmv_p3": 71348.26
   },
   {
    "cs_tab": "Luana",
@@ -4813,7 +5869,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1646803",
+   "gmv_p1": 21622.17,
+   "gmv_p2": 15264.23,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Luana",
@@ -4828,7 +5888,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "334983",
+   "gmv_p1": 1040995.22,
+   "gmv_p2": 644445.85,
+   "gmv_p3": 128899.88
   },
   {
    "cs_tab": "Luana",
@@ -4843,7 +5907,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1170555",
+   "gmv_p1": 528628.96,
+   "gmv_p2": 354026.12,
+   "gmv_p3": 14032.7
   },
   {
    "cs_tab": "Luana",
@@ -4858,7 +5926,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1672566",
+   "gmv_p1": 811263.24,
+   "gmv_p2": 455233.14,
+   "gmv_p3": 96936.48
   },
   {
    "cs_tab": "Luana",
@@ -4873,7 +5945,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1776270",
+   "gmv_p1": 97506.0,
+   "gmv_p2": 58428.4,
+   "gmv_p3": 2370.0
   },
   {
    "cs_tab": "Luana",
@@ -4888,7 +5964,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1514453",
+   "gmv_p1": 1282372.6,
+   "gmv_p2": 761022.3,
+   "gmv_p3": 60498.5
   },
   {
    "cs_tab": "Luana",
@@ -4903,7 +5983,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1409509",
+   "gmv_p1": 414385.33,
+   "gmv_p2": 235434.32,
+   "gmv_p3": 12524.12
   },
   {
    "cs_tab": "Luana",
@@ -4918,7 +6002,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1191066",
+   "gmv_p1": 309095.0,
+   "gmv_p2": 155170.0,
+   "gmv_p3": 43910.0
   },
   {
    "cs_tab": "Luana",
@@ -4933,7 +6021,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1370866",
+   "gmv_p1": 33984.9,
+   "gmv_p2": 15881.9,
+   "gmv_p3": 5389.6
   },
   {
    "cs_tab": "Luana",
@@ -4948,7 +6040,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1115487",
+   "gmv_p1": 760136.73,
+   "gmv_p2": 260566.62,
+   "gmv_p3": 67357.17
   },
   {
    "cs_tab": "Luana",
@@ -4963,7 +6059,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1240668",
+   "gmv_p1": 1968464.12,
+   "gmv_p2": 788981.0,
+   "gmv_p3": 164783.0
   },
   {
    "cs_tab": "Luana",
@@ -4978,7 +6078,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1140146",
+   "gmv_p1": 44679.85,
+   "gmv_p2": 17861.56,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Luana",
@@ -4993,7 +6097,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "12963",
+   "gmv_p1": 547802.6,
+   "gmv_p2": 131305.14,
+   "gmv_p3": 9064.6
   },
   {
    "cs_tab": "Luana",
@@ -5008,7 +6116,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1416343",
+   "gmv_p1": 1203745.25,
+   "gmv_p2": 154536.37,
+   "gmv_p3": 20352.29
   },
   {
    "cs_tab": "Luana",
@@ -5023,7 +6135,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "542723",
+   "gmv_p1": 40792.28,
+   "gmv_p2": 5200.97,
+   "gmv_p3": 500.0
   },
   {
    "cs_tab": "Luana",
@@ -5038,7 +6154,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "479020",
+   "gmv_p1": 227452.74,
+   "gmv_p2": 20632.5,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Thamiris",
@@ -5053,7 +6173,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": false,
-   "obs_orig": "Aguardando credencial"
+   "obs_orig": "Aguardando credencial",
+   "bq_id": "1805647",
+   "gmv_p1": 18438.91,
+   "gmv_p2": 1832640.82,
+   "gmv_p3": 144356.05
   },
   {
    "cs_tab": "Thamiris",
@@ -5068,7 +6192,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": false,
-   "obs_orig": "Aguardando credencial | julho"
+   "obs_orig": "Aguardando credencial | julho",
+   "bq_id": "1078366",
+   "gmv_p1": 48097.97,
+   "gmv_p2": 1237837.6,
+   "gmv_p3": 206176.91
   },
   {
    "cs_tab": "Thamiris",
@@ -5083,7 +6211,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "Não tem maturidade pra tecnologia"
+   "obs_orig": "Não tem maturidade pra tecnologia",
+   "bq_id": "1831638",
+   "gmv_p1": 15032.0,
+   "gmv_p2": 327286.32,
+   "gmv_p3": 79998.13
   },
   {
    "cs_tab": "Thamiris",
@@ -5098,7 +6230,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1617476",
+   "gmv_p1": 40036.48,
+   "gmv_p2": 164538.5,
+   "gmv_p3": 20114.6
   },
   {
    "cs_tab": "Thamiris",
@@ -5113,7 +6249,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "CHURN ORÁCULO"
+   "obs_orig": "CHURN ORÁCULO",
+   "bq_id": "8",
+   "gmv_p1": 885280.97,
+   "gmv_p2": 3328964.13,
+   "gmv_p3": 325011.98
   },
   {
    "cs_tab": "Thamiris",
@@ -5128,7 +6268,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "38",
+   "gmv_p1": 63258.24,
+   "gmv_p2": 236365.75,
+   "gmv_p3": 51741.1
   },
   {
    "cs_tab": "Thamiris",
@@ -5143,7 +6287,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "57608",
+   "gmv_p1": 11528.7,
+   "gmv_p2": 36296.6,
+   "gmv_p3": 5105.2
   },
   {
    "cs_tab": "Thamiris",
@@ -5158,7 +6306,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1618245",
+   "gmv_p1": 323820.3,
+   "gmv_p2": 959998.15,
+   "gmv_p3": 124381.0
   },
   {
    "cs_tab": "Thamiris",
@@ -5173,7 +6325,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1705224",
+   "gmv_p1": 279168.05,
+   "gmv_p2": 852629.9,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Thamiris",
@@ -5188,7 +6344,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "754709",
+   "gmv_p1": 83868.49,
+   "gmv_p2": 503162.43,
+   "gmv_p3": 1446.43
   },
   {
    "cs_tab": "Thamiris",
@@ -5203,7 +6363,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1832603",
+   "gmv_p1": 298725.6,
+   "gmv_p2": 802605.0,
+   "gmv_p3": 118885.57
   },
   {
    "cs_tab": "Thamiris",
@@ -5218,7 +6382,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "567903",
+   "gmv_p1": 827446.76,
+   "gmv_p2": 2287348.97,
+   "gmv_p3": 231625.12
   },
   {
    "cs_tab": "Thamiris",
@@ -5233,7 +6401,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1707653",
+   "gmv_p1": 230390.96,
+   "gmv_p2": 516946.6,
+   "gmv_p3": 176911.65
   },
   {
    "cs_tab": "Thamiris",
@@ -5248,7 +6420,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1520847",
+   "gmv_p1": 32110.0,
+   "gmv_p2": 81614.0,
+   "gmv_p3": 10644.0
   },
   {
    "cs_tab": "Thamiris",
@@ -5263,7 +6439,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "Grupo Kapton ... não se decidiram"
+   "obs_orig": "Grupo Kapton ... não se decidiram",
+   "bq_id": "115071",
+   "gmv_p1": 158974.1,
+   "gmv_p2": 298517.1,
+   "gmv_p3": 46814.0
   },
   {
    "cs_tab": "Thamiris",
@@ -5278,7 +6458,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Thamiris",
@@ -5293,7 +6477,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1520391",
+   "gmv_p1": 437852.65,
+   "gmv_p2": 751277.3,
+   "gmv_p3": 102775.7
   },
   {
    "cs_tab": "Thamiris",
@@ -5308,7 +6496,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "212906",
+   "gmv_p1": 473309.01,
+   "gmv_p2": 827691.29,
+   "gmv_p3": 137520.78
   },
   {
    "cs_tab": "Thamiris",
@@ -5323,7 +6515,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1013272",
+   "gmv_p1": 155390.92,
+   "gmv_p2": 264798.86,
+   "gmv_p3": 8947.6
   },
   {
    "cs_tab": "Thamiris",
@@ -5338,7 +6534,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "68527",
+   "gmv_p1": 3485563.83,
+   "gmv_p2": 5615283.01,
+   "gmv_p3": 832668.24
   },
   {
    "cs_tab": "Thamiris",
@@ -5353,7 +6553,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "707072",
+   "gmv_p1": 2377655.85,
+   "gmv_p2": 3384871.02,
+   "gmv_p3": 415856.63
   },
   {
    "cs_tab": "Thamiris",
@@ -5368,7 +6572,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "250116",
+   "gmv_p1": 4183563.83,
+   "gmv_p2": 5607115.33,
+   "gmv_p3": 894875.12
   },
   {
    "cs_tab": "Thamiris",
@@ -5383,7 +6591,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "948623",
+   "gmv_p1": 822380.41,
+   "gmv_p2": 1142471.84,
+   "gmv_p3": 103538.42
   },
   {
    "cs_tab": "Thamiris",
@@ -5398,7 +6610,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "982907",
+   "gmv_p1": 799945.66,
+   "gmv_p2": 1058982.57,
+   "gmv_p3": 102557.1
   },
   {
    "cs_tab": "Thamiris",
@@ -5413,7 +6629,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "34354",
+   "gmv_p1": 899890.31,
+   "gmv_p2": 1133996.98,
+   "gmv_p3": 202582.49
   },
   {
    "cs_tab": "Thamiris",
@@ -5428,7 +6648,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "7777",
+   "gmv_p1": 2634020.8,
+   "gmv_p2": 3059388.0,
+   "gmv_p3": 548281.9
   },
   {
    "cs_tab": "Thamiris",
@@ -5443,7 +6667,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "Grupo Kapton ... não se decidiram"
+   "obs_orig": "Grupo Kapton ... não se decidiram",
+   "bq_id": "62332",
+   "gmv_p1": 1445678.2,
+   "gmv_p2": 1749194.1,
+   "gmv_p3": 279571.0
   },
   {
    "cs_tab": "Thamiris",
@@ -5458,7 +6686,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "Apresentação agendada 21/07"
+   "obs_orig": "Apresentação agendada 21/07",
+   "bq_id": "145163",
+   "gmv_p1": 3282837.0,
+   "gmv_p2": 3957446.0,
+   "gmv_p3": 428150.0
   },
   {
    "cs_tab": "Thamiris",
@@ -5473,7 +6705,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1428630",
+   "gmv_p1": 1507990.13,
+   "gmv_p2": 1674976.85,
+   "gmv_p3": 279916.74
   },
   {
    "cs_tab": "Thamiris",
@@ -5488,7 +6724,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": false,
-   "obs_orig": "Montando painel 20/07 - Prox passo apresentar Oráculo"
+   "obs_orig": "Montando painel 20/07 - Prox passo apresentar Oráculo",
+   "bq_id": "968033",
+   "gmv_p1": 11390573.56,
+   "gmv_p2": 14664036.68,
+   "gmv_p3": 1413351.0
   },
   {
    "cs_tab": "Thamiris",
@@ -5503,7 +6743,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "107077",
+   "gmv_p1": 3414590.7,
+   "gmv_p2": 3751850.5,
+   "gmv_p3": 684631.5
   },
   {
    "cs_tab": "Thamiris",
@@ -5518,7 +6762,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "desmarcou reunião de Oráculo 5 vezes"
+   "obs_orig": "desmarcou reunião de Oráculo 5 vezes",
+   "bq_id": "1516172",
+   "gmv_p1": 202356.33,
+   "gmv_p2": 224832.11,
+   "gmv_p3": 9113.6
   },
   {
    "cs_tab": "Thamiris",
@@ -5533,7 +6781,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "63957",
+   "gmv_p1": 774482.0,
+   "gmv_p2": 891094.0,
+   "gmv_p3": 65242.0
   },
   {
    "cs_tab": "Thamiris",
@@ -5548,7 +6800,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1110791",
+   "gmv_p1": 13192061.27,
+   "gmv_p2": 13159555.97,
+   "gmv_p3": 2113385.0
   },
   {
    "cs_tab": "Thamiris",
@@ -5563,7 +6819,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1480880",
+   "gmv_p1": 762887.09,
+   "gmv_p2": 804312.01,
+   "gmv_p3": 73354.8
   },
   {
    "cs_tab": "Thamiris",
@@ -5578,7 +6838,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1044170",
+   "gmv_p1": 1590144.1,
+   "gmv_p2": 1574737.12,
+   "gmv_p3": 337294.85
   },
   {
    "cs_tab": "Thamiris",
@@ -5593,7 +6857,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1123393",
+   "gmv_p1": 24283161.8,
+   "gmv_p2": 23266746.87,
+   "gmv_p3": 3386281.85
   },
   {
    "cs_tab": "Thamiris",
@@ -5608,7 +6876,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "123613",
+   "gmv_p1": 20254.6,
+   "gmv_p2": 21531.9,
+   "gmv_p3": 2554.6
   },
   {
    "cs_tab": "Thamiris",
@@ -5623,7 +6895,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Thamiris",
@@ -5638,7 +6914,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "52771",
+   "gmv_p1": 598574.79,
+   "gmv_p2": 505249.44,
+   "gmv_p3": 37157.48
   },
   {
    "cs_tab": "Thamiris",
@@ -5653,7 +6933,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "548863",
+   "gmv_p1": 1538020.6,
+   "gmv_p2": 1459854.2,
+   "gmv_p3": 170225.0
   },
   {
    "cs_tab": "Thamiris",
@@ -5668,7 +6952,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "820612",
+   "gmv_p1": 1820907.15,
+   "gmv_p2": 1544171.71,
+   "gmv_p3": 275507.1
   },
   {
    "cs_tab": "Thamiris",
@@ -5683,7 +6971,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "525596",
+   "gmv_p1": 1066675.01,
+   "gmv_p2": 1003004.64,
+   "gmv_p3": 73464.4
   },
   {
    "cs_tab": "Thamiris",
@@ -5698,7 +6990,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "CHURN ORÁCULO"
+   "obs_orig": "CHURN ORÁCULO",
+   "bq_id": "1213886",
+   "gmv_p1": 1888902.72,
+   "gmv_p2": 1688272.46,
+   "gmv_p3": 206579.48
   },
   {
    "cs_tab": "Thamiris",
@@ -5713,7 +7009,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "620674",
+   "gmv_p1": 2432118.43,
+   "gmv_p2": 2103661.55,
+   "gmv_p3": 197894.47
   },
   {
    "cs_tab": "Thamiris",
@@ -5728,7 +7028,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "CHURN ORÁCULO | Usando Taillor"
+   "obs_orig": "CHURN ORÁCULO | Usando Taillor",
+   "bq_id": "3301",
+   "gmv_p1": 3101048.35,
+   "gmv_p2": 2632762.86,
+   "gmv_p3": 475512.14
   },
   {
    "cs_tab": "Thamiris",
@@ -5743,7 +7047,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1355848",
+   "gmv_p1": 1263785.08,
+   "gmv_p2": 1087265.39,
+   "gmv_p3": 89947.42
   },
   {
    "cs_tab": "Thamiris",
@@ -5758,7 +7066,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "913427",
+   "gmv_p1": 4819636.21,
+   "gmv_p2": 3982279.74,
+   "gmv_p3": 383872.3
   },
   {
    "cs_tab": "Thamiris",
@@ -5773,7 +7085,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "391367",
+   "gmv_p1": 487235.05,
+   "gmv_p2": 414925.87,
+   "gmv_p3": 52015.26
   },
   {
    "cs_tab": "Thamiris",
@@ -5788,7 +7104,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1011737",
+   "gmv_p1": 540608.7,
+   "gmv_p2": 330863.6,
+   "gmv_p3": 38287.45
   },
   {
    "cs_tab": "Thamiris",
@@ -5803,7 +7123,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "usa bot"
+   "obs_orig": "usa bot",
+   "bq_id": "156781",
+   "gmv_p1": 881593.48,
+   "gmv_p2": 727398.89,
+   "gmv_p3": 73997.47
   },
   {
    "cs_tab": "Thamiris",
@@ -5818,7 +7142,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "441578",
+   "gmv_p1": 1703630.0,
+   "gmv_p2": 1344282.12,
+   "gmv_p3": 90816.03
   },
   {
    "cs_tab": "Thamiris",
@@ -5833,7 +7161,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "402982",
+   "gmv_p1": 1615884.58,
+   "gmv_p2": 1070941.74,
+   "gmv_p3": 284548.26
   },
   {
    "cs_tab": "Thamiris",
@@ -5848,7 +7180,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1529280",
+   "gmv_p1": 4308346.78,
+   "gmv_p2": 3160747.22,
+   "gmv_p3": 555661.45
   },
   {
    "cs_tab": "Thamiris",
@@ -5863,7 +7199,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1040413",
+   "gmv_p1": 863970.19,
+   "gmv_p2": 645784.82,
+   "gmv_p3": 59699.3
   },
   {
    "cs_tab": "Thamiris",
@@ -5878,7 +7218,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1600255",
+   "gmv_p1": 1947573.91,
+   "gmv_p2": 1503655.81,
+   "gmv_p3": 44335.35
   },
   {
    "cs_tab": "Thamiris",
@@ -5893,7 +7237,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "Usa CRM, não tem interesse"
+   "obs_orig": "Usa CRM, não tem interesse",
+   "bq_id": "451968",
+   "gmv_p1": 874963.96,
+   "gmv_p2": 628526.56,
+   "gmv_p3": 66185.42
   },
   {
    "cs_tab": "Thamiris",
@@ -5908,7 +7256,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1145501",
+   "gmv_p1": 35273.75,
+   "gmv_p2": 27254.07,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Thamiris",
@@ -5923,7 +7275,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1516190",
+   "gmv_p1": 1024454.53,
+   "gmv_p2": 715070.05,
+   "gmv_p3": 112753.4
   },
   {
    "cs_tab": "Thamiris",
@@ -5938,7 +7294,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "Preço"
+   "obs_orig": "Preço",
+   "bq_id": "1279276",
+   "gmv_p1": 9761376.34,
+   "gmv_p2": 5867767.47,
+   "gmv_p3": 579745.78
   },
   {
    "cs_tab": "Thamiris",
@@ -5953,7 +7313,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1574022",
+   "gmv_p1": 1076373.8,
+   "gmv_p2": 768346.85,
+   "gmv_p3": 68518.92
   },
   {
    "cs_tab": "Thamiris",
@@ -5968,7 +7332,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "Já tentei contato várias vezes, não retornam"
+   "obs_orig": "Já tentei contato várias vezes, não retornam",
+   "bq_id": "1143861",
+   "gmv_p1": 285113.98,
+   "gmv_p2": 170300.49,
+   "gmv_p3": 34319.61
   },
   {
    "cs_tab": "Thamiris",
@@ -5983,7 +7351,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "Preço"
+   "obs_orig": "Preço",
+   "bq_id": "1483567",
+   "gmv_p1": 384867.79,
+   "gmv_p2": 263901.85,
+   "gmv_p3": 6535.2
   },
   {
    "cs_tab": "Thamiris",
@@ -5998,7 +7370,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "Preço"
+   "obs_orig": "Preço",
+   "bq_id": "1555716",
+   "gmv_p1": 410492.2,
+   "gmv_p2": 260126.52,
+   "gmv_p3": 44805.86
   },
   {
    "cs_tab": "Thamiris",
@@ -6013,7 +7389,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "Preço"
+   "obs_orig": "Preço",
+   "bq_id": "1094612",
+   "gmv_p1": 27157.35,
+   "gmv_p2": 16112.58,
+   "gmv_p3": 8257.8
   },
   {
    "cs_tab": "Thamiris",
@@ -6028,7 +7408,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "917059",
+   "gmv_p1": 7152736.18,
+   "gmv_p2": 4303210.9,
+   "gmv_p3": 489743.46
   },
   {
    "cs_tab": "Thamiris",
@@ -6043,7 +7427,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1643381",
+   "gmv_p1": 5699450.27,
+   "gmv_p2": 3182381.94,
+   "gmv_p3": 388817.28
   },
   {
    "cs_tab": "Thamiris",
@@ -6058,7 +7446,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1379136",
+   "gmv_p1": 832287.7,
+   "gmv_p2": 465135.46,
+   "gmv_p3": 75177.15
   },
   {
    "cs_tab": "Thamiris",
@@ -6073,7 +7465,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Thamiris",
@@ -6088,7 +7484,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "Churn de assistente, não quis utilizar o Oráculo"
+   "obs_orig": "Churn de assistente, não quis utilizar o Oráculo",
+   "bq_id": "842293",
+   "gmv_p1": 14187918.25,
+   "gmv_p2": 6665173.53,
+   "gmv_p3": 1300411.27
   },
   {
    "cs_tab": "Thamiris",
@@ -6103,7 +7503,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "400993",
+   "gmv_p1": 165268.67,
+   "gmv_p2": 81362.04,
+   "gmv_p3": 7922.45
   },
   {
    "cs_tab": "Thamiris",
@@ -6118,7 +7522,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1756648",
+   "gmv_p1": 926172.33,
+   "gmv_p2": 420207.45,
+   "gmv_p3": 62854.31
   },
   {
    "cs_tab": "Thamiris",
@@ -6133,7 +7541,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": "Preço e falta de maturidade"
+   "obs_orig": "Preço e falta de maturidade",
+   "bq_id": "453110",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Thamiris",
@@ -6148,7 +7560,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1271690",
+   "gmv_p1": 685153.41,
+   "gmv_p2": 332610.42,
+   "gmv_p3": 18315.42
   },
   {
    "cs_tab": "Thamiris",
@@ -6163,7 +7579,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1649216",
+   "gmv_p1": 940075.04,
+   "gmv_p2": 343312.78,
+   "gmv_p3": 127966.86
   },
   {
    "cs_tab": "Thamiris",
@@ -6178,7 +7598,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": null
   },
   {
    "cs_tab": "Thamiris",
@@ -6193,7 +7617,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "292554",
+   "gmv_p1": 1063948.76,
+   "gmv_p2": 434142.77,
+   "gmv_p3": 16443.1
   },
   {
    "cs_tab": "Thamiris",
@@ -6208,7 +7636,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1276481",
+   "gmv_p1": 417608.82,
+   "gmv_p2": 153145.59,
+   "gmv_p3": 17692.8
   },
   {
    "cs_tab": "Thamiris",
@@ -6223,7 +7655,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1101909",
+   "gmv_p1": 16083.5,
+   "gmv_p2": 6013.5,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Thamiris",
@@ -6238,7 +7674,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "144574",
+   "gmv_p1": 20300.0,
+   "gmv_p2": 1564.0,
+   "gmv_p3": 530.1
   },
   {
    "cs_tab": "Thamiris",
@@ -6253,7 +7693,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "152442",
+   "gmv_p1": 464058.32,
+   "gmv_p2": 145623.9,
+   "gmv_p3": 24588.3
   },
   {
    "cs_tab": "Thamiris",
@@ -6268,7 +7712,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1234006",
+   "gmv_p1": 472693.02,
+   "gmv_p2": 92665.63,
+   "gmv_p3": 2698.66
   },
   {
    "cs_tab": "Thamiris",
@@ -6283,7 +7731,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1232863",
+   "gmv_p1": 420697.96,
+   "gmv_p2": 246379.45,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Thamiris",
@@ -6298,7 +7750,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1842018",
+   "gmv_p1": 45.54,
+   "gmv_p2": null,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Thamiris",
@@ -6313,7 +7769,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "290692",
+   "gmv_p1": 85062.56,
+   "gmv_p2": null,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Thamiris",
@@ -6328,7 +7788,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1945202",
+   "gmv_p1": null,
+   "gmv_p2": 979688.75,
+   "gmv_p3": 4477.0
   },
   {
    "cs_tab": "Thamiris",
@@ -6343,7 +7807,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "15",
+   "gmv_p1": null,
+   "gmv_p2": 436900.96,
+   "gmv_p3": 111673.68
   },
   {
    "cs_tab": "Thamiris",
@@ -6358,7 +7826,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1833521",
+   "gmv_p1": null,
+   "gmv_p2": 196600.96,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Thamiris",
@@ -6373,7 +7845,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1926419",
+   "gmv_p1": null,
+   "gmv_p2": 65554.57,
+   "gmv_p3": 8106.2
   },
   {
    "cs_tab": "Thamiris",
@@ -6388,7 +7864,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "2076887",
+   "gmv_p1": null,
+   "gmv_p2": 43429.33,
+   "gmv_p3": 44170.13
   },
   {
    "cs_tab": "Thamiris",
@@ -6403,7 +7883,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1951430",
+   "gmv_p1": null,
+   "gmv_p2": 3907.0,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Thamiris",
@@ -6418,7 +7902,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": false,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "1426269",
+   "gmv_p1": null,
+   "gmv_p2": 2290.0,
+   "gmv_p3": null
   },
   {
    "cs_tab": "Thamiris",
@@ -6433,7 +7921,11 @@ window.CS2_DATA = {
    "mensalidade": null,
    "tino": true,
    "vestipago": false,
-   "obs_orig": ""
+   "obs_orig": "",
+   "bq_id": "727491",
+   "gmv_p1": 1224039.6,
+   "gmv_p2": 1911023.41,
+   "gmv_p3": 126457.67
   }
  ]
 };
