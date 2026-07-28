@@ -35,14 +35,21 @@ DECISOES QUE VALEM A PENA SABER (medidas no BQ em 24 e 27/07/2026):
     execucao. Sem isso, uma loja que saisse da janela de 30 dias sumiria do
     painel levando junto o que o CS ja tivesse preenchido.
 
-  * data25 = 25o pedido PAGO acumulado. Medido em 27/07/2026 contra as 19 marcas
-    que tinham a data preenchida na planilha: a data digitada vem SEMPRE depois
-    da medida, com lag mediano de 19 dias (34 se contar todos os status). Ou
-    seja, a planilha registra quando a CS percebeu o marco, nao quando ele
-    aconteceu — por isso o BQ passa a mandar aqui. A data que estava na planilha
-    fica guardada em data25_planilha. Um caso ilustra o problema: Dona Charme
-    estava com 2026-11-11, data no FUTURO (ano digitado errado); o marco real
-    foi 2025-11-05.
+  * data25 = 25o pedido PAGO acumulado, e vem SO do BQ (28/07/2026). Medido em
+    27/07 contra as 19 marcas que tinham a data preenchida na planilha: a data
+    digitada vem SEMPRE depois da medida, com lag mediano de 19 dias (34 se
+    contar todos os status) — a planilha registrava quando a CS percebeu o
+    marco, nao quando ele aconteceu. Como a coluna deixou de ser preenchida a
+    mao, o valor da planilha nao e mais herdado: fica arquivado em
+    data25_planilha e a celula nasce vazia ate o BQ medir o marco. Dois erros
+    de ano sumiram sozinhos com isso (Baubaki 2026-11-03, Elas charmosa
+    2026-11-18, ambas datas no futuro); antes ja tinha aparecido o mesmo com
+    Dona Charme, 2026-11-11 quando o marco real foi 2025-11-05.
+
+    Excecao: quem NAO casa por nome com o BQ tambem fica vazio. E o unico ponto
+    do modulo onde ausencia de match apaga dado — vale aqui porque a alternativa
+    e exibir para sempre um numero que ninguem mais atualiza. Para corrigir um
+    caso especifico, edite a celula no painel: o overlay vence sobre o BQ.
 
 Credencial: GOOGLE_APPLICATION_CREDENTIALS (arquivo) ou GCP_SA_KEY (json inline).
 Sem credencial o modulo nao quebra o fetcher: devolve os dados como estavam.
@@ -237,9 +244,13 @@ def _dias_p3():
 def _aba1(aba1, novas, prev, idx, marco_por_id):
     """Enriquece a aba 1 e acrescenta uma linha em branco por loja nova.
 
-    Enriquecimento (em quem casa por nome):
-      * data25 <- data do 25o pedido pago (a da planilha vai p/ data25_planilha)
-      * cadastro_bq <- created_at do dominio (NAO substitui `entrada`, ver abaixo)
+    Enriquecimento:
+      * data25 <- data do 25o pedido pago, so do BQ. A da planilha e arquivada
+        em data25_planilha e nao aparece mais no painel (a coluna deixou de ser
+        preenchida a mao). Sem marco medido, a celula fica vazia.
+      * cadastro_bq <- created_at do dominio, em quem casa por nome. NAO
+        substitui `entrada` e nao e exibido no painel (decisao de 28/07/2026);
+        fica no dado para consulta. Ver abaixo o porque de nao substituir.
 
     Linhas ja geradas antes (origem=bq no dashboard anterior) sao preservadas
     mesmo depois de sair da janela de JANELA_DIAS.
@@ -263,11 +274,23 @@ def _aba1(aba1, novas, prev, idx, marco_por_id):
     # calculo do marco — entraria sem 25 pedidos e ficaria sem data pra sempre.
     aba1, add, mantidas = _aba1_novas(aba1, novas, prev)
 
-    casou = com_marco = 0
+    casou = com_marco = limpas = 0
     for r in aba1:
+        # A coluna 25+ passou a ser 100% do BQ (decisao da Laura, 28/07/2026:
+        # "a coluna nao vai mais ser preenchida manualmente"). O que a CS
+        # digitou fica arquivado em data25_planilha e some do painel; sem marco
+        # medido a celula fica vazia, inclusive em quem nao casa por nome —
+        # nao ha de onde tirar a data, e o valor herdado so envelhecia. Correcao
+        # pontual continua possivel: o overlay de edicao vence sobre este campo.
+        if r.get("data25") and not r.get("data25_planilha"):
+            r["data25_planilha"] = r["data25"]
+        if r.get("data25"):
+            limpas += 1
+        r["data25"] = None
+
         loja = idx.get(norm(r.get("marca")))
         if not loja:
-            continue          # sem cadastro achado: a planilha continua valendo
+            continue          # sem cadastro achado: o resto da planilha vale
         casou += 1
         if loja.get("criada"):
             r["cadastro_bq"] = loja["criada"].isoformat()
@@ -276,19 +299,15 @@ def _aba1(aba1, novas, prev, idx, marco_por_id):
                 r["dias"] = (hoje - loja["criada"]).days
         m = marco_por_id.get(loja["id"], {})
         if m.get("marco"):
-            # guarda o que a CS digitou antes de trocar (uma vez so)
-            if not r.get("data25_planilha"):
-                r["data25_planilha"] = r.get("data25")
             r["data25"] = m["marco"].isoformat()
-            r["pedidos_pagos"] = m.get("pedidos")
             com_marco += 1
-        elif m.get("pedidos") is not None:
-            # casou, mas ainda nao chegou aos 25: nao inventa data nem apaga a
-            # que a CS digitou — so registra quantos pedidos ja tem
+        if m.get("pedidos") is not None:
+            # sem 25 pedidos ainda: sem data, mas registra quantos ja tem
             r["pedidos_pagos"] = m.get("pedidos")
 
     print(f"[bq] aba1: {casou} casaram com o cadastro, {com_marco} com data de "
-          f"{MARCO_PEDIDOS}o pedido pago; +{add} loja(s) nova(s) "
+          f"{MARCO_PEDIDOS}o pedido pago ({limpas} vinham da planilha, agora so "
+          f"em data25_planilha); +{add} loja(s) nova(s) "
           f"(mantidas {mantidas} de execucoes anteriores)", flush=True)
     return aba1
 
