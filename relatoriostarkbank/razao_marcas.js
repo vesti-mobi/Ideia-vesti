@@ -8,6 +8,7 @@ window.RAZAO_MARCAS = (function(){
     var raw = {
         "2 wave":                                            "2wave Ltda",
         "3r lopes":                                          "Rayanne Lopes",
+        "9a671393-ae08-473d-8548-37e681827269":              "N A ALMENDRA GOFFERT CONFECCOES LTDA",
         "a f aires de oliveira ltda":                        "A F Aires De Oliveira Ltda",
         "a perola collection":                               "PEROLA COLLECTION INDUSTRIA E COMERCIO LTDA",
         "a rouparia":                                        "ANGELICA APARECIDA DE OLIVEIRA",

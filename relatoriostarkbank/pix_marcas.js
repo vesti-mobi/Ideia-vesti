@@ -6,6 +6,7 @@
 // Match feito pelo nomeFantasia (minusculo, sem acento, sem espaco nas pontas).
 window.PIX_MARCAS = (function(){
     var raw = {
+        "9a671393-ae08-473d-8548-37e681827269":              "72868441000110",
         "aero summer 2":                                     "Não cadastrada",
         "aero summer um":                                    "Solicitada ao CS",
         "ag moda intima":                                    "Pagseguro",

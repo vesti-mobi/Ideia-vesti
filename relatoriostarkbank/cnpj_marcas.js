@@ -8,6 +8,7 @@ window.CNPJ_MARCAS = (function(){
     var raw = {
         "2 wave":                                            "60.447.090/0001-95",
         "3r lopes":                                          "127.232.574-10",
+        "9a671393-ae08-473d-8548-37e681827269":              "72.868.441/0001-10",
         "a f aires de oliveira ltda":                        "30.425.190/0001-50",
         "a perola collection":                               "27.710.407/0001-69",
         "a rouparia":                                        "32.979.501/0001-58",

@@ -1,7 +1,7 @@
 {
   "_leia": "Fonte da verdade das contas das marcas (CNPJ, razao social, chave PIX). Editado pelo painel StarkBank / celular (app stark-admin). Os 3 arquivos pix_marcas.js, cnpj_marcas.js e razao_marcas.js sao GERADOS a partir daqui — nao edite eles na mao.",
-  "atualizadoEm": "2026-07-27T23:39:12.306Z",
-  "atualizadoPor": "celular",
+  "atualizadoEm": "2026-07-28T12:41:24.160Z",
+  "atualizadoPor": "painel",
   "marcas": {
     "2 wave": {
       "pix": "",
@@ -8793,6 +8793,13 @@
       "pix": "",
       "cnpj": "51.033.465/0001-80",
       "razao": "ZUA STYLE CONFECCAO DO VESTUARIO APUCARANA LTDA"
+    },
+    "9a671393-ae08-473d-8548-37e681827269": {
+      "pix": "72868441000110",
+      "cnpj": "72.868.441/0001-10",
+      "razao": "N A ALMENDRA GOFFERT CONFECCOES LTDA",
+      "editadoEm": "2026-07-28T12:41:24.160Z",
+      "origem": "painel"
     }
   }
 }
