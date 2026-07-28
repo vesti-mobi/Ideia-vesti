@@ -3,8 +3,8 @@
 Enriquecimento do relatoriocs2 via BigQuery (roda 1x/dia junto do fetch_data.py).
 
 Faz quatro coisas:
-  1. ABA 1 - toda LOJA nova (dominio com modulo de vendas) criada nos ultimos
-     JANELA_DIAS vira uma linha em branco na Passagem de Bastao.
+  1. ABA 1 - toda LOJA nova (dominio com modulo de vendas) cadastrada a partir
+     de DATA_CORTE_NOVAS vira uma linha em branco na Passagem de Bastao.
   2. ABA 1 - a coluna "25+ / Ult. marco" (data25) e a data em que a marca bateu
      o 25o PEDIDO PAGO acumulado, medida no BQ.
   3. ABA 3 - o GMV das empresas vem do BQ em tres periodos, todo dia.
@@ -32,8 +32,9 @@ DECISOES QUE VALEM A PENA SABER (medidas no BQ em 24 e 27/07/2026):
 
   * Linha adicionada aqui NUNCA e removida depois. As linhas geradas ficam
     marcadas com origem="bq" e sao relidas do dashboard_data.js anterior a cada
-    execucao. Sem isso, uma loja que saisse da janela de 30 dias sumiria do
-    painel levando junto o que o CS ja tivesse preenchido.
+    execucao. Sem isso, mudar o criterio de entrada (como aconteceu em 28/07,
+    da janela movel de 30 dias para a data fixa) apagaria linhas ja no painel,
+    levando junto o que o CS tivesse preenchido nelas.
 
   * data25 = 25o pedido PAGO acumulado, e vem SO do BQ (28/07/2026). Medido em
     27/07 contra as 19 marcas que tinham a data preenchida na planilha: a data
@@ -69,8 +70,16 @@ DATASET = "vestilake_BI"
 DS = f"`{PROJECT}.{DATASET}`"
 
 TETO_PEDIDO = 1_000_000        # acima disso e lixo de origem, nao venda
-JANELA_DIAS = 30               # quanto tempo pra tras procuramos "loja nova"
 MARCO_PEDIDOS = 25             # o "25+" da aba 1
+
+# Loja com cadastro a partir daqui vira linha nova nas abas 1 e 3. E uma data
+# FIXA, nao uma janela movel (era "ultimos 30 dias" ate 28/07/2026): o roster
+# pedido pela Laura e "as marcas da planilha + as cadastradas a partir de
+# 24/07". Com janela movel o corte andava sozinho todo dia e o painel passava a
+# depender de quando rodou. As linhas que entraram antes desta data pela regra
+# antiga continuam no painel — foram mantidas de proposito (decisao de
+# 28/07/2026); a data vale daqui pra frente.
+DATA_CORTE_NOVAS = "2026-07-24"
 
 # A data de entrada da aba 1 vem do BQ? Desligado de proposito — veja o porque
 # em _aba1(): `entrada` (passagem de bastao) e `created_at` (cadastro do
@@ -224,9 +233,9 @@ def enriquecer(aba1, aba3, prev):
     marco_por_id = {m["id"]: m for m in marco}
     print(f"[bq] {len(lojas)} lojas, {len(idx)} nomes unicos, {len(gmv)} com GMV", flush=True)
 
-    hoje = datetime.date.today()
-    corte = hoje - datetime.timedelta(days=JANELA_DIAS)
+    corte = datetime.date.fromisoformat(DATA_CORTE_NOVAS)
     novas = [l for l in lojas if l.get("criada") and l["criada"] >= corte]
+    print(f"[bq] {len(novas)} loja(s) com cadastro a partir de {corte}", flush=True)
 
     aba1 = _aba1(aba1, novas, prev, idx, marco_por_id)
     aba3 = _aba3_com_gmv(aba3, novas, prev, idx, gmv_por_id)
@@ -252,8 +261,8 @@ def _aba1(aba1, novas, prev, idx, marco_por_id):
         substitui `entrada` e nao e exibido no painel (decisao de 28/07/2026);
         fica no dado para consulta. Ver abaixo o porque de nao substituir.
 
-    Linhas ja geradas antes (origem=bq no dashboard anterior) sao preservadas
-    mesmo depois de sair da janela de JANELA_DIAS.
+    Linhas ja geradas antes (origem=bq no dashboard anterior) sao preservadas,
+    inclusive as 8 que entraram com cadastro anterior a DATA_CORTE_NOVAS.
 
     Por que nao sobrescreve (medido em 27/07/2026): as duas datas nao sao a
     mesma coisa. `entrada` na planilha e quando a marca entrou na Passagem de
@@ -282,8 +291,12 @@ def _aba1(aba1, novas, prev, idx, marco_por_id):
         # medido a celula fica vazia, inclusive em quem nao casa por nome —
         # nao ha de onde tirar a data, e o valor herdado so envelhecia. Correcao
         # pontual continua possivel: o overlay de edicao vence sobre este campo.
-        if r.get("data25") and not r.get("data25_planilha"):
-            r["data25_planilha"] = r["data25"]
+        # `not in` e nao `not r.get(...)`: a chave e criada uma unica vez, mesmo
+        # valendo None. Se testasse o valor, a linha voltaria a ser "arquivavel"
+        # todo dia — e no dia em que o BQ nao devolvesse o marco, a data que ele
+        # mesmo mediu seria arquivada como se a CS a tivesse digitado.
+        if "data25_planilha" not in r:
+            r["data25_planilha"] = r.get("data25")
         if r.get("data25"):
             limpas += 1
         r["data25"] = None
