@@ -1,4 +1,4 @@
-name: TMP match apelidos relatoriocs2
+name: TMP match apelidos relatoriocs2 fase 2
 
 on:
   workflow_dispatch:
@@ -18,55 +18,41 @@ jobs:
       - name: Instalar dependencias
         run: pip install google-cloud-bigquery
 
-      - name: Procurar candidatos
+      - name: Buscar sem o filtro de modulo
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
         run: |
           cd relatoriocs2
           python - <<'PY'
-          import difflib, json, os, re, sys, tempfile, unicodedata
+          import sys
           sys.path.insert(0, ".")
           import bq_enrich as B
 
-          ALVOS = ["Art&Cor","Baubaki","Menina Moleka Kids","CVL",
-                   "Stick Lingerie - Grupo Strelisse","Elas charmosa","Clovis",
-                   "Dama Jeans","Surf Center Company",
-                   "V.E.M Vida e energia e movimento","Lazarf","Circow","Practory",
-                   "Amicca","Versally","Paty Lady","Bebela","Riquezzi Jeans",
-                   "Free Man","New Sun","Use Fortiori","Terceira Via Jeans",
-                   "Mishamna","Nino danielli","Tiffany Beach"]
+          # termo distintivo de cada marca que nao casou na fase 1
+          TERMOS = ["baubaki","moleka","charmosa","dama","surf center","lazarf",
+                    "circow","practory","amicca","amici","bebela","riquezzi",
+                    "free man","freeman","new sun","fortiori","terceira via",
+                    "danielli","tiffany"]
 
+          ors = " OR ".join(f"LOWER(d.name) LIKE '%{t}%'" for t in TERMOS)
+          SQL = f"""
+          SELECT CAST(d.ID AS STRING) id, d.name,
+                 CAST(d.modulos AS STRING) modulos,
+                 DATE(CAST(d.created_at AS TIMESTAMP)) criada,
+                 a.name anjo
+          FROM `{B.PROJECT}.{B.DATASET}`.odbc_domains d
+          LEFT JOIN `{B.PROJECT}.{B.DATASET}`.odbc_angels a
+                 ON CAST(a.id AS STRING) = CAST(d.angel_id AS STRING)
+          WHERE ({ors}) AND d.name IS NOT NULL
+          ORDER BY LOWER(d.name)
+          """
           c = B._client()
-          lojas = B._rows(c, B.SQL_LOJAS, "lojas")
-          gmv = {g["id"]: (g.get("p1") or 0)+(g.get("p2") or 0)+(g.get("p3") or 0)
-                 for g in B._rows(c, B.SQL_GMV, "GMV")}
-
-          def toks(s):
-              s = unicodedata.normalize("NFD", str(s or "").lower())
-              s = "".join(ch for ch in s if unicodedata.category(ch) != "Mn")
-              return set(t for t in re.split(r"[^a-z0-9]+", s) if len(t) > 2)
-
-          print("\n" + "=" * 70)
-          for alvo in ALVOS:
-              na, ta = B.norm(alvo), toks(alvo)
-              cands = []
-              for l in lojas:
-                  nl, tl = B.norm(l["name"]), toks(l["name"])
-                  if not nl:
-                      continue
-                  r = difflib.SequenceMatcher(None, na, nl).ratio()
-                  if na and nl and (na in nl or nl in na):
-                      r = max(r, 0.90)
-                  if ta and tl and (ta & tl):
-                      r = max(r, 0.60 + 0.30 * len(ta & tl) / max(len(ta), len(tl)))
-                  if r >= 0.55:
-                      cands.append((round(r, 3), l["name"], l["id"],
-                                    str(l.get("criada")), round(gmv.get(l["id"], 0))))
-              cands.sort(key=lambda x: (-x[0], -x[4]))
-              print(f"\n### {alvo}")
-              if not cands:
-                  print("   (nenhum candidato)")
-              for s, nome, i, criada, g in cands[:4]:
-                  print(f"   {s:5.3f}  {nome[:44]:44s} id={i:7s} {criada}  GMV={g}")
-          print("\n" + "=" * 70)
+          rows = B._rows(c, SQL, "dominios por termo, SEM filtro de modulo")
+          print("\n" + "=" * 78)
+          print(f"{len(rows)} dominio(s) encontrados\n")
+          for r in rows:
+              vendas = "VENDAS" if "vendas" in (r["modulos"] or "").lower() else "------"
+              print(f"  {vendas}  {str(r['name'])[:40]:40s} id={r['id']:8s} "
+                    f"{r['criada']}  anjo={r['anjo']}")
+          print("=" * 78)
           PY
