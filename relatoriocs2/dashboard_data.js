@@ -1,5 +1,5 @@
 window.CS2_DATA = {
- "gerado_em": "28/07/2026 12:47",
+ "gerado_em": "28/07/2026 14:52",
  "hoje": "2026-07-28",
  "bq": {
   "ok": true,
@@ -39,10 +39,12 @@ window.CS2_DATA = {
    "dias": 323,
    "implementador": "Tatiane",
    "cs": "Luana",
-   "data25": null,
+   "data25": "2025-10-24",
    "obs_orig": "Tino feito | MUDANÇAS NA PLANILHA",
    "status": "ativa",
-   "data25_planilha": null
+   "data25_planilha": null,
+   "cadastro_bq": "2023-02-13",
+   "pedidos_pagos": 1104
   },
   {
    "marca": "Pijamas - Lua Cheia",
@@ -62,10 +64,12 @@ window.CS2_DATA = {
    "dias": 301,
    "implementador": "Tatiane",
    "cs": "Gabriella Busto",
-   "data25": null,
+   "data25": "2025-10-30",
    "obs_orig": "CANCELADO",
    "status": "cancelada",
-   "data25_planilha": "2026-11-03"
+   "data25_planilha": "2026-11-03",
+   "cadastro_bq": "2025-09-26",
+   "pedidos_pagos": 26
   },
   {
    "marca": "Menina Moleka Kids",
@@ -73,10 +77,12 @@ window.CS2_DATA = {
    "dias": 300,
    "implementador": "Alexia",
    "cs": "Luana",
-   "data25": null,
+   "data25": "2025-10-27",
    "obs_orig": "CANCELADO",
    "status": "cancelada",
-   "data25_planilha": "2025-10-28"
+   "data25_planilha": "2025-10-28",
+   "cadastro_bq": "2025-09-26",
+   "pedidos_pagos": 33
   },
   {
    "marca": "CVL",
@@ -84,10 +90,12 @@ window.CS2_DATA = {
    "dias": 296,
    "implementador": "Tatiane",
    "cs": "Thamiris",
-   "data25": null,
+   "data25": "2026-01-05",
    "obs_orig": "",
    "status": "ativa",
-   "data25_planilha": "2026-03-19"
+   "data25_planilha": "2026-03-19",
+   "cadastro_bq": "2025-10-01",
+   "pedidos_pagos": 1555
   },
   {
    "marca": "Stick Lingerie - Grupo Strelisse",
@@ -95,10 +103,12 @@ window.CS2_DATA = {
    "dias": 294,
    "implementador": "Tatiane",
    "cs": "Luana",
-   "data25": null,
+   "data25": "2026-04-16",
    "obs_orig": "Tino feito",
    "status": "ativa",
-   "data25_planilha": "2026-05-05"
+   "data25_planilha": "2026-05-05",
+   "cadastro_bq": "2026-01-09",
+   "pedidos_pagos": 305
   },
   {
    "marca": "Fashion Noire",
@@ -119,10 +129,12 @@ window.CS2_DATA = {
    "dias": 275,
    "implementador": "Tatiane",
    "cs": "Gabriella Busto",
-   "data25": null,
+   "data25": "2025-11-18",
    "obs_orig": "",
    "status": "cancelada",
-   "data25_planilha": "2026-11-18"
+   "data25_planilha": "2026-11-18",
+   "cadastro_bq": "2025-10-21",
+   "pedidos_pagos": 84
   },
   {
    "marca": "Dona Charme",
@@ -244,10 +256,12 @@ window.CS2_DATA = {
    "dias": 237,
    "implementador": "Tatiane",
    "cs": "Thamiris",
-   "data25": null,
+   "data25": "2026-05-13",
    "obs_orig": "Ajustes de integração",
    "status": "sem_reuniao",
-   "data25_planilha": null
+   "data25_planilha": null,
+   "cadastro_bq": "2025-11-28",
+   "pedidos_pagos": 111
   },
   {
    "marca": "Dama Jeans",
@@ -258,7 +272,8 @@ window.CS2_DATA = {
    "data25": null,
    "obs_orig": "CHAMAR - ia integrar não vão mais",
    "status": "sem_reuniao",
-   "data25_planilha": null
+   "data25_planilha": null,
+   "cadastro_bq": "2025-12-15"
   },
   {
    "marca": "Surf Center Company",
@@ -269,7 +284,8 @@ window.CS2_DATA = {
    "data25": null,
    "obs_orig": "CANCELADO",
    "status": "cancelada",
-   "data25_planilha": null
+   "data25_planilha": null,
+   "cadastro_bq": "2023-12-19"
   },
   {
    "marca": "V.E.M Vida e energia e movimento",
@@ -280,7 +296,9 @@ window.CS2_DATA = {
    "data25": null,
    "obs_orig": "CANCELADO",
    "status": "cancelada",
-   "data25_planilha": null
+   "data25_planilha": null,
+   "cadastro_bq": "2026-01-20",
+   "pedidos_pagos": 12
   },
   {
    "marca": "Pigmento Jeans",
@@ -330,7 +348,8 @@ window.CS2_DATA = {
    "data25": null,
    "obs_orig": "CANCELADO",
    "status": "cancelada",
-   "data25_planilha": null
+   "data25_planilha": null,
+   "cadastro_bq": "2026-02-05"
   },
   {
    "marca": "Circow",
@@ -388,10 +407,12 @@ window.CS2_DATA = {
    "dias": 146,
    "implementador": "Alexia",
    "cs": "Luana",
-   "data25": null,
+   "data25": "2026-04-23",
    "obs_orig": "CANCELADO",
    "status": "cancelada",
-   "data25_planilha": "2026-04-23"
+   "data25_planilha": "2026-04-23",
+   "cadastro_bq": "2026-03-02",
+   "pedidos_pagos": 46
   },
   {
    "marca": "Yegrina",
@@ -460,10 +481,12 @@ window.CS2_DATA = {
    "dias": 98,
    "implementador": "Tatiane",
    "cs": "Gabriella Busto",
-   "data25": null,
+   "data25": "2026-05-27",
    "obs_orig": "Tati me passou hoje 22/07 já segui",
    "status": "ativa",
-   "data25_planilha": "2026-05-09"
+   "data25_planilha": "2026-05-09",
+   "cadastro_bq": "2026-04-16",
+   "pedidos_pagos": 159
   },
   {
    "marca": "Mya Collection",
@@ -558,10 +581,12 @@ window.CS2_DATA = {
    "dias": 59,
    "implementador": "Tatiane",
    "cs": "Luana",
-   "data25": null,
+   "data25": "2026-07-24",
    "obs_orig": "Taty pediu pra aguardar - marca está avançando nos pedidos",
    "status": "sem_reuniao",
-   "data25_planilha": null
+   "data25_planilha": null,
+   "cadastro_bq": "2026-05-26",
+   "pedidos_pagos": 27
   },
   {
    "marca": "Bebela",
@@ -572,7 +597,8 @@ window.CS2_DATA = {
    "data25": null,
    "obs_orig": "Falta o treinamento, Tati está marcando",
    "status": "sem_reuniao",
-   "data25_planilha": null
+   "data25_planilha": null,
+   "cadastro_bq": "2026-05-28"
   },
   {
    "marca": "Malu",
@@ -727,7 +753,8 @@ window.CS2_DATA = {
    "data25": null,
    "obs_orig": "CANCELADO",
    "status": "cancelada",
-   "data25_planilha": null
+   "data25_planilha": null,
+   "cadastro_bq": "2025-11-03"
   },
   {
    "marca": "Mishamna",
@@ -738,7 +765,9 @@ window.CS2_DATA = {
    "data25": null,
    "obs_orig": "",
    "status": "ativa",
-   "data25_planilha": null
+   "data25_planilha": null,
+   "cadastro_bq": "2025-08-07",
+   "pedidos_pagos": 1
   },
   {
    "marca": "Nino danielli",
@@ -749,7 +778,9 @@ window.CS2_DATA = {
    "data25": null,
    "obs_orig": "Alexia refez a implementação, estou acompanhando, cliente com dificuldade",
    "status": "ativa",
-   "data25_planilha": null
+   "data25_planilha": null,
+   "cadastro_bq": "2020-05-21",
+   "pedidos_pagos": 4
   },
   {
    "marca": "Tiffany Beach",
@@ -983,20 +1014,20 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "kelly_rodrigues_store",
-   "nome": "Kelly Rodrigues Store",
-   "created_at": "2026-03-31T00:51:59Z",
-   "last_login": "2026-07-08",
-   "dias_sem_acesso": 20,
-   "login_days": 5,
-   "status": "active"
-  },
-  {
    "company": "soror_clothing",
    "nome": "Soror Clothing",
    "created_at": "2026-06-01T17:32:33Z",
    "last_login": "2026-07-16",
    "dias_sem_acesso": 12,
+   "login_days": 5,
+   "status": "active"
+  },
+  {
+   "company": "kelly_rodrigues_store",
+   "nome": "Kelly Rodrigues Store",
+   "created_at": "2026-03-31T00:51:59Z",
+   "last_login": "2026-07-08",
+   "dias_sem_acesso": 20,
    "login_days": 5,
    "status": "active"
   },
@@ -1010,6 +1041,15 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
+   "company": "brytch_jeans",
+   "nome": "Brytch Jeans",
+   "created_at": "2026-07-13T16:15:21Z",
+   "last_login": "2026-07-28",
+   "dias_sem_acesso": 0,
+   "login_days": 4,
+   "status": "active"
+  },
+  {
    "company": "miss_misses",
    "nome": "Miss Misses",
    "created_at": "2026-07-03T16:06:17Z",
@@ -1019,29 +1059,11 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "black_jeans",
-   "nome": "Black Jeans",
-   "created_at": "2026-07-07T12:58:19Z",
-   "last_login": "2026-07-27",
-   "dias_sem_acesso": 1,
-   "login_days": 3,
-   "status": "active"
-  },
-  {
    "company": "conceito_mika",
    "nome": "Conceito Mika",
    "created_at": "2026-06-24T12:58:49Z",
    "last_login": "2026-07-24",
    "dias_sem_acesso": 4,
-   "login_days": 3,
-   "status": "active"
-  },
-  {
-   "company": "brytch_jeans",
-   "nome": "Brytch Jeans",
-   "created_at": "2026-07-13T16:15:21Z",
-   "last_login": "2026-07-25",
-   "dias_sem_acesso": 3,
    "login_days": 3,
    "status": "active"
   },
@@ -1055,12 +1077,21 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "stick_lingerie",
-   "nome": "Stick Lingerie",
-   "created_at": "2026-07-15T17:56:03Z",
+   "company": "nova_versao_roupas",
+   "nome": "Nova Versao Roupas",
+   "created_at": "2026-07-13T21:04:11Z",
    "last_login": "2026-07-28",
    "dias_sem_acesso": 0,
-   "login_days": 2,
+   "login_days": 3,
+   "status": "active"
+  },
+  {
+   "company": "black_jeans",
+   "nome": "Black Jeans",
+   "created_at": "2026-07-07T12:58:19Z",
+   "last_login": "2026-07-27",
+   "dias_sem_acesso": 1,
+   "login_days": 3,
    "status": "active"
   },
   {
@@ -1073,11 +1104,11 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "dolps",
-   "nome": "Dolps",
-   "created_at": "2026-03-08T22:07:26Z",
-   "last_login": "2026-07-27",
-   "dias_sem_acesso": 1,
+   "company": "ankor_design",
+   "nome": "Ankor Design",
+   "created_at": "2026-07-21T12:55:21Z",
+   "last_login": "2026-07-28",
+   "dias_sem_acesso": 0,
    "login_days": 2,
    "status": "active"
   },
@@ -1091,29 +1122,47 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "nova_versao_roupas",
-   "nome": "Nova Versao Roupas",
-   "created_at": "2026-07-13T21:04:11Z",
-   "last_login": "2026-07-22",
-   "dias_sem_acesso": 6,
+   "company": "stick_lingerie",
+   "nome": "Stick Lingerie",
+   "created_at": "2026-07-15T17:56:03Z",
+   "last_login": "2026-07-28",
+   "dias_sem_acesso": 0,
    "login_days": 2,
    "status": "active"
   },
   {
-   "company": "biotipo_jeans",
-   "nome": "Biotipo Jeans",
-   "created_at": "2026-06-29T14:57:22Z",
-   "last_login": "2026-07-07",
-   "dias_sem_acesso": 21,
+   "company": "dolps",
+   "nome": "Dolps",
+   "created_at": "2026-03-08T22:07:26Z",
+   "last_login": "2026-07-27",
+   "dias_sem_acesso": 1,
+   "login_days": 2,
+   "status": "active"
+  },
+  {
+   "company": "bolsas_bauarte_acessorios_da_moda_ltda",
+   "nome": "Bolsas Bauarte Acessorios Da Moda Ltda",
+   "created_at": "2026-05-22T20:24:35Z",
+   "last_login": "2026-07-06",
+   "dias_sem_acesso": 22,
    "login_days": 1,
    "status": "active"
   },
   {
-   "company": "gitaa",
-   "nome": "Gitaa",
-   "created_at": "2026-07-06T12:10:55Z",
-   "last_login": "2026-07-13",
-   "dias_sem_acesso": 15,
+   "company": "amofany",
+   "nome": "Amofany",
+   "created_at": "2026-06-09T15:20:02Z",
+   "last_login": "2026-07-15",
+   "dias_sem_acesso": 13,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "optimist_jeans",
+   "nome": "Optimist Jeans",
+   "created_at": "2026-07-13T21:19:10Z",
+   "last_login": "2026-07-15",
+   "dias_sem_acesso": 13,
    "login_days": 1,
    "status": "active"
   },
@@ -1127,20 +1176,56 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "john_cunningham",
-   "nome": "John Cunningham",
-   "created_at": "2026-07-13T16:23:46Z",
+   "company": "petit_enfant_confeccao_de_pecas_do_vestuario_ltda",
+   "nome": "Petit Enfant Confeccao De Pecas Do Vestuario Ltda",
+   "created_at": "2026-03-11T21:27:52Z",
+   "last_login": "2026-07-08",
+   "dias_sem_acesso": 20,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "alcance_jeans",
+   "nome": "Alcance Jeans",
+   "created_at": "2026-06-17T19:36:52Z",
+   "last_login": "2026-07-13",
+   "dias_sem_acesso": 15,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "gitaa",
+   "nome": "Gitaa",
+   "created_at": "2026-07-06T12:10:55Z",
+   "last_login": "2026-07-13",
+   "dias_sem_acesso": 15,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "biotipo_jeans",
+   "nome": "Biotipo Jeans",
+   "created_at": "2026-06-29T14:57:22Z",
+   "last_login": "2026-07-07",
+   "dias_sem_acesso": 21,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "zoe_sport",
+   "nome": "Zoe Sport",
+   "created_at": "2026-07-13T16:20:33Z",
    "last_login": "2026-07-14",
    "dias_sem_acesso": 14,
    "login_days": 1,
    "status": "active"
   },
   {
-   "company": "pijamas_lua_cheia",
-   "nome": "Pijamas Lua Cheia",
-   "created_at": "2026-07-17T14:46:52Z",
-   "last_login": "2026-07-27",
-   "dias_sem_acesso": 1,
+   "company": "john_cunningham",
+   "nome": "John Cunningham",
+   "created_at": "2026-07-13T16:23:46Z",
+   "last_login": "2026-07-14",
+   "dias_sem_acesso": 14,
    "login_days": 1,
    "status": "active"
   },
@@ -1154,9 +1239,18 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "bolsas_bauarte_acessorios_da_moda_ltda",
-   "nome": "Bolsas Bauarte Acessorios Da Moda Ltda",
-   "created_at": "2026-05-22T20:24:35Z",
+   "company": "pijamas_lua_cheia",
+   "nome": "Pijamas Lua Cheia",
+   "created_at": "2026-07-17T14:46:52Z",
+   "last_login": "2026-07-27",
+   "dias_sem_acesso": 1,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "brascol",
+   "nome": "Brascol",
+   "created_at": "2026-06-01T17:22:05Z",
    "last_login": "2026-07-06",
    "dias_sem_acesso": 22,
    "login_days": 1,
@@ -1172,90 +1266,9 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "amofany",
-   "nome": "Amofany",
-   "created_at": "2026-06-09T15:20:02Z",
-   "last_login": "2026-07-15",
-   "dias_sem_acesso": 13,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "zoe_sport",
-   "nome": "Zoe Sport",
-   "created_at": "2026-07-13T16:20:33Z",
-   "last_login": "2026-07-14",
-   "dias_sem_acesso": 14,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "alcance_jeans",
-   "nome": "Alcance Jeans",
-   "created_at": "2026-06-17T19:36:52Z",
-   "last_login": "2026-07-13",
-   "dias_sem_acesso": 15,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "brascol",
-   "nome": "Brascol",
-   "created_at": "2026-06-01T17:22:05Z",
-   "last_login": "2026-07-06",
-   "dias_sem_acesso": 22,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "petit_enfant_confeccao_de_pecas_do_vestuario_ltda",
-   "nome": "Petit Enfant Confeccao De Pecas Do Vestuario Ltda",
-   "created_at": "2026-03-11T21:27:52Z",
-   "last_login": "2026-07-08",
-   "dias_sem_acesso": 20,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "ankor_design",
-   "nome": "Ankor Design",
-   "created_at": "2026-07-21T12:55:21Z",
-   "last_login": "2026-07-23",
-   "dias_sem_acesso": 5,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "optimist_jeans",
-   "nome": "Optimist Jeans",
-   "created_at": "2026-07-13T21:19:10Z",
-   "last_login": "2026-07-15",
-   "dias_sem_acesso": 13,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "incentive",
-   "nome": "Incentive",
-   "created_at": "2026-05-06T20:20:17Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "rosa_fina",
-   "nome": "Rosa Fina",
-   "created_at": "2026-07-17T14:59:59Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "egoiste",
-   "nome": "Egoiste",
-   "created_at": "2026-06-09T15:20:02Z",
+   "company": "bella_fe",
+   "nome": "Bella Fe",
+   "created_at": "2026-05-29T15:35:18Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
@@ -1271,27 +1284,9 @@ window.CS2_DATA = {
    "status": "inactive"
   },
   {
-   "company": "menina_bonita",
-   "nome": "Menina Bonita",
-   "created_at": "2026-07-21T12:23:43Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "bella_fe",
-   "nome": "Bella Fe",
-   "created_at": "2026-05-29T15:35:18Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "barraca_do_willinha",
-   "nome": "Barraca Do Willinha",
-   "created_at": "2026-03-24T01:28:10Z",
+   "company": "crocker_jeans",
+   "nome": "Crocker Jeans",
+   "created_at": "2026-07-02T14:22:42Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
@@ -1325,6 +1320,33 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
+   "company": "rosa_fina",
+   "nome": "Rosa Fina",
+   "created_at": "2026-07-17T14:59:59Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "barraca_do_willinha",
+   "nome": "Barraca Do Willinha",
+   "created_at": "2026-03-24T01:28:10Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "egoiste",
+   "nome": "Egoiste",
+   "created_at": "2026-06-09T15:20:02Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
    "company": "santho_pano",
    "nome": "Santho Pano",
    "created_at": "2026-07-21T12:37:40Z",
@@ -1334,9 +1356,18 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "crocker_jeans",
-   "nome": "Crocker Jeans",
-   "created_at": "2026-07-02T14:22:42Z",
+   "company": "menina_bonita",
+   "nome": "Menina Bonita",
+   "created_at": "2026-07-21T12:23:43Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "incentive",
+   "nome": "Incentive",
+   "created_at": "2026-05-06T20:20:17Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
@@ -3885,10 +3916,10 @@ window.CS2_DATA = {
    "tino": null,
    "vestipago": null,
    "obs_orig": "",
-   "gmv_p1": null,
-   "gmv_p2": null,
-   "gmv_p3": null,
-   "bq_id": null
+   "gmv_p1": 285140.9,
+   "gmv_p2": 326347.0,
+   "gmv_p3": 27420.0,
+   "bq_id": "503164"
   },
   {
    "cs_tab": "Luana",
@@ -5462,10 +5493,10 @@ window.CS2_DATA = {
    "tino": null,
    "vestipago": null,
    "obs_orig": "",
-   "gmv_p1": null,
-   "gmv_p2": null,
-   "gmv_p3": null,
-   "bq_id": null
+   "gmv_p1": 285140.9,
+   "gmv_p2": 326347.0,
+   "gmv_p3": 27420.0,
+   "bq_id": "503164"
   },
   {
    "cs_tab": "Luana",
@@ -5785,10 +5816,10 @@ window.CS2_DATA = {
    "tino": null,
    "vestipago": null,
    "obs_orig": "",
-   "gmv_p1": null,
-   "gmv_p2": null,
+   "gmv_p1": 2001085.16,
+   "gmv_p2": 1891116.56,
    "gmv_p3": null,
-   "bq_id": null
+   "bq_id": "762147"
   },
   {
    "cs_tab": "Luana",
@@ -5994,10 +6025,10 @@ window.CS2_DATA = {
    "tino": null,
    "vestipago": null,
    "obs_orig": "",
-   "gmv_p1": null,
-   "gmv_p2": null,
-   "gmv_p3": null,
-   "bq_id": null
+   "gmv_p1": 1664859.75,
+   "gmv_p2": 1298139.81,
+   "gmv_p3": 575.6,
+   "bq_id": "1536130"
   },
   {
    "cs_tab": "Luana",
@@ -7137,7 +7168,7 @@ window.CS2_DATA = {
    "gmv_p1": null,
    "gmv_p2": null,
    "gmv_p3": null,
-   "bq_id": null
+   "bq_id": "198403"
   },
   {
    "cs_tab": "Thamiris",
@@ -7704,10 +7735,10 @@ window.CS2_DATA = {
    "tino": false,
    "vestipago": false,
    "obs_orig": "",
-   "gmv_p1": null,
-   "gmv_p2": null,
+   "gmv_p1": 6841.0,
+   "gmv_p2": 4054.6,
    "gmv_p3": null,
-   "bq_id": null
+   "bq_id": "70489"
   },
   {
    "cs_tab": "Thamiris",
