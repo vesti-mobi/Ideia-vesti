@@ -1,5 +1,5 @@
 window.CS2_DATA = {
- "gerado_em": "28/07/2026 12:29",
+ "gerado_em": "28/07/2026 12:47",
  "hoje": "2026-07-28",
  "bq": {
   "ok": true,
@@ -983,11 +983,11 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "blunt",
-   "nome": "Blunt",
-   "created_at": "2026-04-07T14:45:43Z",
-   "last_login": "2026-07-14",
-   "dias_sem_acesso": 14,
+   "company": "kelly_rodrigues_store",
+   "nome": "Kelly Rodrigues Store",
+   "created_at": "2026-03-31T00:51:59Z",
+   "last_login": "2026-07-08",
+   "dias_sem_acesso": 20,
    "login_days": 5,
    "status": "active"
   },
@@ -1001,11 +1001,11 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "kelly_rodrigues_store",
-   "nome": "Kelly Rodrigues Store",
-   "created_at": "2026-03-31T00:51:59Z",
-   "last_login": "2026-07-08",
-   "dias_sem_acesso": 20,
+   "company": "blunt",
+   "nome": "Blunt",
+   "created_at": "2026-04-07T14:45:43Z",
+   "last_login": "2026-07-14",
+   "dias_sem_acesso": 14,
    "login_days": 5,
    "status": "active"
   },
@@ -1028,20 +1028,20 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "brytch_jeans",
-   "nome": "Brytch Jeans",
-   "created_at": "2026-07-13T16:15:21Z",
-   "last_login": "2026-07-25",
-   "dias_sem_acesso": 3,
-   "login_days": 3,
-   "status": "active"
-  },
-  {
    "company": "conceito_mika",
    "nome": "Conceito Mika",
    "created_at": "2026-06-24T12:58:49Z",
    "last_login": "2026-07-24",
    "dias_sem_acesso": 4,
+   "login_days": 3,
+   "status": "active"
+  },
+  {
+   "company": "brytch_jeans",
+   "nome": "Brytch Jeans",
+   "created_at": "2026-07-13T16:15:21Z",
+   "last_login": "2026-07-25",
+   "dias_sem_acesso": 3,
    "login_days": 3,
    "status": "active"
   },
@@ -1052,6 +1052,15 @@ window.CS2_DATA = {
    "last_login": "2026-07-24",
    "dias_sem_acesso": 4,
    "login_days": 3,
+   "status": "active"
+  },
+  {
+   "company": "stick_lingerie",
+   "nome": "Stick Lingerie",
+   "created_at": "2026-07-15T17:56:03Z",
+   "last_login": "2026-07-28",
+   "dias_sem_acesso": 0,
+   "login_days": 2,
    "status": "active"
   },
   {
@@ -1069,15 +1078,6 @@ window.CS2_DATA = {
    "created_at": "2026-03-08T22:07:26Z",
    "last_login": "2026-07-27",
    "dias_sem_acesso": 1,
-   "login_days": 2,
-   "status": "active"
-  },
-  {
-   "company": "stick_lingerie",
-   "nome": "Stick Lingerie",
-   "created_at": "2026-07-15T17:56:03Z",
-   "last_login": "2026-07-28",
-   "dias_sem_acesso": 0,
    "login_days": 2,
    "status": "active"
   },
@@ -1100,92 +1100,11 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "john_jones_jeans_confeccoes_ltda",
-   "nome": "John Jones Jeans Confeccoes Ltda",
-   "created_at": "2026-06-12T15:20:57Z",
-   "last_login": "2026-07-02",
-   "dias_sem_acesso": 26,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "pijamas_lua_cheia",
-   "nome": "Pijamas Lua Cheia",
-   "created_at": "2026-07-17T14:46:52Z",
-   "last_login": "2026-07-27",
-   "dias_sem_acesso": 1,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "bolsas_bauarte_acessorios_da_moda_ltda",
-   "nome": "Bolsas Bauarte Acessorios Da Moda Ltda",
-   "created_at": "2026-05-22T20:24:35Z",
-   "last_login": "2026-07-06",
-   "dias_sem_acesso": 22,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "alcance_jeans",
-   "nome": "Alcance Jeans",
-   "created_at": "2026-06-17T19:36:52Z",
-   "last_login": "2026-07-13",
-   "dias_sem_acesso": 15,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "brascol",
-   "nome": "Brascol",
-   "created_at": "2026-06-01T17:22:05Z",
-   "last_login": "2026-07-06",
-   "dias_sem_acesso": 22,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "john_cunningham",
-   "nome": "John Cunningham",
-   "created_at": "2026-07-13T16:23:46Z",
-   "last_login": "2026-07-14",
-   "dias_sem_acesso": 14,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "petit_enfant_confeccao_de_pecas_do_vestuario_ltda",
-   "nome": "Petit Enfant Confeccao De Pecas Do Vestuario Ltda",
-   "created_at": "2026-03-11T21:27:52Z",
-   "last_login": "2026-07-08",
-   "dias_sem_acesso": 20,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "maria_chica",
-   "nome": "Maria Chica",
-   "created_at": "2026-05-13T13:20:32Z",
-   "last_login": "2026-07-15",
-   "dias_sem_acesso": 13,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "optimist_jeans",
-   "nome": "Optimist Jeans",
-   "created_at": "2026-07-13T21:19:10Z",
-   "last_login": "2026-07-15",
-   "dias_sem_acesso": 13,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "tricomix",
-   "nome": "Tricomix",
-   "created_at": "2026-06-10T19:16:10Z",
-   "last_login": "2026-07-21",
-   "dias_sem_acesso": 7,
+   "company": "biotipo_jeans",
+   "nome": "Biotipo Jeans",
+   "created_at": "2026-06-29T14:57:22Z",
+   "last_login": "2026-07-07",
+   "dias_sem_acesso": 21,
    "login_days": 1,
    "status": "active"
   },
@@ -1199,20 +1118,56 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "ankor_design",
-   "nome": "Ankor Design",
-   "created_at": "2026-07-21T12:55:21Z",
-   "last_login": "2026-07-23",
-   "dias_sem_acesso": 5,
+   "company": "maria_chica",
+   "nome": "Maria Chica",
+   "created_at": "2026-05-13T13:20:32Z",
+   "last_login": "2026-07-15",
+   "dias_sem_acesso": 13,
    "login_days": 1,
    "status": "active"
   },
   {
-   "company": "biotipo_jeans",
-   "nome": "Biotipo Jeans",
-   "created_at": "2026-06-29T14:57:22Z",
-   "last_login": "2026-07-07",
-   "dias_sem_acesso": 21,
+   "company": "john_cunningham",
+   "nome": "John Cunningham",
+   "created_at": "2026-07-13T16:23:46Z",
+   "last_login": "2026-07-14",
+   "dias_sem_acesso": 14,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "pijamas_lua_cheia",
+   "nome": "Pijamas Lua Cheia",
+   "created_at": "2026-07-17T14:46:52Z",
+   "last_login": "2026-07-27",
+   "dias_sem_acesso": 1,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "john_jones_jeans_confeccoes_ltda",
+   "nome": "John Jones Jeans Confeccoes Ltda",
+   "created_at": "2026-06-12T15:20:57Z",
+   "last_login": "2026-07-02",
+   "dias_sem_acesso": 26,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "bolsas_bauarte_acessorios_da_moda_ltda",
+   "nome": "Bolsas Bauarte Acessorios Da Moda Ltda",
+   "created_at": "2026-05-22T20:24:35Z",
+   "last_login": "2026-07-06",
+   "dias_sem_acesso": 22,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "tricomix",
+   "nome": "Tricomix",
+   "created_at": "2026-06-10T19:16:10Z",
+   "last_login": "2026-07-21",
+   "dias_sem_acesso": 7,
    "login_days": 1,
    "status": "active"
   },
@@ -1235,18 +1190,99 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "crocker_jeans",
-   "nome": "Crocker Jeans",
-   "created_at": "2026-07-02T14:22:42Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
+   "company": "alcance_jeans",
+   "nome": "Alcance Jeans",
+   "created_at": "2026-06-17T19:36:52Z",
+   "last_login": "2026-07-13",
+   "dias_sem_acesso": 15,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "brascol",
+   "nome": "Brascol",
+   "created_at": "2026-06-01T17:22:05Z",
+   "last_login": "2026-07-06",
+   "dias_sem_acesso": 22,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "petit_enfant_confeccao_de_pecas_do_vestuario_ltda",
+   "nome": "Petit Enfant Confeccao De Pecas Do Vestuario Ltda",
+   "created_at": "2026-03-11T21:27:52Z",
+   "last_login": "2026-07-08",
+   "dias_sem_acesso": 20,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "ankor_design",
+   "nome": "Ankor Design",
+   "created_at": "2026-07-21T12:55:21Z",
+   "last_login": "2026-07-23",
+   "dias_sem_acesso": 5,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "optimist_jeans",
+   "nome": "Optimist Jeans",
+   "created_at": "2026-07-13T21:19:10Z",
+   "last_login": "2026-07-15",
+   "dias_sem_acesso": 13,
+   "login_days": 1,
    "status": "active"
   },
   {
    "company": "incentive",
    "nome": "Incentive",
    "created_at": "2026-05-06T20:20:17Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "rosa_fina",
+   "nome": "Rosa Fina",
+   "created_at": "2026-07-17T14:59:59Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "egoiste",
+   "nome": "Egoiste",
+   "created_at": "2026-06-09T15:20:02Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "cvl_moda",
+   "nome": "Cvl Moda",
+   "created_at": "2026-03-11T21:10:09Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "inactive"
+  },
+  {
+   "company": "menina_bonita",
+   "nome": "Menina Bonita",
+   "created_at": "2026-07-21T12:23:43Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "bella_fe",
+   "nome": "Bella Fe",
+   "created_at": "2026-05-29T15:35:18Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
@@ -1271,51 +1307,6 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "egoiste",
-   "nome": "Egoiste",
-   "created_at": "2026-06-09T15:20:02Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "bella_fe",
-   "nome": "Bella Fe",
-   "created_at": "2026-05-29T15:35:18Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "rosa_fina",
-   "nome": "Rosa Fina",
-   "created_at": "2026-07-17T14:59:59Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "santho_pano",
-   "nome": "Santho Pano",
-   "created_at": "2026-07-21T12:37:40Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "cvl_moda",
-   "nome": "Cvl Moda",
-   "created_at": "2026-03-11T21:10:09Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "inactive"
-  },
-  {
    "company": "bella_donna",
    "nome": "Bella Donna",
    "created_at": "2026-05-04T21:13:55Z",
@@ -1334,9 +1325,18 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "menina_bonita",
-   "nome": "Menina Bonita",
-   "created_at": "2026-07-21T12:23:43Z",
+   "company": "santho_pano",
+   "nome": "Santho Pano",
+   "created_at": "2026-07-21T12:37:40Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "crocker_jeans",
+   "nome": "Crocker Jeans",
+   "created_at": "2026-07-02T14:22:42Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
