@@ -65,6 +65,18 @@ jobs:
           python fetch_invoices.py
           touch "$GITHUB_WORKSPACE/.cr_updated"
 
+      - name: Corrigir nomes de marca no dados.js (CP)
+        # O CP (fetch_data.py) resolve o nome da marca lendo o invoices.js que
+        # JA estava no repo, e roda ANTES do fetch_invoices.py. Marca cujo
+        # primeiro pedido Starkbank e recente ainda nao esta nesse invoices.js
+        # antigo e sai com nomeFantasia="" — o painel entao mostra o companyId
+        # cru (index.html faz `nomeFantasia || companyId`). Caso: Sisal Jeans
+        # em 28/07/2026. Aqui, com o invoices.js ja atualizado, reaplicamos os
+        # nomes. Nao aborta o job: e cosmetico, o proximo run resolveria.
+        continue-on-error: true
+        working-directory: relatoriostarkbank
+        run: python patch_nomes.py
+
       # (removido) "Reconciliar antecipacao real": era um remendo da era Fabric
       # pra corrigir a classificacao Fluxo/Antecipacao. Agora o CP ja vem da API
       # com antecipationValue por parcela, e o build() classifica direto
