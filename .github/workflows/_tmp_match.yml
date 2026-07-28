@@ -28,13 +28,18 @@ jobs:
           sys.path.insert(0, ".")
           import bq_enrich as B
 
-          # termo distintivo de cada marca que nao casou na fase 1
-          TERMOS = ["baubaki","moleka","charmosa","dama","surf center","lazarf",
-                    "circow","practory","amicca","amici","bebela","riquezzi",
-                    "free man","freeman","new sun","fortiori","terceira via",
-                    "danielli","tiffany"]
-
-          ors = " OR ".join(f"LOWER(d.name) LIKE '%{t}%'" for t in TERMOS)
+          # marca da planilha -> termo distintivo (o suficiente p/ nao pegar CPF)
+          ALVOS = {
+              "Baubaki": "baubaki", "Menina Moleka Kids": "moleka",
+              "Elas charmosa": "elas charm", "Dama Jeans": "dama jeans",
+              "Surf Center Company": "surf center", "Lazarf": "lazarf",
+              "Circow": "circow", "Practory": "practory", "Amicca": "amicca",
+              "Bebela": "bebela", "Riquezzi Jeans": "riquezzi",
+              "Free Man": "free man", "New Sun": "new sun",
+              "Use Fortiori": "fortiori", "Terceira Via Jeans": "terceira via",
+              "Nino danielli": "nino dani", "Tiffany Beach": "tiffany bea",
+          }
+          ors = " OR ".join(f"LOWER(d.name) LIKE '%{t}%'" for t in ALVOS.values())
           SQL = f"""
           SELECT CAST(d.ID AS STRING) id, d.name,
                  CAST(d.modulos AS STRING) modulos,
@@ -46,13 +51,15 @@ jobs:
           WHERE ({ors}) AND d.name IS NOT NULL
           ORDER BY LOWER(d.name)
           """
-          c = B._client()
-          rows = B._rows(c, SQL, "dominios por termo, SEM filtro de modulo")
+          rows = B._rows(B._client(), SQL, "dominios por termo, SEM filtro de modulo")
           print("\n" + "=" * 78)
-          print(f"{len(rows)} dominio(s) encontrados\n")
-          for r in rows:
-              vendas = "VENDAS" if "vendas" in (r["modulos"] or "").lower() else "------"
-              print(f"  {vendas}  {str(r['name'])[:40]:40s} id={r['id']:8s} "
-                    f"{r['criada']}  anjo={r['anjo']}")
-          print("=" * 78)
+          print(f"{len(rows)} dominio(s) encontrados no total\n")
+          for marca, termo in ALVOS.items():
+              hits = [r for r in rows if termo in str(r["name"]).lower()]
+              print(f"\n### {marca}   (termo: {termo!r}) -> {len(hits)} hit(s)")
+              for r in hits[:6]:
+                  vendas = "VENDAS" if "vendas" in (r["modulos"] or "").lower() else "------"
+                  print(f"   {vendas}  {str(r['name'])[:40]:40s} id={r['id']:8s} "
+                        f"{r['criada']}  anjo={r['anjo']}")
+          print("\n" + "=" * 78)
           PY
