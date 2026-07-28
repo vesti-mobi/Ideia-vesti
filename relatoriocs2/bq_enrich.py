@@ -297,8 +297,10 @@ def _aba1(aba1, novas, prev, idx, marco_por_id):
         # mesmo mediu seria arquivada como se a CS a tivesse digitado.
         if "data25_planilha" not in r:
             r["data25_planilha"] = r.get("data25")
-        if r.get("data25"):
-            limpas += 1
+            if r["data25_planilha"]:
+                limpas += 1   # so conta arquivamento de verdade: depois que a
+                              # chave existe, o que se apaga aqui e a data que o
+                              # proprio BQ escreveu na execucao anterior
         r["data25"] = None
 
         loja = idx.get(norm(r.get("marca")))
@@ -318,9 +320,9 @@ def _aba1(aba1, novas, prev, idx, marco_por_id):
             # sem 25 pedidos ainda: sem data, mas registra quantos ja tem
             r["pedidos_pagos"] = m.get("pedidos")
 
+    arquivo = f", {limpas} data(s) da planilha arquivada(s)" if limpas else ""
     print(f"[bq] aba1: {casou} casaram com o cadastro, {com_marco} com data de "
-          f"{MARCO_PEDIDOS}o pedido pago ({limpas} vinham da planilha, agora so "
-          f"em data25_planilha); +{add} loja(s) nova(s) "
+          f"{MARCO_PEDIDOS}o pedido pago{arquivo}; +{add} loja(s) nova(s) "
           f"(mantidas {mantidas} de execucoes anteriores)", flush=True)
     return aba1
 
