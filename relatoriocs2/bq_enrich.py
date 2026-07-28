@@ -26,6 +26,12 @@ DECISOES QUE VALEM A PENA SABER (medidas no BQ em 24 e 27/07/2026):
     com zero: zero seria afirmar que ela nao vendeu, e o que houve foi so nao
     ter achado o cadastro.
 
+  * O cadastro e procurado em dois passos. Primeiro entre as LOJAS (dominio com
+    modulo de vendas); quem sobra vai para _complemento(), que busca o nome
+    exato no cadastro inteiro — 10 das 25 marcas sem match em 28/07 estavam
+    cadastradas com o nome identico, so que sem o modulo de vendas. Para as que
+    tem grafia diferente mesmo (Art&Cor x "ART E COR") existe o mapa APELIDOS.
+
   * Marca que nao casa por nome MANTEM a data de entrada da planilha. Nao casar
     nao prova que a data esta errada — so que nao achamos o cadastro. Mesmo
     principio do GMV e da coluna Tino.
@@ -104,6 +110,30 @@ CS_ABA3 = {
     "gabriella busto": "Busto",
     "luana coutinho": "Luana",
     "thamiris ribeiro": "Thamiris",
+}
+
+
+# Marca cujo nome na planilha nao bate com o do cadastro. Mapeia
+# norm(nome na planilha) -> ID do dominio (o ID e estavel; o nome muda).
+# Levantado em 28/07/2026 comparando nome e data: a data de entrada da planilha
+# caiu em cima da data de cadastro em quase todos (Clovis exato, CVL 1 dia,
+# Versally exato, Paty Lady 1 dia, V.E.M 1 dia, Bebela 1 dia).
+APELIDOS = {
+    "artcor":                     "928822",   # ART E COR
+    "cvl":                        "1805647",  # CVL Moda
+    "sticklingeriegrupostrelisse": "1924064", # Stick Lingerie (2 cadastros; este
+                                              # e o que tem as vendas — o outro,
+                                              # 1808051, esta zerado)
+    "clovis":                     "1880528",  # Clovis Calcados
+    "vemvidaeenergiaemovimento":  "1934991",  # Use Vem - Vida e Energia e Movimento
+    "versally":                   "2018982",  # Versally Lingerie
+    "patylady":                   "2066732",  # Paty Lady Jeans
+    "mishamna":                   "1739788",  # MISHAMNA BRASIL
+    "surfcentercompany":          "1189766",  # Surf Center
+    "bebela":                     "2069390",  # Bebela Jeans (e nao "Bebela closet",
+                                              # de 2019: a entrada e 27/05/2026 e
+                                              # este cadastro e de 28/05/2026)
+    "ninodanielli":               "126149",   # Nino Danieli
 }
 
 
@@ -198,15 +228,87 @@ def norm_nome_anjo(a):
 def _indice_lojas(lojas, gmv):
     """norm(nome) -> loja. Nome repetido entre lojas e ambiguo: fica a que mais
     vendeu (a outra costuma ser cadastro morto homonimo)."""
+    return _merge_idx({}, lojas, gmv)
+
+
+def _merge_idx(idx, lojas, gmv):
+    """Acrescenta lojas ao indice sem derrubar chave que ja existe. Entre duas
+    candidatas novas para a mesma chave, fica a que mais vendeu."""
     total = {g["id"]: (g.get("p1") or 0) + (g.get("p2") or 0) + (g.get("p3") or 0) for g in gmv}
-    idx = {}
+    novas = {}
     for l in lojas:
         k = norm(l["name"])
-        if not k:
+        if not k or k in idx:
             continue
-        atual = idx.get(k)
+        atual = novas.get(k)
         if atual is None or total.get(l["id"], 0) > total.get(atual["id"], 0):
-            idx[k] = l
+            novas[k] = l
+    idx.update(novas)
+    return idx
+
+
+def _sql_norm(col):
+    """norm() do Python escrito em SQL — precisa dar exatamente o mesmo texto."""
+    return f"REGEXP_REPLACE(NORMALIZE(LOWER({col}), NFD), r'[^a-z0-9]', '')"
+
+
+def _complemento(client, idx, nomes_painel, gmv):
+    """Procura no cadastro as marcas do painel que nenhuma LOJA casou.
+
+    Por que existe (medido em 28/07/2026): SQL_LOJAS so olha dominio com modulo
+    de vendas, e 10 das 25 marcas sem match estavam cadastradas com o nome
+    IDENTICO ao da planilha, so que sem esse modulo — Baubaki, Menina Moleka
+    Kids, Elas Charmosa, Dama Jeans, Lazarf, Practory, Terceira Via Jeans. Nao
+    era diferenca de grafia, era o filtro. Aqui a busca e pelo nome exato das
+    marcas que faltam (mais os IDs do mapa APELIDOS), entao nao ha risco de
+    varrer o cadastro inteiro e casar com homonimo de pessoa fisica.
+
+    Isto NAO cria linha nova no painel: linha nova continua saindo so de
+    SQL_LOJAS. Serve para a marca que ja esta na planilha receber data25, GMV e
+    cadastro_bq.
+    """
+    faltam = sorted({n for n in nomes_painel if n and n not in idx})
+    ids = sorted(set(APELIDOS.values()))
+    if not faltam and not ids:
+        return idx
+
+    # norm() so produz [a-z0-9], entao interpolar aqui e seguro
+    cond = []
+    if faltam:
+        cond.append(f"{_sql_norm('d.name')} IN ({','.join(repr(n) for n in faltam)})")
+    if ids:
+        cond.append(f"CAST(d.ID AS STRING) IN ({','.join(repr(i) for i in ids)})")
+
+    sql = f"""
+    SELECT CAST(d.ID AS STRING) id, d.name,
+           DATE(CAST(d.created_at AS TIMESTAMP)) criada,
+           a.name anjo
+    FROM {DS}.odbc_domains d
+    LEFT JOIN {DS}.odbc_angels a ON CAST(a.id AS STRING) = CAST(d.angel_id AS STRING)
+    WHERE ({' OR '.join(cond)})
+      AND d.name IS NOT NULL
+      AND LOWER(d.name) NOT LIKE '%teste%'
+    """
+    try:
+        achados = _rows(client, sql, f"cadastro de {len(faltam)} marca(s) fora do "
+                                     f"modulo de vendas + {len(ids)} apelido(s)")
+    except Exception as e:
+        print(f"[bq] complemento falhou ({e}) — seguindo so com as lojas", flush=True)
+        return idx
+
+    antes = len(idx)
+    _merge_idx(idx, achados, gmv)
+    por_id = {l["id"]: l for l in achados}
+
+    # apelido e explicito: vence inclusive um match por nome ja existente
+    apel = 0
+    for chave, did in APELIDOS.items():
+        l = por_id.get(did)
+        if l:
+            idx[chave] = l
+            apel += 1
+    print(f"[bq] complemento: +{len(idx) - antes} por nome exato, {apel} por apelido "
+          f"(de {len(APELIDOS)} no mapa)", flush=True)
     return idx
 
 
@@ -232,6 +334,12 @@ def enriquecer(aba1, aba3, prev):
     gmv_por_id = {g["id"]: g for g in gmv}
     marco_por_id = {m["id"]: m for m in marco}
     print(f"[bq] {len(lojas)} lojas, {len(idx)} nomes unicos, {len(gmv)} com GMV", flush=True)
+
+    # marcas do painel que nenhuma loja casou: procura o cadastro sem exigir o
+    # modulo de vendas (e aplica o mapa de apelidos)
+    nomes_painel = ([norm(r.get("marca")) for r in aba1] +
+                    [norm(r.get("empresa")) for r in aba3])
+    idx = _complemento(client, idx, nomes_painel, gmv)
 
     corte = datetime.date.fromisoformat(DATA_CORTE_NOVAS)
     novas = [l for l in lojas if l.get("criada") and l["criada"] >= corte]
