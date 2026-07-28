@@ -1,5 +1,5 @@
 // Saldos Starkbank (gerado por fetch_saldos.py)
-window.SALDO_GERADO_EM = "2026-07-28T08:00:34";
+window.SALDO_GERADO_EM = "2026-07-28T08:50:45";
 window.SALDO_VESTIPAGO = 60924.36;
 window.SALDO_TOTAL_MARCAS = 2398.19;
 window.SALDOS = {
