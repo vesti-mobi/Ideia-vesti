@@ -1205,7 +1205,7 @@ window.CNPJ_MARCAS = (function(){
         "nany borges moda feminina":                         "18.204.090/0001-06",
         "naos sport":                                        "41.549.988/0001-20",
         "nari fashion":                                      "64.148.422/0001-91",
-        "nasmah":                                            "42339602000118",
+        "nasmah":                                            "42.339.602/0001-18",
         "nasmah filial":                                     "42.339.602/0001-18",
         "natal 1":                                           "13.649.755/0010-54",
         "natal 3":                                           "13.649.755/0067-90",

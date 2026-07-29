@@ -1,7 +1,7 @@
 {
   "_leia": "Fonte da verdade das contas das marcas (CNPJ, razao social, chave PIX). Editado pelo painel StarkBank / celular (app stark-admin). Os 3 arquivos pix_marcas.js, cnpj_marcas.js e razao_marcas.js sao GERADOS a partir daqui — nao edite eles na mao.",
-  "atualizadoEm": "2026-07-28T12:41:24.160Z",
-  "atualizadoPor": "painel",
+  "atualizadoEm": "2026-07-29T16:36:52.338Z",
+  "atualizadoPor": "celular",
   "marcas": {
     "2 wave": {
       "pix": "",
@@ -6018,9 +6018,11 @@
       "razao": "CONFECCOES NARI FASHION LTDA"
     },
     "nasmah": {
-      "pix": "42339602000118",
-      "cnpj": "42339602000118",
-      "razao": "GOLDEN STYLE VESTUARIO LTDA"
+      "pix": "contatonasmah@gmail.com",
+      "cnpj": "42.339.602/0001-18",
+      "razao": "GOLDEN STYLE VESTUARIO LTDA",
+      "editadoEm": "2026-07-29T16:36:52.338Z",
+      "origem": "celular"
     },
     "nasmah filial": {
       "pix": "",

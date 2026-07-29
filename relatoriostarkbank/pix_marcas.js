@@ -175,7 +175,7 @@ window.PIX_MARCAS = (function(){
         "mundo boho":                                        "32084423000123",
         "myllena":                                           "42158482000152",
         "n bloom var":                                       "17820490000841",
-        "nasmah":                                            "42339602000118",
+        "nasmah":                                            "contatonasmah@gmail.com",
         "nick atacado":                                      "44839916000105",
         "nicky atacado":                                     "44839916000105",
         "nono modas":                                        "34329403000109",
