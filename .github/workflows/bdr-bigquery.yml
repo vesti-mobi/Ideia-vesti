@@ -1,0 +1,35 @@
+name: Atualizar BDR no BigQuery
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 03:00 BRT
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias Python
+        run: pip install pandas requests google-cloud-bigquery pyarrow
+
+      - name: Gravar credencial BigQuery (SA key)
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
+
+      # Sem commit/push: o script so escreve na tabela
+      # vesti-data-499015.vestilake_BI.bdr (DELETE do intervalo + INSERT).
+      - name: Atualizar bdr a partir da API da BDR Asset
+        working-directory: PainelElisa
+        env:
+          BDR_USER: ${{ secrets.BDR_USER }}
+          BDR_PASS: ${{ secrets.BDR_PASS }}
+        run: python _bdr_to_bq.py
