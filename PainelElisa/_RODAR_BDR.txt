@@ -1,0 +1,95 @@
+========================================================================
+BDR -> BigQuery : FEITO em 06/08/2026
+========================================================================
+A tabela vesti-data-499015.vestilake_BI.bdr JA EXISTE e ja esta carregada:
+  213.475 linhas | 2025-01-01 -> 2026-08-06
+  particionada por dt_ref, clusterizada por company_id
+
+E a particao BDR do PBIX "Metricas VestiPago" JA foi reapontada para o
+BigQuery (as etapas "Valor Vesti" e "Semana" foram preservadas).
+
+
+------------------------------------------------------------------------
+O QUE VOCE PRECISA FAZER AGORA
+------------------------------------------------------------------------
+1) No Power BI Desktop (Metricas VestiPago): Atualizar (Refresh) a tabela
+   BDR e SALVAR o .pbix. Enquanto nao salvar, a mudanca so existe na
+   sessao aberta.
+
+2) Daqui pra frente, atualizar o BDR no BigQuery com:
+
+   cd C:\Users\Laura\Projetos\Ideia-vesti\PainelElisa
+   py _bdr_to_bq.py
+
+   Busca a API da BDR Asset (janela rolante de ~2 meses), descarta o dia
+   mais antigo (vem parcial, mesma regra do notebook do Fabric) e regrava
+   esse intervalo no BQ. Idempotente: rodar 2x nao duplica.
+   NAO precisa de Azure/Fabric - so API + BigQuery.
+
+
+------------------------------------------------------------------------
+COMO FOI FEITA A CARGA INICIAL (para referencia)
+------------------------------------------------------------------------
+O plano original era ler o historico do warehouse VestiHouse (Fabric),
+mas a CAPACIDADE FABRIC ESTA PAUSADA:
+   "Unable to complete the action because this Fabric capacity is
+    currently not active" (erro 24800)
+e a subscription Azure aparece como "state": "Disabled" - ou seja, nem
+da' pra retomar a capacidade.
+
+Solucao: o historico foi extraido do PROPRIO MODELO do Power BI aberto
+(a tabela BDR ja estava importada em memoria, 207.003 linhas ate
+2026-06-08), via DAX/ADOMD, e concatenado com a janela da API:
+
+   py scratchpad\export_bdr.py 58304          # modelo PBI -> CSV
+   py _bdr_to_bq.py --seed-csv <csv>          # CSV + API -> BigQuery
+
+O script tem os dois caminhos: --seed-fabric (se a capacidade voltar) e
+--seed-csv (o que foi usado).
+
+
+------------------------------------------------------------------------
+RESSALVA: 2 DIAS FALTANDO
+------------------------------------------------------------------------
+O modelo (Fabric) parou em 2026-06-08 e a API so cobre de 2026-06-11 em
+diante. Logo faltam 09/06 e 10/06 de 2026 (~350 linhas estimadas).
+Nenhuma fonte disponivel hoje tem esses 2 dias.
+Se a capacidade Fabric for religada, da' pra tapar o buraco com:
+
+   py -c "import _bdr_to_bq as b, pandas as pd; d=b.fetch_fabric(); d=d[(d.dt_ref>=pd.Timestamp('2026-06-09').date())&(d.dt_ref<=pd.Timestamp('2026-06-10').date())]; b.load(b.bq_client(), d, False)"
+
+
+------------------------------------------------------------------------
+OBSERVACAO SOBRE DUPLICATAS
+------------------------------------------------------------------------
+Existem 252 grupos duplicados (275 linhas extras) por
+dt_ref+id_pedido+dt_vencimento+valor_onerado. Isso JA vinha assim do
+Fabric (sao linhas com id_pedido vazio) - nao foi introduzido pela
+migracao. Nao foi deduplicado para o numero continuar batendo com o que
+o painel mostrava antes.
+
+
+------------------------------------------------------------------------
+M DA PARTICAO BDR (ja aplicado no modelo)
+------------------------------------------------------------------------
+let
+    Fonte = GoogleBigQuery.Database([Implementation="2.0"]),
+    DB = Fonte{[Name="vesti-data-499015",Kind="Database"]}[Data],
+    Source = Value.NativeQuery(DB, "SELECT dt_ref, dt_pagamento, dt_vencimento, dt_pagamento_rebate, valor_onerado, valor_presente, valor_juros, taxa_juros, taxa_contabil, rebate, pct_rebate_juros, rebate_financeiro, id_pedido, company_id FROM `vesti-data-499015.vestilake_BI.bdr`"),
+    #"Tipo Alterado1" = Table.TransformColumnTypes(Source,{{"dt_ref", type date}, {"dt_pagamento", type date}, {"dt_vencimento", type date}, {"dt_pagamento_rebate", type date}, {"valor_onerado", type number}, {"valor_juros", type number}, {"valor_presente", type number}, {"taxa_juros", type number}, {"taxa_contabil", type number}, {"rebate", type number}, {"rebate_financeiro", type number}, {"pct_rebate_juros", type number}}),
+    #"Personalização Adicionada" = Table.AddColumn(#"Tipo Alterado1", "Valor Vesti", each [rebate]/[taxa_contabil]*[valor_juros]),
+    #"Coluna Duplicada" = Table.DuplicateColumn(#"Personalização Adicionada", "dt_ref", "dt_ref - Copiar"),
+    #"Semana do Ano Calculada" = Table.TransformColumns(#"Coluna Duplicada",{{"dt_ref - Copiar", Date.WeekOfYear, Int64.Type}}),
+    #"Colunas Renomeadas" = Table.RenameColumns(#"Semana do Ano Calculada",{{"dt_ref - Copiar", "Semana"}}),
+    #"Tipo Alterado2" = Table.TransformColumnTypes(#"Colunas Renomeadas",{{"Valor Vesti", type number}})
+in
+    #"Tipo Alterado2"
+
+
+------------------------------------------------------------------------
+CONFERENCIA NO BIGQUERY
+------------------------------------------------------------------------
+SELECT FORMAT_DATE('%Y-%m', dt_ref) mes, COUNT(*) linhas,
+       ROUND(SUM(valor_onerado),2) onerado, ROUND(SUM(rebate_financeiro),2) rebate
+FROM `vesti-data-499015.vestilake_BI.bdr`
+GROUP BY 1 ORDER BY 1
