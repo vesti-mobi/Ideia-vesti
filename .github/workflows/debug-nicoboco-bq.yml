@@ -1,0 +1,83 @@
+name: Debug Nicoboco BigQuery
+
+# Workflow DESCARTAVEL: so le o BigQuery e imprime no log. Nao escreve nada,
+# nem no BQ nem no repo. Apagar depois da investigacao.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  consulta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: pip install -q google-cloud-bigquery
+
+      - name: Gravar credencial BigQuery (SA key)
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
+
+      - name: Consultar
+        run: |
+          cat > /tmp/consulta.py <<'PY'
+          from google.cloud import bigquery
+
+          PROJ = "vesti-data-499015"
+          DS = "vestilake_BI"
+          cli = bigquery.Client(project=PROJ)
+
+          def q(sql):
+              return list(cli.query(sql).result())
+
+          print("=" * 70)
+          print("TABELAS DO DATASET")
+          print("=" * 70)
+          tabelas = [r[0] for r in q(f"""
+              SELECT table_name FROM `{PROJ}.{DS}.INFORMATION_SCHEMA.TABLES` ORDER BY table_name
+          """)]
+          print(", ".join(tabelas))
+
+          print()
+          print("=" * 70)
+          print("COLUNAS QUE PARECEM CNPJ / EMPRESA")
+          print("=" * 70)
+          cols = q(f"""
+              SELECT table_name, column_name, data_type
+              FROM `{PROJ}.{DS}.INFORMATION_SCHEMA.COLUMNS`
+              WHERE REGEXP_CONTAINS(LOWER(column_name), r'cnpj|document|company|domain|razao|fantasia|name')
+              ORDER BY table_name, column_name
+          """)
+          for r in cols:
+              print(f"  {r[0]}.{r[1]}  ({r[2]})")
+
+          # Onde procurar o CNPJ: toda tabela que tenha uma coluna com cara de CNPJ.
+          alvos = {}
+          for r in cols:
+              if "cnpj" in r[1].lower() or "document" in r[1].lower():
+                  alvos.setdefault(r[0], []).append(r[1])
+
+          print()
+          print("=" * 70)
+          print("BUSCA: CNPJ 67997537 (Nicoboco Shop) e nome LIKE nicoboco")
+          print("=" * 70)
+          for tab, colunas in alvos.items():
+              cond = " OR ".join(
+                  f"REGEXP_REPLACE(CAST({c} AS STRING), r'[^0-9]', '') LIKE '67997537%'" for c in colunas
+              )
+              try:
+                  linhas = q(f"SELECT * FROM `{PROJ}.{DS}.{tab}` WHERE {cond} LIMIT 20")
+              except Exception as e:
+                  print(f"  [{tab}] falhou: {str(e)[:150]}")
+                  continue
+              print(f"\n  --- {tab}: {len(linhas)} linha(s) com esse CNPJ")
+              for l in linhas:
+                  print("   ", dict(l))
+          PY
+          python /tmp/consulta.py
