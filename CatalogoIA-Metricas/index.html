@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<title>Catálogo IA — Métricas de uso</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:#F7F5FC;color:#2A1B45}
+  .top-bar{background:#fff;border-bottom:1px solid #EAE4F5;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .logo{font-family:'Manrope',sans-serif;font-size:22px;font-weight:800;color:#6D28D9}
+  .logo .accent{color:#A78BFA}
+  .sub{font-size:12.5px;color:#7A6E92;margin-top:2px}
+  .info{font-size:12px;color:#8B8398;text-align:right}
+  .container{max-width:1180px;margin:0 auto;padding:26px 20px 60px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:14px;margin-bottom:26px}
+  .kpi{background:#fff;border:1px solid #EAE4F5;border-radius:14px;padding:16px 18px}
+  .kpi .n{font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:#2A1B45;line-height:1.1}
+  .kpi .l{font-size:11.5px;color:#7A6E92;margin-top:5px;text-transform:uppercase;letter-spacing:.06em}
+  .kpi .h{font-size:11.5px;color:#A79FBC;margin-top:6px}
+  .kpi.destaque .n{color:#6D28D9}
+  .card{background:#fff;border:1px solid #EAE4F5;border-radius:14px;padding:20px 22px;margin-bottom:22px}
+  .card h2{font-family:'Manrope',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px}
+  .card .desc{font-size:12.5px;color:#7A6E92;margin-bottom:16px;line-height:1.55}
+  .graficos{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media(max-width:860px){.graficos{grid-template-columns:1fr}}
+  .wrap-tabela{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:760px}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#7A6E92;font-weight:600;padding:0 10px 10px;border-bottom:2px solid #EFEAF8;white-space:nowrap}
+  th.num,td.num{text-align:right}
+  td{padding:11px 10px;border-bottom:1px solid #F3EFFA}
+  tr:last-child td{border-bottom:none}
+  .marca{font-weight:600}
+  .arq{font-size:11.5px;color:#A79FBC;margin-top:2px}
+  .zero{color:#C4BDD4}
+  .selo{display:inline-block;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .s-ativa{background:#E6F7EE;color:#0E7C4A}
+  .s-parada{background:#FFF2E2;color:#B45309}
+  .s-nunca{background:#F4F2F8;color:#8B8398}
+  .s-testou{background:#FEF0F3;color:#BE123C}
+  .aprox{color:#A79FBC;font-weight:400}
+  .nota{font-size:12px;color:#7A6E92;line-height:1.65;background:#FBFAFE;border:1px solid #EFEAF8;border-radius:12px;padding:14px 16px}
+  .nota b{color:#2A1B45}
+  canvas{max-height:270px}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#2A1B45,#6D28D9)">
+  <div style="background:#fff;border-radius:16px;padding:40px;width:360px;box-shadow:0 8px 32px rgba(0,0,0,.2);text-align:center">
+    <div style="font-family:'Manrope',sans-serif;font-size:30px;font-weight:800;color:#6D28D9;margin-bottom:4px">Catálogo IA</div>
+    <div style="font-size:13px;color:#7A6E92;margin-bottom:28px">Métricas de uso</div>
+    <input type="password" id="loginPass" placeholder="Digite a senha..." style="width:100%;padding:12px 16px;border:2px solid #E5DFF0;border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;outline:none;margin-bottom:12px;text-align:center" onkeydown="if(event.key==='Enter')doLogin()">
+    <div id="loginError" style="color:#E11D48;font-size:12px;margin-bottom:12px;display:none">Senha incorreta</div>
+    <button onclick="doLogin()" style="width:100%;padding:12px;background:#6D28D9;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">Entrar</button>
+  </div>
+</div>
+
+<div id="dashContent" style="display:none">
+
+<div class="top-bar">
+  <div>
+    <div class="logo">Catálogo <span class="accent">IA</span></div>
+    <div class="sub">Métricas de uso por marca · Vesti</div>
+  </div>
+  <div class="info" id="cabecalho-info">—</div>
+</div>
+
+<div class="container">
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="graficos">
+    <div class="card">
+      <h2>Linha do tempo</h2>
+      <div class="desc">Produtos publicados por semana e crescimento da base de marcas cadastradas.</div>
+      <canvas id="g-tempo"></canvas>
+    </div>
+    <div class="card">
+      <h2>Marcas ativas</h2>
+      <div class="desc">Ativa = publicou 2 ou mais produtos na semana. "Deram sinal de vida" inclui quem só acessou ou gerou descrição sem publicar.</div>
+      <canvas id="g-ativas"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Uso por marca</h2>
+    <div class="desc">Ordenado por produtos publicados. "Descrições geradas" conta cada geração; "envios" conta cada publicação na Vesti (reenviar o mesmo produto até aprovar o texto continua sendo 1 produto).</div>
+    <div class="wrap-tabela">
+      <table>
+        <thead>
+          <tr>
+            <th>Marca</th>
+            <th class="num">Produtos publicados</th>
+            <th class="num">Últimos 7 dias</th>
+            <th class="num">Descrições geradas</th>
+            <th class="num">Envios</th>
+            <th>Último acesso</th>
+            <th>Situação</th>
+          </tr>
+        </thead>
+        <tbody id="tabela"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="nota" id="nota"></div>
+
+</div>
+</div><!-- /#dashContent -->
+
+<script>
+function doLogin(){
+  var pass = document.getElementById('loginPass').value;
+  if (pass === 'Mudar123'){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashContent').style.display = 'block';
+    sessionStorage.setItem('catalogoia_auth','1');
+    desenhar();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('loginPass').style.borderColor = '#E11D48';
+  }
+}
+</script>
+
+<script src="dados.js"></script>
+<script>
+var D = window.DADOS || null;
+var desenhado = false;
+
+function dataBR(iso){
+  if (!iso) return '—';
+  var s = String(iso).slice(0,10).split('-');
+  return s.length === 3 ? s[2]+'/'+s[1]+'/'+s[0] : '—';
+}
+function diaMes(iso){
+  var s = String(iso).slice(0,10).split('-');
+  return s.length === 3 ? s[2]+'/'+s[1] : iso;
+}
+// Quem gerou descrição e não publicou nada não é "nunca usou": é alguém que
+// testou o fluxo inteiro e parou antes de publicar. É o caso mais acionável da
+// tabela, então ganha rótulo próprio.
+function situacao(m, paradaDias){
+  if (!m.ultimo) return ['s-nunca','Nunca usou'];
+  if (m.envios === 0 && m.descricoes > 0 && m.produtos === 0) return ['s-testou','Testou, não publicou'];
+  if (m.ativa) return ['s-ativa','Ativa'];
+  if (m.dias !== null && m.dias > paradaDias) return ['s-parada','Parada há '+m.dias+' dias'];
+  return ['s-ativa','Em uso'];
+}
+
+function desenhar(){
+  if (desenhado || !D) return;
+  desenhado = true;
+
+  document.getElementById('cabecalho-info').innerHTML =
+    'Dados de <b>'+dataBR(D.gerado_em)+'</b><br>medindo desde '+dataBR(D.medindo_desde);
+
+  var k = D.kpis;
+  var cards = [
+    {n:k.produtos_total, l:'Produtos publicados', h:k.produtos_7d+' nos últimos 7 dias', destaque:true},
+    {n:k.descricoes_total, l:'Descrições geradas', h:'inclui as que não foram publicadas'},
+    {n:k.usando+'/'+k.liberadas, l:'Marcas que usaram', h:k.nunca_usaram+' liberadas nunca entraram'},
+    {n:k.ativas, l:'Ativas esta semana', h:D.criterio.produtos_semana+'+ produtos em 7 dias'},
+    {n:k.paradas, l:'Paradas', h:'sem toque há mais de '+D.criterio.dias_parada+' dias'},
+    {n:k.contas, l:'Contas cadastradas', h:k.com_conta+' marcas com conta'}
+  ];
+  document.getElementById('kpis').innerHTML = cards.map(function(c){
+    return '<div class="kpi'+(c.destaque?' destaque':'')+'"><div class="n">'+c.n+'</div><div class="l">'+c.l+'</div><div class="h">'+c.h+'</div></div>';
+  }).join('');
+
+  document.getElementById('tabela').innerHTML = D.marcas.map(function(m){
+    var s = situacao(m, D.criterio.dias_parada);
+    var num = function(v){ return v ? v : '<span class="zero">0</span>'; };
+    return '<tr>'
+      + '<td><div class="marca">'+m.nome+'</div>'+(m.arquetipo?'<div class="arq">'+m.arquetipo+'</div>':'')+'</td>'
+      + '<td class="num">'+(m.estimado&&m.produtos?'<span class="aprox">≈</span> ':'')+num(m.produtos)+'</td>'
+      + '<td class="num">'+num(m.produtos_7d)+'</td>'
+      + '<td class="num">'+num(m.descricoes)+'</td>'
+      + '<td class="num">'+num(m.envios)+'</td>'
+      + '<td>'+dataBR(m.ultimo)+'</td>'
+      + '<td><span class="selo '+s[0]+'">'+s[1]+'</span></td>'
+      + '</tr>';
+  }).join('');
+
+  var rotulos = D.semanas.map(function(s){ return diaMes(s.inicio); });
+
+  new Chart(document.getElementById('g-tempo'), {
+    type:'line',
+    data:{ labels:rotulos, datasets:[
+      {label:'Produtos publicados', data:D.semanas.map(function(s){return s.produtos}), borderColor:'#6D28D9', backgroundColor:'rgba(109,40,217,.10)', fill:true, tension:.3, pointRadius:3},
+      {label:'Marcas cadastradas (acumulado)', data:D.semanas.map(function(s){return s.cadastros}), borderColor:'#C4B5FD', borderDash:[5,4], fill:false, tension:.3, pointRadius:2, yAxisID:'y1'}
+    ]},
+    options:{ responsive:true, interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}},
+      scales:{ y:{beginAtZero:true, ticks:{precision:0}, title:{display:true,text:'produtos',font:{size:10}}},
+               y1:{beginAtZero:true, position:'right', grid:{drawOnChartArea:false}, ticks:{precision:0}, title:{display:true,text:'marcas',font:{size:10}}} } }
+  });
+
+  new Chart(document.getElementById('g-ativas'), {
+    type:'bar',
+    data:{ labels:rotulos, datasets:[
+      {label:'Ativas ('+D.criterio.produtos_semana+'+ produtos)', data:D.semanas.map(function(s){return s.ativas}), backgroundColor:'#6D28D9', borderRadius:4},
+      {label:'Deram sinal de vida', data:D.semanas.map(function(s){return s.usaram}), backgroundColor:'#DDD3F7', borderRadius:4}
+    ]},
+    options:{ responsive:true, interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}},
+      scales:{ y:{beginAtZero:true, ticks:{precision:0}, title:{display:true,text:'marcas',font:{size:10}}} } }
+  });
+
+  document.getElementById('nota').innerHTML =
+    '<b>Como ler estes números.</b> A telemetria só existe desde <b>'+dataBR(D.medindo_desde)+'</b> — '
+    + 'silêncio antes dessa data não significa que a marca não usou. Onde o total aparece com <b>≈</b>, '
+    + 'o número veio do aprendizado de estilo (que guarda o id de cada produto aprovado desde o começo do projeto) '
+    + 'e não da telemetria: é um piso histórico, pode haver mais.<br><br>'
+    + '<b>Produto conta uma vez.</b> A lojista costuma reenviar o mesmo produto até aprovar o texto — '
+    + 'isso continua sendo 1 produto publicado, mas cada geração aparece em "descrições geradas". '
+    + 'Por isso "descrições" é sempre maior ou igual a "produtos".<br><br>'
+    + '<b>Fonte:</b> Redis do Catálogo IA (o mesmo do app). Atualizar: <code>node fetch_metricas.js</code> e publicar o <code>dados.js</code>.';
+}
+
+if (sessionStorage.getItem('catalogoia_auth') === '1'){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashContent').style.display = 'block';
+  desenhar();
+}
+</script>
+</body>
+</html>
