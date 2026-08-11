@@ -241,6 +241,79 @@ const diasDesde = (iso) => {
   const porApp = {};
   for (const a of APPS) porApp[a.id] = { ...a, ...(await montar(a.prefixo, { comEstimativa: false })) };
 
+  // ---------- historico ATRIBUIDO (o que aconteceu antes da marcacao por app) ----------
+  // Ate 11/08/2026 nenhum evento dizia de qual app veio — mas o log do proprio piloto
+  // (`auto:log:<slug>`, acao 'gerado') diz o que ELE publicou, e quando. Entao:
+  //   auto   = o que esta no log naquela semana
+  //   manual = o resto dos produtos da semana
+  // Isso e ATRIBUICAO, nao medicao: vai marcado como tal e o painel mostra com "≈".
+  // Duas limitacoes conhecidas: o log guarda no maximo 200 eventos por marca (o que
+  // passar disso deixa de ser atribuivel ao auto e cai no manual), e o casamento e por
+  // CONTAGEM na semana, nao por id — os dois lados vem de fontes diferentes.
+  const geradosPorSlugSemana = {};
+  const geradosPorSlug = {};
+  let autoDesde = '';
+  for (const k of await r.keys('auto:log:*')) {
+    const slug = normSlug(k.slice('auto:log:'.length));
+    for (const s of await r.lrange(k, 0, -1)) {
+      let it; try { it = JSON.parse(s); } catch (_) { continue; }
+      if (it.acao !== 'gerado') continue;
+      const dia = String(it.quando || '').slice(0, 10);
+      if (!dia) continue;
+      const seg = segundaDe(dia);
+      geradosPorSlugSemana[slug] = geradosPorSlugSemana[slug] || {};
+      geradosPorSlugSemana[slug][seg] = (geradosPorSlugSemana[slug][seg] || 0) + 1;
+      geradosPorSlug[slug] = (geradosPorSlug[slug] || 0) + 1;
+      if (!autoDesde || dia < autoDesde) autoDesde = dia;
+    }
+  }
+
+  // Divide cada semana entre os dois apps e soma SO o que ainda nao foi medido — assim
+  // o dia em que a marcacao entrou nao conta duas vezes.
+  for (const [i, semana] of geral.semanas.entries()) {
+    // O ponto de partida de cada app na semana e o que ele MEDIU; a atribuicao so
+    // acrescenta o que falta, marca a marca.
+    for (const a of APPS) {
+      const s = porApp[a.id].semanas[i];
+      s.produtos_medidos = s.produtos;
+      s.atribuido = 0;
+    }
+    for (const m of marcas) {
+      const totalSemana = await r.scard(`uso:${m.slug}:w:${semana.inicio}`);
+      if (!totalSemana) continue;
+      const cotaAuto = Math.min((geradosPorSlugSemana[m.slug] || {})[semana.inicio] || 0, totalSemana);
+      const cota = { auto: cotaAuto, manual: totalSemana - cotaAuto };
+      for (const a of APPS) {
+        const s = porApp[a.id].semanas[i];
+        const medidoMarca = await r.scard(`uso:${a.prefixo}${m.slug}:w:${semana.inicio}`);
+        const falta = Math.max(0, cota[a.id] - medidoMarca);
+        s.produtos += falta;
+        s.atribuido += falta;
+      }
+    }
+  }
+
+  // Mesma divisao nos totais por marca e nos KPIs.
+  for (const a of APPS) {
+    const alvo = porApp[a.id];
+    for (const linha of alvo.marcas) {
+      const totalMarca = (geral.marcas.find((g) => g.slug === linha.slug) || {}).produtos || 0;
+      const doAuto = Math.min(geradosPorSlug[linha.slug] || 0, totalMarca);
+      const cota = a.id === 'auto' ? doAuto : totalMarca - doAuto;
+      linha.produtos_medidos = linha.produtos;
+      linha.atribuido = Math.max(0, cota - linha.produtos);
+      linha.produtos = linha.produtos_medidos + linha.atribuido;
+      linha.estimado = linha.atribuido > 0;
+    }
+    alvo.marcas.sort((x, y) => y.produtos - x.produtos || String(x.nome).localeCompare(String(y.nome)));
+    alvo.kpis.produtos_total = alvo.marcas.reduce((s, l) => s + l.produtos, 0);
+    alvo.kpis.produtos_atribuidos = alvo.marcas.reduce((s, l) => s + l.atribuido, 0);
+    alvo.kpis.total_estimado = alvo.kpis.produtos_atribuidos > 0;
+    alvo.kpis.usando = alvo.marcas.filter((l) => l.ultimo || l.produtos).length;
+    alvo.kpis.nunca_usaram = alvo.kpis.liberadas - alvo.kpis.usando;
+  }
+  const autoPublicaDesde = autoDesde;
+
   // Desde quando existe a separacao por app: o primeiro evento marcado. Antes disso o
   // total e real, mas as abas de app estao vazias — e o painel precisa dizer isso.
   const apartirDe = Object.values(porApp)
@@ -252,6 +325,7 @@ const diasDesde = (iso) => {
     hoje,
     medindo_desde: medindoDesde || '',
     apps_desde: apartirDe,
+    auto_publica_desde: autoPublicaDesde,
     criterio: { produtos_semana: ATIVA_MIN_PRODUTOS, dias_parada: PARADA_DIAS, janela_dias: 7, semanas: SEMANAS },
     ...geral,
     apps: porApp,
