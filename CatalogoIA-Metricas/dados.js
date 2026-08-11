@@ -1,8 +1,9 @@
 window.DADOS = {
-  "gerado_em": "2026-08-11T18:06:40.874Z",
+  "gerado_em": "2026-08-11T18:29:19.856Z",
   "hoje": "2026-08-11",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
-  "apps_desde": "",
+  "apps_desde": "2026-08-11T18:28:02.542Z",
+  "auto_publica_desde": "2026-08-10",
   "criterio": {
     "produtos_semana": 2,
     "dias_parada": 7,
@@ -87,12 +88,12 @@ window.DADOS = {
       "estimado": false,
       "produtos_7d": 25,
       "ativa": true,
-      "acessos": 9,
-      "buscas": 40,
+      "acessos": 10,
+      "buscas": 45,
       "descricoes": 3,
       "envios": 25,
       "primeiro": "2026-08-10T19:02:35.392Z",
-      "ultimo": "2026-08-11T16:47:06.870Z",
+      "ultimo": "2026-08-11T18:28:55.773Z",
       "dias": 0
     },
     {
@@ -430,17 +431,38 @@ window.DADOS = {
       "kpis": {
         "liberadas": 16,
         "ativas": 0,
-        "usando": 0,
-        "nunca_usaram": 16,
+        "usando": 1,
+        "nunca_usaram": 15,
         "paradas": 0,
         "com_conta": 10,
         "contas": 9,
-        "produtos_total": 0,
+        "produtos_total": 23,
         "produtos_7d": 0,
         "descricoes_total": 0,
-        "total_estimado": false
+        "total_estimado": true,
+        "produtos_atribuidos": 23
       },
       "marcas": [
+        {
+          "slug": "nicoboco",
+          "nome": "Nicoboco",
+          "arquetipo": "explorador",
+          "tem_conta": true,
+          "email": "nicoboco.shop@nicoboco.com.br",
+          "produtos": 23,
+          "estimado": true,
+          "produtos_7d": 0,
+          "ativa": false,
+          "acessos": 1,
+          "buscas": 5,
+          "descricoes": 0,
+          "envios": 0,
+          "primeiro": "2026-08-11T18:28:02.542Z",
+          "ultimo": "2026-08-11T18:28:55.773Z",
+          "dias": 0,
+          "produtos_medidos": 0,
+          "atribuido": 23
+        },
         {
           "slug": "amiska",
           "nome": "Amiska",
@@ -457,7 +479,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "andressa-vesti",
@@ -475,7 +499,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "anne-blanc",
@@ -493,7 +519,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "demissy",
@@ -511,7 +539,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "gitaa",
@@ -529,7 +559,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "monnika-marikinha",
@@ -547,7 +579,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "murano",
@@ -565,7 +599,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "murano-filial",
@@ -583,25 +619,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
-        },
-        {
-          "slug": "nicoboco",
-          "nome": "Nicoboco",
-          "arquetipo": "explorador",
-          "tem_conta": true,
-          "email": "nicoboco.shop@nicoboco.com.br",
-          "produtos": 0,
-          "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
-          "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "opera-kids",
@@ -619,7 +639,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "optimist-feirinha",
@@ -637,7 +659,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "optimist-jeans",
@@ -655,7 +679,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "petit",
@@ -673,7 +699,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "stefani",
@@ -691,7 +719,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "trimix",
@@ -709,7 +739,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "ttng",
@@ -727,7 +759,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         }
       ],
       "semanas": [
@@ -738,7 +772,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-06-01",
@@ -747,7 +783,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-06-08",
@@ -756,7 +794,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-06-15",
@@ -765,7 +805,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-06-22",
@@ -774,7 +816,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-06-29",
@@ -783,7 +827,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-07-06",
@@ -792,7 +838,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-07-13",
@@ -801,7 +849,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 3,
-          "novos": 3
+          "novos": 3,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-07-20",
@@ -810,7 +860,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 5,
-          "novos": 2
+          "novos": 2,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-07-27",
@@ -819,7 +871,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 5,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-08-03",
@@ -828,16 +882,20 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 7,
-          "novos": 2
+          "novos": 2,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-08-10",
           "fim": "2026-08-16",
-          "produtos": 0,
+          "produtos": 23,
           "ativas": 0,
-          "usaram": 0,
+          "usaram": 1,
           "cadastros": 9,
-          "novos": 2
+          "novos": 2,
+          "produtos_medidos": 0,
+          "atribuido": 23
         }
       ]
     },
@@ -848,15 +906,16 @@ window.DADOS = {
       "kpis": {
         "liberadas": 16,
         "ativas": 0,
-        "usando": 0,
-        "nunca_usaram": 16,
+        "usando": 8,
+        "nunca_usaram": 8,
         "paradas": 0,
         "com_conta": 10,
         "contas": 9,
-        "produtos_total": 0,
+        "produtos_total": 150,
         "produtos_7d": 0,
         "descricoes_total": 0,
-        "total_estimado": false
+        "total_estimado": true,
+        "produtos_atribuidos": 150
       },
       "marcas": [
         {
@@ -865,8 +924,8 @@ window.DADOS = {
           "arquetipo": "sabio",
           "tem_conta": true,
           "email": "missmilliebr@gmail.com",
-          "produtos": 0,
-          "estimado": false,
+          "produtos": 55,
+          "estimado": true,
           "produtos_7d": 0,
           "ativa": false,
           "acessos": 0,
@@ -875,7 +934,49 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 55
+        },
+        {
+          "slug": "petit",
+          "nome": "Petit",
+          "arquetipo": "inocente",
+          "tem_conta": true,
+          "email": "anderson@mundotaci.com.br",
+          "produtos": 43,
+          "estimado": true,
+          "produtos_7d": 0,
+          "ativa": false,
+          "acessos": 0,
+          "buscas": 0,
+          "descricoes": 0,
+          "envios": 0,
+          "primeiro": "",
+          "ultimo": "",
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 43
+        },
+        {
+          "slug": "opera-kids",
+          "nome": "Ópera Kids",
+          "arquetipo": "inocente",
+          "tem_conta": true,
+          "email": "contato@operakids.com.br",
+          "produtos": 36,
+          "estimado": true,
+          "produtos_7d": 0,
+          "ativa": false,
+          "acessos": 0,
+          "buscas": 0,
+          "descricoes": 0,
+          "envios": 0,
+          "primeiro": "",
+          "ultimo": "",
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 36
         },
         {
           "slug": "andressa-vesti",
@@ -883,8 +984,8 @@ window.DADOS = {
           "arquetipo": "rebelde",
           "tem_conta": true,
           "email": "andressavazpinto@gmail.commx",
-          "produtos": 0,
-          "estimado": false,
+          "produtos": 8,
+          "estimado": true,
           "produtos_7d": 0,
           "ativa": false,
           "acessos": 0,
@@ -893,7 +994,89 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 8
+        },
+        {
+          "slug": "optimist-jeans",
+          "nome": "Optimist Jeans",
+          "arquetipo": "governante",
+          "tem_conta": true,
+          "email": "ecommerce@optimistjeans.com.br",
+          "produtos": 3,
+          "estimado": true,
+          "produtos_7d": 0,
+          "ativa": false,
+          "acessos": 0,
+          "buscas": 0,
+          "descricoes": 0,
+          "envios": 0,
+          "primeiro": "",
+          "ultimo": "",
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 3
+        },
+        {
+          "slug": "nicoboco",
+          "nome": "Nicoboco",
+          "arquetipo": "explorador",
+          "tem_conta": true,
+          "email": "nicoboco.shop@nicoboco.com.br",
+          "produtos": 2,
+          "estimado": true,
+          "produtos_7d": 0,
+          "ativa": false,
+          "acessos": 0,
+          "buscas": 0,
+          "descricoes": 0,
+          "envios": 0,
+          "primeiro": "",
+          "ultimo": "",
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 2
+        },
+        {
+          "slug": "optimist-feirinha",
+          "nome": "Optimist Feirinha",
+          "arquetipo": "",
+          "tem_conta": true,
+          "email": "ecommerce@optimistjeans.com.br",
+          "produtos": 2,
+          "estimado": true,
+          "produtos_7d": 0,
+          "ativa": false,
+          "acessos": 0,
+          "buscas": 0,
+          "descricoes": 0,
+          "envios": 0,
+          "primeiro": "",
+          "ultimo": "",
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 2
+        },
+        {
+          "slug": "monnika-marikinha",
+          "nome": "Monnika Marikinha",
+          "arquetipo": "amante",
+          "tem_conta": true,
+          "email": "monnikamarikinhaloja@gmail.com",
+          "produtos": 1,
+          "estimado": true,
+          "produtos_7d": 0,
+          "ativa": false,
+          "acessos": 0,
+          "buscas": 0,
+          "descricoes": 0,
+          "envios": 0,
+          "primeiro": "",
+          "ultimo": "",
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 1
         },
         {
           "slug": "anne-blanc",
@@ -911,7 +1094,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "demissy",
@@ -929,7 +1114,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "gitaa",
@@ -947,25 +1134,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
-        },
-        {
-          "slug": "monnika-marikinha",
-          "nome": "Monnika Marikinha",
-          "arquetipo": "amante",
-          "tem_conta": true,
-          "email": "monnikamarikinhaloja@gmail.com",
-          "produtos": 0,
-          "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
-          "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "murano",
@@ -983,7 +1154,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "murano-filial",
@@ -1001,97 +1174,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
-        },
-        {
-          "slug": "nicoboco",
-          "nome": "Nicoboco",
-          "arquetipo": "explorador",
-          "tem_conta": true,
-          "email": "nicoboco.shop@nicoboco.com.br",
-          "produtos": 0,
-          "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
-          "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null
-        },
-        {
-          "slug": "opera-kids",
-          "nome": "Ópera Kids",
-          "arquetipo": "inocente",
-          "tem_conta": true,
-          "email": "contato@operakids.com.br",
-          "produtos": 0,
-          "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
-          "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null
-        },
-        {
-          "slug": "optimist-feirinha",
-          "nome": "Optimist Feirinha",
-          "arquetipo": "",
-          "tem_conta": true,
-          "email": "ecommerce@optimistjeans.com.br",
-          "produtos": 0,
-          "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
-          "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null
-        },
-        {
-          "slug": "optimist-jeans",
-          "nome": "Optimist Jeans",
-          "arquetipo": "governante",
-          "tem_conta": true,
-          "email": "ecommerce@optimistjeans.com.br",
-          "produtos": 0,
-          "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
-          "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null
-        },
-        {
-          "slug": "petit",
-          "nome": "Petit",
-          "arquetipo": "inocente",
-          "tem_conta": true,
-          "email": "anderson@mundotaci.com.br",
-          "produtos": 0,
-          "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
-          "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "stefani",
@@ -1109,7 +1194,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "trimix",
@@ -1127,7 +1214,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "slug": "ttng",
@@ -1145,7 +1234,9 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "",
           "ultimo": "",
-          "dias": null
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 0
         }
       ],
       "semanas": [
@@ -1156,7 +1247,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-06-01",
@@ -1165,7 +1258,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-06-08",
@@ -1174,7 +1269,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-06-15",
@@ -1183,7 +1280,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-06-22",
@@ -1192,7 +1291,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-06-29",
@@ -1201,7 +1302,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-07-06",
@@ -1210,7 +1313,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 0,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-07-13",
@@ -1219,7 +1324,9 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 3,
-          "novos": 3
+          "novos": 3,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-07-20",
@@ -1228,34 +1335,42 @@ window.DADOS = {
           "ativas": 0,
           "usaram": 0,
           "cadastros": 5,
-          "novos": 2
+          "novos": 2,
+          "produtos_medidos": 0,
+          "atribuido": 0
         },
         {
           "inicio": "2026-07-27",
           "fim": "2026-08-02",
-          "produtos": 0,
+          "produtos": 13,
           "ativas": 0,
           "usaram": 0,
           "cadastros": 5,
-          "novos": 0
+          "novos": 0,
+          "produtos_medidos": 0,
+          "atribuido": 13
         },
         {
           "inicio": "2026-08-03",
           "fim": "2026-08-09",
-          "produtos": 0,
+          "produtos": 21,
           "ativas": 0,
           "usaram": 0,
           "cadastros": 7,
-          "novos": 2
+          "novos": 2,
+          "produtos_medidos": 0,
+          "atribuido": 21
         },
         {
           "inicio": "2026-08-10",
           "fim": "2026-08-16",
-          "produtos": 0,
+          "produtos": 20,
           "ativas": 0,
           "usaram": 0,
           "cadastros": 9,
-          "novos": 2
+          "novos": 2,
+          "produtos_medidos": 0,
+          "atribuido": 20
         }
       ]
     }
