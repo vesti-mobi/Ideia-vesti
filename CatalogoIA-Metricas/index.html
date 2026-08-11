@@ -202,24 +202,24 @@ function pintar(recorte){
 
   // Aba de app sem nenhum dado: dizer POR QUE está vazia, senão parece painel quebrado.
   var aviso = document.getElementById('aviso-aba');
-  if (ehApp && !dados.kpis.produtos_total && !dados.kpis.descricoes_total){
+  if (ehApp){
+    var atrib = dados.kpis.produtos_atribuidos || 0;
+    var medido = dados.kpis.produtos_total - atrib;
     aviso.style.display = '';
-    aviso.innerHTML = '<b>Ainda sem dados neste app.</b> A separação por app começou em '
-      + (D.apps_desde ? '<b>'+dataBR(D.apps_desde)+'</b>' : '11/08/2026')
-      + ' — antes disso os dois apps gravavam no mesmo lugar e não dá para desmembrar o histórico. '
-      + 'O que aconteceu antes continua inteiro na aba <b>Total</b>.';
-  } else if (ehApp){
-    aviso.style.display = '';
-    aviso.innerHTML = 'Este recorte conta só o que passou por <b>'+recorte.nome+'</b>, e começa em '
-      + (D.apps_desde ? '<b>'+dataBR(D.apps_desde)+'</b>' : '11/08/2026')
-      + '. A aba <b>Total</b> é a única com o histórico completo.';
+    aviso.innerHTML = '<b>Medido × atribuído.</b> A marcação por app entrou em <b>11/08/2026</b>; '
+      + 'daí em diante cada evento diz de qual app veio ('+medido+' produto'+(medido===1?'':'s')+' aqui). '
+      + 'O que veio antes foi <b>atribuído</b> ('+atrib+'), e por isso aparece com <b>≈</b>: '
+      + 'o log do piloto mostra que ele só passou a publicar em <b>'+dataBR(D.auto_publica_desde)+'</b>, '
+      + 'então o que é dele naquele período sai do log e todo o resto é manual. '
+      + 'Somando as duas abas você chega no mesmo número da aba <b>Total</b>.';
   } else {
     aviso.style.display = 'none';
   }
 
   var k = dados.kpis;
   var cards = [
-    {n:k.produtos_total, l:'Produtos publicados', h:k.produtos_7d+' nos últimos 7 dias', destaque:true},
+    {n:(k.total_estimado?'<span class="aprox">≈</span> ':'')+k.produtos_total, l:'Produtos publicados',
+     h:(k.produtos_atribuidos ? k.produtos_atribuidos+' atribuídos ao histórico' : k.produtos_7d+' nos últimos 7 dias'), destaque:true},
     {n:k.descricoes_total, l:'Descrições geradas', h:'inclui as que não foram publicadas'},
     {n:k.usando+'/'+k.liberadas, l:'Marcas que usaram', h:k.nunca_usaram+' liberadas nunca entraram'},
     {n:k.ativas, l:'Ativas esta semana', h:D.criterio.produtos_semana+'+ produtos em 7 dias'},
@@ -282,7 +282,7 @@ function pintar(recorte){
     + '<b>Produto conta uma vez.</b> A lojista costuma reenviar o mesmo produto até aprovar o texto — '
     + 'isso continua sendo 1 produto publicado, mas cada geração aparece em "descrições geradas". '
     + 'Por isso "descrições" é sempre maior ou igual a "produtos".<br><br>'
-    + '<b>Abas.</b> Os dois apps (piloto automático e manual) gravam no mesmo Redis. A separação por app existe desde <b>11/08/2026</b> — antes disso só há o total, e é por isso que as abas de app começam vazias.<br><br>'
+    + '<b>Abas.</b> Os dois apps gravam no mesmo Redis e a marcação por app só existe desde <b>11/08/2026</b>. O período anterior não foi perdido: ele é <b>atribuído</b> a partir do log do piloto (que registra o que ele publicou e quando) — o que é dele vai para a aba do automático e todo o resto para a do manual. Números atribuídos aparecem com <b>≈</b> e as duas abas sempre somam o Total.<br><br>'
     + '<b>Fonte:</b> Redis do Catálogo IA (o mesmo do app), atualizado sozinho 2x por dia (09h e 18h) pelo workflow <code>catalogo-ia-metricas.yml</code>. Para rodar na mão: <code>node fetch_metricas.js</code>.';
 }
 
