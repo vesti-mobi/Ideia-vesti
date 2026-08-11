@@ -1,0 +1,52 @@
+# Atualiza sozinho o dados.js do painel de metricas do Catalogo IA.
+#
+# Roda 2x por dia (09h e 18h de Brasilia). O fetch_metricas.js le o Redis do app —
+# a credencial vem do secret REDIS_URL, nunca do repositorio (este repo e publico).
+#
+# Sem VESTI_BRANDS aqui de proposito: aquele env carrega as APIKEYs das marcas e o
+# script so precisa do NOME delas, que ja esta na propria lista de marcas do Redis e
+# no fallback dentro do script.
+name: Catalogo IA - metricas
+
+on:
+  schedule:
+    - cron: '0 12 * * *'    # 09h de Brasilia (UTC-3)
+    - cron: '0 21 * * *'    # 18h de Brasilia
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # O script pede o ioredis pelo caminho do app (ProjetoCatalogo/versao_auto/
+      # node_modules), que nao existe no runner. Instalamos aqui e o script cai no
+      # require normal quando aquele caminho falha.
+      - name: Instalar ioredis
+        run: npm install ioredis@5 --no-save
+
+      - name: Gerar dados.js
+        env:
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+        run: node CatalogoIA-Metricas/fetch_metricas.js
+
+      - name: Publicar se mudou
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          if git diff --quiet -- CatalogoIA-Metricas/dados.js; then
+            echo "sem mudanca no dados.js"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CatalogoIA-Metricas/dados.js
+          git commit -m "Catalogo IA: metricas de $(date -u +'%d/%m %H:%M') UTC"
+          git push
