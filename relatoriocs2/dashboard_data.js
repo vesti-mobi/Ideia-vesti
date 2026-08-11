@@ -1,9 +1,9 @@
 window.CS2_DATA = {
- "gerado_em": "10/08/2026 10:01",
- "hoje": "2026-08-10",
+ "gerado_em": "11/08/2026 09:40",
+ "hoje": "2026-08-11",
  "bq": {
   "ok": true,
-  "p3_dias": 41,
+  "p3_dias": 42,
   "periodos": {
    "p1": [
     "2025-07-01",
@@ -44,7 +44,7 @@ window.CS2_DATA = {
    "status": "ativa",
    "data25_planilha": null,
    "cadastro_bq": "2023-02-13",
-   "pedidos_pagos": 1171
+   "pedidos_pagos": 1175
   },
   {
    "marca": "Pijamas - Lua Cheia",
@@ -95,7 +95,7 @@ window.CS2_DATA = {
    "status": "ativa",
    "data25_planilha": "2026-03-19",
    "cadastro_bq": "2025-10-01",
-   "pedidos_pagos": 1684
+   "pedidos_pagos": 1686
   },
   {
    "marca": "Stick Lingerie - Grupo Strelisse",
@@ -108,7 +108,7 @@ window.CS2_DATA = {
    "status": "ativa",
    "data25_planilha": "2026-05-05",
    "cadastro_bq": "2026-01-09",
-   "pedidos_pagos": 344
+   "pedidos_pagos": 351
   },
   {
    "marca": "Fashion Noire",
@@ -121,7 +121,7 @@ window.CS2_DATA = {
    "status": "ativa",
    "cadastro_bq": "2025-10-13",
    "data25_planilha": "2026-05-05",
-   "pedidos_pagos": 669
+   "pedidos_pagos": 678
   },
   {
    "marca": "Elas charmosa",
@@ -147,7 +147,7 @@ window.CS2_DATA = {
    "status": "ativa",
    "cadastro_bq": "2025-10-23",
    "data25_planilha": "2026-11-11",
-   "pedidos_pagos": 1020
+   "pedidos_pagos": 1029
   },
   {
    "marca": "D'Veras Moda",
@@ -261,7 +261,7 @@ window.CS2_DATA = {
    "status": "sem_reuniao",
    "data25_planilha": null,
    "cadastro_bq": "2025-11-28",
-   "pedidos_pagos": 124
+   "pedidos_pagos": 127
   },
   {
    "marca": "Dama Jeans",
@@ -310,7 +310,7 @@ window.CS2_DATA = {
    "obs_orig": "CHAMAR",
    "status": "sem_reuniao",
    "cadastro_bq": "2026-01-26",
-   "pedidos_pagos": 22,
+   "pedidos_pagos": 23,
    "data25_planilha": null
   },
   {
@@ -337,7 +337,7 @@ window.CS2_DATA = {
    "status": "ativa",
    "cadastro_bq": "2016-09-13",
    "data25_planilha": "2026-05-26",
-   "pedidos_pagos": 240
+   "pedidos_pagos": 245
   },
   {
    "marca": "Lazarf",
@@ -486,7 +486,7 @@ window.CS2_DATA = {
    "status": "ativa",
    "data25_planilha": "2026-05-09",
    "cadastro_bq": "2026-04-16",
-   "pedidos_pagos": 192
+   "pedidos_pagos": 193
   },
   {
    "marca": "Mya Collection",
@@ -549,7 +549,7 @@ window.CS2_DATA = {
    "status": "sem_reuniao",
    "cadastro_bq": "2026-05-14",
    "data25_planilha": "2026-07-22",
-   "pedidos_pagos": 138
+   "pedidos_pagos": 139
   },
   {
    "marca": "Valentina brand",
@@ -586,7 +586,7 @@ window.CS2_DATA = {
    "status": "sem_reuniao",
    "data25_planilha": null,
    "cadastro_bq": "2026-05-26",
-   "pedidos_pagos": 54
+   "pedidos_pagos": 55
   },
   {
    "marca": "Bebela",
@@ -610,7 +610,7 @@ window.CS2_DATA = {
    "obs_orig": "Finalizou treinamento de vendas 17 - Acompanhando | Implantando Oráculo",
    "status": "sem_reuniao",
    "cadastro_bq": "2026-05-29",
-   "pedidos_pagos": 3,
+   "pedidos_pagos": 4,
    "data25_planilha": null
   },
   {
@@ -624,7 +624,7 @@ window.CS2_DATA = {
    "status": "ativa",
    "cadastro_bq": "2026-05-30",
    "data25_planilha": "2026-06-16",
-   "pedidos_pagos": 113
+   "pedidos_pagos": 115
   },
   {
    "marca": "DB Brand",
@@ -647,7 +647,7 @@ window.CS2_DATA = {
    "data25": null,
    "obs_orig": "",
    "status": "sem_reuniao",
-   "cadastro_bq": "2026-06-18",
+   "cadastro_bq": "2020-05-01",
    "data25_planilha": null
   },
   {
@@ -858,7 +858,7 @@ window.CS2_DATA = {
    "cs": "",
    "data25": null,
    "pedidos_pagos": null,
-   "cadastro_bq": "2026-07-17",
+   "cadastro_bq": "2018-09-03",
    "obs_orig": "",
    "status": "sem_reuniao",
    "origem": "bq",
@@ -1071,7 +1071,7 @@ window.CS2_DATA = {
    "implementador": "",
    "cs": "Tatiane",
    "data25": null,
-   "cadastro_bq": "2023-12-19",
+   "cadastro_bq": "2026-08-05",
    "obs_orig": "",
    "status": "sem_reuniao",
    "origem": "bq",
@@ -1089,61 +1089,96 @@ window.CS2_DATA = {
    "status": "sem_reuniao",
    "origem": "bq",
    "data25_planilha": null
+  },
+  {
+   "marca": "Samire Style",
+   "entrada": "2026-08-10",
+   "dias": 1,
+   "implementador": "",
+   "cs": "",
+   "data25": null,
+   "cadastro_bq": "2026-08-10",
+   "obs_orig": "",
+   "status": "sem_reuniao",
+   "origem": "bq",
+   "data25_planilha": null
+  },
+  {
+   "marca": "CHAVILLE FASHION",
+   "entrada": "2026-08-10",
+   "dias": 1,
+   "implementador": "",
+   "cs": "Elisa",
+   "data25": null,
+   "cadastro_bq": "2026-08-10",
+   "obs_orig": "",
+   "status": "sem_reuniao",
+   "origem": "bq",
+   "data25_planilha": null
   }
  ],
  "aba2": [
   {
-   "company": "caju_brasil",
-   "nome": "Caju Brasil",
-   "created_at": "2026-03-08T22:05:27Z",
-   "last_login": "2026-08-09",
+   "company": "opera_kids",
+   "nome": "Opera Kids",
+   "created_at": "2026-03-11T20:38:40Z",
+   "last_login": "2026-08-10",
    "dias_sem_acesso": 1,
    "login_days": 26,
    "status": "active"
   },
   {
-   "company": "opera_kids",
-   "nome": "Opera Kids",
-   "created_at": "2026-03-11T20:38:40Z",
-   "last_login": "2026-08-08",
-   "dias_sem_acesso": 2,
-   "login_days": 25,
+   "company": "caju_brasil",
+   "nome": "Caju Brasil",
+   "created_at": "2026-03-08T22:05:27Z",
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
+   "login_days": 26,
    "status": "active"
   },
   {
    "company": "lete_moda_e_praia",
    "nome": "Lete Moda E Praia",
    "created_at": "2026-03-16T20:08:41Z",
-   "last_login": "2026-08-08",
-   "dias_sem_acesso": 2,
-   "login_days": 16,
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
+   "login_days": 17,
    "status": "active"
   },
   {
    "company": "boho_chic",
    "nome": "Boho Chic",
    "created_at": "2026-07-01T17:10:16Z",
-   "last_login": "2026-08-09",
+   "last_login": "2026-08-10",
    "dias_sem_acesso": 1,
-   "login_days": 15,
+   "login_days": 16,
    "status": "active"
   },
   {
    "company": "le_ricard",
    "nome": "Le Ricard",
    "created_at": "2026-07-07T13:45:10Z",
-   "last_login": "2026-08-06",
-   "dias_sem_acesso": 4,
-   "login_days": 13,
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
+   "login_days": 14,
    "status": "active"
   },
   {
    "company": "amiska",
    "nome": "Amiska",
    "created_at": "2026-05-26T15:47:20Z",
-   "last_login": "2026-08-06",
-   "dias_sem_acesso": 4,
-   "login_days": 10,
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
+   "login_days": 11,
+   "status": "active"
+  },
+  {
+   "company": "doce_deleite",
+   "nome": "Doce Deleite",
+   "created_at": "2026-06-18T21:17:44Z",
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
+   "login_days": 8,
    "status": "active"
   },
   {
@@ -1151,16 +1186,7 @@ window.CS2_DATA = {
    "nome": "Conceito Mika",
    "created_at": "2026-06-24T12:58:49Z",
    "last_login": "2026-08-06",
-   "dias_sem_acesso": 4,
-   "login_days": 7,
-   "status": "active"
-  },
-  {
-   "company": "doce_deleite",
-   "nome": "Doce Deleite",
-   "created_at": "2026-06-18T21:17:44Z",
-   "last_login": "2026-08-06",
-   "dias_sem_acesso": 4,
+   "dias_sem_acesso": 5,
    "login_days": 7,
    "status": "active"
   },
@@ -1169,7 +1195,25 @@ window.CS2_DATA = {
    "nome": "Vestidoteca",
    "created_at": "2026-04-29T18:02:54Z",
    "last_login": "2026-08-07",
-   "dias_sem_acesso": 3,
+   "dias_sem_acesso": 4,
+   "login_days": 6,
+   "status": "active"
+  },
+  {
+   "company": "miss_misses",
+   "nome": "Miss Misses",
+   "created_at": "2026-07-03T16:06:17Z",
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
+   "login_days": 6,
+   "status": "active"
+  },
+  {
+   "company": "murano",
+   "nome": "Murano",
+   "created_at": "2026-04-15T13:07:44Z",
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
    "login_days": 6,
    "status": "active"
   },
@@ -1178,25 +1222,16 @@ window.CS2_DATA = {
    "nome": "Brytch Jeans",
    "created_at": "2026-07-13T16:15:21Z",
    "last_login": "2026-07-29",
-   "dias_sem_acesso": 12,
+   "dias_sem_acesso": 13,
    "login_days": 5,
    "status": "active"
   },
   {
-   "company": "murano",
-   "nome": "Murano",
-   "created_at": "2026-04-15T13:07:44Z",
-   "last_login": "2026-08-03",
-   "dias_sem_acesso": 7,
-   "login_days": 5,
-   "status": "active"
-  },
-  {
-   "company": "miss_misses",
-   "nome": "Miss Misses",
-   "created_at": "2026-07-03T16:06:17Z",
-   "last_login": "2026-08-04",
-   "dias_sem_acesso": 6,
+   "company": "black_jeans",
+   "nome": "Black Jeans",
+   "created_at": "2026-07-07T12:58:19Z",
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
    "login_days": 5,
    "status": "active"
   },
@@ -1204,18 +1239,9 @@ window.CS2_DATA = {
    "company": "anemone",
    "nome": "Anemone",
    "created_at": "2026-06-18T19:02:07Z",
-   "last_login": "2026-07-24",
-   "dias_sem_acesso": 17,
-   "login_days": 4,
-   "status": "active"
-  },
-  {
-   "company": "black_jeans",
-   "nome": "Black Jeans",
-   "created_at": "2026-07-07T12:58:19Z",
-   "last_login": "2026-08-03",
-   "dias_sem_acesso": 7,
-   "login_days": 4,
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
+   "login_days": 5,
    "status": "active"
   },
   {
@@ -1223,7 +1249,16 @@ window.CS2_DATA = {
    "nome": "Nova Versao Roupas",
    "created_at": "2026-07-13T21:04:11Z",
    "last_login": "2026-08-01",
-   "dias_sem_acesso": 9,
+   "dias_sem_acesso": 10,
+   "login_days": 4,
+   "status": "active"
+  },
+  {
+   "company": "kelly_rodrigues_store",
+   "nome": "Kelly Rodrigues Store",
+   "created_at": "2026-03-31T00:51:59Z",
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
    "login_days": 4,
    "status": "active"
   },
@@ -1232,7 +1267,16 @@ window.CS2_DATA = {
    "nome": "Rosie Lingerie",
    "created_at": "2026-08-03T12:36:15Z",
    "last_login": "2026-08-08",
-   "dias_sem_acesso": 2,
+   "dias_sem_acesso": 3,
+   "login_days": 4,
+   "status": "active"
+  },
+  {
+   "company": "blunt",
+   "nome": "Blunt",
+   "created_at": "2026-04-07T14:45:43Z",
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
    "login_days": 4,
    "status": "active"
   },
@@ -1241,25 +1285,16 @@ window.CS2_DATA = {
    "nome": "Amofany",
    "created_at": "2026-06-09T15:20:02Z",
    "last_login": "2026-08-05",
-   "dias_sem_acesso": 5,
+   "dias_sem_acesso": 6,
    "login_days": 4,
    "status": "active"
   },
   {
-   "company": "kelly_rodrigues_store",
-   "nome": "Kelly Rodrigues Store",
-   "created_at": "2026-03-31T00:51:59Z",
-   "last_login": "2026-08-09",
+   "company": "fashion_girl",
+   "nome": "Fashion Girl",
+   "created_at": "2026-08-04T12:12:39Z",
+   "last_login": "2026-08-10",
    "dias_sem_acesso": 1,
-   "login_days": 3,
-   "status": "active"
-  },
-  {
-   "company": "blunt",
-   "nome": "Blunt",
-   "created_at": "2026-04-07T14:45:43Z",
-   "last_login": "2026-07-31",
-   "dias_sem_acesso": 10,
    "login_days": 3,
    "status": "active"
   },
@@ -1268,25 +1303,16 @@ window.CS2_DATA = {
    "nome": "Dolps",
    "created_at": "2026-03-08T22:07:26Z",
    "last_login": "2026-08-07",
-   "dias_sem_acesso": 3,
+   "dias_sem_acesso": 4,
    "login_days": 3,
    "status": "active"
   },
   {
-   "company": "pijamas_lua_cheia",
-   "nome": "Pijamas Lua Cheia",
-   "created_at": "2026-07-17T14:46:52Z",
-   "last_login": "2026-07-30",
-   "dias_sem_acesso": 11,
-   "login_days": 2,
-   "status": "active"
-  },
-  {
-   "company": "equivoco",
-   "nome": "Equivoco",
-   "created_at": "2026-07-28T13:45:43Z",
-   "last_login": "2026-08-06",
-   "dias_sem_acesso": 4,
+   "company": "ankor_design",
+   "nome": "Ankor Design",
+   "created_at": "2026-07-21T12:55:21Z",
+   "last_login": "2026-07-28",
+   "dias_sem_acesso": 14,
    "login_days": 2,
    "status": "active"
   },
@@ -1295,7 +1321,7 @@ window.CS2_DATA = {
    "nome": "Tricomix",
    "created_at": "2026-06-10T19:16:10Z",
    "last_login": "2026-08-07",
-   "dias_sem_acesso": 3,
+   "dias_sem_acesso": 4,
    "login_days": 2,
    "status": "active"
   },
@@ -1304,43 +1330,7 @@ window.CS2_DATA = {
    "nome": "Maria Chica",
    "created_at": "2026-05-13T13:20:32Z",
    "last_login": "2026-08-08",
-   "dias_sem_acesso": 2,
-   "login_days": 2,
-   "status": "active"
-  },
-  {
-   "company": "ankor_design",
-   "nome": "Ankor Design",
-   "created_at": "2026-07-21T12:55:21Z",
-   "last_login": "2026-07-28",
-   "dias_sem_acesso": 13,
-   "login_days": 2,
-   "status": "active"
-  },
-  {
-   "company": "stick_lingerie",
-   "nome": "Stick Lingerie",
-   "created_at": "2026-07-15T17:56:03Z",
-   "last_login": "2026-07-28",
-   "dias_sem_acesso": 13,
-   "login_days": 2,
-   "status": "active"
-  },
-  {
-   "company": "soror_clothing",
-   "nome": "Soror Clothing",
-   "created_at": "2026-06-01T17:32:33Z",
-   "last_login": "2026-07-16",
-   "dias_sem_acesso": 25,
-   "login_days": 2,
-   "status": "active"
-  },
-  {
-   "company": "be_eight",
-   "nome": "Be Eight",
-   "created_at": "2026-07-06T17:03:53Z",
-   "last_login": "2026-07-21",
-   "dias_sem_acesso": 20,
+   "dias_sem_acesso": 3,
    "login_days": 2,
    "status": "active"
   },
@@ -1349,7 +1339,70 @@ window.CS2_DATA = {
    "nome": "Tuba Plus",
    "created_at": "2026-07-13T20:13:43Z",
    "last_login": "2026-07-17",
-   "dias_sem_acesso": 24,
+   "dias_sem_acesso": 25,
+   "login_days": 2,
+   "status": "active"
+  },
+  {
+   "company": "skenn",
+   "nome": "Skenn",
+   "created_at": "2026-07-28T01:07:30Z",
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
+   "login_days": 2,
+   "status": "active"
+  },
+  {
+   "company": "pijamas_lua_cheia",
+   "nome": "Pijamas Lua Cheia",
+   "created_at": "2026-07-17T14:46:52Z",
+   "last_login": "2026-07-30",
+   "dias_sem_acesso": 12,
+   "login_days": 2,
+   "status": "active"
+  },
+  {
+   "company": "john_cunningham",
+   "nome": "John Cunningham",
+   "created_at": "2026-07-13T16:23:46Z",
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
+   "login_days": 2,
+   "status": "active"
+  },
+  {
+   "company": "equivoco",
+   "nome": "Equivoco",
+   "created_at": "2026-07-28T13:45:43Z",
+   "last_login": "2026-08-06",
+   "dias_sem_acesso": 5,
+   "login_days": 2,
+   "status": "active"
+  },
+  {
+   "company": "soror_clothing",
+   "nome": "Soror Clothing",
+   "created_at": "2026-06-01T17:32:33Z",
+   "last_login": "2026-07-16",
+   "dias_sem_acesso": 26,
+   "login_days": 2,
+   "status": "active"
+  },
+  {
+   "company": "be_eight",
+   "nome": "Be Eight",
+   "created_at": "2026-07-06T17:03:53Z",
+   "last_login": "2026-07-21",
+   "dias_sem_acesso": 21,
+   "login_days": 2,
+   "status": "active"
+  },
+  {
+   "company": "stick_lingerie",
+   "nome": "Stick Lingerie",
+   "created_at": "2026-07-15T17:56:03Z",
+   "last_login": "2026-07-28",
+   "dias_sem_acesso": 14,
    "login_days": 2,
    "status": "active"
   },
@@ -1358,25 +1411,7 @@ window.CS2_DATA = {
    "nome": "Imagivan",
    "created_at": "2026-06-23T15:12:57Z",
    "last_login": "2026-07-31",
-   "dias_sem_acesso": 10,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "skenn",
-   "nome": "Skenn",
-   "created_at": "2026-07-28T01:07:30Z",
-   "last_login": "2026-08-06",
-   "dias_sem_acesso": 4,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "alcance_jeans",
-   "nome": "Alcance Jeans",
-   "created_at": "2026-06-17T19:36:52Z",
-   "last_login": "2026-07-13",
-   "dias_sem_acesso": 28,
+   "dias_sem_acesso": 11,
    "login_days": 1,
    "status": "active"
   },
@@ -1385,79 +1420,7 @@ window.CS2_DATA = {
    "nome": "Gitaa",
    "created_at": "2026-07-06T12:10:55Z",
    "last_login": "2026-07-13",
-   "dias_sem_acesso": 28,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "rosa_fina",
-   "nome": "Rosa Fina",
-   "created_at": "2026-07-17T14:59:59Z",
-   "last_login": "2026-08-06",
-   "dias_sem_acesso": 4,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "john_cunningham",
-   "nome": "John Cunningham",
-   "created_at": "2026-07-13T16:23:46Z",
-   "last_login": "2026-07-14",
-   "dias_sem_acesso": 27,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "vida_marinha",
-   "nome": "Vida Marinha",
-   "created_at": "2026-07-24T13:42:52Z",
-   "last_login": "2026-08-03",
-   "dias_sem_acesso": 7,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "arary",
-   "nome": "Arary",
-   "created_at": "2026-07-29T02:22:57Z",
-   "last_login": "2026-07-28",
-   "dias_sem_acesso": 13,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "amicia",
-   "nome": "Amicia",
-   "created_at": "2026-07-27T09:52:06Z",
-   "last_login": "2026-07-31",
-   "dias_sem_acesso": 10,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "zoe_sport",
-   "nome": "Zoe Sport",
-   "created_at": "2026-07-13T16:20:33Z",
-   "last_login": "2026-07-14",
-   "dias_sem_acesso": 27,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "optimist_jeans",
-   "nome": "Optimist Jeans",
-   "created_at": "2026-07-13T21:19:10Z",
-   "last_login": "2026-07-15",
-   "dias_sem_acesso": 26,
-   "login_days": 1,
-   "status": "active"
-  },
-  {
-   "company": "maria_dutra_jeans",
-   "nome": "Maria Dutra Jeans",
-   "created_at": "2026-08-03T14:22:17Z",
-   "last_login": "2026-08-07",
-   "dias_sem_acesso": 3,
+   "dias_sem_acesso": 29,
    "login_days": 1,
    "status": "active"
   },
@@ -1466,95 +1429,113 @@ window.CS2_DATA = {
    "nome": "Egoiste",
    "created_at": "2026-06-09T15:20:02Z",
    "last_login": "2026-07-29",
-   "dias_sem_acesso": 12,
+   "dias_sem_acesso": 13,
    "login_days": 1,
    "status": "active"
   },
   {
-   "company": "brascol",
-   "nome": "Brascol",
-   "created_at": "2026-06-01T17:22:05Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
+   "company": "zoe_sport",
+   "nome": "Zoe Sport",
+   "created_at": "2026-07-13T16:20:33Z",
+   "last_login": "2026-07-14",
+   "dias_sem_acesso": 28,
+   "login_days": 1,
    "status": "active"
   },
   {
-   "company": "villon_jeans",
-   "nome": "Villon Jeans",
-   "created_at": "2026-07-24T23:19:17Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
+   "company": "alcance_jeans",
+   "nome": "Alcance Jeans",
+   "created_at": "2026-06-17T19:36:52Z",
+   "last_login": "2026-07-13",
+   "dias_sem_acesso": 29,
+   "login_days": 1,
    "status": "active"
   },
   {
-   "company": "bella_fe",
-   "nome": "Bella Fe",
-   "created_at": "2026-05-29T15:35:18Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
+   "company": "rosa_fina",
+   "nome": "Rosa Fina",
+   "created_at": "2026-07-17T14:59:59Z",
+   "last_login": "2026-08-06",
+   "dias_sem_acesso": 5,
+   "login_days": 1,
    "status": "active"
   },
   {
-   "company": "miss_manu",
-   "nome": "Miss Manu",
-   "created_at": "2026-07-24T23:05:48Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
+   "company": "arary",
+   "nome": "Arary",
+   "created_at": "2026-07-29T02:22:57Z",
+   "last_login": "2026-07-28",
+   "dias_sem_acesso": 14,
+   "login_days": 1,
    "status": "active"
   },
   {
-   "company": "bolsas_bauarte_acessorios_da_moda_ltda",
-   "nome": "Bolsas Bauarte Acessorios Da Moda Ltda",
-   "created_at": "2026-05-22T20:24:35Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
+   "company": "optimist_jeans",
+   "nome": "Optimist Jeans",
+   "created_at": "2026-07-13T21:19:10Z",
+   "last_login": "2026-07-15",
+   "dias_sem_acesso": 27,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "amicia",
+   "nome": "Amicia",
+   "created_at": "2026-07-27T09:52:06Z",
+   "last_login": "2026-07-31",
+   "dias_sem_acesso": 11,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "vida_marinha",
+   "nome": "Vida Marinha",
+   "created_at": "2026-07-24T13:42:52Z",
+   "last_login": "2026-08-03",
+   "dias_sem_acesso": 8,
+   "login_days": 1,
    "status": "active"
   },
   {
    "company": "groovy_forever",
    "nome": "Groovy Forever",
    "created_at": "2026-07-27T17:09:55Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
+   "login_days": 1,
    "status": "active"
   },
   {
-   "company": "bella_donna",
-   "nome": "Bella Donna",
-   "created_at": "2026-05-04T21:13:55Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "inactive"
-  },
-  {
-   "company": "menina_bonita",
-   "nome": "Menina Bonita",
-   "created_at": "2026-07-21T12:23:43Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
+   "company": "maria_dutra_jeans",
+   "nome": "Maria Dutra Jeans",
+   "created_at": "2026-08-03T14:22:17Z",
+   "last_login": "2026-08-07",
+   "dias_sem_acesso": 4,
+   "login_days": 1,
    "status": "active"
   },
   {
-   "company": "mary_acessorios",
-   "nome": "Mary Acessorios",
-   "created_at": "2026-07-24T22:06:16Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
+   "company": "kafka_baby",
+   "nome": "Kafka Baby",
+   "created_at": "2026-08-03T15:36:57Z",
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
+   "login_days": 1,
    "status": "active"
   },
   {
-   "company": "stefani",
-   "nome": "Stefani",
-   "created_at": "2026-07-28T01:22:20Z",
+   "company": "petit_enfant_confeccao_de_pecas_do_vestuario_ltda",
+   "nome": "Petit Enfant Confeccao De Pecas Do Vestuario Ltda",
+   "created_at": "2026-03-11T21:27:52Z",
+   "last_login": "2026-08-10",
+   "dias_sem_acesso": 1,
+   "login_days": 1,
+   "status": "active"
+  },
+  {
+   "company": "top_orange",
+   "nome": "Top Orange",
+   "created_at": "2026-07-24T22:39:52Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
@@ -1570,252 +1551,9 @@ window.CS2_DATA = {
    "status": "active"
   },
   {
-   "company": "ssang_bang_wool",
-   "nome": "Ssang Bang Wool",
-   "created_at": "2026-07-24T22:17:25Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "manaca",
-   "nome": "Manaca",
-   "created_at": "2026-07-24T10:25:50Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "yunire",
-   "nome": "Yunire",
-   "created_at": "2026-07-24T23:34:57Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "artecor",
-   "nome": "Artecor",
-   "created_at": "2026-07-28T10:40:56Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "kauly",
-   "nome": "Kauly",
-   "created_at": "2026-07-24T10:10:02Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "top_orange",
-   "nome": "Top Orange",
-   "created_at": "2026-07-24T22:39:52Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
    "company": "donna_ritz",
    "nome": "Donna Ritz",
    "created_at": "2026-07-28T01:54:34Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "karmani",
-   "nome": "Karmani",
-   "created_at": "2026-07-28T13:33:05Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "cambos",
-   "nome": "Cambos",
-   "created_at": "2026-07-24T21:55:41Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "trimix",
-   "nome": "Trimix",
-   "created_at": "2026-07-24T22:27:16Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "daline",
-   "nome": "Daline",
-   "created_at": "2026-06-15T11:22:15Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "crocker_jeans",
-   "nome": "Crocker Jeans",
-   "created_at": "2026-07-02T14:22:42Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "delia_modas",
-   "nome": "Delia Modas",
-   "created_at": "2026-07-24T13:26:45Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "cvl_moda",
-   "nome": "Cvl Moda",
-   "created_at": "2026-03-11T21:10:09Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "inactive"
-  },
-  {
-   "company": "kafka_baby",
-   "nome": "Kafka Baby",
-   "created_at": "2026-08-03T15:36:57Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "kalli",
-   "nome": "Kalli",
-   "created_at": "2026-07-24T09:44:41Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "nanaminze",
-   "nome": "Nanaminze",
-   "created_at": "2026-07-28T10:28:03Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "petit_enfant_confeccao_de_pecas_do_vestuario_ltda",
-   "nome": "Petit Enfant Confeccao De Pecas Do Vestuario Ltda",
-   "created_at": "2026-03-11T21:27:52Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "santa_prata",
-   "nome": "Santa Prata",
-   "created_at": "2026-07-28T01:36:44Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "barraca_do_willinha",
-   "nome": "Barraca Do Willinha",
-   "created_at": "2026-03-24T01:28:10Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "luciana_pais",
-   "nome": "Luciana Pais",
-   "created_at": "2026-07-24T23:47:30Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "incentive",
-   "nome": "Incentive",
-   "created_at": "2026-05-06T20:20:17Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "adama",
-   "nome": "Adama",
-   "created_at": "2026-07-28T11:18:56Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "nono_modas",
-   "nome": "Nono Modas",
-   "created_at": "2026-07-25T00:05:06Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "lemier",
-   "nome": "Lemier",
-   "created_at": "2026-07-25T00:21:18Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "santho_pano",
-   "nome": "Santho Pano",
-   "created_at": "2026-07-21T12:37:40Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "l2m_girls",
-   "nome": "L2m Girls",
-   "created_at": "2026-07-24T22:53:38Z",
-   "last_login": null,
-   "dias_sem_acesso": null,
-   "login_days": 0,
-   "status": "active"
-  },
-  {
-   "company": "gule",
-   "nome": "Gule",
-   "created_at": "2026-07-24T12:48:43Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
@@ -1831,9 +1569,306 @@ window.CS2_DATA = {
    "status": "inactive"
   },
   {
+   "company": "adama",
+   "nome": "Adama",
+   "created_at": "2026-07-28T11:18:56Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "incentive",
+   "nome": "Incentive",
+   "created_at": "2026-05-06T20:20:17Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "villon_jeans",
+   "nome": "Villon Jeans",
+   "created_at": "2026-07-24T23:19:17Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "nono_modas",
+   "nome": "Nono Modas",
+   "created_at": "2026-07-25T00:05:06Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "ssang_bang_wool",
+   "nome": "Ssang Bang Wool",
+   "created_at": "2026-07-24T22:17:25Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "karmani",
+   "nome": "Karmani",
+   "created_at": "2026-07-28T13:33:05Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "crocker_jeans",
+   "nome": "Crocker Jeans",
+   "created_at": "2026-07-02T14:22:42Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "cambos",
+   "nome": "Cambos",
+   "created_at": "2026-07-24T21:55:41Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "nanaminze",
+   "nome": "Nanaminze",
+   "created_at": "2026-07-28T10:28:03Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "artecor",
+   "nome": "Artecor",
+   "created_at": "2026-07-28T10:40:56Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "bolsas_bauarte_acessorios_da_moda_ltda",
+   "nome": "Bolsas Bauarte Acessorios Da Moda Ltda",
+   "created_at": "2026-05-22T20:24:35Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "bella_fe",
+   "nome": "Bella Fe",
+   "created_at": "2026-05-29T15:35:18Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "l2m_girls",
+   "nome": "L2m Girls",
+   "created_at": "2026-07-24T22:53:38Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "trimix",
+   "nome": "Trimix",
+   "created_at": "2026-07-24T22:27:16Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "brascol",
+   "nome": "Brascol",
+   "created_at": "2026-06-01T17:22:05Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "santa_prata",
+   "nome": "Santa Prata",
+   "created_at": "2026-07-28T01:36:44Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "luciana_pais",
+   "nome": "Luciana Pais",
+   "created_at": "2026-07-24T23:47:30Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "mary_acessorios",
+   "nome": "Mary Acessorios",
+   "created_at": "2026-07-24T22:06:16Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "miss_manu",
+   "nome": "Miss Manu",
+   "created_at": "2026-07-24T23:05:48Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "menina_bonita",
+   "nome": "Menina Bonita",
+   "created_at": "2026-07-21T12:23:43Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "kauly",
+   "nome": "Kauly",
+   "created_at": "2026-07-24T10:10:02Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "cvl_moda",
+   "nome": "Cvl Moda",
+   "created_at": "2026-03-11T21:10:09Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "delia_modas",
+   "nome": "Delia Modas",
+   "created_at": "2026-07-24T13:26:45Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "daline",
+   "nome": "Daline",
+   "created_at": "2026-06-15T11:22:15Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "lemier",
+   "nome": "Lemier",
+   "created_at": "2026-07-25T00:21:18Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "stefani",
+   "nome": "Stefani",
+   "created_at": "2026-07-28T01:22:20Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "barraca_do_willinha",
+   "nome": "Barraca Do Willinha",
+   "created_at": "2026-03-24T01:28:10Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "yunire",
+   "nome": "Yunire",
+   "created_at": "2026-07-24T23:34:57Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "kalli",
+   "nome": "Kalli",
+   "created_at": "2026-07-24T09:44:41Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "manaca",
+   "nome": "Manaca",
+   "created_at": "2026-07-24T10:25:50Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "bella_donna",
+   "nome": "Bella Donna",
+   "created_at": "2026-05-04T21:13:55Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "inactive"
+  },
+  {
+   "company": "gule",
+   "nome": "Gule",
+   "created_at": "2026-07-24T12:48:43Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
    "company": "biotipo_jeans",
    "nome": "Biotipo Jeans",
    "created_at": "2026-06-29T14:57:22Z",
+   "last_login": null,
+   "dias_sem_acesso": null,
+   "login_days": 0,
+   "status": "active"
+  },
+  {
+   "company": "santho_pano",
+   "nome": "Santho Pano",
+   "created_at": "2026-07-21T12:37:40Z",
    "last_login": null,
    "dias_sem_acesso": null,
    "login_days": 0,
@@ -1877,7 +1912,7 @@ window.CS2_DATA = {
    "bq_id": "1074486",
    "gmv_p1": 10917.64,
    "gmv_p2": 145115.54,
-   "gmv_p3": 22791.43
+   "gmv_p3": 23031.32
   },
   {
    "cs_tab": "Busto",
@@ -1896,7 +1931,7 @@ window.CS2_DATA = {
    "bq_id": "858226",
    "gmv_p1": 236342.95,
    "gmv_p2": 2276962.36,
-   "gmv_p3": 489998.66
+   "gmv_p3": 504087.38
   },
   {
    "cs_tab": "Busto",
@@ -1915,7 +1950,7 @@ window.CS2_DATA = {
    "bq_id": "70832",
    "gmv_p1": 936520.53,
    "gmv_p2": 9836992.22,
-   "gmv_p3": 231927.84
+   "gmv_p3": 238032.7
   },
   {
    "cs_tab": "Busto",
@@ -1934,7 +1969,7 @@ window.CS2_DATA = {
    "bq_id": "126426",
    "gmv_p1": 44578.53,
    "gmv_p2": 381612.91,
-   "gmv_p3": 14062.22
+   "gmv_p3": 20342.61
   },
   {
    "cs_tab": "Busto",
@@ -1953,7 +1988,7 @@ window.CS2_DATA = {
    "bq_id": "312379",
    "gmv_p1": 218657.01,
    "gmv_p2": 1154686.68,
-   "gmv_p3": 382993.82
+   "gmv_p3": 400524.21
   },
   {
    "cs_tab": "Busto",
@@ -1972,7 +2007,7 @@ window.CS2_DATA = {
    "bq_id": "105975",
    "gmv_p1": 362876.83,
    "gmv_p2": 1613968.62,
-   "gmv_p3": 235183.88
+   "gmv_p3": 250939.43
   },
   {
    "cs_tab": "Busto",
@@ -1991,7 +2026,7 @@ window.CS2_DATA = {
    "bq_id": "1234816",
    "gmv_p1": 146320.21,
    "gmv_p2": 571507.92,
-   "gmv_p3": 18075.95
+   "gmv_p3": 18914.55
   },
   {
    "cs_tab": "Busto",
@@ -2010,7 +2045,7 @@ window.CS2_DATA = {
    "bq_id": "2602",
    "gmv_p1": 301181.22,
    "gmv_p2": 738604.5,
-   "gmv_p3": 710149.54
+   "gmv_p3": 717905.84
   },
   {
    "cs_tab": "Busto",
@@ -2029,7 +2064,7 @@ window.CS2_DATA = {
    "bq_id": "135576",
    "gmv_p1": 1679383.98,
    "gmv_p2": 5443424.43,
-   "gmv_p3": 1786545.98
+   "gmv_p3": 1892377.04
   },
   {
    "cs_tab": "Busto",
@@ -2048,7 +2083,7 @@ window.CS2_DATA = {
    "bq_id": "317744",
    "gmv_p1": 925349.31,
    "gmv_p2": 2958558.55,
-   "gmv_p3": 644404.87
+   "gmv_p3": 669481.15
   },
   {
    "cs_tab": "Busto",
@@ -2067,7 +2102,7 @@ window.CS2_DATA = {
    "bq_id": "1790137",
    "gmv_p1": 187612.01,
    "gmv_p2": 536180.67,
-   "gmv_p3": 269053.3
+   "gmv_p3": 272621.96
   },
   {
    "cs_tab": "Busto",
@@ -2105,7 +2140,7 @@ window.CS2_DATA = {
    "bq_id": "758201",
    "gmv_p1": 603990.97,
    "gmv_p2": 1325395.41,
-   "gmv_p3": 442732.29
+   "gmv_p3": 455213.85
   },
   {
    "cs_tab": "Busto",
@@ -2162,7 +2197,7 @@ window.CS2_DATA = {
    "bq_id": "1030215",
    "gmv_p1": 215788.21,
    "gmv_p2": 376022.58,
-   "gmv_p3": 45160.17
+   "gmv_p3": 45409.57
   },
   {
    "cs_tab": "Busto",
@@ -2181,7 +2216,7 @@ window.CS2_DATA = {
    "bq_id": "1058361",
    "gmv_p1": 2833775.86,
    "gmv_p2": 4768682.31,
-   "gmv_p3": 892476.6
+   "gmv_p3": 917658.93
   },
   {
    "cs_tab": "Busto",
@@ -2238,7 +2273,7 @@ window.CS2_DATA = {
    "bq_id": "119437",
    "gmv_p1": 666394.8,
    "gmv_p2": 974420.9,
-   "gmv_p3": 168129.9
+   "gmv_p3": 236630.2
   },
   {
    "cs_tab": "Busto",
@@ -2257,7 +2292,7 @@ window.CS2_DATA = {
    "bq_id": "203228",
    "gmv_p1": 13584849.02,
    "gmv_p2": 18357131.57,
-   "gmv_p3": 3380218.23
+   "gmv_p3": 3608960.71
   },
   {
    "cs_tab": "Busto",
@@ -2276,7 +2311,7 @@ window.CS2_DATA = {
    "bq_id": "1169506",
    "gmv_p1": 841863.99,
    "gmv_p2": 1205924.88,
-   "gmv_p3": 275031.92
+   "gmv_p3": 455398.74
   },
   {
    "cs_tab": "Busto",
@@ -2295,7 +2330,7 @@ window.CS2_DATA = {
    "bq_id": "155660",
    "gmv_p1": 1149812.5,
    "gmv_p2": 1575074.03,
-   "gmv_p3": 408052.68
+   "gmv_p3": 426277.72
   },
   {
    "cs_tab": "Busto",
@@ -2314,7 +2349,7 @@ window.CS2_DATA = {
    "bq_id": "347376",
    "gmv_p1": 616760.15,
    "gmv_p2": 798711.57,
-   "gmv_p3": 77989.39
+   "gmv_p3": 89915.19
   },
   {
    "cs_tab": "Busto",
@@ -2333,7 +2368,7 @@ window.CS2_DATA = {
    "bq_id": "50269",
    "gmv_p1": 778876.5,
    "gmv_p2": 1013888.05,
-   "gmv_p3": 180500.6
+   "gmv_p3": 180650.6
   },
   {
    "cs_tab": "Busto",
@@ -2352,7 +2387,7 @@ window.CS2_DATA = {
    "bq_id": "129809",
    "gmv_p1": 1678272.06,
    "gmv_p2": 1879260.74,
-   "gmv_p3": 505276.62
+   "gmv_p3": 507995.32
   },
   {
    "cs_tab": "Busto",
@@ -2371,7 +2406,7 @@ window.CS2_DATA = {
    "bq_id": "1220707",
    "gmv_p1": 74257.23,
    "gmv_p2": 86456.4,
-   "gmv_p3": 16741.65
+   "gmv_p3": 17387.74
   },
   {
    "cs_tab": "Busto",
@@ -2409,7 +2444,7 @@ window.CS2_DATA = {
    "bq_id": "476639",
    "gmv_p1": 1162862.9,
    "gmv_p2": 1254252.23,
-   "gmv_p3": 255141.59
+   "gmv_p3": 260906.15
   },
   {
    "cs_tab": "Busto",
@@ -2466,7 +2501,7 @@ window.CS2_DATA = {
    "bq_id": "1017092",
    "gmv_p1": 1198438.4,
    "gmv_p2": 1252105.0,
-   "gmv_p3": 250005.0
+   "gmv_p3": 271168.0
   },
   {
    "cs_tab": "Busto",
@@ -2504,7 +2539,7 @@ window.CS2_DATA = {
    "bq_id": "1237877",
    "gmv_p1": 560643.98,
    "gmv_p2": 588215.64,
-   "gmv_p3": 101840.02
+   "gmv_p3": 120814.38
   },
   {
    "cs_tab": "Busto",
@@ -2542,7 +2577,7 @@ window.CS2_DATA = {
    "bq_id": "25804",
    "gmv_p1": 1459835.7,
    "gmv_p2": 1359259.15,
-   "gmv_p3": 301382.77
+   "gmv_p3": 301556.75
   },
   {
    "cs_tab": "Busto",
@@ -2561,7 +2596,7 @@ window.CS2_DATA = {
    "bq_id": "619088",
    "gmv_p1": 892327.1,
    "gmv_p2": 724998.98,
-   "gmv_p3": 87429.8
+   "gmv_p3": 89096.8
   },
   {
    "cs_tab": "Busto",
@@ -2580,7 +2615,7 @@ window.CS2_DATA = {
    "bq_id": "1524895",
    "gmv_p1": 5155463.05,
    "gmv_p2": 4979485.42,
-   "gmv_p3": 1181787.13
+   "gmv_p3": 1223499.94
   },
   {
    "cs_tab": "Busto",
@@ -2599,7 +2634,7 @@ window.CS2_DATA = {
    "bq_id": "261508",
    "gmv_p1": 3944697.22,
    "gmv_p2": 3548989.4,
-   "gmv_p3": 822583.32
+   "gmv_p3": 858739.32
   },
   {
    "cs_tab": "Busto",
@@ -2618,7 +2653,7 @@ window.CS2_DATA = {
    "bq_id": "940943",
    "gmv_p1": 1756946.24,
    "gmv_p2": 1652723.02,
-   "gmv_p3": 356093.74
+   "gmv_p3": 358919.98
   },
   {
    "cs_tab": "Busto",
@@ -2656,7 +2691,7 @@ window.CS2_DATA = {
    "bq_id": "549482",
    "gmv_p1": 345558.48,
    "gmv_p2": 324367.0,
-   "gmv_p3": 58364.0
+   "gmv_p3": 60401.0
   },
   {
    "cs_tab": "Busto",
@@ -2675,7 +2710,7 @@ window.CS2_DATA = {
    "bq_id": "878111",
    "gmv_p1": 904951.57,
    "gmv_p2": 869574.05,
-   "gmv_p3": 111762.4
+   "gmv_p3": 112119.4
   },
   {
    "cs_tab": "Busto",
@@ -2694,7 +2729,7 @@ window.CS2_DATA = {
    "bq_id": "1415574",
    "gmv_p1": 1613097.28,
    "gmv_p2": 1563471.36,
-   "gmv_p3": 166553.29
+   "gmv_p3": 174945.08
   },
   {
    "cs_tab": "Busto",
@@ -2713,7 +2748,7 @@ window.CS2_DATA = {
    "bq_id": "965096",
    "gmv_p1": 812368.69,
    "gmv_p2": 746185.83,
-   "gmv_p3": 119396.05
+   "gmv_p3": 129068.22
   },
   {
    "cs_tab": "Busto",
@@ -2751,7 +2786,7 @@ window.CS2_DATA = {
    "bq_id": "646683",
    "gmv_p1": 360179.01,
    "gmv_p2": 325118.0,
-   "gmv_p3": 35766.0
+   "gmv_p3": 39514.0
   },
   {
    "cs_tab": "Busto",
@@ -2770,7 +2805,7 @@ window.CS2_DATA = {
    "bq_id": "57825",
    "gmv_p1": 576711.75,
    "gmv_p2": 512824.58,
-   "gmv_p3": 51234.48
+   "gmv_p3": 51073.55
   },
   {
    "cs_tab": "Busto",
@@ -2789,7 +2824,7 @@ window.CS2_DATA = {
    "bq_id": "812626",
    "gmv_p1": 4503233.99,
    "gmv_p2": 3641578.41,
-   "gmv_p3": 896398.0
+   "gmv_p3": 898085.95
   },
   {
    "cs_tab": "Busto",
@@ -2808,7 +2843,7 @@ window.CS2_DATA = {
    "bq_id": "1258736",
    "gmv_p1": 2655607.09,
    "gmv_p2": 2176149.5,
-   "gmv_p3": 503586.5
+   "gmv_p3": 525004.0
   },
   {
    "cs_tab": "Busto",
@@ -2846,7 +2881,7 @@ window.CS2_DATA = {
    "bq_id": "949606",
    "gmv_p1": 842322.39,
    "gmv_p2": 715132.61,
-   "gmv_p3": 90757.49
+   "gmv_p3": 93858.29
   },
   {
    "cs_tab": "Busto",
@@ -2884,7 +2919,7 @@ window.CS2_DATA = {
    "bq_id": "43629",
    "gmv_p1": 166775.47,
    "gmv_p2": 136592.0,
-   "gmv_p3": 26201.0
+   "gmv_p3": 26876.0
   },
   {
    "cs_tab": "Busto",
@@ -2903,7 +2938,7 @@ window.CS2_DATA = {
    "bq_id": "187505",
    "gmv_p1": 818786.6,
    "gmv_p2": 661231.2,
-   "gmv_p3": 207058.5
+   "gmv_p3": 211105.0
   },
   {
    "cs_tab": "Busto",
@@ -2922,7 +2957,7 @@ window.CS2_DATA = {
    "bq_id": "95387",
    "gmv_p1": 387697.4,
    "gmv_p2": 318124.52,
-   "gmv_p3": 15333.01
+   "gmv_p3": 14911.86
   },
   {
    "cs_tab": "Busto",
@@ -2941,7 +2976,7 @@ window.CS2_DATA = {
    "bq_id": "60671",
    "gmv_p1": 2156832.41,
    "gmv_p2": 1668140.87,
-   "gmv_p3": 302056.37
+   "gmv_p3": 311943.77
   },
   {
    "cs_tab": "Busto",
@@ -2960,7 +2995,7 @@ window.CS2_DATA = {
    "bq_id": "15266",
    "gmv_p1": 218141.13,
    "gmv_p2": 160232.81,
-   "gmv_p3": 60688.1
+   "gmv_p3": 68248.76
   },
   {
    "cs_tab": "Busto",
@@ -2998,7 +3033,7 @@ window.CS2_DATA = {
    "bq_id": "1080025",
    "gmv_p1": 1390667.99,
    "gmv_p2": 1054319.63,
-   "gmv_p3": 107478.96
+   "gmv_p3": 151149.0
   },
   {
    "cs_tab": "Busto",
@@ -3017,7 +3052,7 @@ window.CS2_DATA = {
    "bq_id": "42652",
    "gmv_p1": 793514.04,
    "gmv_p2": 610283.21,
-   "gmv_p3": 85534.73
+   "gmv_p3": 91464.43
   },
   {
    "cs_tab": "Busto",
@@ -3036,7 +3071,7 @@ window.CS2_DATA = {
    "bq_id": "240758",
    "gmv_p1": 650837.0,
    "gmv_p2": 472835.7,
-   "gmv_p3": 101499.9
+   "gmv_p3": 104215.5
   },
   {
    "cs_tab": "Busto",
@@ -3074,7 +3109,7 @@ window.CS2_DATA = {
    "bq_id": "368683",
    "gmv_p1": 3832164.66,
    "gmv_p2": 2852466.87,
-   "gmv_p3": 513321.63
+   "gmv_p3": 527110.63
   },
   {
    "cs_tab": "Busto",
@@ -3093,7 +3128,7 @@ window.CS2_DATA = {
    "bq_id": "82263",
    "gmv_p1": 691519.27,
    "gmv_p2": 525816.85,
-   "gmv_p3": 52455.63
+   "gmv_p3": 55656.78
   },
   {
    "cs_tab": "Busto",
@@ -3112,7 +3147,7 @@ window.CS2_DATA = {
    "bq_id": "683519",
    "gmv_p1": 2503959.54,
    "gmv_p2": 1714841.78,
-   "gmv_p3": 359371.85
+   "gmv_p3": 360675.93
   },
   {
    "cs_tab": "Busto",
@@ -3131,7 +3166,7 @@ window.CS2_DATA = {
    "bq_id": "41496",
    "gmv_p1": 1642324.99,
    "gmv_p2": 1161638.65,
-   "gmv_p3": 208946.53
+   "gmv_p3": 209855.1
   },
   {
    "cs_tab": "Busto",
@@ -3169,7 +3204,7 @@ window.CS2_DATA = {
    "bq_id": "1347965",
    "gmv_p1": 2091209.05,
    "gmv_p2": 1470646.99,
-   "gmv_p3": 153386.68
+   "gmv_p3": 153491.68
   },
   {
    "cs_tab": "Busto",
@@ -3188,7 +3223,7 @@ window.CS2_DATA = {
    "bq_id": "711696",
    "gmv_p1": 1549621.58,
    "gmv_p2": 1045789.35,
-   "gmv_p3": 204325.28
+   "gmv_p3": 208783.43
   },
   {
    "cs_tab": "Busto",
@@ -3225,7 +3260,7 @@ window.CS2_DATA = {
    "obs_orig": "",
    "gmv_p1": 313157.3,
    "gmv_p2": 216755.5,
-   "gmv_p3": 30150.5,
+   "gmv_p3": 35187.5,
    "bq_id": "23502"
   },
   {
@@ -3245,7 +3280,7 @@ window.CS2_DATA = {
    "bq_id": "713811",
    "gmv_p1": 1191615.0,
    "gmv_p2": 817022.0,
-   "gmv_p3": 185755.0
+   "gmv_p3": 218305.0
   },
   {
    "cs_tab": "Busto",
@@ -3264,7 +3299,7 @@ window.CS2_DATA = {
    "bq_id": "1518181",
    "gmv_p1": 130933.63,
    "gmv_p2": 85855.79,
-   "gmv_p3": 8627.33
+   "gmv_p3": 9849.13
   },
   {
    "cs_tab": "Busto",
@@ -3283,7 +3318,7 @@ window.CS2_DATA = {
    "bq_id": "693446",
    "gmv_p1": 2147899.83,
    "gmv_p2": 1192473.67,
-   "gmv_p3": 281897.41
+   "gmv_p3": 287046.27
   },
   {
    "cs_tab": "Busto",
@@ -3302,7 +3337,7 @@ window.CS2_DATA = {
    "bq_id": "606820",
    "gmv_p1": 943225.4,
    "gmv_p2": 559718.0,
-   "gmv_p3": 76812.0
+   "gmv_p3": 102101.0
   },
   {
    "cs_tab": "Busto",
@@ -3321,7 +3356,7 @@ window.CS2_DATA = {
    "bq_id": "34017",
    "gmv_p1": 425647.5,
    "gmv_p2": 247084.8,
-   "gmv_p3": 30429.4
+   "gmv_p3": 30119.5
   },
   {
    "cs_tab": "Busto",
@@ -3340,7 +3375,7 @@ window.CS2_DATA = {
    "bq_id": "1126062",
    "gmv_p1": 1371765.0,
    "gmv_p2": 687153.15,
-   "gmv_p3": 166658.7
+   "gmv_p3": 166738.6
   },
   {
    "cs_tab": "Busto",
@@ -3359,7 +3394,7 @@ window.CS2_DATA = {
    "bq_id": "1407398",
    "gmv_p1": 4771052.99,
    "gmv_p2": 2483628.52,
-   "gmv_p3": 375298.44
+   "gmv_p3": 390746.27
   },
   {
    "cs_tab": "Busto",
@@ -3378,7 +3413,7 @@ window.CS2_DATA = {
    "bq_id": "661636",
    "gmv_p1": 312821.63,
    "gmv_p2": 151335.91,
-   "gmv_p3": 11308.0
+   "gmv_p3": 15380.0
   },
   {
    "cs_tab": "Busto",
@@ -3397,7 +3432,7 @@ window.CS2_DATA = {
    "bq_id": "646958",
    "gmv_p1": 3261238.6,
    "gmv_p2": 1447692.4,
-   "gmv_p3": 286732.21
+   "gmv_p3": 287037.01
   },
   {
    "cs_tab": "Busto",
@@ -3416,7 +3451,7 @@ window.CS2_DATA = {
    "bq_id": "1210327",
    "gmv_p1": 618119.5,
    "gmv_p2": 248582.95,
-   "gmv_p3": 37046.13
+   "gmv_p3": 38969.58
   },
   {
    "cs_tab": "Busto",
@@ -3435,7 +3470,7 @@ window.CS2_DATA = {
    "bq_id": "629282",
    "gmv_p1": 2771237.66,
    "gmv_p2": 1047776.05,
-   "gmv_p3": 295302.68
+   "gmv_p3": 309321.78
   },
   {
    "cs_tab": "Busto",
@@ -3454,7 +3489,7 @@ window.CS2_DATA = {
    "bq_id": "13160",
    "gmv_p1": 1333900.66,
    "gmv_p2": 172724.75,
-   "gmv_p3": 93314.94
+   "gmv_p3": 114391.94
   },
   {
    "cs_tab": "Busto",
@@ -3492,7 +3527,7 @@ window.CS2_DATA = {
    "bq_id": "33269",
    "gmv_p1": 999796.08,
    "gmv_p2": 672031.92,
-   "gmv_p3": 182866.69
+   "gmv_p3": 188052.29
   },
   {
    "cs_tab": "Busto",
@@ -3511,7 +3546,7 @@ window.CS2_DATA = {
    "bq_id": "119716",
    "gmv_p1": 1636080.21,
    "gmv_p2": 1701506.12,
-   "gmv_p3": 158273.69
+   "gmv_p3": 174987.49
   },
   {
    "cs_tab": "Busto",
@@ -3530,7 +3565,7 @@ window.CS2_DATA = {
    "bq_id": "336063",
    "gmv_p1": 732489.6,
    "gmv_p2": 812276.94,
-   "gmv_p3": 86049.66
+   "gmv_p3": 87726.86
   },
   {
    "cs_tab": "Busto",
@@ -3549,7 +3584,7 @@ window.CS2_DATA = {
    "bq_id": "632540",
    "gmv_p1": 3901352.55,
    "gmv_p2": 5318355.03,
-   "gmv_p3": 1492658.19
+   "gmv_p3": 1641899.31
   },
   {
    "cs_tab": "Busto",
@@ -3568,7 +3603,7 @@ window.CS2_DATA = {
    "bq_id": "351565",
    "gmv_p1": 823260.34,
    "gmv_p2": 950063.73,
-   "gmv_p3": 266196.48
+   "gmv_p3": 272425.59
   },
   {
    "cs_tab": "Busto",
@@ -3587,7 +3622,7 @@ window.CS2_DATA = {
    "bq_id": "38651",
    "gmv_p1": 1300697.51,
    "gmv_p2": 1831447.68,
-   "gmv_p3": 464117.96
+   "gmv_p3": 476049.96
   },
   {
    "cs_tab": "Busto",
@@ -3606,7 +3641,7 @@ window.CS2_DATA = {
    "bq_id": "1299419",
    "gmv_p1": 498671.74,
    "gmv_p2": 419119.43,
-   "gmv_p3": 154136.47
+   "gmv_p3": 158950.57
   },
   {
    "cs_tab": "Busto",
@@ -3625,7 +3660,7 @@ window.CS2_DATA = {
    "bq_id": "448792",
    "gmv_p1": 8148418.4,
    "gmv_p2": 9199582.44,
-   "gmv_p3": 1535409.6
+   "gmv_p3": 1594362.6
   },
   {
    "cs_tab": "Busto",
@@ -3644,7 +3679,7 @@ window.CS2_DATA = {
    "bq_id": "449259",
    "gmv_p1": 3481597.0,
    "gmv_p2": 2683834.3,
-   "gmv_p3": 864920.2
+   "gmv_p3": 894985.5
   },
   {
    "cs_tab": "Luana",
@@ -3720,7 +3755,7 @@ window.CS2_DATA = {
    "bq_id": "1431828",
    "gmv_p1": 27666.63,
    "gmv_p2": 109551.52,
-   "gmv_p3": 32419.87
+   "gmv_p3": 34082.87
   },
   {
    "cs_tab": "Luana",
@@ -3739,7 +3774,7 @@ window.CS2_DATA = {
    "bq_id": "644061",
    "gmv_p1": 232988.76,
    "gmv_p2": 834775.51,
-   "gmv_p3": 406171.54
+   "gmv_p3": 421318.13
   },
   {
    "cs_tab": "Luana",
@@ -3758,7 +3793,7 @@ window.CS2_DATA = {
    "bq_id": "1819640",
    "gmv_p1": 1327482.76,
    "gmv_p2": 4358536.96,
-   "gmv_p3": 1236296.45
+   "gmv_p3": 1298895.35
   },
   {
    "cs_tab": "Luana",
@@ -3777,7 +3812,7 @@ window.CS2_DATA = {
    "bq_id": "251048",
    "gmv_p1": 282868.12,
    "gmv_p2": 860151.49,
-   "gmv_p3": 166626.47
+   "gmv_p3": 168274.47
   },
   {
    "cs_tab": "Luana",
@@ -3796,7 +3831,7 @@ window.CS2_DATA = {
    "bq_id": "731799",
    "gmv_p1": 222853.82,
    "gmv_p2": 646046.89,
-   "gmv_p3": 229479.25
+   "gmv_p3": 230704.8
   },
   {
    "cs_tab": "Luana",
@@ -3834,7 +3869,7 @@ window.CS2_DATA = {
    "bq_id": "810439",
    "gmv_p1": 808367.98,
    "gmv_p2": 2490137.58,
-   "gmv_p3": 263929.79
+   "gmv_p3": 283175.61
   },
   {
    "cs_tab": "Luana",
@@ -3853,7 +3888,7 @@ window.CS2_DATA = {
    "bq_id": "928822",
    "gmv_p1": 458232.84,
    "gmv_p2": 1281498.92,
-   "gmv_p3": 306474.56
+   "gmv_p3": 334888.86
   },
   {
    "cs_tab": "Luana",
@@ -3872,7 +3907,7 @@ window.CS2_DATA = {
    "bq_id": "1571077",
    "gmv_p1": 117285.03,
    "gmv_p2": 342248.85,
-   "gmv_p3": 20637.43
+   "gmv_p3": 20517.43
   },
   {
    "cs_tab": "Luana",
@@ -3910,7 +3945,7 @@ window.CS2_DATA = {
    "bq_id": "125339",
    "gmv_p1": 508570.48,
    "gmv_p2": 1273192.81,
-   "gmv_p3": 479436.58
+   "gmv_p3": 491131.37
   },
   {
    "cs_tab": "Luana",
@@ -3929,7 +3964,7 @@ window.CS2_DATA = {
    "bq_id": "49554",
    "gmv_p1": 1748114.2,
    "gmv_p2": 4207372.6,
-   "gmv_p3": 373077.8
+   "gmv_p3": 384351.8
   },
   {
    "cs_tab": "Luana",
@@ -3948,7 +3983,7 @@ window.CS2_DATA = {
    "bq_id": "1275581",
    "gmv_p1": 184195.95,
    "gmv_p2": 393259.7,
-   "gmv_p3": 164978.2
+   "gmv_p3": 168457.2
   },
   {
    "cs_tab": "Luana",
@@ -4005,7 +4040,7 @@ window.CS2_DATA = {
    "bq_id": "46233",
    "gmv_p1": 81965.38,
    "gmv_p2": 153825.98,
-   "gmv_p3": 46524.88
+   "gmv_p3": 49133.07
   },
   {
    "cs_tab": "Luana",
@@ -4024,7 +4059,7 @@ window.CS2_DATA = {
    "bq_id": "618541",
    "gmv_p1": 100422.2,
    "gmv_p2": 187071.48,
-   "gmv_p3": 28294.7
+   "gmv_p3": 22432.0
   },
   {
    "cs_tab": "Luana",
@@ -4043,7 +4078,7 @@ window.CS2_DATA = {
    "bq_id": "1178586",
    "gmv_p1": 3699864.52,
    "gmv_p2": 6417242.6,
-   "gmv_p3": 2039115.06
+   "gmv_p3": 2070094.53
   },
   {
    "cs_tab": "Luana",
@@ -4062,7 +4097,7 @@ window.CS2_DATA = {
    "bq_id": "317136",
    "gmv_p1": 324958.8,
    "gmv_p2": 574731.84,
-   "gmv_p3": 140490.98
+   "gmv_p3": 145029.57
   },
   {
    "cs_tab": "Luana",
@@ -4119,7 +4154,7 @@ window.CS2_DATA = {
    "bq_id": "1316026",
    "gmv_p1": 1419394.57,
    "gmv_p2": 2310199.15,
-   "gmv_p3": 515729.2
+   "gmv_p3": 530815.8
   },
   {
    "cs_tab": "Luana",
@@ -4138,7 +4173,7 @@ window.CS2_DATA = {
    "bq_id": "1448441",
    "gmv_p1": 1356951.31,
    "gmv_p2": 2137551.23,
-   "gmv_p3": 556430.0
+   "gmv_p3": 575601.07
   },
   {
    "cs_tab": "Luana",
@@ -4157,7 +4192,7 @@ window.CS2_DATA = {
    "bq_id": "1201385",
    "gmv_p1": 167068.3,
    "gmv_p2": 248569.15,
-   "gmv_p3": 23245.5
+   "gmv_p3": 27619.5
   },
   {
    "cs_tab": "Luana",
@@ -4195,7 +4230,7 @@ window.CS2_DATA = {
    "bq_id": "65652",
    "gmv_p1": 2542930.17,
    "gmv_p2": 3514750.02,
-   "gmv_p3": 464147.7
+   "gmv_p3": 474621.76
   },
   {
    "cs_tab": "Luana",
@@ -4214,7 +4249,7 @@ window.CS2_DATA = {
    "bq_id": "1250065",
    "gmv_p1": 1042108.0,
    "gmv_p2": 1404462.5,
-   "gmv_p3": 228203.3
+   "gmv_p3": 230880.3
   },
   {
    "cs_tab": "Luana",
@@ -4233,7 +4268,7 @@ window.CS2_DATA = {
    "bq_id": "1733",
    "gmv_p1": 640172.19,
    "gmv_p2": 831146.94,
-   "gmv_p3": 212388.72
+   "gmv_p3": 223166.12
   },
   {
    "cs_tab": "Luana",
@@ -4271,7 +4306,7 @@ window.CS2_DATA = {
    "bq_id": "1703736",
    "gmv_p1": 619690.23,
    "gmv_p2": 727039.2,
-   "gmv_p3": 153765.4
+   "gmv_p3": 156993.97
   },
   {
    "cs_tab": "Luana",
@@ -4290,7 +4325,7 @@ window.CS2_DATA = {
    "bq_id": "1544822",
    "gmv_p1": 646961.03,
    "gmv_p2": 787076.01,
-   "gmv_p3": 194731.2
+   "gmv_p3": 206017.87
   },
   {
    "cs_tab": "Luana",
@@ -4309,7 +4344,7 @@ window.CS2_DATA = {
    "bq_id": "1637938",
    "gmv_p1": 396109.33,
    "gmv_p2": 473641.88,
-   "gmv_p3": 81804.83
+   "gmv_p3": 84138.54
   },
   {
    "cs_tab": "Luana",
@@ -4328,7 +4363,7 @@ window.CS2_DATA = {
    "bq_id": "27008",
    "gmv_p1": 6617676.72,
    "gmv_p2": 9270781.24,
-   "gmv_p3": 2035042.45
+   "gmv_p3": 2041232.12
   },
   {
    "cs_tab": "Luana",
@@ -4347,7 +4382,7 @@ window.CS2_DATA = {
    "bq_id": "1078045",
    "gmv_p1": 176295.2,
    "gmv_p2": 150801.55,
-   "gmv_p3": 9030.93
+   "gmv_p3": 9251.7
   },
   {
    "cs_tab": "Luana",
@@ -4366,7 +4401,7 @@ window.CS2_DATA = {
    "bq_id": "1568965",
    "gmv_p1": 696552.1,
    "gmv_p2": 804213.79,
-   "gmv_p3": 340657.65
+   "gmv_p3": 345032.48
   },
   {
    "cs_tab": "Luana",
@@ -4384,7 +4419,7 @@ window.CS2_DATA = {
    "obs_orig": "",
    "gmv_p1": 285140.9,
    "gmv_p2": 326347.0,
-   "gmv_p3": 67816.5,
+   "gmv_p3": 69925.0,
    "bq_id": "503164"
   },
   {
@@ -4404,7 +4439,7 @@ window.CS2_DATA = {
    "bq_id": "909617",
    "gmv_p1": 84911.47,
    "gmv_p2": 97902.57,
-   "gmv_p3": 16061.65
+   "gmv_p3": 17126.65
   },
   {
    "cs_tab": "Luana",
@@ -4423,7 +4458,7 @@ window.CS2_DATA = {
    "bq_id": "998275",
    "gmv_p1": 244807.2,
    "gmv_p2": 274959.45,
-   "gmv_p3": 45800.6
+   "gmv_p3": 45658.9
   },
   {
    "cs_tab": "Luana",
@@ -4461,7 +4496,7 @@ window.CS2_DATA = {
    "bq_id": "24244",
    "gmv_p1": 316590.73,
    "gmv_p2": 329038.82,
-   "gmv_p3": 82363.64
+   "gmv_p3": 83421.38
   },
   {
    "cs_tab": "Luana",
@@ -4480,7 +4515,7 @@ window.CS2_DATA = {
    "bq_id": "627689",
    "gmv_p1": 6088122.65,
    "gmv_p2": 6233643.1,
-   "gmv_p3": 1454699.5
+   "gmv_p3": 1476730.9
   },
   {
    "cs_tab": "Luana",
@@ -4518,7 +4553,7 @@ window.CS2_DATA = {
    "bq_id": "1468945",
    "gmv_p1": 558708.27,
    "gmv_p2": 583465.42,
-   "gmv_p3": 115955.1
+   "gmv_p3": 123751.4
   },
   {
    "cs_tab": "Luana",
@@ -4537,7 +4572,7 @@ window.CS2_DATA = {
    "bq_id": "1035659",
    "gmv_p1": 119834.33,
    "gmv_p2": 122655.06,
-   "gmv_p3": 25493.93
+   "gmv_p3": 27157.13
   },
   {
    "cs_tab": "Luana",
@@ -4556,7 +4591,7 @@ window.CS2_DATA = {
    "bq_id": "60719",
    "gmv_p1": 864836.07,
    "gmv_p2": 835680.11,
-   "gmv_p3": 254937.13
+   "gmv_p3": 262040.13
   },
   {
    "cs_tab": "Luana",
@@ -4575,7 +4610,7 @@ window.CS2_DATA = {
    "bq_id": "1541315",
    "gmv_p1": 1131234.06,
    "gmv_p2": 1142479.73,
-   "gmv_p3": 292429.57
+   "gmv_p3": 295437.67
   },
   {
    "cs_tab": "Luana",
@@ -4594,7 +4629,7 @@ window.CS2_DATA = {
    "bq_id": "828876",
    "gmv_p1": 5455192.95,
    "gmv_p2": 5362545.73,
-   "gmv_p3": 1113941.96
+   "gmv_p3": 1153024.86
   },
   {
    "cs_tab": "Luana",
@@ -4632,7 +4667,7 @@ window.CS2_DATA = {
    "bq_id": "1272421",
    "gmv_p1": 16656064.36,
    "gmv_p2": 15997286.23,
-   "gmv_p3": 4090578.65
+   "gmv_p3": 4195001.22
   },
   {
    "cs_tab": "Luana",
@@ -4651,7 +4686,7 @@ window.CS2_DATA = {
    "bq_id": "712379",
    "gmv_p1": 617730.97,
    "gmv_p2": 596400.51,
-   "gmv_p3": 28250.18
+   "gmv_p3": 29746.0
   },
   {
    "cs_tab": "Luana",
@@ -4670,7 +4705,7 @@ window.CS2_DATA = {
    "bq_id": "1566528",
    "gmv_p1": 669529.13,
    "gmv_p2": 619647.35,
-   "gmv_p3": 167209.95
+   "gmv_p3": 183900.04
   },
   {
    "cs_tab": "Luana",
@@ -4689,7 +4724,7 @@ window.CS2_DATA = {
    "bq_id": "1375391",
    "gmv_p1": 455276.65,
    "gmv_p2": 391646.27,
-   "gmv_p3": 88592.6
+   "gmv_p3": 97991.3
   },
   {
    "cs_tab": "Luana",
@@ -4708,7 +4743,7 @@ window.CS2_DATA = {
    "bq_id": "157684",
    "gmv_p1": 218003.91,
    "gmv_p2": 189682.4,
-   "gmv_p3": 16645.6
+   "gmv_p3": 23176.7
   },
   {
    "cs_tab": "Luana",
@@ -4727,7 +4762,7 @@ window.CS2_DATA = {
    "bq_id": "14035",
    "gmv_p1": 3110399.17,
    "gmv_p2": 2658691.89,
-   "gmv_p3": 576313.31
+   "gmv_p3": 600859.78
   },
   {
    "cs_tab": "Luana",
@@ -4746,7 +4781,7 @@ window.CS2_DATA = {
    "bq_id": "230413",
    "gmv_p1": 1598884.62,
    "gmv_p2": 1363040.01,
-   "gmv_p3": 229512.82
+   "gmv_p3": 232437.75
   },
   {
    "cs_tab": "Luana",
@@ -4765,7 +4800,7 @@ window.CS2_DATA = {
    "bq_id": "991148",
    "gmv_p1": 2830914.56,
    "gmv_p2": 2345181.24,
-   "gmv_p3": 609367.01
+   "gmv_p3": 616006.01
   },
   {
    "cs_tab": "Luana",
@@ -4784,7 +4819,7 @@ window.CS2_DATA = {
    "bq_id": "873969",
    "gmv_p1": 741503.11,
    "gmv_p2": 614081.92,
-   "gmv_p3": 112960.36
+   "gmv_p3": 116237.84
   },
   {
    "cs_tab": "Luana",
@@ -4803,7 +4838,7 @@ window.CS2_DATA = {
    "bq_id": "1372995",
    "gmv_p1": 4093082.63,
    "gmv_p2": 3219311.47,
-   "gmv_p3": 724421.45
+   "gmv_p3": 724985.45
   },
   {
    "cs_tab": "Luana",
@@ -4822,7 +4857,7 @@ window.CS2_DATA = {
    "bq_id": "42595",
    "gmv_p1": 2688131.74,
    "gmv_p2": 2016744.29,
-   "gmv_p3": 392075.7
+   "gmv_p3": 395277.7
   },
   {
    "cs_tab": "Luana",
@@ -4879,7 +4914,7 @@ window.CS2_DATA = {
    "bq_id": "1098231",
    "gmv_p1": 1853678.33,
    "gmv_p2": 1371574.21,
-   "gmv_p3": 344470.31
+   "gmv_p3": 347779.72
   },
   {
    "cs_tab": "Luana",
@@ -4898,7 +4933,7 @@ window.CS2_DATA = {
    "bq_id": "432686",
    "gmv_p1": 994764.0,
    "gmv_p2": 734110.0,
-   "gmv_p3": 102630.0
+   "gmv_p3": 127075.0
   },
   {
    "cs_tab": "Luana",
@@ -4917,7 +4952,7 @@ window.CS2_DATA = {
    "bq_id": "1345093",
    "gmv_p1": 1705639.4,
    "gmv_p2": 1138877.62,
-   "gmv_p3": 254528.03
+   "gmv_p3": 318139.72
   },
   {
    "cs_tab": "Luana",
@@ -4936,7 +4971,7 @@ window.CS2_DATA = {
    "bq_id": "1434710",
    "gmv_p1": 448589.86,
    "gmv_p2": 304987.78,
-   "gmv_p3": 43904.71
+   "gmv_p3": 43081.62
   },
   {
    "cs_tab": "Luana",
@@ -4974,7 +5009,7 @@ window.CS2_DATA = {
    "bq_id": "243791",
    "gmv_p1": 614768.68,
    "gmv_p2": 415711.38,
-   "gmv_p3": 114694.15
+   "gmv_p3": 116431.41
   },
   {
    "cs_tab": "Luana",
@@ -4993,7 +5028,7 @@ window.CS2_DATA = {
    "bq_id": "334983",
    "gmv_p1": 1040995.22,
    "gmv_p2": 644445.85,
-   "gmv_p3": 180649.05
+   "gmv_p3": 188449.01
   },
   {
    "cs_tab": "Luana",
@@ -5012,7 +5047,7 @@ window.CS2_DATA = {
    "bq_id": "1170555",
    "gmv_p1": 528628.96,
    "gmv_p2": 354026.12,
-   "gmv_p3": 48302.8
+   "gmv_p3": 49022.2
   },
   {
    "cs_tab": "Luana",
@@ -5031,7 +5066,7 @@ window.CS2_DATA = {
    "bq_id": "1672566",
    "gmv_p1": 811263.24,
    "gmv_p2": 455233.14,
-   "gmv_p3": 127213.22
+   "gmv_p3": 128350.22
   },
   {
    "cs_tab": "Luana",
@@ -5069,7 +5104,7 @@ window.CS2_DATA = {
    "bq_id": "1409509",
    "gmv_p1": 414385.33,
    "gmv_p2": 235434.32,
-   "gmv_p3": 31819.37
+   "gmv_p3": 35248.37
   },
   {
    "cs_tab": "Luana",
@@ -5088,7 +5123,7 @@ window.CS2_DATA = {
    "bq_id": "1191066",
    "gmv_p1": 309095.0,
    "gmv_p2": 155170.0,
-   "gmv_p3": 62120.0
+   "gmv_p3": 65315.0
   },
   {
    "cs_tab": "Luana",
@@ -5126,7 +5161,7 @@ window.CS2_DATA = {
    "bq_id": "1115487",
    "gmv_p1": 760136.73,
    "gmv_p2": 260566.62,
-   "gmv_p3": 74063.42
+   "gmv_p3": 74813.42
   },
   {
    "cs_tab": "Luana",
@@ -5145,7 +5180,7 @@ window.CS2_DATA = {
    "bq_id": "1240668",
    "gmv_p1": 1968464.12,
    "gmv_p2": 788981.0,
-   "gmv_p3": 254381.0
+   "gmv_p3": 256773.0
   },
   {
    "cs_tab": "Luana",
@@ -5202,7 +5237,7 @@ window.CS2_DATA = {
    "bq_id": "1416343",
    "gmv_p1": 1203745.25,
    "gmv_p2": 154536.37,
-   "gmv_p3": 24941.29
+   "gmv_p3": 26574.47
   },
   {
    "cs_tab": "Luana",
@@ -5297,7 +5332,7 @@ window.CS2_DATA = {
    "bq_id": "1431828",
    "gmv_p1": 27666.63,
    "gmv_p2": 109551.52,
-   "gmv_p3": 32419.87
+   "gmv_p3": 34082.87
   },
   {
    "cs_tab": "Luana",
@@ -5316,7 +5351,7 @@ window.CS2_DATA = {
    "bq_id": "644061",
    "gmv_p1": 232988.76,
    "gmv_p2": 834775.51,
-   "gmv_p3": 406171.54
+   "gmv_p3": 421318.13
   },
   {
    "cs_tab": "Luana",
@@ -5335,7 +5370,7 @@ window.CS2_DATA = {
    "bq_id": "1819640",
    "gmv_p1": 1327482.76,
    "gmv_p2": 4358536.96,
-   "gmv_p3": 1236296.45
+   "gmv_p3": 1298895.35
   },
   {
    "cs_tab": "Luana",
@@ -5354,7 +5389,7 @@ window.CS2_DATA = {
    "bq_id": "251048",
    "gmv_p1": 282868.12,
    "gmv_p2": 860151.49,
-   "gmv_p3": 166626.47
+   "gmv_p3": 168274.47
   },
   {
    "cs_tab": "Luana",
@@ -5373,7 +5408,7 @@ window.CS2_DATA = {
    "bq_id": "731799",
    "gmv_p1": 222853.82,
    "gmv_p2": 646046.89,
-   "gmv_p3": 229479.25
+   "gmv_p3": 230704.8
   },
   {
    "cs_tab": "Luana",
@@ -5411,7 +5446,7 @@ window.CS2_DATA = {
    "bq_id": "810439",
    "gmv_p1": 808367.98,
    "gmv_p2": 2490137.58,
-   "gmv_p3": 263929.79
+   "gmv_p3": 283175.61
   },
   {
    "cs_tab": "Luana",
@@ -5430,7 +5465,7 @@ window.CS2_DATA = {
    "bq_id": "928822",
    "gmv_p1": 458232.84,
    "gmv_p2": 1281498.92,
-   "gmv_p3": 306474.56
+   "gmv_p3": 334888.86
   },
   {
    "cs_tab": "Luana",
@@ -5449,7 +5484,7 @@ window.CS2_DATA = {
    "bq_id": "1571077",
    "gmv_p1": 117285.03,
    "gmv_p2": 342248.85,
-   "gmv_p3": 20637.43
+   "gmv_p3": 20517.43
   },
   {
    "cs_tab": "Luana",
@@ -5487,7 +5522,7 @@ window.CS2_DATA = {
    "bq_id": "125339",
    "gmv_p1": 508570.48,
    "gmv_p2": 1273192.81,
-   "gmv_p3": 479436.58
+   "gmv_p3": 491131.37
   },
   {
    "cs_tab": "Luana",
@@ -5506,7 +5541,7 @@ window.CS2_DATA = {
    "bq_id": "49554",
    "gmv_p1": 1748114.2,
    "gmv_p2": 4207372.6,
-   "gmv_p3": 373077.8
+   "gmv_p3": 384351.8
   },
   {
    "cs_tab": "Luana",
@@ -5525,7 +5560,7 @@ window.CS2_DATA = {
    "bq_id": "1275581",
    "gmv_p1": 184195.95,
    "gmv_p2": 393259.7,
-   "gmv_p3": 164978.2
+   "gmv_p3": 168457.2
   },
   {
    "cs_tab": "Luana",
@@ -5582,7 +5617,7 @@ window.CS2_DATA = {
    "bq_id": "46233",
    "gmv_p1": 81965.38,
    "gmv_p2": 153825.98,
-   "gmv_p3": 46524.88
+   "gmv_p3": 49133.07
   },
   {
    "cs_tab": "Luana",
@@ -5601,7 +5636,7 @@ window.CS2_DATA = {
    "bq_id": "618541",
    "gmv_p1": 100422.2,
    "gmv_p2": 187071.48,
-   "gmv_p3": 28294.7
+   "gmv_p3": 22432.0
   },
   {
    "cs_tab": "Luana",
@@ -5620,7 +5655,7 @@ window.CS2_DATA = {
    "bq_id": "1178586",
    "gmv_p1": 3699864.52,
    "gmv_p2": 6417242.6,
-   "gmv_p3": 2039115.06
+   "gmv_p3": 2070094.53
   },
   {
    "cs_tab": "Luana",
@@ -5639,7 +5674,7 @@ window.CS2_DATA = {
    "bq_id": "317136",
    "gmv_p1": 324958.8,
    "gmv_p2": 574731.84,
-   "gmv_p3": 140490.98
+   "gmv_p3": 145029.57
   },
   {
    "cs_tab": "Luana",
@@ -5696,7 +5731,7 @@ window.CS2_DATA = {
    "bq_id": "1316026",
    "gmv_p1": 1419394.57,
    "gmv_p2": 2310199.15,
-   "gmv_p3": 515729.2
+   "gmv_p3": 530815.8
   },
   {
    "cs_tab": "Luana",
@@ -5715,7 +5750,7 @@ window.CS2_DATA = {
    "bq_id": "1448441",
    "gmv_p1": 1356951.31,
    "gmv_p2": 2137551.23,
-   "gmv_p3": 556430.0
+   "gmv_p3": 575601.07
   },
   {
    "cs_tab": "Luana",
@@ -5734,7 +5769,7 @@ window.CS2_DATA = {
    "bq_id": "1201385",
    "gmv_p1": 167068.3,
    "gmv_p2": 248569.15,
-   "gmv_p3": 23245.5
+   "gmv_p3": 27619.5
   },
   {
    "cs_tab": "Luana",
@@ -5772,7 +5807,7 @@ window.CS2_DATA = {
    "bq_id": "65652",
    "gmv_p1": 2542930.17,
    "gmv_p2": 3514750.02,
-   "gmv_p3": 464147.7
+   "gmv_p3": 474621.76
   },
   {
    "cs_tab": "Luana",
@@ -5791,7 +5826,7 @@ window.CS2_DATA = {
    "bq_id": "1250065",
    "gmv_p1": 1042108.0,
    "gmv_p2": 1404462.5,
-   "gmv_p3": 228203.3
+   "gmv_p3": 230880.3
   },
   {
    "cs_tab": "Luana",
@@ -5810,7 +5845,7 @@ window.CS2_DATA = {
    "bq_id": "1733",
    "gmv_p1": 640172.19,
    "gmv_p2": 831146.94,
-   "gmv_p3": 212388.72
+   "gmv_p3": 223166.12
   },
   {
    "cs_tab": "Luana",
@@ -5848,7 +5883,7 @@ window.CS2_DATA = {
    "bq_id": "1703736",
    "gmv_p1": 619690.23,
    "gmv_p2": 727039.2,
-   "gmv_p3": 153765.4
+   "gmv_p3": 156993.97
   },
   {
    "cs_tab": "Luana",
@@ -5867,7 +5902,7 @@ window.CS2_DATA = {
    "bq_id": "1544822",
    "gmv_p1": 646961.03,
    "gmv_p2": 787076.01,
-   "gmv_p3": 194731.2
+   "gmv_p3": 206017.87
   },
   {
    "cs_tab": "Luana",
@@ -5886,7 +5921,7 @@ window.CS2_DATA = {
    "bq_id": "1637938",
    "gmv_p1": 396109.33,
    "gmv_p2": 473641.88,
-   "gmv_p3": 81804.83
+   "gmv_p3": 84138.54
   },
   {
    "cs_tab": "Luana",
@@ -5905,7 +5940,7 @@ window.CS2_DATA = {
    "bq_id": "27008",
    "gmv_p1": 6617676.72,
    "gmv_p2": 9270781.24,
-   "gmv_p3": 2035042.45
+   "gmv_p3": 2041232.12
   },
   {
    "cs_tab": "Luana",
@@ -5924,7 +5959,7 @@ window.CS2_DATA = {
    "bq_id": "1078045",
    "gmv_p1": 176295.2,
    "gmv_p2": 150801.55,
-   "gmv_p3": 9030.93
+   "gmv_p3": 9251.7
   },
   {
    "cs_tab": "Luana",
@@ -5943,7 +5978,7 @@ window.CS2_DATA = {
    "bq_id": "1568965",
    "gmv_p1": 696552.1,
    "gmv_p2": 804213.79,
-   "gmv_p3": 340657.65
+   "gmv_p3": 345032.48
   },
   {
    "cs_tab": "Luana",
@@ -5961,7 +5996,7 @@ window.CS2_DATA = {
    "obs_orig": "",
    "gmv_p1": 285140.9,
    "gmv_p2": 326347.0,
-   "gmv_p3": 67816.5,
+   "gmv_p3": 69925.0,
    "bq_id": "503164"
   },
   {
@@ -5981,7 +6016,7 @@ window.CS2_DATA = {
    "bq_id": "909617",
    "gmv_p1": 84911.47,
    "gmv_p2": 97902.57,
-   "gmv_p3": 16061.65
+   "gmv_p3": 17126.65
   },
   {
    "cs_tab": "Luana",
@@ -6000,7 +6035,7 @@ window.CS2_DATA = {
    "bq_id": "998275",
    "gmv_p1": 244807.2,
    "gmv_p2": 274959.45,
-   "gmv_p3": 45800.6
+   "gmv_p3": 45658.9
   },
   {
    "cs_tab": "Luana",
@@ -6038,7 +6073,7 @@ window.CS2_DATA = {
    "bq_id": "24244",
    "gmv_p1": 316590.73,
    "gmv_p2": 329038.82,
-   "gmv_p3": 82363.64
+   "gmv_p3": 83421.38
   },
   {
    "cs_tab": "Luana",
@@ -6057,7 +6092,7 @@ window.CS2_DATA = {
    "bq_id": "627689",
    "gmv_p1": 6088122.65,
    "gmv_p2": 6233643.1,
-   "gmv_p3": 1454699.5
+   "gmv_p3": 1476730.9
   },
   {
    "cs_tab": "Luana",
@@ -6095,7 +6130,7 @@ window.CS2_DATA = {
    "bq_id": "1468945",
    "gmv_p1": 558708.27,
    "gmv_p2": 583465.42,
-   "gmv_p3": 115955.1
+   "gmv_p3": 123751.4
   },
   {
    "cs_tab": "Luana",
@@ -6114,7 +6149,7 @@ window.CS2_DATA = {
    "bq_id": "1035659",
    "gmv_p1": 119834.33,
    "gmv_p2": 122655.06,
-   "gmv_p3": 25493.93
+   "gmv_p3": 27157.13
   },
   {
    "cs_tab": "Luana",
@@ -6133,7 +6168,7 @@ window.CS2_DATA = {
    "bq_id": "60719",
    "gmv_p1": 864836.07,
    "gmv_p2": 835680.11,
-   "gmv_p3": 254937.13
+   "gmv_p3": 262040.13
   },
   {
    "cs_tab": "Luana",
@@ -6152,7 +6187,7 @@ window.CS2_DATA = {
    "bq_id": "1541315",
    "gmv_p1": 1131234.06,
    "gmv_p2": 1142479.73,
-   "gmv_p3": 292429.57
+   "gmv_p3": 295437.67
   },
   {
    "cs_tab": "Luana",
@@ -6171,7 +6206,7 @@ window.CS2_DATA = {
    "bq_id": "828876",
    "gmv_p1": 5455192.95,
    "gmv_p2": 5362545.73,
-   "gmv_p3": 1113941.96
+   "gmv_p3": 1153024.86
   },
   {
    "cs_tab": "Luana",
@@ -6209,7 +6244,7 @@ window.CS2_DATA = {
    "bq_id": "1272421",
    "gmv_p1": 16656064.36,
    "gmv_p2": 15997286.23,
-   "gmv_p3": 4090578.65
+   "gmv_p3": 4195001.22
   },
   {
    "cs_tab": "Luana",
@@ -6228,7 +6263,7 @@ window.CS2_DATA = {
    "bq_id": "712379",
    "gmv_p1": 617730.97,
    "gmv_p2": 596400.51,
-   "gmv_p3": 28250.18
+   "gmv_p3": 29746.0
   },
   {
    "cs_tab": "Luana",
@@ -6247,7 +6282,7 @@ window.CS2_DATA = {
    "bq_id": "1566528",
    "gmv_p1": 669529.13,
    "gmv_p2": 619647.35,
-   "gmv_p3": 167209.95
+   "gmv_p3": 183900.04
   },
   {
    "cs_tab": "Luana",
@@ -6266,7 +6301,7 @@ window.CS2_DATA = {
    "bq_id": "1375391",
    "gmv_p1": 455276.65,
    "gmv_p2": 391646.27,
-   "gmv_p3": 88592.6
+   "gmv_p3": 97991.3
   },
   {
    "cs_tab": "Luana",
@@ -6304,7 +6339,7 @@ window.CS2_DATA = {
    "bq_id": "157684",
    "gmv_p1": 218003.91,
    "gmv_p2": 189682.4,
-   "gmv_p3": 16645.6
+   "gmv_p3": 23176.7
   },
   {
    "cs_tab": "Luana",
@@ -6323,7 +6358,7 @@ window.CS2_DATA = {
    "bq_id": "14035",
    "gmv_p1": 3110399.17,
    "gmv_p2": 2658691.89,
-   "gmv_p3": 576313.31
+   "gmv_p3": 600859.78
   },
   {
    "cs_tab": "Luana",
@@ -6342,7 +6377,7 @@ window.CS2_DATA = {
    "bq_id": "230413",
    "gmv_p1": 1598884.62,
    "gmv_p2": 1363040.01,
-   "gmv_p3": 229512.82
+   "gmv_p3": 232437.75
   },
   {
    "cs_tab": "Luana",
@@ -6361,7 +6396,7 @@ window.CS2_DATA = {
    "bq_id": "991148",
    "gmv_p1": 2830914.56,
    "gmv_p2": 2345181.24,
-   "gmv_p3": 609367.01
+   "gmv_p3": 616006.01
   },
   {
    "cs_tab": "Luana",
@@ -6380,7 +6415,7 @@ window.CS2_DATA = {
    "bq_id": "873969",
    "gmv_p1": 741503.11,
    "gmv_p2": 614081.92,
-   "gmv_p3": 112960.36
+   "gmv_p3": 116237.84
   },
   {
    "cs_tab": "Luana",
@@ -6399,7 +6434,7 @@ window.CS2_DATA = {
    "bq_id": "1372995",
    "gmv_p1": 4093082.63,
    "gmv_p2": 3219311.47,
-   "gmv_p3": 724421.45
+   "gmv_p3": 724985.45
   },
   {
    "cs_tab": "Luana",
@@ -6418,7 +6453,7 @@ window.CS2_DATA = {
    "bq_id": "42595",
    "gmv_p1": 2688131.74,
    "gmv_p2": 2016744.29,
-   "gmv_p3": 392075.7
+   "gmv_p3": 395277.7
   },
   {
    "cs_tab": "Luana",
@@ -6475,7 +6510,7 @@ window.CS2_DATA = {
    "bq_id": "1098231",
    "gmv_p1": 1853678.33,
    "gmv_p2": 1371574.21,
-   "gmv_p3": 344470.31
+   "gmv_p3": 347779.72
   },
   {
    "cs_tab": "Luana",
@@ -6513,7 +6548,7 @@ window.CS2_DATA = {
    "bq_id": "432686",
    "gmv_p1": 994764.0,
    "gmv_p2": 734110.0,
-   "gmv_p3": 102630.0
+   "gmv_p3": 127075.0
   },
   {
    "cs_tab": "Luana",
@@ -6532,7 +6567,7 @@ window.CS2_DATA = {
    "bq_id": "1345093",
    "gmv_p1": 1705639.4,
    "gmv_p2": 1138877.62,
-   "gmv_p3": 254528.03
+   "gmv_p3": 318139.72
   },
   {
    "cs_tab": "Luana",
@@ -6551,7 +6586,7 @@ window.CS2_DATA = {
    "bq_id": "1434710",
    "gmv_p1": 448589.86,
    "gmv_p2": 304987.78,
-   "gmv_p3": 43904.71
+   "gmv_p3": 43081.62
   },
   {
    "cs_tab": "Luana",
@@ -6589,7 +6624,7 @@ window.CS2_DATA = {
    "bq_id": "243791",
    "gmv_p1": 614768.68,
    "gmv_p2": 415711.38,
-   "gmv_p3": 114694.15
+   "gmv_p3": 116431.41
   },
   {
    "cs_tab": "Luana",
@@ -6627,7 +6662,7 @@ window.CS2_DATA = {
    "bq_id": "334983",
    "gmv_p1": 1040995.22,
    "gmv_p2": 644445.85,
-   "gmv_p3": 180649.05
+   "gmv_p3": 188449.01
   },
   {
    "cs_tab": "Luana",
@@ -6646,7 +6681,7 @@ window.CS2_DATA = {
    "bq_id": "1170555",
    "gmv_p1": 528628.96,
    "gmv_p2": 354026.12,
-   "gmv_p3": 48302.8
+   "gmv_p3": 49022.2
   },
   {
    "cs_tab": "Luana",
@@ -6665,7 +6700,7 @@ window.CS2_DATA = {
    "bq_id": "1672566",
    "gmv_p1": 811263.24,
    "gmv_p2": 455233.14,
-   "gmv_p3": 127213.22
+   "gmv_p3": 128350.22
   },
   {
    "cs_tab": "Luana",
@@ -6722,7 +6757,7 @@ window.CS2_DATA = {
    "bq_id": "1409509",
    "gmv_p1": 414385.33,
    "gmv_p2": 235434.32,
-   "gmv_p3": 31819.37
+   "gmv_p3": 35248.37
   },
   {
    "cs_tab": "Luana",
@@ -6741,7 +6776,7 @@ window.CS2_DATA = {
    "bq_id": "1191066",
    "gmv_p1": 309095.0,
    "gmv_p2": 155170.0,
-   "gmv_p3": 62120.0
+   "gmv_p3": 65315.0
   },
   {
    "cs_tab": "Luana",
@@ -6779,7 +6814,7 @@ window.CS2_DATA = {
    "bq_id": "1115487",
    "gmv_p1": 760136.73,
    "gmv_p2": 260566.62,
-   "gmv_p3": 74063.42
+   "gmv_p3": 74813.42
   },
   {
    "cs_tab": "Luana",
@@ -6798,7 +6833,7 @@ window.CS2_DATA = {
    "bq_id": "1240668",
    "gmv_p1": 1968464.12,
    "gmv_p2": 788981.0,
-   "gmv_p3": 254381.0
+   "gmv_p3": 256773.0
   },
   {
    "cs_tab": "Luana",
@@ -6855,7 +6890,7 @@ window.CS2_DATA = {
    "bq_id": "1416343",
    "gmv_p1": 1203745.25,
    "gmv_p2": 154536.37,
-   "gmv_p3": 24941.29
+   "gmv_p3": 26574.47
   },
   {
    "cs_tab": "Luana",
@@ -6912,7 +6947,7 @@ window.CS2_DATA = {
    "bq_id": "1805647",
    "gmv_p1": 18438.91,
    "gmv_p2": 1832640.82,
-   "gmv_p3": 262250.26
+   "gmv_p3": 271113.0
   },
   {
    "cs_tab": "Thamiris",
@@ -6931,7 +6966,7 @@ window.CS2_DATA = {
    "bq_id": "1078366",
    "gmv_p1": 48097.97,
    "gmv_p2": 1237837.6,
-   "gmv_p3": 289594.88
+   "gmv_p3": 290830.68
   },
   {
    "cs_tab": "Thamiris",
@@ -6950,7 +6985,7 @@ window.CS2_DATA = {
    "bq_id": "1831638",
    "gmv_p1": 15032.0,
    "gmv_p2": 327286.32,
-   "gmv_p3": 115834.14
+   "gmv_p3": 116527.14
   },
   {
    "cs_tab": "Thamiris",
@@ -6969,7 +7004,7 @@ window.CS2_DATA = {
    "bq_id": "1617476",
    "gmv_p1": 40036.48,
    "gmv_p2": 164538.5,
-   "gmv_p3": 34725.3
+   "gmv_p3": 37242.5
   },
   {
    "cs_tab": "Thamiris",
@@ -6988,7 +7023,7 @@ window.CS2_DATA = {
    "bq_id": "8",
    "gmv_p1": 885280.97,
    "gmv_p2": 3328964.13,
-   "gmv_p3": 467683.48
+   "gmv_p3": 478167.16
   },
   {
    "cs_tab": "Thamiris",
@@ -7026,7 +7061,7 @@ window.CS2_DATA = {
    "bq_id": "57608",
    "gmv_p1": 11528.7,
    "gmv_p2": 36296.6,
-   "gmv_p3": 7875.5
+   "gmv_p3": 11511.4
   },
   {
    "cs_tab": "Thamiris",
@@ -7045,7 +7080,7 @@ window.CS2_DATA = {
    "bq_id": "1618245",
    "gmv_p1": 323820.3,
    "gmv_p2": 959998.15,
-   "gmv_p3": 207884.0
+   "gmv_p3": 214465.0
   },
   {
    "cs_tab": "Thamiris",
@@ -7102,7 +7137,7 @@ window.CS2_DATA = {
    "bq_id": "1832603",
    "gmv_p1": 298725.6,
    "gmv_p2": 802605.0,
-   "gmv_p3": 194889.39
+   "gmv_p3": 207461.84
   },
   {
    "cs_tab": "Thamiris",
@@ -7121,7 +7156,7 @@ window.CS2_DATA = {
    "bq_id": "567903",
    "gmv_p1": 827446.76,
    "gmv_p2": 2287348.97,
-   "gmv_p3": 348990.81
+   "gmv_p3": 351761.69
   },
   {
    "cs_tab": "Thamiris",
@@ -7178,7 +7213,7 @@ window.CS2_DATA = {
    "bq_id": "115071",
    "gmv_p1": 158974.1,
    "gmv_p2": 298517.1,
-   "gmv_p3": 63204.6
+   "gmv_p3": 64613.9
   },
   {
    "cs_tab": "Thamiris",
@@ -7196,7 +7231,7 @@ window.CS2_DATA = {
    "obs_orig": "",
    "gmv_p1": 133514.6,
    "gmv_p2": 242975.75,
-   "gmv_p3": 41173.9,
+   "gmv_p3": 43473.9,
    "bq_id": "1024327"
   },
   {
@@ -7216,7 +7251,7 @@ window.CS2_DATA = {
    "bq_id": "1520391",
    "gmv_p1": 437852.65,
    "gmv_p2": 751277.3,
-   "gmv_p3": 207029.05
+   "gmv_p3": 210383.55
   },
   {
    "cs_tab": "Thamiris",
@@ -7273,7 +7308,7 @@ window.CS2_DATA = {
    "bq_id": "68527",
    "gmv_p1": 3485563.83,
    "gmv_p2": 5615283.01,
-   "gmv_p3": 1310032.17
+   "gmv_p3": 1333670.24
   },
   {
    "cs_tab": "Thamiris",
@@ -7292,7 +7327,7 @@ window.CS2_DATA = {
    "bq_id": "707072",
    "gmv_p1": 2377655.85,
    "gmv_p2": 3384871.02,
-   "gmv_p3": 562007.67
+   "gmv_p3": 582526.32
   },
   {
    "cs_tab": "Thamiris",
@@ -7311,7 +7346,7 @@ window.CS2_DATA = {
    "bq_id": "250116",
    "gmv_p1": 4183563.83,
    "gmv_p2": 5607115.33,
-   "gmv_p3": 1389510.46
+   "gmv_p3": 1401840.58
   },
   {
    "cs_tab": "Thamiris",
@@ -7330,7 +7365,7 @@ window.CS2_DATA = {
    "bq_id": "948623",
    "gmv_p1": 822380.41,
    "gmv_p2": 1142471.84,
-   "gmv_p3": 151723.9
+   "gmv_p3": 155885.52
   },
   {
    "cs_tab": "Thamiris",
@@ -7349,7 +7384,7 @@ window.CS2_DATA = {
    "bq_id": "982907",
    "gmv_p1": 799945.66,
    "gmv_p2": 1058982.57,
-   "gmv_p3": 174389.3
+   "gmv_p3": 186254.3
   },
   {
    "cs_tab": "Thamiris",
@@ -7368,7 +7403,7 @@ window.CS2_DATA = {
    "bq_id": "34354",
    "gmv_p1": 899890.31,
    "gmv_p2": 1133996.98,
-   "gmv_p3": 271538.39
+   "gmv_p3": 275941.69
   },
   {
    "cs_tab": "Thamiris",
@@ -7387,7 +7422,7 @@ window.CS2_DATA = {
    "bq_id": "7777",
    "gmv_p1": 2634020.8,
    "gmv_p2": 3059388.0,
-   "gmv_p3": 927260.0
+   "gmv_p3": 965520.1
   },
   {
    "cs_tab": "Thamiris",
@@ -7406,7 +7441,7 @@ window.CS2_DATA = {
    "bq_id": "62332",
    "gmv_p1": 1445678.2,
    "gmv_p2": 1749194.1,
-   "gmv_p3": 377036.8
+   "gmv_p3": 382124.3
   },
   {
    "cs_tab": "Thamiris",
@@ -7425,7 +7460,7 @@ window.CS2_DATA = {
    "bq_id": "145163",
    "gmv_p1": 3282837.0,
    "gmv_p2": 3957446.0,
-   "gmv_p3": 525147.0
+   "gmv_p3": 535484.0
   },
   {
    "cs_tab": "Thamiris",
@@ -7444,7 +7479,7 @@ window.CS2_DATA = {
    "bq_id": "1428630",
    "gmv_p1": 1507990.13,
    "gmv_p2": 1674976.85,
-   "gmv_p3": 479080.52
+   "gmv_p3": 493992.7
   },
   {
    "cs_tab": "Thamiris",
@@ -7463,7 +7498,7 @@ window.CS2_DATA = {
    "bq_id": "968033",
    "gmv_p1": 11390573.56,
    "gmv_p2": 14664036.68,
-   "gmv_p3": 2196418.3
+   "gmv_p3": 2241134.4
   },
   {
    "cs_tab": "Thamiris",
@@ -7482,7 +7517,7 @@ window.CS2_DATA = {
    "bq_id": "107077",
    "gmv_p1": 3414590.7,
    "gmv_p2": 3751850.5,
-   "gmv_p3": 991103.5
+   "gmv_p3": 1007661.0
   },
   {
    "cs_tab": "Thamiris",
@@ -7539,7 +7574,7 @@ window.CS2_DATA = {
    "bq_id": "1110791",
    "gmv_p1": 13192061.27,
    "gmv_p2": 13159555.97,
-   "gmv_p3": 2819156.0
+   "gmv_p3": 2898524.0
   },
   {
    "cs_tab": "Thamiris",
@@ -7577,7 +7612,7 @@ window.CS2_DATA = {
    "bq_id": "1044170",
    "gmv_p1": 1590144.1,
    "gmv_p2": 1574737.12,
-   "gmv_p3": 490529.01
+   "gmv_p3": 533238.11
   },
   {
    "cs_tab": "Thamiris",
@@ -7596,7 +7631,7 @@ window.CS2_DATA = {
    "bq_id": "1123393",
    "gmv_p1": 24283161.8,
    "gmv_p2": 23266746.87,
-   "gmv_p3": 4747518.28
+   "gmv_p3": 4900727.75
   },
   {
    "cs_tab": "Thamiris",
@@ -7653,7 +7688,7 @@ window.CS2_DATA = {
    "bq_id": "52771",
    "gmv_p1": 598574.79,
    "gmv_p2": 505249.44,
-   "gmv_p3": 58181.23
+   "gmv_p3": 61904.33
   },
   {
    "cs_tab": "Thamiris",
@@ -7672,7 +7707,7 @@ window.CS2_DATA = {
    "bq_id": "548863",
    "gmv_p1": 1538020.6,
    "gmv_p2": 1459854.2,
-   "gmv_p3": 243630.79
+   "gmv_p3": 246679.24
   },
   {
    "cs_tab": "Thamiris",
@@ -7691,7 +7726,7 @@ window.CS2_DATA = {
    "bq_id": "820612",
    "gmv_p1": 1820907.15,
    "gmv_p2": 1544171.71,
-   "gmv_p3": 344706.07
+   "gmv_p3": 379507.47
   },
   {
    "cs_tab": "Thamiris",
@@ -7710,7 +7745,7 @@ window.CS2_DATA = {
    "bq_id": "525596",
    "gmv_p1": 1066675.01,
    "gmv_p2": 1003004.64,
-   "gmv_p3": 142939.76
+   "gmv_p3": 148239.12
   },
   {
    "cs_tab": "Thamiris",
@@ -7729,7 +7764,7 @@ window.CS2_DATA = {
    "bq_id": "1213886",
    "gmv_p1": 1888902.72,
    "gmv_p2": 1688272.46,
-   "gmv_p3": 359138.3
+   "gmv_p3": 364801.25
   },
   {
    "cs_tab": "Thamiris",
@@ -7748,7 +7783,7 @@ window.CS2_DATA = {
    "bq_id": "620674",
    "gmv_p1": 2432118.43,
    "gmv_p2": 2103661.55,
-   "gmv_p3": 366309.88
+   "gmv_p3": 395368.55
   },
   {
    "cs_tab": "Thamiris",
@@ -7767,7 +7802,7 @@ window.CS2_DATA = {
    "bq_id": "3301",
    "gmv_p1": 3101048.35,
    "gmv_p2": 2632762.86,
-   "gmv_p3": 727554.62
+   "gmv_p3": 742045.44
   },
   {
    "cs_tab": "Thamiris",
@@ -7786,7 +7821,7 @@ window.CS2_DATA = {
    "bq_id": "1355848",
    "gmv_p1": 1263785.08,
    "gmv_p2": 1087265.39,
-   "gmv_p3": 168550.94
+   "gmv_p3": 177116.39
   },
   {
    "cs_tab": "Thamiris",
@@ -7805,7 +7840,7 @@ window.CS2_DATA = {
    "bq_id": "913427",
    "gmv_p1": 4819636.21,
    "gmv_p2": 3982279.74,
-   "gmv_p3": 670404.8
+   "gmv_p3": 695087.8
   },
   {
    "cs_tab": "Thamiris",
@@ -7824,7 +7859,7 @@ window.CS2_DATA = {
    "bq_id": "391367",
    "gmv_p1": 487235.05,
    "gmv_p2": 414925.87,
-   "gmv_p3": 107326.18
+   "gmv_p3": 117256.43
   },
   {
    "cs_tab": "Thamiris",
@@ -7843,7 +7878,7 @@ window.CS2_DATA = {
    "bq_id": "1011737",
    "gmv_p1": 540608.7,
    "gmv_p2": 330863.6,
-   "gmv_p3": 57305.85
+   "gmv_p3": 59114.05
   },
   {
    "cs_tab": "Thamiris",
@@ -7862,7 +7897,7 @@ window.CS2_DATA = {
    "bq_id": "156781",
    "gmv_p1": 881593.48,
    "gmv_p2": 727398.89,
-   "gmv_p3": 94867.66
+   "gmv_p3": 99265.82
   },
   {
    "cs_tab": "Thamiris",
@@ -7881,7 +7916,7 @@ window.CS2_DATA = {
    "bq_id": "441578",
    "gmv_p1": 1703630.0,
    "gmv_p2": 1344282.12,
-   "gmv_p3": 155107.74
+   "gmv_p3": 155231.72
   },
   {
    "cs_tab": "Thamiris",
@@ -7900,7 +7935,7 @@ window.CS2_DATA = {
    "bq_id": "402982",
    "gmv_p1": 1615884.58,
    "gmv_p2": 1070941.74,
-   "gmv_p3": 356008.02
+   "gmv_p3": 356674.42
   },
   {
    "cs_tab": "Thamiris",
@@ -7919,7 +7954,7 @@ window.CS2_DATA = {
    "bq_id": "1529280",
    "gmv_p1": 4308346.78,
    "gmv_p2": 3160747.22,
-   "gmv_p3": 856996.66
+   "gmv_p3": 935225.08
   },
   {
    "cs_tab": "Thamiris",
@@ -7938,7 +7973,7 @@ window.CS2_DATA = {
    "bq_id": "1040413",
    "gmv_p1": 863970.19,
    "gmv_p2": 645784.82,
-   "gmv_p3": 87267.02
+   "gmv_p3": 89839.6
   },
   {
    "cs_tab": "Thamiris",
@@ -7957,7 +7992,7 @@ window.CS2_DATA = {
    "bq_id": "1600255",
    "gmv_p1": 1947573.91,
    "gmv_p2": 1503655.81,
-   "gmv_p3": 281393.89
+   "gmv_p3": 273009.44
   },
   {
    "cs_tab": "Thamiris",
@@ -7976,7 +8011,7 @@ window.CS2_DATA = {
    "bq_id": "451968",
    "gmv_p1": 874963.96,
    "gmv_p2": 628526.56,
-   "gmv_p3": 88960.52
+   "gmv_p3": 90169.02
   },
   {
    "cs_tab": "Thamiris",
@@ -8014,7 +8049,7 @@ window.CS2_DATA = {
    "bq_id": "1516190",
    "gmv_p1": 1024454.53,
    "gmv_p2": 715070.05,
-   "gmv_p3": 168537.25
+   "gmv_p3": 193259.35
   },
   {
    "cs_tab": "Thamiris",
@@ -8033,7 +8068,7 @@ window.CS2_DATA = {
    "bq_id": "1279276",
    "gmv_p1": 9761376.34,
    "gmv_p2": 5867767.47,
-   "gmv_p3": 1030699.08
+   "gmv_p3": 1130627.87
   },
   {
    "cs_tab": "Thamiris",
@@ -8052,7 +8087,7 @@ window.CS2_DATA = {
    "bq_id": "1574022",
    "gmv_p1": 1076373.8,
    "gmv_p2": 768346.85,
-   "gmv_p3": 117767.61
+   "gmv_p3": 129792.72
   },
   {
    "cs_tab": "Thamiris",
@@ -8090,7 +8125,7 @@ window.CS2_DATA = {
    "bq_id": "1483567",
    "gmv_p1": 384867.79,
    "gmv_p2": 263901.85,
-   "gmv_p3": 17219.31
+   "gmv_p3": 18508.61
   },
   {
    "cs_tab": "Thamiris",
@@ -8147,7 +8182,7 @@ window.CS2_DATA = {
    "bq_id": "917059",
    "gmv_p1": 7152736.18,
    "gmv_p2": 4303210.9,
-   "gmv_p3": 809680.69
+   "gmv_p3": 831103.79
   },
   {
    "cs_tab": "Thamiris",
@@ -8166,7 +8201,7 @@ window.CS2_DATA = {
    "bq_id": "1643381",
    "gmv_p1": 5699450.27,
    "gmv_p2": 3182381.94,
-   "gmv_p3": 561876.76
+   "gmv_p3": 599887.27
   },
   {
    "cs_tab": "Thamiris",
@@ -8185,7 +8220,7 @@ window.CS2_DATA = {
    "bq_id": "1379136",
    "gmv_p1": 832287.7,
    "gmv_p2": 465135.46,
-   "gmv_p3": 92976.23
+   "gmv_p3": 94367.83
   },
   {
    "cs_tab": "Thamiris",
@@ -8223,7 +8258,7 @@ window.CS2_DATA = {
    "bq_id": "842293",
    "gmv_p1": 14187918.25,
    "gmv_p2": 6665173.53,
-   "gmv_p3": 1945197.56
+   "gmv_p3": 2032079.86
   },
   {
    "cs_tab": "Thamiris",
@@ -8280,7 +8315,7 @@ window.CS2_DATA = {
    "bq_id": "1661979",
    "gmv_p1": 51739383.06,
    "gmv_p2": 21337145.99,
-   "gmv_p3": 2384655.6
+   "gmv_p3": 2455708.98
   },
   {
    "cs_tab": "Thamiris",
@@ -8299,7 +8334,7 @@ window.CS2_DATA = {
    "bq_id": "1271690",
    "gmv_p1": 685153.41,
    "gmv_p2": 332610.42,
-   "gmv_p3": 24933.49
+   "gmv_p3": 25700.49
   },
   {
    "cs_tab": "Thamiris",
@@ -8318,7 +8353,7 @@ window.CS2_DATA = {
    "bq_id": "1649216",
    "gmv_p1": 940075.04,
    "gmv_p2": 343312.78,
-   "gmv_p3": 226947.11
+   "gmv_p3": 230393.81
   },
   {
    "cs_tab": "Thamiris",
@@ -8336,7 +8371,7 @@ window.CS2_DATA = {
    "obs_orig": "",
    "gmv_p1": 2143741.54,
    "gmv_p2": 930612.17,
-   "gmv_p3": 88161.85,
+   "gmv_p3": 88094.35,
    "bq_id": "829798"
   },
   {
@@ -8356,7 +8391,7 @@ window.CS2_DATA = {
    "bq_id": "292554",
    "gmv_p1": 1063948.76,
    "gmv_p2": 434142.77,
-   "gmv_p3": 54681.68
+   "gmv_p3": 55298.12
   },
   {
    "cs_tab": "Thamiris",
@@ -8375,7 +8410,7 @@ window.CS2_DATA = {
    "bq_id": "1276481",
    "gmv_p1": 417608.82,
    "gmv_p2": 153145.59,
-   "gmv_p3": 22161.08
+   "gmv_p3": 24060.33
   },
   {
    "cs_tab": "Thamiris",
@@ -8413,7 +8448,7 @@ window.CS2_DATA = {
    "bq_id": "144574",
    "gmv_p1": 20300.0,
    "gmv_p2": 1564.0,
-   "gmv_p3": 2421.1
+   "gmv_p3": 530.1
   },
   {
    "cs_tab": "Thamiris",
@@ -8432,7 +8467,7 @@ window.CS2_DATA = {
    "bq_id": "152442",
    "gmv_p1": 464058.32,
    "gmv_p2": 145623.9,
-   "gmv_p3": 30924.1
+   "gmv_p3": 32643.0
   },
   {
    "cs_tab": "Thamiris",
@@ -8546,7 +8581,7 @@ window.CS2_DATA = {
    "bq_id": "15",
    "gmv_p1": null,
    "gmv_p2": 436900.96,
-   "gmv_p3": 164882.6
+   "gmv_p3": 172613.58
   },
   {
    "cs_tab": "Thamiris",
@@ -8584,7 +8619,7 @@ window.CS2_DATA = {
    "bq_id": "1926419",
    "gmv_p1": null,
    "gmv_p2": 65554.57,
-   "gmv_p3": 25888.5
+   "gmv_p3": 35311.0
   },
   {
    "cs_tab": "Thamiris",
@@ -8603,7 +8638,7 @@ window.CS2_DATA = {
    "bq_id": "2076887",
    "gmv_p1": null,
    "gmv_p2": 43429.33,
-   "gmv_p3": 66161.76
+   "gmv_p3": 76744.52
   },
   {
    "cs_tab": "Thamiris",
@@ -8660,7 +8695,7 @@ window.CS2_DATA = {
    "bq_id": "727491",
    "gmv_p1": 1224039.6,
    "gmv_p2": 1911023.41,
-   "gmv_p3": 333026.8
+   "gmv_p3": 367210.47
   },
   {
    "cs_tab": "",
@@ -8751,7 +8786,7 @@ window.CS2_DATA = {
    "gmv_p1": null,
    "gmv_p2": null,
    "gmv_p3": null,
-   "bq_id": "2122394",
+   "bq_id": "28210",
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
@@ -8846,7 +8881,7 @@ window.CS2_DATA = {
    "plano": "",
    "gmv_p1": null,
    "gmv_p2": null,
-   "gmv_p3": 4905.79,
+   "gmv_p3": 4878.04,
    "bq_id": "2132423",
    "mensalidade": null,
    "tino": null,
@@ -9021,9 +9056,9 @@ window.CS2_DATA = {
    "cs": "Tatiane",
    "plano": "",
    "gmv_p1": null,
-   "gmv_p2": 10.0,
-   "gmv_p3": null,
-   "bq_id": "1189766",
+   "gmv_p2": null,
+   "gmv_p3": 600.0,
+   "bq_id": "2139982",
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
@@ -9040,6 +9075,38 @@ window.CS2_DATA = {
    "gmv_p2": null,
    "gmv_p3": null,
    "bq_id": "2142264",
+   "mensalidade": null,
+   "tino": null,
+   "vestipago": null,
+   "obs_orig": "",
+   "origem": "bq"
+  },
+  {
+   "cs_tab": "",
+   "empresa": "Samire Style",
+   "color": "",
+   "cs": "",
+   "plano": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": "2144431",
+   "mensalidade": null,
+   "tino": null,
+   "vestipago": null,
+   "obs_orig": "",
+   "origem": "bq"
+  },
+  {
+   "cs_tab": "",
+   "empresa": "CHAVILLE FASHION",
+   "color": "",
+   "cs": "Elisa",
+   "plano": "",
+   "gmv_p1": null,
+   "gmv_p2": null,
+   "gmv_p3": null,
+   "bq_id": "2144393",
    "mensalidade": null,
    "tino": null,
    "vestipago": null,
