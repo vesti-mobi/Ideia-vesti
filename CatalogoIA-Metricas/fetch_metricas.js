@@ -250,9 +250,25 @@ const diasDesde = (iso) => {
   // Duas limitacoes conhecidas: o log guarda no maximo 200 eventos por marca (o que
   // passar disso deixa de ser atribuivel ao auto e cai no manual), e o casamento e por
   // CONTAGEM na semana, nao por id — os dois lados vem de fontes diferentes.
+  // Snapshot congelado (`auto:hist:gerados`): o log e uma lista truncada em 200 e roda —
+  // a Nicoboco ja perdeu registros de geracao para eventos repetidos de "adiado". Sem
+  // isto o numero atribuido ao piloto ENCOLHERIA sozinho a cada rodada do painel.
+  // Guardamos sempre o MAIOR valor ja visto por marca/semana.
+  const snapshot = await (async () => {
+    try { return JSON.parse((await r.get('auto:hist:gerados')) || '{}'); } catch (_) { return {}; }
+  })();
   const geradosPorSlugSemana = {};
   const geradosPorSlug = {};
+  const contadoAgora = {};   // so o que o log mostra AGORA (o snapshot pode ser maior)
   let autoDesde = '';
+  for (const [slug, semanas] of Object.entries(snapshot)) {
+    for (const [seg, n] of Object.entries(semanas || {})) {
+      geradosPorSlugSemana[slug] = geradosPorSlugSemana[slug] || {};
+      geradosPorSlugSemana[slug][seg] = Math.max(geradosPorSlugSemana[slug][seg] || 0, n);
+      if (!autoDesde || seg < autoDesde) autoDesde = seg;
+    }
+    geradosPorSlug[slug] = Object.values(semanas || {}).reduce((s, n) => s + n, 0);
+  }
   for (const k of await r.keys('auto:log:*')) {
     const slug = normSlug(k.slice('auto:log:'.length));
     for (const s of await r.lrange(k, 0, -1)) {
@@ -262,10 +278,14 @@ const diasDesde = (iso) => {
       if (!dia) continue;
       const seg = segundaDe(dia);
       geradosPorSlugSemana[slug] = geradosPorSlugSemana[slug] || {};
-      geradosPorSlugSemana[slug][seg] = (geradosPorSlugSemana[slug][seg] || 0) + 1;
-      geradosPorSlug[slug] = (geradosPorSlug[slug] || 0) + 1;
+      geradosPorSlugSemana[slug][seg] = Math.max((geradosPorSlugSemana[slug][seg] || 0), (contadoAgora[slug] || {})[seg] = ((contadoAgora[slug] = contadoAgora[slug] || {})[seg] || 0) + 1);
+
       if (!autoDesde || dia < autoDesde) autoDesde = dia;
     }
+  }
+
+  for (const slug of Object.keys(geradosPorSlugSemana)) {
+    geradosPorSlug[slug] = Object.values(geradosPorSlugSemana[slug]).reduce((s2, n) => s2 + n, 0);
   }
 
   // Divide cada semana entre os dois apps e soma SO o que ainda nao foi medido — assim
