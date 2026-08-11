@@ -1,5 +1,5 @@
 window.DADOS = {
-  "gerado_em": "2026-08-11T17:52:26.715Z",
+  "gerado_em": "2026-08-11T18:06:40.874Z",
   "hoje": "2026-08-11",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "",
@@ -75,7 +75,7 @@ window.DADOS = {
       "envios": 12,
       "primeiro": "2026-07-28T11:47:18.529Z",
       "ultimo": "2026-08-10T18:01:12.573Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "nicoboco",
