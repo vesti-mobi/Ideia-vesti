@@ -42,6 +42,12 @@
   .s-nunca{background:#F4F2F8;color:#8B8398}
   .s-testou{background:#FEF0F3;color:#BE123C}
   .aprox{color:#A79FBC;font-weight:400}
+  /* Abas: total (os dois apps somados) x cada app separado. */
+  .abas{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .aba{background:#fff;border:1px solid #EAE4F5;border-radius:999px;padding:8px 18px;font:inherit;font-size:13px;font-weight:600;color:#7A6E92;cursor:pointer}
+  .aba:hover{border-color:#C4B5FD;color:#2A1B45}
+  .aba.ativa{background:#6D28D9;border-color:#6D28D9;color:#fff}
+  .aviso-aba{font-size:12.5px;color:#B45309;background:#FFF8E6;border:1px solid #F5E3BE;border-radius:12px;padding:12px 16px;margin-bottom:20px;line-height:1.6}
   .nota{font-size:12px;color:#7A6E92;line-height:1.65;background:#FBFAFE;border:1px solid #EFEAF8;border-radius:12px;padding:14px 16px}
   .nota b{color:#2A1B45}
   canvas{max-height:270px}
@@ -70,6 +76,11 @@
 </div>
 
 <div class="container">
+
+  <!-- Os dois apps escrevem no mesmo Redis; a separação por app existe desde 11/08/2026.
+       "Total" é a única série com histórico completo, por isso é a aba de entrada. -->
+  <div class="abas" id="abas"></div>
+  <div class="aviso-aba" id="aviso-aba" style="display:none"></div>
 
   <div class="kpis" id="kpis"></div>
 
@@ -152,14 +163,61 @@ function situacao(m, paradaDias){
   return ['s-ativa','Em uso'];
 }
 
+// Recortes disponíveis. O "total" é o D inteiro (soma dos dois apps, com histórico
+// completo); cada app é um recorte que só existe depois que a marcação por app entrou.
+function recortes(){
+  var lista = [{id:'total', nome:'Total', dados:D}];
+  var apps = D.apps || {};
+  Object.keys(apps).forEach(function(id){
+    lista.push({id:id, nome:apps[id].nome || id, dados:apps[id]});
+  });
+  return lista;
+}
+
+var ABA = 'total';
+var graficos = [];
+
+function trocarAba(id){
+  ABA = id;
+  var itens = recortes();
+  document.getElementById('abas').innerHTML = itens.map(function(it){
+    return '<button class="aba'+(it.id===ABA?' ativa':'')+'" type="button" onclick="trocarAba(\''+it.id+'\')">'+it.nome+'</button>';
+  }).join('');
+  var atual = itens.filter(function(it){ return it.id===ABA; })[0] || itens[0];
+  pintar(atual);
+}
+
 function desenhar(){
   if (desenhado || !D) return;
   desenhado = true;
+  trocarAba('total');
+}
+
+function pintar(recorte){
+  var dados = recorte.dados;
+  var ehApp = recorte.id !== 'total';
 
   document.getElementById('cabecalho-info').innerHTML =
     'Dados de <b>'+dataBR(D.gerado_em)+'</b><br>medindo desde '+dataBR(D.medindo_desde);
 
-  var k = D.kpis;
+  // Aba de app sem nenhum dado: dizer POR QUE está vazia, senão parece painel quebrado.
+  var aviso = document.getElementById('aviso-aba');
+  if (ehApp && !dados.kpis.produtos_total && !dados.kpis.descricoes_total){
+    aviso.style.display = '';
+    aviso.innerHTML = '<b>Ainda sem dados neste app.</b> A separação por app começou em '
+      + (D.apps_desde ? '<b>'+dataBR(D.apps_desde)+'</b>' : '11/08/2026')
+      + ' — antes disso os dois apps gravavam no mesmo lugar e não dá para desmembrar o histórico. '
+      + 'O que aconteceu antes continua inteiro na aba <b>Total</b>.';
+  } else if (ehApp){
+    aviso.style.display = '';
+    aviso.innerHTML = 'Este recorte conta só o que passou por <b>'+recorte.nome+'</b>, e começa em '
+      + (D.apps_desde ? '<b>'+dataBR(D.apps_desde)+'</b>' : '11/08/2026')
+      + '. A aba <b>Total</b> é a única com o histórico completo.';
+  } else {
+    aviso.style.display = 'none';
+  }
+
+  var k = dados.kpis;
   var cards = [
     {n:k.produtos_total, l:'Produtos publicados', h:k.produtos_7d+' nos últimos 7 dias', destaque:true},
     {n:k.descricoes_total, l:'Descrições geradas', h:'inclui as que não foram publicadas'},
@@ -172,7 +230,7 @@ function desenhar(){
     return '<div class="kpi'+(c.destaque?' destaque':'')+'"><div class="n">'+c.n+'</div><div class="l">'+c.l+'</div><div class="h">'+c.h+'</div></div>';
   }).join('');
 
-  document.getElementById('tabela').innerHTML = D.marcas.map(function(m){
+  document.getElementById('tabela').innerHTML = dados.marcas.map(function(m){
     var s = situacao(m, D.criterio.dias_parada);
     var num = function(v){ return v ? v : '<span class="zero">0</span>'; };
     return '<tr>'
@@ -186,30 +244,35 @@ function desenhar(){
       + '</tr>';
   }).join('');
 
-  var rotulos = D.semanas.map(function(s){ return diaMes(s.inicio); });
+  var rotulos = dados.semanas.map(function(s){ return diaMes(s.inicio); });
 
-  new Chart(document.getElementById('g-tempo'), {
+  // Trocar de aba redesenha: sem destruir, o Chart.js empilha instâncias no mesmo canvas
+  // e o gráfico antigo continua aparecendo no hover.
+  graficos.forEach(function(g){ g.destroy(); });
+  graficos = [];
+
+  graficos.push(new Chart(document.getElementById('g-tempo'), {
     type:'line',
     data:{ labels:rotulos, datasets:[
-      {label:'Produtos publicados', data:D.semanas.map(function(s){return s.produtos}), borderColor:'#6D28D9', backgroundColor:'rgba(109,40,217,.10)', fill:true, tension:.3, pointRadius:3},
-      {label:'Marcas cadastradas (acumulado)', data:D.semanas.map(function(s){return s.cadastros}), borderColor:'#C4B5FD', borderDash:[5,4], fill:false, tension:.3, pointRadius:2, yAxisID:'y1'}
+      {label:'Produtos publicados', data:dados.semanas.map(function(s){return s.produtos}), borderColor:'#6D28D9', backgroundColor:'rgba(109,40,217,.10)', fill:true, tension:.3, pointRadius:3},
+      {label:'Marcas cadastradas (acumulado)', data:dados.semanas.map(function(s){return s.cadastros}), borderColor:'#C4B5FD', borderDash:[5,4], fill:false, tension:.3, pointRadius:2, yAxisID:'y1'}
     ]},
     options:{ responsive:true, interaction:{mode:'index',intersect:false},
       plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}},
       scales:{ y:{beginAtZero:true, ticks:{precision:0}, title:{display:true,text:'produtos',font:{size:10}}},
                y1:{beginAtZero:true, position:'right', grid:{drawOnChartArea:false}, ticks:{precision:0}, title:{display:true,text:'marcas',font:{size:10}}} } }
-  });
+  }));
 
-  new Chart(document.getElementById('g-ativas'), {
+  graficos.push(new Chart(document.getElementById('g-ativas'), {
     type:'bar',
     data:{ labels:rotulos, datasets:[
-      {label:'Ativas ('+D.criterio.produtos_semana+'+ produtos)', data:D.semanas.map(function(s){return s.ativas}), backgroundColor:'#6D28D9', borderRadius:4},
-      {label:'Deram sinal de vida', data:D.semanas.map(function(s){return s.usaram}), backgroundColor:'#DDD3F7', borderRadius:4}
+      {label:'Ativas ('+D.criterio.produtos_semana+'+ produtos)', data:dados.semanas.map(function(s){return s.ativas}), backgroundColor:'#6D28D9', borderRadius:4},
+      {label:'Deram sinal de vida', data:dados.semanas.map(function(s){return s.usaram}), backgroundColor:'#DDD3F7', borderRadius:4}
     ]},
     options:{ responsive:true, interaction:{mode:'index',intersect:false},
       plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}},
       scales:{ y:{beginAtZero:true, ticks:{precision:0}, title:{display:true,text:'marcas',font:{size:10}}} } }
-  });
+  }));
 
   document.getElementById('nota').innerHTML =
     '<b>Como ler estes números.</b> A telemetria só existe desde <b>'+dataBR(D.medindo_desde)+'</b> — '
@@ -219,7 +282,8 @@ function desenhar(){
     + '<b>Produto conta uma vez.</b> A lojista costuma reenviar o mesmo produto até aprovar o texto — '
     + 'isso continua sendo 1 produto publicado, mas cada geração aparece em "descrições geradas". '
     + 'Por isso "descrições" é sempre maior ou igual a "produtos".<br><br>'
-    + '<b>Fonte:</b> Redis do Catálogo IA (o mesmo do app). Atualizar: <code>node fetch_metricas.js</code> e publicar o <code>dados.js</code>.';
+    + '<b>Abas.</b> Os dois apps (piloto automático e manual) gravam no mesmo Redis. A separação por app existe desde <b>11/08/2026</b> — antes disso só há o total, e é por isso que as abas de app começam vazias.<br><br>'
+    + '<b>Fonte:</b> Redis do Catálogo IA (o mesmo do app), atualizado sozinho 2x por dia (09h e 18h) pelo workflow <code>catalogo-ia-metricas.yml</code>. Para rodar na mão: <code>node fetch_metricas.js</code>.';
 }
 
 if (sessionStorage.getItem('catalogoia_auth') === '1'){
