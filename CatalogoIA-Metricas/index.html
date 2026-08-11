@@ -220,7 +220,7 @@ function pintar(recorte){
   var cards = [
     {n:(k.total_estimado?'<span class="aprox">≈</span> ':'')+k.produtos_total, l:'Produtos publicados',
      h:(k.produtos_atribuidos ? k.produtos_atribuidos+' atribuídos ao histórico' : k.produtos_7d+' nos últimos 7 dias'), destaque:true},
-    {n:k.descricoes_total, l:'Descrições geradas', h:'inclui as que não foram publicadas'},
+    {n:(ehApp && !k.descricoes_total ? '—' : k.descricoes_total), l:'Descrições geradas', h:(ehApp && !k.descricoes_total ? 'sem medição antes de 11/08' : 'inclui as que não foram publicadas')},
     {n:k.usando+'/'+k.liberadas, l:'Marcas que usaram', h:k.nunca_usaram+' liberadas nunca entraram'},
     {n:k.ativas, l:'Ativas esta semana', h:D.criterio.produtos_semana+'+ produtos em 7 dias'},
     {n:k.paradas, l:'Paradas', h:'sem toque há mais de '+D.criterio.dias_parada+' dias'},
@@ -233,12 +233,17 @@ function pintar(recorte){
   document.getElementById('tabela').innerHTML = dados.marcas.map(function(m){
     var s = situacao(m, D.criterio.dias_parada);
     var num = function(v){ return v ? v : '<span class="zero">0</span>'; };
+    // Numa aba de app, zero em "descrições"/"envios" quase nunca quer dizer zero: quer
+    // dizer NÃO MEDIDO. São contadores sem data, então não dá para dividir o passado
+    // como se faz com os produtos. Mostrar "0" ali seria afirmar algo falso.
+    var semBase = function(v){ return v ? v : '<span class="zero" title="sem medição neste recorte antes de 11/08/2026">—</span>'; };
+    var contador = ehApp ? semBase : num;
     return '<tr>'
       + '<td><div class="marca">'+m.nome+'</div>'+(m.arquetipo?'<div class="arq">'+m.arquetipo+'</div>':'')+'</td>'
       + '<td class="num">'+(m.estimado&&m.produtos?'<span class="aprox">≈</span> ':'')+num(m.produtos)+'</td>'
       + '<td class="num">'+num(m.produtos_7d)+'</td>'
-      + '<td class="num">'+num(m.descricoes)+'</td>'
-      + '<td class="num">'+num(m.envios)+'</td>'
+      + '<td class="num">'+contador(m.descricoes)+'</td>'
+      + '<td class="num">'+contador(m.envios)+'</td>'
       + '<td>'+dataBR(m.ultimo)+'</td>'
       + '<td><span class="selo '+s[0]+'">'+s[1]+'</span></td>'
       + '</tr>';
@@ -282,7 +287,7 @@ function pintar(recorte){
     + '<b>Produto conta uma vez.</b> A lojista costuma reenviar o mesmo produto até aprovar o texto — '
     + 'isso continua sendo 1 produto publicado, mas cada geração aparece em "descrições geradas". '
     + 'Por isso "descrições" é sempre maior ou igual a "produtos".<br><br>'
-    + '<b>Abas.</b> Os dois apps gravam no mesmo Redis e a marcação por app só existe desde <b>11/08/2026</b>. O período anterior não foi perdido: ele é <b>atribuído</b> a partir do log do piloto (que registra o que ele publicou e quando) — o que é dele vai para a aba do automático e todo o resto para a do manual. Números atribuídos aparecem com <b>≈</b> e as duas abas sempre somam o Total.<br><br>'
+    + '<b>Abas.</b> Os dois apps gravam no mesmo Redis e a marcação por app só existe desde <b>11/08/2026</b>. O período anterior não foi perdido: ele é <b>atribuído</b> a partir do log do piloto (que registra o que ele publicou e quando) — o que é dele vai para a aba do automático e todo o resto para a do manual. Números atribuídos aparecem com <b>≈</b> e as duas abas sempre somam o Total. Já <b>descrições geradas</b> e <b>envios</b> são contadores sem data: não dá para dividir o passado, então nas abas de app eles aparecem como <b>—</b> (não medido) até acumularem daqui para frente.<br><br>'
     + '<b>Fonte:</b> Redis do Catálogo IA (o mesmo do app), atualizado sozinho 2x por dia (09h e 18h) pelo workflow <code>catalogo-ia-metricas.yml</code>. Para rodar na mão: <code>node fetch_metricas.js</code>.';
 }
 
