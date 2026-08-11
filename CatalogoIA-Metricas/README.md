@@ -5,6 +5,20 @@ Painel separado, no padrão dos outros (senha na entrada, HTML estático no GitH
 - **URL:** https://vesti-mobi.github.io/dados/CatalogoIA-Metricas/
 - **Senha:** `Mudar123` (mesma dos demais painéis)
 
+## Abas (auto × manual)
+
+Os dois apps do Catálogo IA — o do **piloto automático** e o **manual** — sempre
+escreveram no MESMO Redis e nas MESMAS chaves `uso:<slug>`, então o total sempre foi a
+soma dos dois. Desde **11/08/2026** cada evento conta também num espaço próprio
+(`uso:app:<auto|manual>:...`) e o painel tem três abas:
+
+- **Total** — os dois somados. É a única série com histórico completo.
+- **Piloto automático** e **Manual** — só o que passou por aquele app, a partir de 11/08/2026.
+
+O que veio antes não dá para desmembrar: a marcação por app não existia. As abas de app
+também não mostram o `≈` do piso histórico, porque aquele número vem do aprendizado de
+estilo, que não sabe por qual app o produto passou.
+
 ## O que mostra
 
 - KPIs: produtos publicados, descrições geradas, marcas que usaram × liberadas, ativas, paradas, contas.
@@ -47,7 +61,9 @@ Depois é só publicar o `dados.js` no repo. O script lê as credenciais de fora
 - **"Testou, não publicou"**: marca que gerou descrição e não enviou nenhuma para a Vesti.
   Não é o mesmo que "nunca usou", e é o caso que mais pede uma conversa.
 
-## Automatizar (não feito)
+## Automatizar (feito)
 
-Dá para rodar sozinho num workflow do GitHub Actions, como o PainelElisa. Precisaria do
-`REDIS_URL` como secret do repo — decisão da Laura, porque hoje essa credencial não está lá.
+Roda sozinho: `.github/workflows/catalogo-ia-metricas.yml`, 2x por dia (09h e 18h de
+Brasília) e também no botão *Run workflow*. O `REDIS_URL` é secret do repositório; o
+workflow commita o `dados.js` só quando o conteúdo muda. Não passa `VESTI_BRANDS` — os
+nomes das marcas fixas estão no próprio script, e assim nenhuma APIKEY vai para o CI.
