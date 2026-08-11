@@ -30,6 +30,25 @@ const path = require('path');
 
 const RAIZ_APP = path.join(__dirname, '..', 'ProjetoCatalogo');
 
+// Os dois apps escrevem no MESMO Redis. Desde 11/08/2026 cada evento conta tambem num
+// espaco proprio (`uso:app:<id>:...`), e o painel ganhou uma aba por app. O prefixo
+// vazio e o TOTAL de sempre — soma dos dois, e a unica serie que tem historico completo.
+const APPS = [
+  { id: 'auto', nome: 'Piloto automático', prefixo: 'app:auto:' },
+  { id: 'manual', nome: 'Manual', prefixo: 'app:manual:' },
+];
+
+// Nomes das marcas fixas (as que vivem no VESTI_BRANDS do app). Ficam aqui para o
+// script rodar no GitHub Actions sem precisar do env com as APIKEYs: nome de marca nao
+// e segredo, apikey e. Quando VESTI_BRANDS existe, ele tem prioridade.
+const NOMES_FIXOS = {
+  'opera-kids': 'Ópera Kids',
+  'petit': 'Petit',
+  'murano': 'Murano',
+  'murano-filial': 'Murano filial',
+  'anne-blanc': 'Anne Blanc',
+};
+
 function carregarEnv(arquivo) {
   let txt;
   try { txt = fs.readFileSync(arquivo, 'utf8'); } catch (_) { return false; }
@@ -50,7 +69,11 @@ if (!process.env.REDIS_URL) {
   console.error('ERRO: REDIS_URL ausente. Esperado em ProjetoCatalogo/versao_auto/.env.local');
   process.exit(1);
 }
-const Redis = require(path.join(RAIZ_APP, 'versao_auto', 'node_modules', 'ioredis'));
+// Na maquina da Laura o ioredis vem do app (nao ha node_modules nesta pasta); no
+// GitHub Actions esse caminho nao existe e o pacote e instalado no proprio runner.
+let Redis;
+try { Redis = require(path.join(RAIZ_APP, 'versao_auto', 'node_modules', 'ioredis')); }
+catch (_) { Redis = require('ioredis'); }
 
 // ---------- datas (fuso de Brasilia, igual ao app) ----------
 const TZ_BR = 'America/Sao_Paulo';
@@ -84,6 +107,7 @@ const diasDesde = (iso) => {
     catch (_) { return []; }
   };
   const porSlug = new Map();
+  for (const [slug, nome] of Object.entries(NOMES_FIXOS)) porSlug.set(slug, { slug, nome });
   for (const m of JSON.parse(process.env.VESTI_BRANDS || '[]')) porSlug.set(normSlug(m.slug || m.nome), { slug: normSlug(m.slug || m.nome), nome: m.nome || m.slug });
   for (const m of await lerJson('marcas:registry')) porSlug.set(normSlug(m.slug || m.nome), { slug: normSlug(m.slug || m.nome), nome: m.nome || m.slug });
   for (const m of await lerJson('marcas:removidas')) porSlug.delete(normSlug(m.slug || m.nome));
@@ -109,17 +133,25 @@ const diasDesde = (iso) => {
   const semanas = ultimasSemanas(SEMANAS, hoje);
 
   // ---------- por marca ----------
+  // `prefixo` vazio = total de sempre (soma dos dois apps). `app:auto:` / `app:manual:`
+  // = so o que aquele app registrou. As regras sao as mesmas nos tres recortes; muda so
+  // de qual conjunto de chaves os numeros saem.
+  //
+  // `comEstimativa` so vale no total: o piso historico vem do aprendizado de estilo, que
+  // e unico e nao sabe por qual app o produto passou. Estimar dentro de uma aba de app
+  // seria inventar uma divisao que o dado nao tem.
+  async function montar(prefixo, { comEstimativa } = {}) {
   const linhas = [];
   for (const m of marcas) {
-    const h = await r.hgetall(`uso:${m.slug}`) || {};
-    const medidos = await r.scard(`uso:${m.slug}:produtos`);
+    const h = await r.hgetall(`uso:${prefixo}${m.slug}`) || {};
+    const medidos = await r.scard(`uso:${prefixo}${m.slug}:produtos`);
 
     // Piso historico: o aprendizado de estilo guarda o id de cada produto que a marca
     // aprovou. E subestimado de proposito (so conta produto editado), mas cobre o uso
     // anterior a telemetria — sem ele a Petit apareceria como "nunca usou".
     let estimados = 0, estiloAtualizado = '';
     try {
-      const e = JSON.parse((await r.get(`estilo:${m.slug}`)) || 'null');
+      const e = comEstimativa ? JSON.parse((await r.get(`estilo:${m.slug}`)) || 'null') : null;
       if (e) {
         const ids = new Set();
         for (const reg of [...(e.ativas || []), ...(e.candidatas || []), ...(e.bloqueadas || []), ...(e.regras || [])]) {
@@ -134,7 +166,7 @@ const diasDesde = (iso) => {
     // produto tocado em dois dias e um produto so).
     const idsSemana = new Set();
     for (const d of dias7) {
-      for (const id of await r.smembers(`uso:${m.slug}:d:${d}`)) idsSemana.add(id);
+      for (const id of await r.smembers(`uso:${prefixo}${m.slug}:d:${d}`)) idsSemana.add(id);
     }
 
     const ultimo = [h.ultimo || '', estiloAtualizado].sort().pop() || '';
@@ -171,10 +203,10 @@ const diasDesde = (iso) => {
   const serie = [];
   for (const inicio of semanas) {
     const fim = somaDias(inicio, 6);
-    const toques = await r.hgetall(`uso:w:${inicio}`) || {};
+    const toques = await r.hgetall(`uso:${prefixo}w:${inicio}`) || {};
     let produtos = 0, ativas = 0, usaram = 0;
     for (const s of slugs) {
-      const n = await r.scard(`uso:${s}:w:${inicio}`);
+      const n = await r.scard(`uso:${prefixo}${s}:w:${inicio}`);
       produtos += n;
       if (n >= ATIVA_MIN_PRODUTOS) ativas++;
       if (n > 0 || Number(toques[s] || 0) > 0) usaram++;
@@ -186,11 +218,7 @@ const diasDesde = (iso) => {
     });
   }
 
-  const dados = {
-    gerado_em: new Date().toISOString(),
-    hoje,
-    medindo_desde: medindoDesde || '',
-    criterio: { produtos_semana: ATIVA_MIN_PRODUTOS, dias_parada: PARADA_DIAS, janela_dias: 7, semanas: SEMANAS },
+  return {
     kpis: {
       liberadas: linhas.length,
       ativas: linhas.filter((l) => l.ativa).length,
@@ -207,8 +235,34 @@ const diasDesde = (iso) => {
     marcas: linhas,
     semanas: serie,
   };
+  }
+
+  const geral = await montar('', { comEstimativa: true });
+  const porApp = {};
+  for (const a of APPS) porApp[a.id] = { ...a, ...(await montar(a.prefixo, { comEstimativa: false })) };
+
+  // Desde quando existe a separacao por app: o primeiro evento marcado. Antes disso o
+  // total e real, mas as abas de app estao vazias — e o painel precisa dizer isso.
+  const apartirDe = Object.values(porApp)
+    .flatMap((a) => a.marcas.map((m) => m.primeiro).filter(Boolean))
+    .sort()[0] || '';
+
+  const dados = {
+    gerado_em: new Date().toISOString(),
+    hoje,
+    medindo_desde: medindoDesde || '',
+    apps_desde: apartirDe,
+    criterio: { produtos_semana: ATIVA_MIN_PRODUTOS, dias_parada: PARADA_DIAS, janela_dias: 7, semanas: SEMANAS },
+    ...geral,
+    apps: porApp,
+  };
+  const linhas = geral.marcas;
 
   console.log(`medindo desde ${dados.medindo_desde || '(nao definido)'} | ${dados.kpis.liberadas} marcas liberadas | ${dados.kpis.usando} usaram | ${dados.kpis.produtos_total} produtos publicados`);
+  for (const a of APPS) {
+    const k = porApp[a.id].kpis;
+    console.log(`  [${a.nome}] ${k.produtos_total} produtos | ${k.descricoes_total} descricoes | ${k.usando} marcas`);
+  }
   for (const l of linhas) {
     console.log(`  ${l.nome.padEnd(22)} produtos:${String(l.produtos).padStart(4)}${l.estimado ? '~' : ' '} 7d:${String(l.produtos_7d).padStart(3)}  descricoes:${String(l.descricoes).padStart(4)}  envios:${String(l.envios).padStart(4)}  ultimo:${(l.ultimo || '-').slice(0, 10)}`);
   }
