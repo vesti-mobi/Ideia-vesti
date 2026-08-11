@@ -1,5 +1,5 @@
 window.DADOS = {
-  "gerado_em": "2026-08-11T19:29:20.014Z",
+  "gerado_em": "2026-08-11T21:35:01.262Z",
   "hoje": "2026-08-11",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
@@ -18,12 +18,30 @@ window.DADOS = {
     "paradas": 1,
     "com_conta": 10,
     "contas": 9,
-    "produtos_total": 174,
-    "produtos_7d": 60,
-    "descricoes_total": 92,
+    "produtos_total": 226,
+    "produtos_7d": 112,
+    "descricoes_total": 144,
     "total_estimado": true
   },
   "marcas": [
+    {
+      "slug": "nicoboco",
+      "nome": "Nicoboco",
+      "arquetipo": "explorador",
+      "tem_conta": true,
+      "email": "nicoboco.shop@nicoboco.com.br",
+      "produtos": 78,
+      "estimado": false,
+      "produtos_7d": 78,
+      "ativa": true,
+      "acessos": 16,
+      "buscas": 119,
+      "descricoes": 57,
+      "envios": 79,
+      "primeiro": "2026-08-10T19:02:35.392Z",
+      "ultimo": "2026-08-11T21:32:45.982Z",
+      "dias": 0
+    },
     {
       "slug": "amiska",
       "nome": "Amiska",
@@ -58,7 +76,7 @@ window.DADOS = {
       "envios": 0,
       "primeiro": "",
       "ultimo": "2026-07-22T20:22:50.872Z",
-      "dias": 19
+      "dias": 20
     },
     {
       "slug": "opera-kids",
@@ -77,24 +95,6 @@ window.DADOS = {
       "primeiro": "2026-07-28T11:47:18.529Z",
       "ultimo": "2026-08-10T18:01:12.573Z",
       "dias": 1
-    },
-    {
-      "slug": "nicoboco",
-      "nome": "Nicoboco",
-      "arquetipo": "explorador",
-      "tem_conta": true,
-      "email": "nicoboco.shop@nicoboco.com.br",
-      "produtos": 26,
-      "estimado": false,
-      "produtos_7d": 26,
-      "ativa": true,
-      "acessos": 16,
-      "buscas": 63,
-      "descricoes": 5,
-      "envios": 27,
-      "primeiro": "2026-08-10T19:02:35.392Z",
-      "ultimo": "2026-08-11T19:26:13.888Z",
-      "dias": 0
     },
     {
       "slug": "andressa-vesti",
@@ -292,7 +292,7 @@ window.DADOS = {
       "envios": 0,
       "primeiro": "2026-08-04T14:28:52.117Z",
       "ultimo": "2026-08-10T20:06:44.561Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "ttng",
@@ -416,7 +416,7 @@ window.DADOS = {
     {
       "inicio": "2026-08-10",
       "fim": "2026-08-16",
-      "produtos": 44,
+      "produtos": 96,
       "ativas": 3,
       "usaram": 5,
       "cadastros": 9,
@@ -436,11 +436,11 @@ window.DADOS = {
         "paradas": 0,
         "com_conta": 10,
         "contas": 9,
-        "produtos_total": 23,
-        "produtos_7d": 2,
-        "descricoes_total": 2,
-        "total_estimado": true,
-        "produtos_atribuidos": 21
+        "produtos_total": 54,
+        "produtos_7d": 54,
+        "descricoes_total": 54,
+        "total_estimado": false,
+        "produtos_atribuidos": 0
       },
       "marcas": [
         {
@@ -449,19 +449,19 @@ window.DADOS = {
           "arquetipo": "explorador",
           "tem_conta": true,
           "email": "nicoboco.shop@nicoboco.com.br",
-          "produtos": 23,
-          "estimado": true,
-          "produtos_7d": 2,
+          "produtos": 54,
+          "estimado": false,
+          "produtos_7d": 54,
           "ativa": true,
           "acessos": 7,
-          "buscas": 23,
-          "descricoes": 2,
-          "envios": 2,
+          "buscas": 82,
+          "descricoes": 54,
+          "envios": 54,
           "primeiro": "2026-08-11T18:28:02.542Z",
-          "ultimo": "2026-08-11T19:26:13.888Z",
+          "ultimo": "2026-08-11T21:33:24.912Z",
           "dias": 0,
-          "produtos_medidos": 2,
-          "atribuido": 21
+          "produtos_medidos": 54,
+          "atribuido": 0
         },
         {
           "slug": "amiska",
@@ -889,13 +889,13 @@ window.DADOS = {
         {
           "inicio": "2026-08-10",
           "fim": "2026-08-16",
-          "produtos": 23,
+          "produtos": 55,
           "ativas": 1,
           "usaram": 1,
           "cadastros": 9,
           "novos": 2,
-          "produtos_medidos": 2,
-          "atribuido": 21
+          "produtos_medidos": 55,
+          "atribuido": 0
         }
       ]
     },
@@ -911,11 +911,11 @@ window.DADOS = {
         "paradas": 0,
         "com_conta": 10,
         "contas": 9,
-        "produtos_total": 151,
+        "produtos_total": 203,
         "produtos_7d": 0,
         "descricoes_total": 0,
         "total_estimado": true,
-        "produtos_atribuidos": 151
+        "produtos_atribuidos": 203
       },
       "marcas": [
         {
@@ -924,6 +924,26 @@ window.DADOS = {
           "arquetipo": "sabio",
           "tem_conta": true,
           "email": "missmilliebr@gmail.com",
+          "produtos": 55,
+          "estimado": true,
+          "produtos_7d": 0,
+          "ativa": false,
+          "acessos": 0,
+          "buscas": 0,
+          "descricoes": 0,
+          "envios": 0,
+          "primeiro": "",
+          "ultimo": "",
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 55
+        },
+        {
+          "slug": "nicoboco",
+          "nome": "Nicoboco",
+          "arquetipo": "explorador",
+          "tem_conta": true,
+          "email": "nicoboco.shop@nicoboco.com.br",
           "produtos": 55,
           "estimado": true,
           "produtos_7d": 0,
@@ -997,26 +1017,6 @@ window.DADOS = {
           "dias": null,
           "produtos_medidos": 0,
           "atribuido": 8
-        },
-        {
-          "slug": "nicoboco",
-          "nome": "Nicoboco",
-          "arquetipo": "explorador",
-          "tem_conta": true,
-          "email": "nicoboco.shop@nicoboco.com.br",
-          "produtos": 3,
-          "estimado": true,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
-          "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null,
-          "produtos_medidos": 0,
-          "atribuido": 3
         },
         {
           "slug": "optimist-jeans",
@@ -1364,13 +1364,13 @@ window.DADOS = {
         {
           "inicio": "2026-08-10",
           "fim": "2026-08-16",
-          "produtos": 21,
+          "produtos": 75,
           "ativas": 0,
           "usaram": 0,
           "cadastros": 9,
           "novos": 2,
           "produtos_medidos": 0,
-          "atribuido": 21
+          "atribuido": 75
         }
       ]
     }
