@@ -133,6 +133,14 @@ table.dt tr.row-alert td{background:rgba(225,112,85,.08)}
 .sub-filter .hint{font-size:11px;color:var(--g);font-style:italic}
 .chk-inline{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--dk);cursor:pointer}
 .chk-inline input{cursor:pointer;accent-color:var(--p)}
+/* barra de "voce clicou em X" abaixo do grafico clicavel */
+.drill-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-6px 0 14px}
+.drill-chip{display:inline-flex;align-items:center;gap:8px;background:var(--p);color:#fff;
+  padding:5px 8px 5px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.drill-chip button{background:rgba(255,255,255,.25);color:#fff;border:none;border-radius:50%;
+  width:18px;height:18px;line-height:1;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif}
+.drill-chip button:hover{background:rgba(255,255,255,.45)}
+.drill-hint{font-size:11px;color:var(--g);font-style:italic}
 .empty-state{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:40px;text-align:center;color:var(--g)}
 .empty-state p{margin:6px 0;font-size:14px}
 .empty-state ul{display:inline-block;text-align:left;margin-top:10px}
