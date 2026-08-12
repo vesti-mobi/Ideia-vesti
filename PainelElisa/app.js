@@ -5,7 +5,7 @@ const $ = (id) => document.getElementById(id);
 
 // state.chaves = lista de periodos selecionados (multi-selecao). 1 item = comportamento antigo.
 const CANAIS = ["Starter","Vesti","Uemtel","Atta","Parceiros"];
-const state = { periodo:"mensal", chaves:[], cs:"todas", canais:new Set(CANAIS), empresa:"todas", tab:"home", cadMes:"todos", upgMin:300000, soCoorte:true, reativMinDias:1 };
+const state = { periodo:"mensal", chaves:[], cs:"todas", canais:new Set(CANAIS), empresa:"todas", tab:"home", cadMes:"todos", upgMin:300000, soCoorte:true, reativMinDias:46 };
 const D = (typeof DADOS !== "undefined") ? DADOS : { empresas:[], mesesList:[], semanasList:[], anosList:[] };
 // parceiros que NAO entram no ranking "TOP 10 Parceiros" (viram canal proprio)
 const PARC_EXCL = new Set(["atta","attasoft","onix","uemtel","vesti","varejo vesti"]);
@@ -559,27 +559,49 @@ function renderTabSemFrete() {
   ], lista.sort((a,b)=>a.name.localeCompare(b.name)).map(e=>({...e,_alert:true})));
 }
 
+// faixas de tempo sem pagar (o piso da coleta é 46 dias — ver SQL_REATIVACAO)
+const FAIXAS_REATIV = [
+  {nome:"46 a 60 dias",   min:46,  max:60,  cor:"#FDCB6E"},
+  {nome:"61 a 90 dias",   min:61,  max:90,  cor:"#F39C12"},
+  {nome:"91 a 180 dias",  min:91,  max:180, cor:"#E17055"},
+  {nome:"mais de 180 dias", min:181, max:1e9, cor:"#D63031"},
+];
+const somaFaixas = (o) => Object.values(o).reduce((s,v)=>s+v, 0);
+
 function renderTabReativ() {
   const lista = empresasFiltradas();
   const mesK = mesAtualChave();
   // evolução mensal: soma de reativações por mês acrosss lista
-  const porMes = {};
+  // quanto tempo a marca ficou sem pagar, por canal (empilhado)
+  const porCanal = {};
   for (const e of lista) {
-    const eventos = e.reativEventos;
-    if (eventos && eventos.length) {          // respeita o atraso mínimo escolhido
-      for (const ev of eventos) {
-        if ((ev.dias||0) < state.reativMinDias || !ev.mes) continue;
-        porMes[ev.mes] = (porMes[ev.mes]||0) + 1;
-      }
-    } else {
-      for (const [m,q] of Object.entries(e.reativacoesPorMes||{})) porMes[m] = (porMes[m]||0) + q;
+    const c = canalDe(e);
+    for (const ev of (e.reativEventos || [])) {
+      if ((ev.dias||0) < state.reativMinDias) continue;
+      if (!mesMatch(ev.mes)) continue;
+      const slot = porCanal[c] || (porCanal[c] = Object.fromEntries(FAIXAS_REATIV.map(f=>[f.nome,0])));
+      const faixa = FAIXAS_REATIV.find(f => (ev.dias||0) >= f.min && (ev.dias||0) <= f.max);
+      if (faixa) slot[faixa.nome]++;
     }
   }
-  const meses = Object.keys(porMes).sort();
+  const canaisComDado = Object.keys(porCanal)
+    .sort((a,b)=>somaFaixas(porCanal[b])-somaFaixas(porCanal[a]));
   makeChart("chart-reativ-evolucao", {
     type:"bar",
-    data:{labels:meses, datasets:[{label:"reativações", data:meses.map(m=>porMes[m]), backgroundColor:COLORS[7]}]},
-    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
+    data:{
+      labels: canaisComDado,
+      datasets: FAIXAS_REATIV.map((f,i)=>({
+        label: f.nome,
+        data: canaisComDado.map(c=>porCanal[c][f.nome]),
+        backgroundColor: f.cor,
+      })),
+    },
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:"bottom"},
+        tooltip:{callbacks:{
+          label:c=>`${c.dataset.label}: ${c.raw} retorno(s)`,
+          footer:items=>`total do canal: ${items.reduce((s,i)=>s+i.raw,0)}`}}},
+      scales:{x:{stacked:true}, y:{stacked:true, ticks:{precision:0}, title:{display:true, text:"retornos"}}}}
   });
   // uma linha por FATURA reativada: marca, quanto ficou inadimplente e quando voltou
   const rows = [];
@@ -587,8 +609,8 @@ function renderTabReativ() {
     for (const ev of (e.reativEventos || [])) {
       if (!mesMatch(ev.mes)) continue;
       if ((ev.dias || 0) < state.reativMinDias) continue;
-      rows.push({...e, _venc: ev.venc, _voltou: ev.voltou, _dias: ev.dias || 0,
-                 _alert: (ev.dias || 0) >= 15});
+      rows.push({...e, _ultimoPag: ev.ultimoPag, _voltou: ev.voltou, _dias: ev.dias || 0,
+                 _alert: (ev.dias || 0) >= 91});
     }
   }
   rows.sort((a,b)=>b._dias - a._dias);
@@ -596,21 +618,21 @@ function renderTabReativ() {
   if (el) {
     const marcas = new Set(rows.map(r=>r.domain_id)).size;
     el.textContent = rows.length
-      ? `${rows.length} faturas de ${marcas} marcas em ${mesK||"—"} · atraso mínimo aplicado: ${state.reativMinDias} dia(s)`
-      : "Nenhuma fatura reativada com esses filtros.";
+      ? `${rows.length} retornos de ${marcas} marcas em ${mesK||"—"} · a partir de ${state.reativMinDias} dias sem pagar`
+      : "Nenhum retorno com esses filtros.";
   }
   renderTable("tbl-reativ", [
     {label:"Marca", fn:r=>r.name, sort:r=>r.name},
     {label:"CS", fn:r=>r.cs, sort:r=>r.cs},
     {label:"Canal", fn:r=>r.canal, sort:r=>r.canal},
-    {label:"Venceu em", fn:r=>r._venc||"—", sort:r=>r._venc||""},
-    {label:"Dias inadimplente", cls:"num", fn:r=>fmtInt(r._dias), sort:r=>r._dias},
+    {label:"Último pagamento antes", fn:r=>r._ultimoPag||"—", sort:r=>r._ultimoPag||""},
+    {label:"Dias sem pagar", cls:"num", fn:r=>fmtInt(r._dias), sort:r=>r._dias},
     {label:"Voltou em", fn:r=>r._voltou||"—", sort:r=>r._voltou||""},
     {label:"Mensalidade", cls:"num", fn:r=>{
       const v = r.valor_plano || r.valor_mensal; return v ? fmtBRL(v) : "—";
     }, sort:r=>r.valor_plano || r.valor_mensal || 0},
-    {label:"Reativações acumuladas", cls:"num", fn:r=>fmtInt(r.totalReativ||0), sort:r=>r.totalReativ||0},
-    {label:"Maior atraso já tido", cls:"num", fn:r=>fmtInt(r.maiorAtraso||0), sort:r=>r.maiorAtraso||0},
+    {label:"Retornos acumulados", cls:"num", fn:r=>fmtInt(r.totalReativ||0), sort:r=>r.totalReativ||0},
+    {label:"Maior ausência já tida", cls:"num", fn:r=>fmtInt(r.maiorAusencia||0), sort:r=>r.maiorAusencia||0},
   ], rows);
 }
 
@@ -1006,7 +1028,7 @@ function bind() {
   bindEmpresaCbx();
   $("filter-cad-mes").addEventListener("change", e=>{ state.cadMes=e.target.value; renderActiveTab(); });
   $("filter-upg-min").addEventListener("change", e=>{ state.upgMin=Number(e.target.value)||300000; renderActiveTab(); });
-  $("filter-reativ-dias").addEventListener("change", e=>{ state.reativMinDias=Number(e.target.value)||1; renderActiveTab(); });
+  $("filter-reativ-dias").addEventListener("change", e=>{ state.reativMinDias=Number(e.target.value)||46; renderActiveTab(); });
   document.querySelectorAll(".chk-coorte").forEach(cb=>cb.addEventListener("change", e=>{
     state.soCoorte = e.target.checked;
     document.querySelectorAll(".chk-coorte").forEach(o=>{ o.checked = state.soCoorte; });
