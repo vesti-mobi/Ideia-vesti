@@ -18,6 +18,12 @@ Elisa e Jennyfer). O filtro de CS é montado dinamicamente a partir dos dados.
   em que fez N". O painel filtra essa coorte por padrão (checkbox nas abas).
 - **Canal Vesti** = `partner_name` em {Vesti, Varejo Vesti}. Não entra no
   ranking de Parceiros.
+- **Reativação = 45+ dias sem pagar.** Mede o intervalo entre uma fatura paga e
+  a seguinte (`LAG` sobre `iugu_invoices` status=paid). *Não* é mais
+  `paid_at > due_date`: naquele critério 70% era atraso de 1 a 3 dias e o maior
+  do banco todo era 30 dias, porque a Iugu cancela a fatura antes disso — então
+  inadimplência longa nunca aparecia. Deu 262 retornos de 198 marcas contra
+  5.939 "reativações" do critério antigo.
 - **Mensalidade**: `valor_plano` (price_cents da assinatura Iugu, o valor
   contratado) é o número certo, mas só existe para ~66 marcas. `valor_mensal`
   (última fatura paga, pode ser proporcional) é o fallback.
