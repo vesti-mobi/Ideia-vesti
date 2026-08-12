@@ -150,9 +150,9 @@ def main():
             "alertas": _alertas(e, c, v, g),
             "reativacoesPorMes": (reativ.get(dom) or {}).get("reativacoesPorMes", {}),
             "totalReativ": (reativ.get(dom) or {}).get("totalReativ", 0),
-            # cada fatura paga em atraso: {mes, venc, voltou, dias}
+            # cada retorno: {mes, ultimoPag, voltou, dias sem pagar}
             "reativEventos": (reativ.get(dom) or {}).get("eventos", []),
-            "maiorAtraso": (reativ.get(dom) or {}).get("maiorAtraso", 0),
+            "maiorAusencia": (reativ.get(dom) or {}).get("maiorAusencia", 0),
             "ultimaVolta": (reativ.get(dom) or {}).get("ultimaVolta", ""),
             "linksCompartilhados": (links.get(dom) or {}).get("linksCompartilhados", 0),
             "cliquesTotal": (links.get(dom) or {}).get("cliquesTotal", 0),
