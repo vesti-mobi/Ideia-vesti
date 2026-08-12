@@ -581,14 +581,6 @@ function renderTabReativ() {
     data:{labels:meses, datasets:[{label:"reativações", data:meses.map(m=>porMes[m]), backgroundColor:COLORS[7]}]},
     options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
   });
-  // TOP 10 marcas acumulado
-  const ranked = lista.filter(e=>e.totalReativ>0).sort((a,b)=>b.totalReativ-a.totalReativ);
-  const top10 = ranked.slice(0,10);
-  makeChart("chart-reativ-top", {
-    type:"bar",
-    data:{labels:top10.map(e=>e.name), datasets:[{label:"reativações", data:top10.map(e=>e.totalReativ), backgroundColor:COLORS[7]}]},
-    options:{indexAxis:"y", responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
-  });
   // uma linha por FATURA reativada: marca, quanto ficou inadimplente e quando voltou
   const rows = [];
   for (const e of lista) {
