@@ -1,7 +1,26 @@
-# Painel CS — Elisa & Jennyfer
+# Painel CS — todas as CS
 
 Dashboard estático (HTML + JSON) seguindo o padrão do PainelCSGerencial.
-Filtra apenas marcas dos CS **Elisa** e **Jennyfer** com `modulos LIKE '%vendas%'`.
+Traz **todas as marcas** com `modulos LIKE '%vendas%'` (antes era restrito a
+Elisa e Jennyfer). O filtro de CS é montado dinamicamente a partir dos dados.
+
+## Regras que não são óbvias
+
+- **1 linha por domínio.** `odbc_companies` traz 1 linha por CNPJ, então um
+  domínio com filiais gerava N linhas com o *mesmo* GMV (Diamantes Lingerie
+  aparecia 79x). `build_data.py` mantém só a matriz e agrega as filiais em
+  `qtdFiliais`/`filiais`.
+- **Primeiras 5 / 25 vendas**: primeiro mês-calendário em que a marca fez N
+  vendas pagas *dentro do próprio mês*. A contagem zera na virada do mês
+  enquanto não bater N; ao bater, grava a data exata e não zera mais.
+- **Piso de dados = 1º mês de `mesesList`** (hoje jul/2025). Para marcas que
+  entraram antes disso o marco das 5/25 não é "primeiras vendas" — é só "um mês
+  em que fez N". O painel filtra essa coorte por padrão (checkbox nas abas).
+- **Canal Vesti** = `partner_name` em {Vesti, Varejo Vesti}. Não entra no
+  ranking de Parceiros.
+- **Mensalidade**: `valor_plano` (price_cents da assinatura Iugu, o valor
+  contratado) é o número certo, mas só existe para ~66 marcas. `valor_mensal`
+  (última fatura paga, pode ser proporcional) é o fallback.
 
 ## Pipeline
 
@@ -33,8 +52,9 @@ start index.html
 | Sem VP ativo / Sem frete | proxy: pedidos nos últimos 30-60d | ⚠ proxy |
 | Marcas travadas | 1º pedido cadastrado sem 1ª venda | ✅ |
 | TOP 10 Starter / Parceiros | bucket atual por GMV | ✅ |
-| Reativações | — | ❌ pendente |
-| Link compartilhado / Clicks | — | ❌ pendente |
+| Reativações | iugu_invoices: fatura paga após o vencimento | ✅ |
+| Link compartilhado / Clicks | sucessodocliente_products / _rankings | ✅ |
+| Oportunidades de Upgrade | GMV dos 3 últimos meses fechados ≥ R$ 300k | ✅ |
 
 ## Canal
 
