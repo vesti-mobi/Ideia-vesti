@@ -25,7 +25,7 @@
 <div class="top-bar">
   <div class="logo-wrap">
     <div class="logo">Elisa <span class="accent">CS</span></div>
-    <div class="sub">Painel Customer Success · Elisa & Jennyfer</div>
+    <div class="sub">Painel Customer Success · todas as CS</div>
   </div>
   <div class="info" id="gerado-em">—</div>
 </div>
@@ -51,20 +51,23 @@
     <div class="filter-group"><label>CS:</label>
       <select class="f-select" id="filter-cs">
         <option value="todas">Todas</option>
-        <option value="Elisa Marques">Elisa</option>
-        <option value="Jennyfer Rabelo">Jennyfer</option>
       </select>
     </div>
     <div class="filter-group"><label>Canal:</label>
       <div class="canal-checks" id="filter-canal">
         <label class="chk"><input type="checkbox" value="Starter" checked> Starter</label>
+        <label class="chk"><input type="checkbox" value="Vesti" checked> Vesti</label>
         <label class="chk"><input type="checkbox" value="Uemtel" checked> Uemtel</label>
         <label class="chk"><input type="checkbox" value="Atta" checked> Atta</label>
         <label class="chk"><input type="checkbox" value="Parceiros" checked> Parceiros</label>
       </div>
     </div>
     <div class="filter-group"><label>Empresa:</label>
-      <select class="f-select" id="filter-empresa"><option value="todas">Todas</option></select>
+      <div class="cbx" id="filter-empresa">
+        <input type="text" class="cbx-input" id="filter-empresa-input" placeholder="Todas" autocomplete="off" spellcheck="false">
+        <button type="button" class="cbx-clear" id="filter-empresa-clear" title="Limpar">×</button>
+        <div class="cbx-panel"></div>
+      </div>
     </div>
   </div>
 
@@ -104,7 +107,7 @@
       </div>
       <div class="hl-card" onclick="switchTab('topparceiros')" style="background:linear-gradient(135deg,#D63031,#FF6B6B)">
         <div class="hl-icon">🥈</div><div class="hl-label">TOP 10 Parceiros</div>
-        <div class="hl-val" id="kpi-topparc">0</div><div class="hl-sub">excl. Atta/Onix</div>
+        <div class="hl-val" id="kpi-topparc">0</div><div class="hl-sub">excl. Atta/Onix/Uemtel/Vesti</div>
       </div>
       <div class="hl-card" onclick="switchTab('vpinativo')" style="background:linear-gradient(135deg,#636E72,#B2BEC3)">
         <div class="hl-icon">🚫</div><div class="hl-label">Sem VP Ativo</div>
@@ -117,6 +120,10 @@
       <div class="hl-card" onclick="switchTab('travadas')" style="background:linear-gradient(135deg,#2D3436,#636E72)">
         <div class="hl-icon">⚠️</div><div class="hl-label">Marcas travadas</div>
         <div class="hl-val" id="kpi-travadas">0</div><div class="hl-sub">implantação parada</div>
+      </div>
+      <div class="hl-card" onclick="switchTab('upgrade')" style="background:linear-gradient(135deg,#00B894,#26D0A5)">
+        <div class="hl-icon">📈</div><div class="hl-label">Oportunidades de Upgrade</div>
+        <div class="hl-val" id="kpi-upgrade">0</div><div class="hl-sub" id="kpi-upgrade-sub">marcas · 300 mil+ em 3 meses</div>
       </div>
       <div class="hl-card" onclick="switchTab('links')" style="background:linear-gradient(135deg,#FDCB6E,#FFE08A)">
         <div class="hl-icon">🔗</div><div class="hl-label">Links & Cliques</div>
@@ -160,6 +167,11 @@
 
   <div id="tab-primeiras5" class="tab-panel">
     <h2 class="tab-title">🚀 Primeiras 5 Vendas · <span class="periodo-label"></span></h2>
+    <p class="hint" style="margin-bottom:12px;color:var(--g);font-size:12px">Critério: 5 vendas pagas <strong>dentro de um mesmo mês</strong>. A contagem começa no mês de entrada e zera a cada virada de mês enquanto não bater 5. Ao bater, marca a data e não zera mais.</p>
+    <div class="sub-filter">
+      <label class="chk-inline"><input type="checkbox" class="chk-coorte" checked> Só marcas que entraram depois do piso de dados</label>
+      <span class="hint" id="p5-coorte-hint"></span>
+    </div>
     <div class="chart-row">
       <div class="ch"><h4>Marcas atingindo 5 vendas pagas por mês</h4><div class="cw"><canvas id="chart-p5-evolucao"></canvas></div></div>
       <div class="ch"><h4>Distribuição por canal</h4><div class="cw"><canvas id="chart-p5-canal"></canvas></div></div>
@@ -169,6 +181,11 @@
 
   <div id="tab-primeiras25" class="tab-panel">
     <h2 class="tab-title">🏆 Primeiras 25 Vendas · <span class="periodo-label"></span></h2>
+    <p class="hint" style="margin-bottom:12px;color:var(--g);font-size:12px">Critério: 25 vendas pagas <strong>dentro de um mesmo mês</strong>. A contagem começa no mês de entrada e zera a cada virada de mês enquanto não bater 25. Ao bater, marca a data e não zera mais.</p>
+    <div class="sub-filter">
+      <label class="chk-inline"><input type="checkbox" class="chk-coorte" checked> Só marcas que entraram depois do piso de dados</label>
+      <span class="hint" id="p25-coorte-hint"></span>
+    </div>
     <div class="chart-row">
       <div class="ch"><h4>Marcas atingindo 25 vendas pagas por mês</h4><div class="cw"><canvas id="chart-p25-evolucao"></canvas></div></div>
       <div class="ch"><h4>Tempo da 1ª venda paga até 25 vendas pagas</h4><div class="cw"><canvas id="chart-p25-tempo"></canvas></div></div>
@@ -178,7 +195,21 @@
 
   <div id="tab-reativ" class="tab-panel">
     <h2 class="tab-title">🔄 Reativações · <span class="periodo-label"></span></h2>
-    <p class="hint" style="margin-bottom:12px;color:var(--g);font-size:12px">Critério: fatura Iugu paga após o vencimento (paid_at &gt; due_date).</p>
+    <p class="hint" style="margin-bottom:12px;color:var(--g);font-size:12px">
+      Critério: fatura Iugu paga depois do vencimento (<code>paid_at &gt; due_date</code>). Uma linha por fatura.
+      <strong>Atenção:</strong> com atraso mínimo de 1 dia, 70% dos casos são de marcas que pagaram só 1-3 dias atrasadas —
+      não chegaram a ficar inadimplentes. Suba o atraso mínimo para ver reativação de verdade.
+    </p>
+    <div class="sub-filter">
+      <label>Atraso mínimo:</label>
+      <select class="f-select" id="filter-reativ-dias">
+        <option value="1" selected>1 dia (tudo que atrasou)</option>
+        <option value="8">8 dias</option>
+        <option value="15">15 dias</option>
+        <option value="30">30 dias</option>
+      </select>
+      <span class="hint" id="reativ-resumo"></span>
+    </div>
     <div class="chart-row">
       <div class="ch"><h4>Reativações por mês (todas marcas)</h4><div class="cw"><canvas id="chart-reativ-evolucao"></canvas></div></div>
       <div class="ch"><h4>TOP 10 marcas mais reativadas (acumulado)</h4><div class="cw"><canvas id="chart-reativ-top"></canvas></div></div>
@@ -201,7 +232,7 @@
       <div class="ch"><h4>TOP 10 por GMV</h4><div class="cw"><canvas id="chart-topp-bar"></canvas></div></div>
       <div class="ch"><h4>Participação no GMV Parceiros</h4><div class="cw"><canvas id="chart-topp-pie"></canvas></div></div>
     </div>
-    <div class="tbl-card"><h4>TOP 10 marcas Parceiros (excl. Atta/Onix)</h4><div class="tbl-wrap"><table class="dt" id="tbl-topparc"></table></div></div>
+    <div class="tbl-card"><h4>TOP 10 marcas Parceiros (excl. Atta/Onix/Uemtel/Vesti)</h4><div class="tbl-wrap"><table class="dt" id="tbl-topparc"></table></div></div>
   </div>
 
   <div id="tab-vpinativo" class="tab-panel">
@@ -233,6 +264,29 @@
       <div class="ch"><h4>Marcas travadas por canal</h4><div class="cw"><canvas id="chart-trav-canal"></canvas></div></div>
     </div>
     <div class="tbl-card"><h4>Marcas paradas (cadastraram pedido mas não venderam)</h4><div class="tbl-wrap"><table class="dt" id="tbl-travadas"></table></div></div>
+  </div>
+
+  <div id="tab-upgrade" class="tab-panel">
+    <h2 class="tab-title">📈 Oportunidades de Upgrade</h2>
+    <p class="hint" style="margin-bottom:12px;color:var(--g);font-size:12px">
+      Marcas que faturaram <strong>R$ 300.000 ou mais</strong> somando os <strong id="upg-janela">3 últimos meses fechados</strong>
+      (não depende do filtro de período). Ordenadas por GMV do trimestre — as de mensalidade mais baixa são as de maior potencial de upgrade.
+    </p>
+    <div class="sub-filter">
+      <label>Faturamento mínimo no trimestre:</label>
+      <select class="f-select" id="filter-upg-min">
+        <option value="300000" selected>R$ 300.000</option>
+        <option value="150000">R$ 150.000</option>
+        <option value="500000">R$ 500.000</option>
+        <option value="1000000">R$ 1.000.000</option>
+      </select>
+      <span class="hint" id="upg-hint"></span>
+    </div>
+    <div class="chart-row">
+      <div class="ch"><h4>TOP 15 por GMV do trimestre</h4><div class="cw"><canvas id="chart-upg-top"></canvas></div></div>
+      <div class="ch"><h4>Mensalidade atual das marcas elegíveis</h4><div class="cw"><canvas id="chart-upg-mens"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>Marcas elegíveis para upgrade</h4><div class="tbl-wrap"><table class="dt" id="tbl-upgrade"></table></div></div>
   </div>
 
   <div id="tab-links" class="tab-panel">
