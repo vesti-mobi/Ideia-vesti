@@ -183,26 +183,39 @@ WHERE COALESCE(l.links, 0) + COALESCE(c.cliques, 0) > 0
 """
 
 # -----------------------------------------------------------------------------
-# 5) REATIVACAO (DISTINCT id OBRIGATORIO: iugu_invoices vem explodido)
-#    alias mes_pago (build_reativacao le r["mes_pago"]).
+# 5) REATIVACAO = a marca ficou um ciclo inteiro sem pagar e voltou.
+#
+#    NAO usa mais `paid_at > due_date` (fatura paga em atraso). Aquele criterio
+#    media so' "pagou com atraso": 70% eram de 1 a 3 dias e o maior atraso do
+#    banco inteiro era 30 dias -- a Iugu cancela a fatura antes disso (2.691
+#    canceladas), entao inadimplencia longa NUNCA aparecia ali.
+#
+#    O criterio certo e' o INTERVALO entre uma fatura paga e a seguinte do mesmo
+#    customer. Gap > 45 dias = pulou pelo menos um ciclo. Decidido com a Laura
+#    em 12/08/2026.
+#
+#    DISTINCT id continua obrigatorio: iugu_invoices vem explodido no BQ.
 # -----------------------------------------------------------------------------
+GAP_MIN_DIAS = 46
+
 SQL_REATIVACAO = f"""
-WITH inv AS (
-  SELECT DISTINCT id, customer_id, DATE(SUBSTR(paid_at, 1, 10)) paid_dt,
-    SAFE.PARSE_DATE('%Y-%m-%d', due_date) due_dt, SUBSTR(paid_at, 1, 7) mes_pago
+WITH pagas AS (
+  SELECT DISTINCT id, customer_id, DATE(SUBSTR(paid_at, 1, 10)) paid_dt
   FROM `{PROJECT}.{DATASET}.iugu_invoices`
-  WHERE status='paid' AND paid_at IS NOT NULL AND paid_at NOT IN ('None','')
-    AND due_date IS NOT NULL AND due_date NOT IN ('None',''))
--- grao de FATURA (nao agregado): o painel mostra, por marca, quanto tempo
--- ficou inadimplente e a data em que voltou. A agregacao por mes e' feita
--- em build_reativacao a partir daqui.
-SELECT sc.domain_id domain_id, inv.mes_pago mes_pago,
-  inv.due_dt due_dt, inv.paid_dt paid_dt,
-  DATE_DIFF(inv.paid_dt, inv.due_dt, DAY) dias_atraso
-FROM inv
-JOIN `{PROJECT}.{DATASET}.silver_companiesativos_iugu` sc ON sc.Customer_ID_Iugu = inv.customer_id
-WHERE inv.paid_dt IS NOT NULL AND inv.due_dt IS NOT NULL
-  AND DATE_DIFF(inv.paid_dt, inv.due_dt, DAY) >= 1
+  WHERE status='paid' AND paid_at IS NOT NULL AND paid_at NOT IN ('None','')),
+com_gap AS (
+  SELECT customer_id, paid_dt,
+         LAG(paid_dt) OVER(PARTITION BY customer_id ORDER BY paid_dt) pag_anterior
+  FROM pagas)
+SELECT sc.domain_id domain_id,
+  FORMAT_DATE('%Y-%m', g.paid_dt) mes_pago,
+  g.pag_anterior ultimo_pagamento,
+  g.paid_dt data_volta,
+  DATE_DIFF(g.paid_dt, g.pag_anterior, DAY) dias_sem_pagar
+FROM com_gap g
+JOIN `{PROJECT}.{DATASET}.silver_companiesativos_iugu` sc ON sc.Customer_ID_Iugu = g.customer_id
+WHERE g.pag_anterior IS NOT NULL
+  AND DATE_DIFF(g.paid_dt, g.pag_anterior, DAY) >= {GAP_MIN_DIAS}
 """
 
 
@@ -415,8 +428,7 @@ def build_links(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
 
 
 def build_reativacao(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
-    """Agrega por mes E guarda cada fatura individualmente, pra tabela poder
-    mostrar quanto tempo a marca ficou inadimplente e quando voltou."""
+    """Um evento por RETORNO: a marca passou `dias` sem pagar e voltou em `voltou`."""
     def _iso(v):
         return v.isoformat() if hasattr(v, "isoformat") else (str(v)[:10] if v else "")
 
@@ -426,18 +438,18 @@ def build_reativacao(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict
         if dom not in empresas_by_dom:
             continue
         mes = r.get("mes_pago") or ""
-        dias = int(r.get("dias_atraso") or 0)
-        slot = out.setdefault(dom, {"reativacoesPorMes": {}, "diasAtrasoTotal": 0,
+        dias = int(r.get("dias_sem_pagar") or 0)
+        slot = out.setdefault(dom, {"reativacoesPorMes": {}, "diasAusenteTotal": 0,
                                      "totalReativ": 0, "eventos": []})
         if mes:
             slot["reativacoesPorMes"][mes] = slot["reativacoesPorMes"].get(mes, 0) + 1
-        slot["diasAtrasoTotal"] += dias
+        slot["diasAusenteTotal"] += dias
         slot["totalReativ"] += 1
-        slot["eventos"].append({"mes": mes, "venc": _iso(r.get("due_dt")),
-                                "voltou": _iso(r.get("paid_dt")), "dias": dias})
+        slot["eventos"].append({"mes": mes, "ultimoPag": _iso(r.get("ultimo_pagamento")),
+                                "voltou": _iso(r.get("data_volta")), "dias": dias})
     for slot in out.values():
         slot["eventos"].sort(key=lambda ev: ev["voltou"], reverse=True)
-        slot["maiorAtraso"] = max((ev["dias"] for ev in slot["eventos"]), default=0)
+        slot["maiorAusencia"] = max((ev["dias"] for ev in slot["eventos"]), default=0)
         slot["ultimaVolta"] = slot["eventos"][0]["voltou"] if slot["eventos"] else ""
     return out
 
@@ -504,7 +516,7 @@ def coletar_do_bq(client: bigquery.Client):
     emp_rows    = run_query(client, SQL_EMPRESAS, "empresas (todas as CS)")
     gmv_rows    = run_query(client, SQL_GMV, "GMV diario")
     pp_rows     = run_query(client, SQL_PRIMEIRO_PEDIDO, "primeiro pedido cadastrado")
-    reativ_rows = run_query(client, SQL_REATIVACAO, "reativacoes (fatura paga atrasada)")
+    reativ_rows = run_query(client, SQL_REATIVACAO, "reativacoes (45+ dias sem pagar)")
     links_rows  = run_query(client, SQL_LINKS, "links/cliques compartilhados")
 
     # Produtos: so se `odbc_products` estiver ingerido (odbc_product_details NAO serve).
