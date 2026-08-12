@@ -196,22 +196,23 @@
   <div id="tab-reativ" class="tab-panel">
     <h2 class="tab-title">🔄 Reativações · <span class="periodo-label"></span></h2>
     <p class="hint" style="margin-bottom:12px;color:var(--g);font-size:12px">
-      Critério: fatura Iugu paga depois do vencimento (<code>paid_at &gt; due_date</code>). Uma linha por fatura.
-      <strong>Atenção:</strong> com atraso mínimo de 1 dia, 70% dos casos são de marcas que pagaram só 1-3 dias atrasadas —
-      não chegaram a ficar inadimplentes. Suba o atraso mínimo para ver reativação de verdade.
+      Critério: a marca passou <strong>mais de 45 dias sem pagar</strong> (pulou pelo menos um ciclo) e voltou a pagar.
+      Mede o intervalo entre uma fatura paga e a seguinte.
+      Não usamos mais "fatura paga em atraso": naquele critério 70% era atraso de 1 a 3 dias e o maior do banco era 30 dias,
+      porque a Iugu cancela a fatura antes disso — inadimplência longa nunca aparecia.
     </p>
     <div class="sub-filter">
-      <label>Atraso mínimo:</label>
+      <label>Tempo mínimo sem pagar:</label>
       <select class="f-select" id="filter-reativ-dias">
-        <option value="1" selected>1 dia (tudo que atrasou)</option>
-        <option value="8">8 dias</option>
-        <option value="15">15 dias</option>
-        <option value="30">30 dias</option>
+        <option value="46" selected>46 dias (tudo)</option>
+        <option value="61">61 dias</option>
+        <option value="91">91 dias</option>
+        <option value="181">mais de 180 dias</option>
       </select>
       <span class="hint" id="reativ-resumo"></span>
     </div>
     <div class="chart-row one">
-      <div class="ch"><h4>Reativações por mês (todas marcas)</h4><div class="cw"><canvas id="chart-reativ-evolucao"></canvas></div></div>
+      <div class="ch"><h4>Retornos por canal e tempo que a marca ficou sem pagar</h4><div class="cw"><canvas id="chart-reativ-evolucao"></canvas></div></div>
     </div>
     <div class="tbl-card"><h4>Marcas reativadas no mês selecionado</h4><div class="tbl-wrap"><table class="dt" id="tbl-reativ"></table></div></div>
   </div>
