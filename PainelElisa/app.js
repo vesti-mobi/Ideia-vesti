@@ -5,7 +5,7 @@ const $ = (id) => document.getElementById(id);
 
 // state.chaves = lista de periodos selecionados (multi-selecao). 1 item = comportamento antigo.
 const CANAIS = ["Starter","Vesti","Uemtel","Atta","Parceiros"];
-const state = { periodo:"mensal", chaves:[], cs:"todas", canais:new Set(CANAIS), empresa:"todas", tab:"home", cadMes:"todos", upgMin:300000, soCoorte:true, reativMinDias:46 };
+const state = { periodo:"mensal", chaves:[], cs:"todas", canais:new Set(CANAIS), empresa:"todas", tab:"home", cadMes:"todos", upgMin:300000, soCoorte:true, reativMinDias:46, reativDrill:null };
 const D = (typeof DADOS !== "undefined") ? DADOS : { empresas:[], mesesList:[], semanasList:[], anosList:[] };
 // parceiros que NAO entram no ranking "TOP 10 Parceiros" (viram canal proprio)
 const PARC_EXCL = new Set(["atta","attasoft","onix","uemtel","vesti","varejo vesti"]);
@@ -567,6 +567,15 @@ const FAIXAS_REATIV = [
   {nome:"mais de 180 dias", min:181, max:1e9, cor:"#D63031"},
 ];
 const somaFaixas = (o) => Object.values(o).reduce((s,v)=>s+v, 0);
+const faixaDe = (dias) => FAIXAS_REATIV.find(f => (dias||0) >= f.min && (dias||0) <= f.max);
+
+// clique numa barra filtra a tabela por canal + faixa; clicar de novo limpa
+function setReativDrill(canal, faixa) {
+  const d = state.reativDrill;
+  state.reativDrill = (d && d.canal === canal && d.faixa === faixa) ? null : {canal, faixa};
+  renderActiveTab();
+}
+window.limparReativDrill = () => { state.reativDrill = null; renderActiveTab(); };
 
 function renderTabReativ() {
   const lista = empresasFiltradas();
@@ -597,18 +606,32 @@ function renderTabReativ() {
       })),
     },
     options:{responsive:true, maintainAspectRatio:false,
+      onClick:(evt, els, chart)=>{
+        if (!els.length) return;
+        const el = els[0];
+        setReativDrill(chart.data.labels[el.index], chart.data.datasets[el.datasetIndex].label);
+      },
+      onHover:(evt, els)=>{
+        if (evt.native && evt.native.target) evt.native.target.style.cursor = els.length ? "pointer" : "default";
+      },
       plugins:{legend:{position:"bottom"},
         tooltip:{callbacks:{
           label:c=>`${c.dataset.label}: ${c.raw} retorno(s)`,
-          footer:items=>`total do canal: ${items.reduce((s,i)=>s+i.raw,0)}`}}},
+          footer:items=>`total do canal: ${items.reduce((s,i)=>s+i.raw,0)} · clique para ver as marcas`}}},
       scales:{x:{stacked:true}, y:{stacked:true, ticks:{precision:0}, title:{display:true, text:"retornos"}}}}
   });
   // uma linha por FATURA reativada: marca, quanto ficou inadimplente e quando voltou
+  const drill = state.reativDrill;
   const rows = [];
   for (const e of lista) {
     for (const ev of (e.reativEventos || [])) {
       if (!mesMatch(ev.mes)) continue;
       if ((ev.dias || 0) < state.reativMinDias) continue;
+      if (drill) {                              // clique numa barra do gráfico
+        if (canalDe(e) !== drill.canal) continue;
+        const f = faixaDe(ev.dias);
+        if (!f || f.nome !== drill.faixa) continue;
+      }
       rows.push({...e, _ultimoPag: ev.ultimoPag, _voltou: ev.voltou, _dias: ev.dias || 0,
                  _alert: (ev.dias || 0) >= 91});
     }
@@ -620,6 +643,14 @@ function renderTabReativ() {
     el.textContent = rows.length
       ? `${rows.length} retornos de ${marcas} marcas em ${mesK||"—"} · a partir de ${state.reativMinDias} dias sem pagar`
       : "Nenhum retorno com esses filtros.";
+  }
+  const elD = $("reativ-drill");
+  if (elD) {
+    elD.innerHTML = drill
+      ? `<span class="drill-chip">${drill.canal} · ${drill.faixa}
+           <button type="button" onclick="limparReativDrill()" title="Ver todos de novo">×</button></span>
+         <span class="drill-hint">mostrando só as marcas desse pedaço da barra</span>`
+      : `<span class="drill-hint">Clique em um pedaço da barra para ver as marcas daquele canal e faixa.</span>`;
   }
   renderTable("tbl-reativ", [
     {label:"Marca", fn:r=>r.name, sort:r=>r.name},
@@ -1023,12 +1054,16 @@ function bind() {
     const cb = e.target;
     if (cb.tagName !== "INPUT") return;
     if (cb.checked) state.canais.add(cb.value); else state.canais.delete(cb.value);
+    state.reativDrill = null;
     populaCs(); populaEmpresas(); renderActiveTab();
   });
   bindEmpresaCbx();
   $("filter-cad-mes").addEventListener("change", e=>{ state.cadMes=e.target.value; renderActiveTab(); });
   $("filter-upg-min").addEventListener("change", e=>{ state.upgMin=Number(e.target.value)||300000; renderActiveTab(); });
-  $("filter-reativ-dias").addEventListener("change", e=>{ state.reativMinDias=Number(e.target.value)||46; renderActiveTab(); });
+  // mudar filtro invalida a seleção feita no gráfico (o pedaço clicado pode nem existir mais)
+  $("filter-reativ-dias").addEventListener("change", e=>{
+    state.reativMinDias=Number(e.target.value)||46; state.reativDrill=null; renderActiveTab();
+  });
   document.querySelectorAll(".chk-coorte").forEach(cb=>cb.addEventListener("change", e=>{
     state.soCoorte = e.target.checked;
     document.querySelectorAll(".chk-coorte").forEach(o=>{ o.checked = state.soCoorte; });
