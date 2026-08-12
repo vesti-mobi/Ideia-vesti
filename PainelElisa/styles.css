@@ -96,6 +96,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--dk)}
 .hl-sub{font-size:12px;opacity:.85;font-weight:400}
 
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+.chart-row.one{grid-template-columns:1fr}
 @media(max-width:900px){.chart-row{grid-template-columns:1fr}}
 .ch{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:16px}
 .ch h4{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--dk)}
