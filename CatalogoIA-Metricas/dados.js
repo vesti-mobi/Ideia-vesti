@@ -1,6 +1,6 @@
 window.DADOS = {
-  "gerado_em": "2026-08-11T21:35:01.262Z",
-  "hoje": "2026-08-11",
+  "gerado_em": "2026-08-12T12:47:24.554Z",
+  "hoje": "2026-08-12",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
   "auto_publica_desde": "2026-08-10",
@@ -18,9 +18,9 @@ window.DADOS = {
     "paradas": 1,
     "com_conta": 10,
     "contas": 9,
-    "produtos_total": 226,
-    "produtos_7d": 112,
-    "descricoes_total": 144,
+    "produtos_total": 247,
+    "produtos_7d": 124,
+    "descricoes_total": 173,
     "total_estimado": true
   },
   "marcas": [
@@ -30,16 +30,16 @@ window.DADOS = {
       "arquetipo": "explorador",
       "tem_conta": true,
       "email": "nicoboco.shop@nicoboco.com.br",
-      "produtos": 78,
+      "produtos": 99,
       "estimado": false,
-      "produtos_7d": 78,
+      "produtos_7d": 99,
       "ativa": true,
-      "acessos": 16,
-      "buscas": 119,
-      "descricoes": 57,
-      "envios": 79,
+      "acessos": 18,
+      "buscas": 150,
+      "descricoes": 86,
+      "envios": 111,
       "primeiro": "2026-08-10T19:02:35.392Z",
-      "ultimo": "2026-08-11T21:32:45.982Z",
+      "ultimo": "2026-08-12T12:07:47.276Z",
       "dias": 0
     },
     {
@@ -50,7 +50,7 @@ window.DADOS = {
       "email": "missmilliebr@gmail.com",
       "produtos": 55,
       "estimado": true,
-      "produtos_7d": 18,
+      "produtos_7d": 9,
       "ativa": true,
       "acessos": 4,
       "buscas": 27,
@@ -88,13 +88,13 @@ window.DADOS = {
       "estimado": true,
       "produtos_7d": 2,
       "ativa": true,
-      "acessos": 44,
+      "acessos": 45,
       "buscas": 52,
       "descricoes": 17,
       "envios": 12,
       "primeiro": "2026-07-28T11:47:18.529Z",
-      "ultimo": "2026-08-10T18:01:12.573Z",
-      "dias": 1
+      "ultimo": "2026-08-12T12:05:03.861Z",
+      "dias": 0
     },
     {
       "slug": "andressa-vesti",
@@ -416,7 +416,7 @@ window.DADOS = {
     {
       "inicio": "2026-08-10",
       "fim": "2026-08-16",
-      "produtos": 96,
+      "produtos": 117,
       "ativas": 3,
       "usaram": 5,
       "cadastros": 9,
@@ -436,9 +436,9 @@ window.DADOS = {
         "paradas": 0,
         "com_conta": 10,
         "contas": 9,
-        "produtos_total": 54,
-        "produtos_7d": 54,
-        "descricoes_total": 54,
+        "produtos_total": 81,
+        "produtos_7d": 81,
+        "descricoes_total": 83,
         "total_estimado": false,
         "produtos_atribuidos": 0
       },
@@ -449,18 +449,18 @@ window.DADOS = {
           "arquetipo": "explorador",
           "tem_conta": true,
           "email": "nicoboco.shop@nicoboco.com.br",
-          "produtos": 54,
+          "produtos": 81,
           "estimado": false,
-          "produtos_7d": 54,
+          "produtos_7d": 81,
           "ativa": true,
-          "acessos": 7,
-          "buscas": 82,
-          "descricoes": 54,
-          "envios": 54,
+          "acessos": 9,
+          "buscas": 110,
+          "descricoes": 83,
+          "envios": 86,
           "primeiro": "2026-08-11T18:28:02.542Z",
-          "ultimo": "2026-08-11T21:33:24.912Z",
+          "ultimo": "2026-08-12T12:07:47.276Z",
           "dias": 0,
-          "produtos_medidos": 54,
+          "produtos_medidos": 81,
           "atribuido": 0
         },
         {
@@ -889,12 +889,12 @@ window.DADOS = {
         {
           "inicio": "2026-08-10",
           "fim": "2026-08-16",
-          "produtos": 55,
+          "produtos": 81,
           "ativas": 1,
           "usaram": 1,
           "cadastros": 9,
           "novos": 2,
-          "produtos_medidos": 55,
+          "produtos_medidos": 81,
           "atribuido": 0
         }
       ]
@@ -911,20 +911,20 @@ window.DADOS = {
         "paradas": 0,
         "com_conta": 10,
         "contas": 9,
-        "produtos_total": 203,
+        "produtos_total": 221,
         "produtos_7d": 0,
         "descricoes_total": 0,
         "total_estimado": true,
-        "produtos_atribuidos": 203
+        "produtos_atribuidos": 221
       },
       "marcas": [
         {
-          "slug": "amiska",
-          "nome": "Amiska",
-          "arquetipo": "sabio",
+          "slug": "nicoboco",
+          "nome": "Nicoboco",
+          "arquetipo": "explorador",
           "tem_conta": true,
-          "email": "missmilliebr@gmail.com",
-          "produtos": 55,
+          "email": "nicoboco.shop@nicoboco.com.br",
+          "produtos": 73,
           "estimado": true,
           "produtos_7d": 0,
           "ativa": false,
@@ -936,14 +936,14 @@ window.DADOS = {
           "ultimo": "",
           "dias": null,
           "produtos_medidos": 0,
-          "atribuido": 55
+          "atribuido": 73
         },
         {
-          "slug": "nicoboco",
-          "nome": "Nicoboco",
-          "arquetipo": "explorador",
+          "slug": "amiska",
+          "nome": "Amiska",
+          "arquetipo": "sabio",
           "tem_conta": true,
-          "email": "nicoboco.shop@nicoboco.com.br",
+          "email": "missmilliebr@gmail.com",
           "produtos": 55,
           "estimado": true,
           "produtos_7d": 0,
@@ -988,13 +988,13 @@ window.DADOS = {
           "estimado": true,
           "produtos_7d": 0,
           "ativa": false,
-          "acessos": 0,
+          "acessos": 1,
           "buscas": 0,
           "descricoes": 0,
           "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null,
+          "primeiro": "2026-08-12T12:05:03.861Z",
+          "ultimo": "2026-08-12T12:05:03.861Z",
+          "dias": 0,
           "produtos_medidos": 0,
           "atribuido": 36
         },
@@ -1364,13 +1364,13 @@ window.DADOS = {
         {
           "inicio": "2026-08-10",
           "fim": "2026-08-16",
-          "produtos": 75,
+          "produtos": 91,
           "ativas": 0,
-          "usaram": 0,
+          "usaram": 1,
           "cadastros": 9,
           "novos": 2,
           "produtos_medidos": 0,
-          "atribuido": 75
+          "atribuido": 91
         }
       ]
     }
