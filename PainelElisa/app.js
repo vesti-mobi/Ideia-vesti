@@ -4,20 +4,38 @@ const fmtInt = (n) => Number(n||0).toLocaleString("pt-BR");
 const $ = (id) => document.getElementById(id);
 
 // state.chaves = lista de periodos selecionados (multi-selecao). 1 item = comportamento antigo.
-const state = { periodo:"mensal", chaves:[], cs:"todas", canais:new Set(["Starter","Uemtel","Atta","Parceiros"]), empresa:"todas", tab:"home", cadMes:"todos" };
+const CANAIS = ["Starter","Vesti","Uemtel","Atta","Parceiros"];
+const state = { periodo:"mensal", chaves:[], cs:"todas", canais:new Set(CANAIS), empresa:"todas", tab:"home", cadMes:"todos", upgMin:300000, soCoorte:true, reativMinDias:1 };
 const D = (typeof DADOS !== "undefined") ? DADOS : { empresas:[], mesesList:[], semanasList:[], anosList:[] };
-const PARC_EXCL = new Set(["atta","attasoft","onix","uemtel"]);
+// parceiros que NAO entram no ranking "TOP 10 Parceiros" (viram canal proprio)
+const PARC_EXCL = new Set(["atta","attasoft","onix","uemtel","vesti","varejo vesti"]);
 const isUemtel = (e) => (e.partner_raw||"").toLowerCase() === "uemtel";
 const isAtta   = (e) => ["atta","attasoft"].includes((e.partner_raw||"").toLowerCase());
+const isVesti  = (e) => ["vesti","varejo vesti"].includes((e.partner_raw||"").toLowerCase());
 const COLORS = ["#6C5CE7","#00B894","#F39C12","#E17055","#0984E3","#FD79A8","#00CEC9","#A29BFE","#D63031","#74B9FF","#FFB94A","#55EFC4"];
 const charts = {}; // canvas id -> Chart instance
 
 // ---------- helpers ----------
 function canalDe(e) {
   if (e.starter_interno) return "Starter";
+  if (isVesti(e)) return "Vesti";
   if (isUemtel(e)) return "Uemtel";
   if (isAtta(e)) return "Atta";
   return "Parceiros";
+}
+// o JSON traz canal so como Starter/Parceiros; aqui vira o canal real (usado nas tabelas)
+function normalizaCanal() { for (const e of D.empresas) e.canal = canalDe(e); }
+
+// Piso de dados: o BQ so tem pedidos a partir do 1o mes de mesesList (jul/2025).
+// Para marcas que entraram ANTES disso a contagem das 5/25 nao comeca no mes de
+// entrada delas (nao existe o historico), entao o marco nao significa "primeiras
+// N vendas" -- significa so "um mes em que fez N". Marcamos essas p/ poder filtrar.
+const PISO_DADOS = () => (D.mesesList && D.mesesList.length) ? D.mesesList[0] : "";
+function marcaCoorte() {
+  const piso = PISO_DADOS();
+  for (const e of D.empresas) {
+    e.marcoConfiavel = !!piso && (e.dataEntrada || "").slice(0,7) >= piso;
+  }
 }
 function empresasFiltradas() {
   return D.empresas.filter(e => {
@@ -83,8 +101,18 @@ const mesMatch = (m) => {
   if (state.periodo === "anual") return state.chaves.some(k => m.slice(0,4) === k);
   return mesesSelecionados().has(m);
 };
-// nº de reativações da empresa somado sobre os períodos selecionados
+// nº de reativações da empresa nos períodos selecionados, respeitando o
+// atraso mínimo escolhido (conta os eventos; cai no agregado se não houver)
 function reativNoPeriodo(e) {
+  const eventos = e.reativEventos;
+  if (eventos && eventos.length) {
+    let s = 0;
+    for (const ev of eventos) {
+      if ((ev.dias || 0) < state.reativMinDias) continue;
+      if (mesMatch(ev.mes)) s++;
+    }
+    return s;
+  }
   const r = e.reativacoesPorMes || {};
   if (state.periodo === "anual") {
     let s = 0;
@@ -162,8 +190,9 @@ function renderKpis() {
     if (!e.temFreteAtivo) semFrete++;
     cadProds += e.qtProdutos||0;
     if ((e.qtProdutos||0) > 0) cadMarcas++;
-    if (mesMatch(e.mes5Vendas)) p5++;
-    if (mesMatch(e.mes25Vendas)) p25++;
+    const coorteOk = !state.soCoorte || e.marcoConfiavel;
+    if (coorteOk && mesMatch(e.mes5Vendas)) p5++;
+    if (coorteOk && mesMatch(e.mes25Vendas)) p25++;
     if (reativNoPeriodo(e) > 0) reativ++;
   }
   $("kpi-gmv").textContent = fmtBRL(gmv);
@@ -196,6 +225,12 @@ function renderKpis() {
     linksTot   += e.linksCompartilhados||0;
     if ((e.linksCompartilhados||0) > 0) marcasLink++;
   }
+  const upg = marcasUpgrade();
+  const mesesUpg = ultimos3MesesFechados();
+  $("kpi-upgrade").textContent = fmtInt(upg.length);
+  $("kpi-upgrade-sub").textContent = mesesUpg.length
+    ? `${fmtBRL(state.upgMin)}+ em ${mesesUpg[0]} … ${mesesUpg[mesesUpg.length-1]}`
+    : "sem meses fechados";
   $("kpi-cliques").textContent    = fmtInt(cliquesTot);
   $("kpi-links").textContent      = fmtInt(linksTot);
   $("kpi-marcas-link").textContent = fmtInt(marcasLink);
@@ -360,8 +395,12 @@ function diasEntre(d1, d2) {
 }
 
 function renderTabPrimeiras(n) {
-  const lista = empresasFiltradas();
+  const lista = empresasFiltradas().filter(e => !state.soCoorte || e.marcoConfiavel);
   const campo = n===5 ? "mes5Vendas" : "mes25Vendas";
+  const elHint = $(n===5 ? "p5-coorte-hint" : "p25-coorte-hint");
+  if (elHint) elHint.textContent = `Piso de dados: ${PISO_DADOS() || "—"}. `
+    + (state.soCoorte ? `Mostrando só marcas que entraram a partir daí (${lista.length} de ${empresasFiltradas().length}).`
+                      : `Mostrando todas — para quem entrou antes do piso, o marco NÃO é "primeiras ${n} vendas".`);
   const mesK = mesAtualChave();
   // evolução: marcas atingindo N por mes
   const porMes = {};
@@ -390,9 +429,9 @@ function renderTabPrimeiras(n) {
     const tempos = [];
     for (const e of lista) {
       const venda1 = e.primeiraVendaPaga || e.primeiraVenda;
-      if (!e.mes25Vendas || !venda1) continue;
+      if (!e.data25Vendas || !venda1) continue;
       const dv = new Date(venda1);
-      const dm = new Date(e.mes25Vendas+"-15");
+      const dm = new Date(e.data25Vendas);
       const dias = Math.floor((dm-dv)/86400000);
       if (dias>=0 && dias<400) tempos.push(dias);
     }
@@ -410,24 +449,31 @@ function renderTabPrimeiras(n) {
       options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
     });
   }
+  const campoData = n===5 ? "data5Vendas" : "data25Vendas";
   const rows = lista.filter(e=>mesMatch(e[campo])).map(e => {
     const venda1Paga = e.primeiraVendaPaga || e.primeiraVenda;
     const ate1aVenda = diasEntre((e.dataEntrada||"").slice(0,10), venda1Paga);
-    const ateNVendas = diasEntre((e.dataEntrada||"").slice(0,10), e[campo] ? e[campo]+"-15" : null);
+    // usa a data exata em que bateu N (antes era aproximado pelo dia 15 do mês)
+    const ateNVendas = diasEntre((e.dataEntrada||"").slice(0,10), e[campoData] || null);
     const permanencia = diasEntre((e.dataEntrada||"").slice(0,10), new Date().toISOString().slice(0,10));
-    return {...e, _venda1Paga:venda1Paga, _ate1aVenda:ate1aVenda, _ateN:ateNVendas, _perm:permanencia};
+    const mesEntrada = (e.dataEntrada||"").slice(0,7);
+    return {...e, _venda1Paga:venda1Paga, _ate1aVenda:ate1aVenda, _ateN:ateNVendas,
+            _perm:permanencia, _noMesEntrada: !!e[campo] && e[campo] === mesEntrada};
   });
   const cols = [
-    {label:"Marca", fn:r=>r.name},
-    {label:"CS", fn:r=>r.cs},
-    {label:"Canal", fn:r=>r.canal},
-    {label:"Data entrada", fn:r=>(r.dataEntrada||"—").slice(0,10)},
-    {label:"Permanência (d)", cls:"num", fn:r=>r._perm??"—"},
-    {label:"1ª venda paga", fn:r=>r._venda1Paga||"—"},
-    {label:"Dias até 1ª venda paga", cls:"num", fn:r=>r._ate1aVenda??"—"},
-    {label:`Mês ${n}ª venda paga`, fn:r=>r[campo]||"—"},
+    {label:"Marca", fn:r=>r.name, sort:r=>r.name},
+    {label:"CS", fn:r=>r.cs, sort:r=>r.cs},
+    {label:"Canal", fn:r=>r.canal, sort:r=>r.canal},
+    {label:"Data entrada", fn:r=>(r.dataEntrada||"—").slice(0,10), sort:r=>r.dataEntrada||""},
+    {label:"Permanência (d)", cls:"num", fn:r=>r._perm??"—", sort:r=>r._perm??-1},
+    {label:"1ª venda paga", fn:r=>r._venda1Paga||"—", sort:r=>r._venda1Paga||""},
+    {label:"Dias até 1ª venda paga", cls:"num", fn:r=>r._ate1aVenda??"—", sort:r=>r._ate1aVenda??-1},
+    {label:`Data que bateu ${n}`, fn:r=>r[campoData]||"—", sort:r=>r[campoData]||""},
+    {label:"No mês de entrada?", fn:r=>r._noMesEntrada
+        ? `<span class="pill pill-ok">sim</span>`
+        : `<span class="pill pill-warn">não</span>`, sort:r=>r._noMesEntrada?1:0},
+    {label:`Dias até ${n} vendas pagas`, cls:"num", fn:r=>r._ateN??"—", sort:r=>r._ateN??-1},
   ];
-  if (n === 25) cols.push({label:"Dias até 25 vendas pagas", cls:"num", fn:r=>r._ateN??"—"});
   renderTable(n===5?"tbl-p5":"tbl-p25", cols, rows);
 }
 
@@ -518,8 +564,16 @@ function renderTabReativ() {
   const mesK = mesAtualChave();
   // evolução mensal: soma de reativações por mês acrosss lista
   const porMes = {};
-  for (const e of lista) for (const [m,q] of Object.entries(e.reativacoesPorMes||{})) {
-    porMes[m] = (porMes[m]||0) + q;
+  for (const e of lista) {
+    const eventos = e.reativEventos;
+    if (eventos && eventos.length) {          // respeita o atraso mínimo escolhido
+      for (const ev of eventos) {
+        if ((ev.dias||0) < state.reativMinDias || !ev.mes) continue;
+        porMes[ev.mes] = (porMes[ev.mes]||0) + 1;
+      }
+    } else {
+      for (const [m,q] of Object.entries(e.reativacoesPorMes||{})) porMes[m] = (porMes[m]||0) + q;
+    }
   }
   const meses = Object.keys(porMes).sort();
   makeChart("chart-reativ-evolucao", {
@@ -535,15 +589,36 @@ function renderTabReativ() {
     data:{labels:top10.map(e=>e.name), datasets:[{label:"reativações", data:top10.map(e=>e.totalReativ), backgroundColor:COLORS[7]}]},
     options:{indexAxis:"y", responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
   });
-  const rows = lista.map(e=>({...e, _q: reativNoPeriodo(e)}))
-    .filter(e=>e._q > 0)
-    .sort((a,b)=>b._q - a._q);
+  // uma linha por FATURA reativada: marca, quanto ficou inadimplente e quando voltou
+  const rows = [];
+  for (const e of lista) {
+    for (const ev of (e.reativEventos || [])) {
+      if (!mesMatch(ev.mes)) continue;
+      if ((ev.dias || 0) < state.reativMinDias) continue;
+      rows.push({...e, _venc: ev.venc, _voltou: ev.voltou, _dias: ev.dias || 0,
+                 _alert: (ev.dias || 0) >= 15});
+    }
+  }
+  rows.sort((a,b)=>b._dias - a._dias);
+  const el = $("reativ-resumo");
+  if (el) {
+    const marcas = new Set(rows.map(r=>r.domain_id)).size;
+    el.textContent = rows.length
+      ? `${rows.length} faturas de ${marcas} marcas em ${mesK||"—"} · atraso mínimo aplicado: ${state.reativMinDias} dia(s)`
+      : "Nenhuma fatura reativada com esses filtros.";
+  }
   renderTable("tbl-reativ", [
-    {label:"Marca", fn:r=>r.name},
-    {label:"CS", fn:r=>r.cs},
-    {label:"Canal", fn:r=>r.canal},
-    {label:`Reativações em ${mesK||"—"}`, cls:"num", fn:r=>fmtInt(r._q)},
-    {label:"Total acumulado", cls:"num", fn:r=>fmtInt(r.totalReativ||0)},
+    {label:"Marca", fn:r=>r.name, sort:r=>r.name},
+    {label:"CS", fn:r=>r.cs, sort:r=>r.cs},
+    {label:"Canal", fn:r=>r.canal, sort:r=>r.canal},
+    {label:"Venceu em", fn:r=>r._venc||"—", sort:r=>r._venc||""},
+    {label:"Dias inadimplente", cls:"num", fn:r=>fmtInt(r._dias), sort:r=>r._dias},
+    {label:"Voltou em", fn:r=>r._voltou||"—", sort:r=>r._voltou||""},
+    {label:"Mensalidade", cls:"num", fn:r=>{
+      const v = r.valor_plano || r.valor_mensal; return v ? fmtBRL(v) : "—";
+    }, sort:r=>r.valor_plano || r.valor_mensal || 0},
+    {label:"Reativações acumuladas", cls:"num", fn:r=>fmtInt(r.totalReativ||0), sort:r=>r.totalReativ||0},
+    {label:"Maior atraso já tido", cls:"num", fn:r=>fmtInt(r.maiorAtraso||0), sort:r=>r.maiorAtraso||0},
   ], rows);
 }
 
@@ -664,13 +739,91 @@ function renderTabLinks() {
   ], ranked);
 }
 
+// ---------- Upgrade: 300k+ nos 3 ultimos meses FECHADOS ----------
+// Independe do filtro de periodo de proposito: e' uma lista de acao comercial,
+// precisa ser sempre a mesma janela pra todo mundo comparar a mesma coisa.
+function ultimos3MesesFechados() {
+  const hoje = new Date();
+  const mesAtual = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}`;
+  const fechados = (D.mesesList || []).filter(m => m < mesAtual).sort();
+  return fechados.slice(-3);
+}
+function gmvJanela(e, meses) {
+  let v = 0;
+  for (const m of meses) v += (e.mensal || {})[m]?.valTotal || 0;
+  return v;
+}
+function pedidosJanela(e, meses) {
+  let q = 0;
+  for (const m of meses) q += (e.mensal || {})[m]?.qtTotal || 0;
+  return q;
+}
+function marcasUpgrade() {
+  const meses = ultimos3MesesFechados();
+  const min = state.upgMin;
+  return empresasFiltradas()
+    // mensalidade de referencia: o plano contratado; se nao houver, a ultima fatura paga
+    .map(e => ({...e, _g3: gmvJanela(e, meses), _q3: pedidosJanela(e, meses),
+                _mens: e.valor_plano || e.valor_mensal || 0}))
+    .filter(e => e._g3 >= min)
+    .sort((a,b) => b._g3 - a._g3);
+}
+
+function renderTabUpgrade() {
+  const meses = ultimos3MesesFechados();
+  const lista = marcasUpgrade();
+  $("upg-janela").textContent = meses.length ? meses.join(" + ") : "3 últimos meses fechados";
+  $("upg-hint").textContent = `${lista.length} marcas · janela ${meses.join(", ") || "—"}`;
+
+  const top15 = lista.slice(0, 15);
+  makeChart("chart-upg-top", {
+    type:"bar",
+    data:{labels:top15.map(e=>e.name), datasets:[{label:"GMV 3 meses", data:top15.map(e=>e._g3), backgroundColor:COLORS[1]}]},
+    options:{indexAxis:"y", responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+             scales:{x:{ticks:{callback:v=>"R$"+(v/1000).toFixed(0)+"k"}}}}
+  });
+  // faixas de mensalidade: quem paga pouco e fatura muito e' o alvo do upgrade
+  const faixas = {"sem valor":0,"até R$ 400":0,"R$ 401-700":0,"R$ 701-1.200":0,"R$ 1.200+":0};
+  for (const e of lista) {
+    const v = e._mens || 0;
+    if (!v) faixas["sem valor"]++;
+    else if (v <= 400) faixas["até R$ 400"]++;
+    else if (v <= 700) faixas["R$ 401-700"]++;
+    else if (v <= 1200) faixas["R$ 701-1.200"]++;
+    else faixas["R$ 1.200+"]++;
+  }
+  makeChart("chart-upg-mens", {
+    type:"doughnut",
+    data:{labels:Object.keys(faixas), datasets:[{data:Object.values(faixas),
+          backgroundColor:["#B2BEC3",COLORS[3],COLORS[2],COLORS[0],COLORS[1]]}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:"bottom"}}}
+  });
+
+  renderTable("tbl-upgrade", [
+    {label:"Marca", fn:r=>r.name, sort:r=>r.name},
+    {label:"CS", fn:r=>r.cs, sort:r=>r.cs},
+    {label:"Canal", fn:r=>r.canal, sort:r=>r.canal},
+    {label:"Plano atual", fn:r=>r.plano||"—", sort:r=>r.plano||""},
+    {label:"Mensalidade contratada", cls:"num", fn:r=>r._mens?fmtBRL(r._mens):"—", sort:r=>r._mens||0},
+    {label:"Última fatura paga", cls:"num", fn:r=>r.valor_mensal?fmtBRL(r.valor_mensal):"—", sort:r=>r.valor_mensal||0},
+    {label:"Filiais", cls:"num", fn:r=>fmtInt(r.qtdFiliais||0), sort:r=>r.qtdFiliais||0},
+    {label:"GMV 3 meses", cls:"num", fn:r=>fmtBRL(r._g3), sort:r=>r._g3},
+    {label:"Pedidos 3 meses", cls:"num", fn:r=>fmtInt(r._q3), sort:r=>r._q3},
+    // quantas vezes o GMV do trimestre cabe na mensalidade: quanto maior, mais defasado o plano
+    {label:"GMV ÷ mensalidade", cls:"num",
+     fn:r=>r._mens?fmtInt(Math.round(r._g3/r._mens))+"x":"—",
+     sort:r=>r._mens?r._g3/r._mens:-1},
+    {label:"Status VP", fn:r=>vpBadge(r)},
+  ], lista);
+}
+
 // ---------- Tab switching ----------
 const TAB_LABELS = {
   gmv:"GMV", vp:"VestiPago (Cartão + PIX)", cadastro:"Cadastro de Produtos",
   primeiras5:"Primeiras 5 Vendas", primeiras25:"Primeiras 25 Vendas",
   reativ:"Reativações", topstarter:"TOP 10 Starter", topparceiros:"TOP 10 Parceiros",
   vpinativo:"Sem VP Ativo", freteinativo:"Sem Frete Ativo", travadas:"Marcas Travadas",
-  links:"Links & Cliques"
+  upgrade:"Oportunidades de Upgrade", links:"Links & Cliques"
 };
 
 function switchTab(tab) {
@@ -702,6 +855,7 @@ function renderActiveTab() {
   else if (state.tab === "freteinativo") renderTabSemFrete();
   else if (state.tab === "travadas") renderTabTravadas();
   else if (state.tab === "reativ") renderTabReativ();
+  else if (state.tab === "upgrade") renderTabUpgrade();
   else if (state.tab === "links") renderTabLinks();
 }
 
@@ -747,11 +901,96 @@ function renderPeriodoDropdown() {
     state.chaves = []; renderPeriodoDropdown(); box.classList.add("open"); renderActiveTab();
   });
 }
+// CS disponiveis vem dos proprios dados (nao mais hardcoded Elisa/Jennyfer)
+function populaCs() {
+  const sel = $("filter-cs");
+  const cont = {};
+  for (const e of D.empresas) {
+    if (!state.canais.has(canalDe(e))) continue;
+    const cs = (e.cs || "").trim() || "(sem CS)";
+    cont[cs] = (cont[cs] || 0) + 1;
+  }
+  const nomes = Object.keys(cont).sort((a,b)=>a.localeCompare(b,"pt-BR"));
+  const cur = state.cs;
+  sel.innerHTML = `<option value="todas">Todas</option>` +
+    nomes.map(n=>`<option value="${n === "(sem CS)" ? "" : n}">${n} (${cont[n]})</option>`).join("");
+  const valores = new Set(["todas", ...nomes.map(n=>n === "(sem CS)" ? "" : n)]);
+  sel.value = valores.has(cur) ? cur : "todas";
+  state.cs = sel.value;
+}
+
+// ---------- Combobox de empresa (com busca visivel) ----------
+const _cbx = { opcoes: [], hi: -1 };
+const _norm = (s) => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const _esc = (s) => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+
 function populaEmpresas() {
-  const sel = $("filter-empresa");
   const lista = empresasFiltradas();
-  sel.innerHTML = `<option value="todas">Todas (${lista.length})</option>` +
-    lista.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(e=>`<option value="${e.name}">${e.name}</option>`).join("");
+  _cbx.opcoes = lista.slice().sort((a,b)=>a.name.localeCompare(b.name,"pt-BR")).map(e=>e.name);
+  const inp = $("filter-empresa-input");
+  inp.placeholder = `Todas (${lista.length}) — digite para buscar`;
+  // se a empresa selecionada saiu da lista pelos outros filtros, volta pra "todas"
+  if (state.empresa !== "todas" && !_cbx.opcoes.includes(state.empresa)) selecionaEmpresa("todas");
+  else if (state.empresa !== "todas") inp.value = state.empresa;
+  renderCbxPanel("");
+}
+
+function renderCbxPanel(termo) {
+  const box = $("filter-empresa"), panel = box.querySelector(".cbx-panel");
+  const t = _norm(termo);
+  const achados = t ? _cbx.opcoes.filter(n => _norm(n).includes(t)) : _cbx.opcoes;
+  _cbx.hi = -1;
+  const head = `<div class="cbx-opt${state.empresa==="todas"?" cur":""}" data-v="todas">Todas as empresas</div>`;
+  if (!achados.length) { panel.innerHTML = head + `<div class="cbx-empty">Nenhuma empresa com “${_esc(termo)}”</div>`; return; }
+  panel.innerHTML = head + achados.slice(0, 300).map(n => {
+    let label = _esc(n);
+    if (t) { // destaca o trecho digitado
+      const i = _norm(n).indexOf(t);
+      if (i >= 0) label = _esc(n.slice(0,i)) + "<mark>" + _esc(n.slice(i,i+termo.length)) + "</mark>" + _esc(n.slice(i+termo.length));
+    }
+    return `<div class="cbx-opt${n===state.empresa?" cur":""}" data-v="${_esc(n)}">${label}</div>`;
+  }).join("") + (achados.length > 300 ? `<div class="cbx-empty">+${achados.length-300} … refine a busca</div>` : "");
+  panel.querySelectorAll(".cbx-opt").forEach(o => o.addEventListener("mousedown", ev => {
+    ev.preventDefault(); selecionaEmpresa(o.dataset.v); renderActiveTab();
+  }));
+}
+
+function selecionaEmpresa(v) {
+  state.empresa = v;
+  const box = $("filter-empresa"), inp = $("filter-empresa-input");
+  inp.value = v === "todas" ? "" : v;
+  box.classList.toggle("sel", v !== "todas");
+  box.classList.remove("open");
+}
+
+function bindEmpresaCbx() {
+  const box = $("filter-empresa"), inp = $("filter-empresa-input");
+  inp.addEventListener("focus", () => { inp.select(); renderCbxPanel(""); box.classList.add("open"); });
+  inp.addEventListener("input", () => { renderCbxPanel(inp.value); box.classList.add("open"); });
+  inp.addEventListener("keydown", ev => {
+    const opts = [...box.querySelectorAll(".cbx-opt")];
+    if (ev.key === "ArrowDown" || ev.key === "ArrowUp") {
+      ev.preventDefault();
+      if (!opts.length) return;
+      _cbx.hi = ev.key === "ArrowDown"
+        ? Math.min(_cbx.hi + 1, opts.length - 1)
+        : Math.max(_cbx.hi - 1, 0);
+      opts.forEach(o=>o.classList.remove("hi"));
+      opts[_cbx.hi].classList.add("hi");
+      opts[_cbx.hi].scrollIntoView({block:"nearest"});
+    } else if (ev.key === "Enter") {
+      ev.preventDefault();
+      const alvo = _cbx.hi >= 0 ? opts[_cbx.hi] : opts.find(o => o.dataset.v !== "todas") || opts[0];
+      if (alvo) { selecionaEmpresa(alvo.dataset.v); renderActiveTab(); }
+    } else if (ev.key === "Escape") {
+      selecionaEmpresa(state.empresa); inp.blur();
+    }
+  });
+  // ao sair sem escolher, volta a mostrar a selecao atual (nao deixa texto solto)
+  inp.addEventListener("blur", () => { setTimeout(()=>{ box.classList.remove("open"); selecionaEmpresa(state.empresa); }, 120); });
+  $("filter-empresa-clear").addEventListener("click", () => {
+    selecionaEmpresa("todas"); renderCbxPanel(""); renderActiveTab(); inp.focus();
+  });
 }
 
 function bind() {
@@ -770,14 +1009,23 @@ function bind() {
     const cb = e.target;
     if (cb.tagName !== "INPUT") return;
     if (cb.checked) state.canais.add(cb.value); else state.canais.delete(cb.value);
-    populaEmpresas(); renderActiveTab();
+    populaCs(); populaEmpresas(); renderActiveTab();
   });
-  $("filter-empresa").addEventListener("change", e=>{ state.empresa=e.target.value; renderActiveTab(); });
+  bindEmpresaCbx();
   $("filter-cad-mes").addEventListener("change", e=>{ state.cadMes=e.target.value; renderActiveTab(); });
+  $("filter-upg-min").addEventListener("change", e=>{ state.upgMin=Number(e.target.value)||300000; renderActiveTab(); });
+  $("filter-reativ-dias").addEventListener("change", e=>{ state.reativMinDias=Number(e.target.value)||1; renderActiveTab(); });
+  document.querySelectorAll(".chk-coorte").forEach(cb=>cb.addEventListener("change", e=>{
+    state.soCoorte = e.target.checked;
+    document.querySelectorAll(".chk-coorte").forEach(o=>{ o.checked = state.soCoorte; });
+    renderActiveTab();
+  }));
 }
 
 (function init(){
   $("gerado-em").textContent = "Gerado em " + (D.geradoEm||"—").slice(0,16).replace("T"," ");
+  normalizaCanal();
+  marcaCoorte();
   buildAnual();
-  populaPeriodoValor(); populaEmpresas(); populaCadMesSelect(); bind(); renderActiveTab();
+  populaPeriodoValor(); populaCs(); populaEmpresas(); populaCadMesSelect(); bind(); renderActiveTab();
 })();
