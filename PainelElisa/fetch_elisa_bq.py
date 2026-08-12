@@ -72,11 +72,11 @@ atta_domains AS (
   WHERE LOWER(d.modulos) LIKE '%vendas%' AND LOWER(d.name) NOT LIKE '%teste%'
     AND LOWER(p.name) IN ('atta', 'attasoft')),
 elisa_domains AS (
+  -- TODAS as CS (antes era restrito a Elisa Marques / Jennyfer Rabelo).
+  -- LEFT JOIN em angels p/ nao perder dominio sem CS atribuida.
   SELECT ad.id, ad.name, ad.angel_id, ad.integration_id, ad.partner_id, ad.modulos,
          ad.created_at domain_created_at
   FROM active_domains ad
-  JOIN `{PROJECT}.{DATASET}.odbc_angels` a ON a.id = ad.angel_id
-  WHERE a.name IN ('Elisa Marques', 'Jennyfer Rabelo')
   UNION DISTINCT
   SELECT atd.id, atd.name, atd.angel_id, atd.integration_id, atd.partner_id, atd.modulos,
          atd.created_at
@@ -86,8 +86,9 @@ ranked_companies AS (
     ROW_NUMBER() OVER(PARTITION BY c.domain_id ORDER BY c.created_at ASC) rn
   FROM `{PROJECT}.{DATASET}.odbc_companies` c
   WHERE c.domain_id IN (SELECT id FROM elisa_domains)),
-sub_best AS (SELECT domain_id, plan_name FROM (
-    SELECT sc.domain_id, s.plan_name, ROW_NUMBER() OVER(PARTITION BY sc.domain_id ORDER BY
+sub_best AS (SELECT domain_id, plan_name, price_cents FROM (
+    SELECT sc.domain_id, s.plan_name, SAFE_CAST(s.price_cents AS INT64) price_cents,
+      ROW_NUMBER() OVER(PARTITION BY sc.domain_id ORDER BY
       CASE WHEN LOWER(s.active)='true' AND LOWER(s.suspended)='false' THEN 0 ELSE 1 END,
       s.updated_at DESC) rn
     FROM `{PROJECT}.{DATASET}.silver_companiesativos_iugu` sc
@@ -103,6 +104,7 @@ SELECT d.id domain_id, d.name domain_name, d.domain_created_at,
   rc.tax_document cnpj, rc.social_name razao_social, rc.company_name,
   rc.rn row_num, rc.created_at company_created_at, a.name angel_name,
   i.name integration_name, p.name partner_name, sub_best.plan_name plano,
+  sub_best.price_cents plano_price_cents,
   inv_best.total_cents last_invoice_cents, d.modulos
 FROM elisa_domains d
 JOIN ranked_companies rc ON rc.domain_id = d.id
@@ -191,24 +193,36 @@ WITH inv AS (
   FROM `{PROJECT}.{DATASET}.iugu_invoices`
   WHERE status='paid' AND paid_at IS NOT NULL AND paid_at NOT IN ('None','')
     AND due_date IS NOT NULL AND due_date NOT IN ('None',''))
-SELECT sc.domain_id domain_id, inv.mes_pago mes_pago, COUNT(*) qt_reativ,
-  SUM(DATE_DIFF(inv.paid_dt, inv.due_dt, DAY)) dias_atraso_total
+-- grao de FATURA (nao agregado): o painel mostra, por marca, quanto tempo
+-- ficou inadimplente e a data em que voltou. A agregacao por mes e' feita
+-- em build_reativacao a partir daqui.
+SELECT sc.domain_id domain_id, inv.mes_pago mes_pago,
+  inv.due_dt due_dt, inv.paid_dt paid_dt,
+  DATE_DIFF(inv.paid_dt, inv.due_dt, DAY) dias_atraso
 FROM inv
 JOIN `{PROJECT}.{DATASET}.silver_companiesativos_iugu` sc ON sc.Customer_ID_Iugu = inv.customer_id
 WHERE inv.paid_dt IS NOT NULL AND inv.due_dt IS NOT NULL
   AND DATE_DIFF(inv.paid_dt, inv.due_dt, DAY) >= 1
-GROUP BY 1, 2
 """
 
 
 # =============================================================================
 # build_* (copiadas de fetch_elisa.py -- puras, sem dependencia de pyodbc)
 # =============================================================================
+# Parceiros que sao a propria Vesti (canal proprio, nao e' parceiro externo)
+VESTI_PROPRIO = {"vesti", "varejo vesti"}
+
+
 def _classify_canal(partner_name: str) -> tuple[str, bool]:
+    """Retorna (canal, starter_interno). O front recalcula o canal a partir de
+    partner_raw (canalDe), entao aqui basta manter Starter/Vesti/Parceiros."""
     p = (partner_name or "").strip().lower()
-    if p in STARTER_INTERNO or p == "":
-        if p == "":
-            return ("Parceiros", False)
+    if not p or p == "n/a":
+        return ("Parceiros", False)
+    if p in VESTI_PROPRIO:
+        return ("Vesti", False)
+    # match tolerante: a base tem "Tizeefy" e "Up Agency" alem dos nomes canonicos
+    if any(p == s or p.startswith(s + " ") for s in STARTER_INTERNO) or p in ("tizeefy",):
         return ("Starter", True)
     return ("Parceiros", False)
 
@@ -223,11 +237,17 @@ def build_empresas(rows: list[dict]) -> list[dict]:
         partner = r.get("partner_name") or ""
         canal, is_starter_interno = _classify_canal(partner)
 
-        cents = r.get("last_invoice_cents")
-        try:
-            valor_mensal = float(cents) / 100.0 if cents not in (None, "") else 0.0
-        except (TypeError, ValueError):
-            valor_mensal = 0.0
+        def _reais(v):
+            try:
+                return round(float(v) / 100.0, 2) if v not in (None, "") else 0.0
+            except (TypeError, ValueError):
+                return 0.0
+
+        # valor_mensal = ultima fatura PAGA (pode ser proporcional/parcial).
+        # valor_plano  = price_cents da assinatura Iugu = mensalidade contratada.
+        # Para decidir upgrade o valor_plano e' o numero certo; mantemos os dois.
+        valor_mensal = _reais(r.get("last_invoice_cents"))
+        valor_plano = _reais(r.get("plano_price_cents"))
 
         if is_filial:
             name = company_name or f"{domain_name} - Filial {rn}"
@@ -251,7 +271,8 @@ def build_empresas(rows: list[dict]) -> list[dict]:
             "starter_interno": is_starter_interno,
             "integracao": r.get("integration_name") or "",
             "plano": r.get("plano") or "",
-            "valor_mensal": round(valor_mensal, 2),
+            "valor_mensal": valor_mensal,
+            "valor_plano": valor_plano,
             "modulos": (r.get("modulos") or ""),
             "is_filial": is_filial,
             "isMatriz": not is_filial,
@@ -283,7 +304,8 @@ def build_gmv(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
         sem = _semana_iso(dia)
         emp = by_emp.setdefault(dom, {"mensal": {}, "semanal": {}, "primeiraVenda": None,
                                        "primeiraVendaPaga": None,
-                                       "qtdVendasMes": {}, "qtdVendasPagasMes": {}})
+                                       "qtdVendasMes": {}, "qtdVendasPagasMes": {},
+                                       "vendasPagasPorDia": {}})
         for chave, periodo in (("mensal", mes), ("semanal", sem)):
             bucket = emp[chave].setdefault(periodo, {
                 "valPix": 0.0, "valCartao": 0.0, "valTotal": 0.0,
@@ -302,6 +324,8 @@ def build_gmv(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
         qt_paid = int(r.get("qt_paid") or 0)
         if qt_paid:
             emp["qtdVendasPagasMes"][mes] = emp["qtdVendasPagasMes"].get(mes, 0) + qt_paid
+            # grao diario: build_data.py usa p/ achar a DATA exata das 5a / 25a venda
+            emp["vendasPagasPorDia"][dia_iso] = emp["vendasPagasPorDia"].get(dia_iso, 0) + qt_paid
             if not emp["primeiraVendaPaga"] or dia_iso < emp["primeiraVendaPaga"]:
                 emp["primeiraVendaPaga"] = dia_iso
 
@@ -391,19 +415,30 @@ def build_links(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
 
 
 def build_reativacao(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
+    """Agrega por mes E guarda cada fatura individualmente, pra tabela poder
+    mostrar quanto tempo a marca ficou inadimplente e quando voltou."""
+    def _iso(v):
+        return v.isoformat() if hasattr(v, "isoformat") else (str(v)[:10] if v else "")
+
     out: dict[str, dict] = {}
     for r in rows:
         dom = str(r.get("domain_id") or "").strip()
         if dom not in empresas_by_dom:
             continue
         mes = r.get("mes_pago") or ""
-        qt = int(r.get("qt_reativ") or 0)
-        dias = int(r.get("dias_atraso_total") or 0)
-        slot = out.setdefault(dom, {"reativacoesPorMes": {}, "diasAtrasoTotal": 0, "totalReativ": 0})
+        dias = int(r.get("dias_atraso") or 0)
+        slot = out.setdefault(dom, {"reativacoesPorMes": {}, "diasAtrasoTotal": 0,
+                                     "totalReativ": 0, "eventos": []})
         if mes:
-            slot["reativacoesPorMes"][mes] = slot["reativacoesPorMes"].get(mes, 0) + qt
+            slot["reativacoesPorMes"][mes] = slot["reativacoesPorMes"].get(mes, 0) + 1
         slot["diasAtrasoTotal"] += dias
-        slot["totalReativ"] += qt
+        slot["totalReativ"] += 1
+        slot["eventos"].append({"mes": mes, "venc": _iso(r.get("due_dt")),
+                                "voltou": _iso(r.get("paid_dt")), "dias": dias})
+    for slot in out.values():
+        slot["eventos"].sort(key=lambda ev: ev["voltou"], reverse=True)
+        slot["maiorAtraso"] = max((ev["dias"] for ev in slot["eventos"]), default=0)
+        slot["ultimaVolta"] = slot["eventos"][0]["voltou"] if slot["eventos"] else ""
     return out
 
 
@@ -466,7 +501,7 @@ def _aplicar_produtos_fallback(cad: dict, empresas_by_dom: dict) -> None:
 
 
 def coletar_do_bq(client: bigquery.Client):
-    emp_rows    = run_query(client, SQL_EMPRESAS, "empresas Elisa/Jenny")
+    emp_rows    = run_query(client, SQL_EMPRESAS, "empresas (todas as CS)")
     gmv_rows    = run_query(client, SQL_GMV, "GMV diario")
     pp_rows     = run_query(client, SQL_PRIMEIRO_PEDIDO, "primeiro pedido cadastrado")
     reativ_rows = run_query(client, SQL_REATIVACAO, "reativacoes (fatura paga atrasada)")
