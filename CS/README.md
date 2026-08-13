@@ -4,13 +4,19 @@ Painel estático de 8 abas, grão semanal (semana ISO do ano corrente).
 
 ```
 index.html          o painel (layout + lógica, sem dependência externa)
+publicar.js         sobe para vesti-mobi/dados/CS via Git Data API
 dados.js            dados reais gerados pelo fetcher — window.PAINEL_DATA
 fetch_dados.js      carga: BigQuery + HubSpot -> dados.js
 painel-clientes.html  layout de referência original (não é usado em produção)
 ```
 
-Abrir: `start index.html`. Sem `dados.js` o painel cai num mock com semente fixa
+No ar: **https://vesti-mobi.github.io/dados/CS/** — senha `Mudar123`.
+Local: `start index.html`. Sem `dados.js` o painel cai num mock com semente fixa
 e o selo no topo mostra "Dados de exemplo".
+
+⚠️ **A senha é uma tranca, não um cofre.** `vesti-mobi/dados` é um repositório
+público: a checagem roda no navegador e `.../CS/dados.js` é baixável direto, sem
+senha. Serve para não abrir o painel por acaso — não protege o conteúdo.
 
 ## Atualizar os dados
 
