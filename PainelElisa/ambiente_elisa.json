@@ -2905,8 +2905,8 @@
     "canalPlanilha": "Vesti"
   },
   "74171": {
-    "ligado": true,
-    "update": "2026-07-20",
+    "ligado": false,
+    "update": "2026-08-13",
     "religamentoReal": false,
     "nomePlanilha": "MX Fashion",
     "canalPlanilha": "Attasoft"
