@@ -1,146 +1,239 @@
 {
-  "1643381": {
+  "1379136": {
+    "reativacoesPorMes": {
+      "2025-04": 1,
+      "2025-07": 1,
+      "2025-09": 1
+    },
+    "diasAusenteTotal": 142,
+    "totalReativ": 3,
+    "eventos": [
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-08-12",
+        "voltou": "2025-09-29",
+        "dias": 48
+      },
+      {
+        "mes": "2025-07",
+        "ultimoPag": "2025-05-29",
+        "voltou": "2025-07-16",
+        "dias": 48
+      },
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-02-28",
+        "voltou": "2025-04-15",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 48,
+    "ultimaVolta": "2025-09-29"
+  },
+  "1516158": {
     "reativacoesPorMes": {
       "2026-03": 1
     },
-    "diasAusenteTotal": 298,
+    "diasAusenteTotal": 316,
     "totalReativ": 1,
     "eventos": [
       {
         "mes": "2026-03",
-        "ultimoPag": "2025-05-26",
-        "voltou": "2026-03-20",
-        "dias": 298
+        "ultimoPag": "2025-04-21",
+        "voltou": "2026-03-03",
+        "dias": 316
       }
     ],
-    "maiorAusencia": 298,
-    "ultimaVolta": "2026-03-20"
+    "maiorAusencia": 316,
+    "ultimaVolta": "2026-03-03"
   },
-  "336": {
+  "1389211": {
     "reativacoesPorMes": {
-      "2025-10": 1
+      "2025-08": 1
     },
-    "diasAusenteTotal": 152,
+    "diasAusenteTotal": 65,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2025-10",
-        "ultimoPag": "2025-05-16",
-        "voltou": "2025-10-15",
-        "dias": 152
+        "mes": "2025-08",
+        "ultimoPag": "2025-06-05",
+        "voltou": "2025-08-09",
+        "dias": 65
       }
     ],
-    "maiorAusencia": 152,
-    "ultimaVolta": "2025-10-15"
+    "maiorAusencia": 65,
+    "ultimaVolta": "2025-08-09"
   },
-  "1074486": {
+  "2043912": {
     "reativacoesPorMes": {
-      "2025-10": 1
+      "2026-06": 1
     },
-    "diasAusenteTotal": 152,
+    "diasAusenteTotal": 48,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2025-10",
-        "ultimoPag": "2025-05-16",
-        "voltou": "2025-10-15",
-        "dias": 152
+        "mes": "2026-06",
+        "ultimoPag": "2026-05-06",
+        "voltou": "2026-06-23",
+        "dias": 48
       }
     ],
-    "maiorAusencia": 152,
-    "ultimaVolta": "2025-10-15"
+    "maiorAusencia": 48,
+    "ultimaVolta": "2026-06-23"
   },
-  "170732": {
+  "43629": {
     "reativacoesPorMes": {
-      "2026-01": 1
+      "2025-09": 1,
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 105,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-05-27",
+        "voltou": "2026-07-23",
+        "dias": 57
+      },
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-22",
+        "voltou": "2025-09-08",
+        "dias": 48
+      }
+    ],
+    "maiorAusencia": 57,
+    "ultimaVolta": "2026-07-23"
+  },
+  "543364": {
+    "reativacoesPorMes": {
+      "2025-09": 1
     },
     "diasAusenteTotal": 54,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2026-01",
-        "ultimoPag": "2025-12-03",
-        "voltou": "2026-01-26",
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-31",
+        "voltou": "2025-09-23",
         "dias": 54
       }
     ],
     "maiorAusencia": 54,
-    "ultimaVolta": "2026-01-26"
+    "ultimaVolta": "2025-09-23"
   },
-  "93281": {
+  "1652126": {
     "reativacoesPorMes": {
-      "2025-04": 1
-    },
-    "diasAusenteTotal": 47,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-02-20",
-        "voltou": "2025-04-08",
-        "dias": 47
-      }
-    ],
-    "maiorAusencia": 47,
-    "ultimaVolta": "2025-04-08"
-  },
-  "1794536": {
-    "reativacoesPorMes": {
+      "2026-03": 1,
+      "2025-08": 1,
       "2026-04": 1
     },
-    "diasAusenteTotal": 56,
-    "totalReativ": 1,
+    "diasAusenteTotal": 165,
+    "totalReativ": 3,
     "eventos": [
       {
         "mes": "2026-04",
-        "ultimoPag": "2026-02-25",
-        "voltou": "2026-04-22",
-        "dias": 56
-      }
-    ],
-    "maiorAusencia": 56,
-    "ultimaVolta": "2026-04-22"
-  },
-  "634486": {
-    "reativacoesPorMes": {
-      "2025-04": 1,
-      "2025-05": 1
-    },
-    "diasAusenteTotal": 116,
-    "totalReativ": 2,
-    "eventos": [
+        "ultimoPag": "2026-02-19",
+        "voltou": "2026-04-13",
+        "dias": 53
+      },
       {
-        "mes": "2025-05",
-        "ultimoPag": "2025-04-07",
-        "voltou": "2025-05-26",
+        "mes": "2026-03",
+        "ultimoPag": "2026-01-28",
+        "voltou": "2026-03-18",
         "dias": 49
       },
       {
-        "mes": "2025-04",
-        "ultimoPag": "2025-01-30",
-        "voltou": "2025-04-07",
-        "dias": 67
+        "mes": "2025-08",
+        "ultimoPag": "2025-06-17",
+        "voltou": "2025-08-19",
+        "dias": 63
       }
     ],
-    "maiorAusencia": 67,
-    "ultimaVolta": "2025-05-26"
+    "maiorAusencia": 63,
+    "ultimaVolta": "2026-04-13"
   },
-  "1186697": {
+  "1791859": {
     "reativacoesPorMes": {
-      "2026-06": 1
+      "2026-03": 1,
+      "2026-07": 1
     },
-    "diasAusenteTotal": 98,
+    "diasAusenteTotal": 193,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-05-29",
+        "voltou": "2026-07-14",
+        "dias": 46
+      },
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2025-10-20",
+        "voltou": "2026-03-16",
+        "dias": 147
+      }
+    ],
+    "maiorAusencia": 147,
+    "ultimaVolta": "2026-07-14"
+  },
+  "1688322": {
+    "reativacoesPorMes": {
+      "2026-03": 1
+    },
+    "diasAusenteTotal": 48,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2026-06",
-        "ultimoPag": "2026-03-10",
-        "voltou": "2026-06-16",
-        "dias": 98
+        "mes": "2026-03",
+        "ultimoPag": "2026-01-22",
+        "voltou": "2026-03-11",
+        "dias": 48
       }
     ],
-    "maiorAusencia": 98,
-    "ultimaVolta": "2026-06-16"
+    "maiorAusencia": 48,
+    "ultimaVolta": "2026-03-11"
+  },
+  "619088": {
+    "reativacoesPorMes": {
+      "2025-11": 1
+    },
+    "diasAusenteTotal": 46,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-11",
+        "ultimoPag": "2025-09-25",
+        "voltou": "2025-11-10",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 46,
+    "ultimaVolta": "2025-11-10"
+  },
+  "1433423": {
+    "reativacoesPorMes": {
+      "2025-09": 1,
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 110,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-03-01",
+        "voltou": "2026-04-27",
+        "dias": 57
+      },
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-31",
+        "voltou": "2025-09-22",
+        "dias": 53
+      }
+    ],
+    "maiorAusencia": 57,
+    "ultimaVolta": "2026-04-27"
   },
   "1186226": {
     "reativacoesPorMes": {
@@ -173,790 +266,39 @@
     "maiorAusencia": 58,
     "ultimaVolta": "2026-07-12"
   },
-  "1389211": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 65,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-06-05",
-        "voltou": "2025-08-09",
-        "dias": 65
-      }
-    ],
-    "maiorAusencia": 65,
-    "ultimaVolta": "2025-08-09"
-  },
-  "658517": {
-    "reativacoesPorMes": {
-      "2026-03": 1
-    },
-    "diasAusenteTotal": 60,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2026-01-17",
-        "voltou": "2026-03-18",
-        "dias": 60
-      }
-    ],
-    "maiorAusencia": 60,
-    "ultimaVolta": "2026-03-18"
-  },
-  "1688322": {
-    "reativacoesPorMes": {
-      "2026-03": 1
-    },
-    "diasAusenteTotal": 48,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2026-01-22",
-        "voltou": "2026-03-11",
-        "dias": 48
-      }
-    ],
-    "maiorAusencia": 48,
-    "ultimaVolta": "2026-03-11"
-  },
-  "1201385": {
-    "reativacoesPorMes": {
-      "2025-09": 1
-    },
-    "diasAusenteTotal": 46,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-18",
-        "voltou": "2025-09-02",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2025-09-02"
-  },
-  "52771": {
-    "reativacoesPorMes": {
-      "2025-08": 1,
-      "2026-03": 1
-    },
-    "diasAusenteTotal": 270,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2025-08-20",
-        "voltou": "2026-03-17",
-        "dias": 209
-      },
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-06-20",
-        "voltou": "2025-08-20",
-        "dias": 61
-      }
-    ],
-    "maiorAusencia": 209,
-    "ultimaVolta": "2026-03-17"
-  },
-  "23263": {
-    "reativacoesPorMes": {
-      "2026-02": 1
-    },
-    "diasAusenteTotal": 124,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-02",
-        "ultimoPag": "2025-10-17",
-        "voltou": "2026-02-18",
-        "dias": 124
-      }
-    ],
-    "maiorAusencia": 124,
-    "ultimaVolta": "2026-02-18"
-  },
-  "1982744": {
-    "reativacoesPorMes": {
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 48,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-03-12",
-        "voltou": "2026-04-29",
-        "dias": 48
-      }
-    ],
-    "maiorAusencia": 48,
-    "ultimaVolta": "2026-04-29"
-  },
-  "1416085": {
-    "reativacoesPorMes": {
-      "2025-03": 1
-    },
-    "diasAusenteTotal": 61,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-03",
-        "ultimoPag": "2025-01-17",
-        "voltou": "2025-03-19",
-        "dias": 61
-      }
-    ],
-    "maiorAusencia": 61,
-    "ultimaVolta": "2025-03-19"
-  },
-  "1329765": {
-    "reativacoesPorMes": {
-      "2025-10": 1
-    },
-    "diasAusenteTotal": 46,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-10",
-        "ultimoPag": "2025-08-29",
-        "voltou": "2025-10-14",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2025-10-14"
-  },
-  "787879": {
-    "reativacoesPorMes": {
-      "2025-11": 1
-    },
-    "diasAusenteTotal": 46,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-11",
-        "ultimoPag": "2025-09-18",
-        "voltou": "2025-11-03",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2025-11-03"
-  },
-  "196201": {
-    "reativacoesPorMes": {
-      "2025-07": 1,
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 112,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-05-21",
-        "voltou": "2026-07-08",
-        "dias": 48
-      },
-      {
-        "mes": "2025-07",
-        "ultimoPag": "2025-05-21",
-        "voltou": "2025-07-24",
-        "dias": 64
-      }
-    ],
-    "maiorAusencia": 64,
-    "ultimaVolta": "2026-07-08"
-  },
-  "53378": {
-    "reativacoesPorMes": {
-      "2026-03": 1
-    },
-    "diasAusenteTotal": 101,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2025-12-16",
-        "voltou": "2026-03-27",
-        "dias": 101
-      }
-    ],
-    "maiorAusencia": 101,
-    "ultimaVolta": "2026-03-27"
-  },
-  "455308": {
-    "reativacoesPorMes": {
-      "2025-06": 1,
-      "2026-02": 1
-    },
-    "diasAusenteTotal": 355,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-02",
-        "ultimoPag": "2025-06-05",
-        "voltou": "2026-02-24",
-        "dias": 264
-      },
-      {
-        "mes": "2025-06",
-        "ultimoPag": "2025-03-06",
-        "voltou": "2025-06-05",
-        "dias": 91
-      }
-    ],
-    "maiorAusencia": 264,
-    "ultimaVolta": "2026-02-24"
-  },
-  "1853374": {
-    "reativacoesPorMes": {
-      "2026-03": 1
-    },
-    "diasAusenteTotal": 130,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2025-11-08",
-        "voltou": "2026-03-18",
-        "dias": 130
-      }
-    ],
-    "maiorAusencia": 130,
-    "ultimaVolta": "2026-03-18"
-  },
-  "50443": {
-    "reativacoesPorMes": {
-      "2025-04": 1
-    },
-    "diasAusenteTotal": 46,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-03-07",
-        "voltou": "2025-04-22",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2025-04-22"
-  },
-  "1812999": {
-    "reativacoesPorMes": {
-      "2026-08": 1
-    },
-    "diasAusenteTotal": 50,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-08",
-        "ultimoPag": "2026-06-22",
-        "voltou": "2026-08-11",
-        "dias": 50
-      }
-    ],
-    "maiorAusencia": 50,
-    "ultimaVolta": "2026-08-11"
-  },
-  "43629": {
-    "reativacoesPorMes": {
-      "2025-09": 1,
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 105,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-05-27",
-        "voltou": "2026-07-23",
-        "dias": 57
-      },
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-22",
-        "voltou": "2025-09-08",
-        "dias": 48
-      }
-    ],
-    "maiorAusencia": 57,
-    "ultimaVolta": "2026-07-23"
-  },
-  "1815775": {
-    "reativacoesPorMes": {
-      "2026-06": 1
-    },
-    "diasAusenteTotal": 106,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-06",
-        "ultimoPag": "2026-03-09",
-        "voltou": "2026-06-23",
-        "dias": 106
-      }
-    ],
-    "maiorAusencia": 106,
-    "ultimaVolta": "2026-06-23"
-  },
-  "993211": {
-    "reativacoesPorMes": {
-      "2025-07": 1
-    },
-    "diasAusenteTotal": 63,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-07",
-        "ultimoPag": "2025-05-19",
-        "voltou": "2025-07-21",
-        "dias": 63
-      }
-    ],
-    "maiorAusencia": 63,
-    "ultimaVolta": "2025-07-21"
-  },
-  "243791": {
-    "reativacoesPorMes": {
-      "2025-09": 1
-    },
-    "diasAusenteTotal": 62,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-02",
-        "voltou": "2025-09-02",
-        "dias": 62
-      }
-    ],
-    "maiorAusencia": 62,
-    "ultimaVolta": "2025-09-02"
-  },
-  "166943": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 53,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-06-20",
-        "voltou": "2025-08-12",
-        "dias": 53
-      }
-    ],
-    "maiorAusencia": 53,
-    "ultimaVolta": "2025-08-12"
-  },
-  "1618245": {
-    "reativacoesPorMes": {
-      "2026-03": 1,
-      "2025-07": 1,
-      "2025-09": 1,
-      "2025-11": 1
-    },
-    "diasAusenteTotal": 446,
-    "totalReativ": 4,
-    "eventos": [
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2025-06-03",
-        "voltou": "2026-03-09",
-        "dias": 279
-      },
-      {
-        "mes": "2025-11",
-        "ultimoPag": "2025-09-17",
-        "voltou": "2025-11-03",
-        "dias": 47
-      },
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-07",
-        "voltou": "2025-09-04",
-        "dias": 59
-      },
-      {
-        "mes": "2025-07",
-        "ultimoPag": "2025-05-02",
-        "voltou": "2025-07-02",
-        "dias": 61
-      }
-    ],
-    "maiorAusencia": 279,
-    "ultimaVolta": "2026-03-09"
-  },
-  "713811": {
-    "reativacoesPorMes": {
-      "2025-04": 1
-    },
-    "diasAusenteTotal": 59,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-02-15",
-        "voltou": "2025-04-15",
-        "dias": 59
-      }
-    ],
-    "maiorAusencia": 59,
-    "ultimaVolta": "2025-04-15"
-  },
-  "1957538": {
-    "reativacoesPorMes": {
-      "2026-06": 1
-    },
-    "diasAusenteTotal": 82,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-06",
-        "ultimoPag": "2026-03-13",
-        "voltou": "2026-06-03",
-        "dias": 82
-      }
-    ],
-    "maiorAusencia": 82,
-    "ultimaVolta": "2026-06-03"
-  },
-  "1700627": {
-    "reativacoesPorMes": {
-      "2025-09": 1,
-      "2026-01": 1
-    },
-    "diasAusenteTotal": 169,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-01",
-        "ultimoPag": "2025-10-14",
-        "voltou": "2026-01-16",
-        "dias": 94
-      },
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-04",
-        "voltou": "2025-09-17",
-        "dias": 75
-      }
-    ],
-    "maiorAusencia": 94,
-    "ultimaVolta": "2026-01-16"
-  },
-  "156269": {
-    "reativacoesPorMes": {
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 56,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-03-04",
-        "voltou": "2026-04-29",
-        "dias": 56
-      }
-    ],
-    "maiorAusencia": 56,
-    "ultimaVolta": "2026-04-29"
-  },
-  "89039": {
-    "reativacoesPorMes": {
-      "2025-08": 1,
-      "2026-06": 1
-    },
-    "diasAusenteTotal": 123,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-06",
-        "ultimoPag": "2026-04-24",
-        "voltou": "2026-06-25",
-        "dias": 62
-      },
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-06-25",
-        "voltou": "2025-08-25",
-        "dias": 61
-      }
-    ],
-    "maiorAusencia": 62,
-    "ultimaVolta": "2026-06-25"
-  },
-  "1110791": {
-    "reativacoesPorMes": {
-      "2025-11": 1,
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 92,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-03-08",
-        "voltou": "2026-04-23",
-        "dias": 46
-      },
-      {
-        "mes": "2025-11",
-        "ultimoPag": "2025-09-25",
-        "voltou": "2025-11-10",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2026-04-23"
-  },
-  "1457975": {
-    "reativacoesPorMes": {
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 58,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-02-20",
-        "voltou": "2026-04-19",
-        "dias": 58
-      }
-    ],
-    "maiorAusencia": 58,
-    "ultimaVolta": "2026-04-19"
-  },
-  "369880": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 129,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-03-31",
-        "voltou": "2025-08-07",
-        "dias": 129
-      }
-    ],
-    "maiorAusencia": 129,
-    "ultimaVolta": "2025-08-07"
-  },
-  "1548772": {
-    "reativacoesPorMes": {
-      "2026-01": 1,
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 128,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-01-13",
-        "voltou": "2026-04-02",
-        "dias": 79
-      },
-      {
-        "mes": "2026-01",
-        "ultimoPag": "2025-11-25",
-        "voltou": "2026-01-13",
-        "dias": 49
-      }
-    ],
-    "maiorAusencia": 79,
-    "ultimaVolta": "2026-04-02"
-  },
-  "33269": {
-    "reativacoesPorMes": {
-      "2025-09": 1
-    },
-    "diasAusenteTotal": 65,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-08",
-        "voltou": "2025-09-11",
-        "dias": 65
-      }
-    ],
-    "maiorAusencia": 65,
-    "ultimaVolta": "2025-09-11"
-  },
-  "844570": {
+  "170732": {
     "reativacoesPorMes": {
       "2026-01": 1
     },
-    "diasAusenteTotal": 52,
+    "diasAusenteTotal": 54,
     "totalReativ": 1,
     "eventos": [
       {
         "mes": "2026-01",
-        "ultimoPag": "2025-11-28",
-        "voltou": "2026-01-19",
-        "dias": 52
-      }
-    ],
-    "maiorAusencia": 52,
-    "ultimaVolta": "2026-01-19"
-  },
-  "1814060": {
-    "reativacoesPorMes": {
-      "2026-05": 1,
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 175,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-05-14",
-        "voltou": "2026-07-07",
-        "dias": 54
-      },
-      {
-        "mes": "2026-05",
-        "ultimoPag": "2026-01-13",
-        "voltou": "2026-05-14",
-        "dias": 121
-      }
-    ],
-    "maiorAusencia": 121,
-    "ultimaVolta": "2026-07-07"
-  },
-  "1842018": {
-    "reativacoesPorMes": {
-      "2026-05": 1
-    },
-    "diasAusenteTotal": 118,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-05",
-        "ultimoPag": "2026-01-31",
-        "voltou": "2026-05-29",
-        "dias": 118
-      }
-    ],
-    "maiorAusencia": 118,
-    "ultimaVolta": "2026-05-29"
-  },
-  "1379136": {
-    "reativacoesPorMes": {
-      "2025-04": 1,
-      "2025-07": 1,
-      "2025-09": 1
-    },
-    "diasAusenteTotal": 142,
-    "totalReativ": 3,
-    "eventos": [
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-08-12",
-        "voltou": "2025-09-29",
-        "dias": 48
-      },
-      {
-        "mes": "2025-07",
-        "ultimoPag": "2025-05-29",
-        "voltou": "2025-07-16",
-        "dias": 48
-      },
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-02-28",
-        "voltou": "2025-04-15",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 48,
-    "ultimaVolta": "2025-09-29"
-  },
-  "1661979": {
-    "reativacoesPorMes": {
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 53,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-05-16",
-        "voltou": "2026-07-08",
-        "dias": 53
-      }
-    ],
-    "maiorAusencia": 53,
-    "ultimaVolta": "2026-07-08"
-  },
-  "182668": {
-    "reativacoesPorMes": {
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 68,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-02-13",
-        "voltou": "2026-04-22",
-        "dias": 68
-      }
-    ],
-    "maiorAusencia": 68,
-    "ultimaVolta": "2026-04-22"
-  },
-  "1529280": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 123,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-04-08",
-        "voltou": "2025-08-09",
-        "dias": 123
-      }
-    ],
-    "maiorAusencia": 123,
-    "ultimaVolta": "2025-08-09"
-  },
-  "1271226": {
-    "reativacoesPorMes": {
-      "2025-04": 1,
-      "2025-06": 1
-    },
-    "diasAusenteTotal": 105,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2025-06",
-        "ultimoPag": "2025-04-23",
-        "voltou": "2025-06-13",
-        "dias": 51
-      },
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-02-28",
-        "voltou": "2025-04-23",
+        "ultimoPag": "2025-12-03",
+        "voltou": "2026-01-26",
         "dias": 54
       }
     ],
     "maiorAusencia": 54,
-    "ultimaVolta": "2025-06-13"
+    "ultimaVolta": "2026-01-26"
+  },
+  "317706": {
+    "reativacoesPorMes": {
+      "2025-04": 1
+    },
+    "diasAusenteTotal": 57,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-02-17",
+        "voltou": "2025-04-15",
+        "dias": 57
+      }
+    ],
+    "maiorAusencia": 57,
+    "ultimaVolta": "2025-04-15"
   },
   "1347965": {
     "reativacoesPorMes": {
@@ -975,75 +317,82 @@
     "maiorAusencia": 47,
     "ultimaVolta": "2025-03-11"
   },
-  "1840967": {
+  "54397": {
     "reativacoesPorMes": {
       "2026-04": 1
     },
-    "diasAusenteTotal": 168,
+    "diasAusenteTotal": 266,
     "totalReativ": 1,
     "eventos": [
       {
         "mes": "2026-04",
-        "ultimoPag": "2025-10-30",
-        "voltou": "2026-04-16",
-        "dias": 168
+        "ultimoPag": "2025-07-14",
+        "voltou": "2026-04-06",
+        "dias": 266
       }
     ],
-    "maiorAusencia": 168,
-    "ultimaVolta": "2026-04-16"
+    "maiorAusencia": 266,
+    "ultimaVolta": "2026-04-06"
   },
-  "170730": {
+  "1643381": {
+    "reativacoesPorMes": {
+      "2026-03": 1
+    },
+    "diasAusenteTotal": 298,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2025-05-26",
+        "voltou": "2026-03-20",
+        "dias": 298
+      }
+    ],
+    "maiorAusencia": 298,
+    "ultimaVolta": "2026-03-20"
+  },
+  "166943": {
     "reativacoesPorMes": {
       "2025-08": 1
     },
-    "diasAusenteTotal": 95,
+    "diasAusenteTotal": 53,
     "totalReativ": 1,
     "eventos": [
       {
         "mes": "2025-08",
-        "ultimoPag": "2025-05-02",
-        "voltou": "2025-08-05",
-        "dias": 95
+        "ultimoPag": "2025-06-20",
+        "voltou": "2025-08-12",
+        "dias": 53
       }
     ],
-    "maiorAusencia": 95,
-    "ultimaVolta": "2025-08-05"
+    "maiorAusencia": 53,
+    "ultimaVolta": "2025-08-12"
   },
-  "1406410": {
+  "681828": {
     "reativacoesPorMes": {
-      "2025-11": 1
+      "2025-03": 1,
+      "2025-06": 1
     },
-    "diasAusenteTotal": 219,
-    "totalReativ": 1,
+    "diasAusenteTotal": 140,
+    "totalReativ": 2,
     "eventos": [
       {
-        "mes": "2025-11",
-        "ultimoPag": "2025-04-02",
-        "voltou": "2025-11-07",
-        "dias": 219
-      }
-    ],
-    "maiorAusencia": 219,
-    "ultimaVolta": "2025-11-07"
-  },
-  "1541278": {
-    "reativacoesPorMes": {
-      "2026-01": 1
-    },
-    "diasAusenteTotal": 56,
-    "totalReativ": 1,
-    "eventos": [
+        "mes": "2025-06",
+        "ultimoPag": "2025-03-12",
+        "voltou": "2025-06-09",
+        "dias": 89
+      },
       {
-        "mes": "2026-01",
-        "ultimoPag": "2025-11-27",
-        "voltou": "2026-01-22",
-        "dias": 56
+        "mes": "2025-03",
+        "ultimoPag": "2025-01-20",
+        "voltou": "2025-03-12",
+        "dias": 51
       }
     ],
-    "maiorAusencia": 56,
-    "ultimaVolta": "2026-01-22"
+    "maiorAusencia": 89,
+    "ultimaVolta": "2025-06-09"
   },
-  "1656666": {
+  "662705": {
     "reativacoesPorMes": {
       "2025-10": 1
     },
@@ -1052,447 +401,92 @@
     "eventos": [
       {
         "mes": "2025-10",
-        "ultimoPag": "2025-08-28",
-        "voltou": "2025-10-14",
+        "ultimoPag": "2025-09-10",
+        "voltou": "2025-10-27",
         "dias": 47
       }
     ],
     "maiorAusencia": 47,
-    "ultimaVolta": "2025-10-14"
+    "ultimaVolta": "2025-10-27"
   },
-  "1516158": {
+  "47634": {
     "reativacoesPorMes": {
-      "2026-03": 1
+      "2025-10": 1
     },
-    "diasAusenteTotal": 316,
+    "diasAusenteTotal": 59,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2026-03",
-        "ultimoPag": "2025-04-21",
-        "voltou": "2026-03-03",
-        "dias": 316
+        "mes": "2025-10",
+        "ultimoPag": "2025-08-08",
+        "voltou": "2025-10-06",
+        "dias": 59
       }
     ],
-    "maiorAusencia": 316,
-    "ultimaVolta": "2026-03-03"
+    "maiorAusencia": 59,
+    "ultimaVolta": "2025-10-06"
   },
-  "1536375": {
+  "1271690": {
     "reativacoesPorMes": {
-      "2025-04": 1,
-      "2025-07": 1,
-      "2025-12": 1
+      "2025-06": 1,
+      "2025-08": 1,
+      "2025-12": 1,
+      "2026-02": 1
     },
-    "diasAusenteTotal": 231,
-    "totalReativ": 3,
-    "eventos": [
-      {
-        "mes": "2025-12",
-        "ultimoPag": "2025-09-18",
-        "voltou": "2025-12-10",
-        "dias": 83
-      },
-      {
-        "mes": "2025-07",
-        "ultimoPag": "2025-04-25",
-        "voltou": "2025-07-10",
-        "dias": 76
-      },
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-02-12",
-        "voltou": "2025-04-25",
-        "dias": 72
-      }
-    ],
-    "maiorAusencia": 83,
-    "ultimaVolta": "2025-12-10"
-  },
-  "38164": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 81,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-06-06",
-        "voltou": "2025-08-26",
-        "dias": 81
-      }
-    ],
-    "maiorAusencia": 81,
-    "ultimaVolta": "2025-08-26"
-  },
-  "1345663": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 81,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-06-06",
-        "voltou": "2025-08-26",
-        "dias": 81
-      }
-    ],
-    "maiorAusencia": 81,
-    "ultimaVolta": "2025-08-26"
-  },
-  "17511": {
-    "reativacoesPorMes": {
-      "2025-12": 1
-    },
-    "diasAusenteTotal": 58,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-12",
-        "ultimoPag": "2025-10-27",
-        "voltou": "2025-12-24",
-        "dias": 58
-      }
-    ],
-    "maiorAusencia": 58,
-    "ultimaVolta": "2025-12-24"
-  },
-  "1210327": {
-    "reativacoesPorMes": {
-      "2025-05": 1,
-      "2025-07": 1,
-      "2025-09": 1,
-      "2026-01": 1
-    },
-    "diasAusenteTotal": 201,
+    "diasAusenteTotal": 195,
     "totalReativ": 4,
     "eventos": [
       {
-        "mes": "2026-01",
-        "ultimoPag": "2025-11-14",
-        "voltou": "2026-01-05",
-        "dias": 52
-      },
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-21",
-        "voltou": "2025-09-09",
-        "dias": 50
-      },
-      {
-        "mes": "2025-07",
-        "ultimoPag": "2025-05-23",
-        "voltou": "2025-07-08",
+        "mes": "2026-02",
+        "ultimoPag": "2026-01-01",
+        "voltou": "2026-02-16",
         "dias": 46
       },
-      {
-        "mes": "2025-05",
-        "ultimoPag": "2025-03-13",
-        "voltou": "2025-05-05",
-        "dias": 53
-      }
-    ],
-    "maiorAusencia": 53,
-    "ultimaVolta": "2026-01-05"
-  },
-  "324397": {
-    "reativacoesPorMes": {
-      "2026-05": 1
-    },
-    "diasAusenteTotal": 61,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-05",
-        "ultimoPag": "2026-03-11",
-        "voltou": "2026-05-11",
-        "dias": 61
-      }
-    ],
-    "maiorAusencia": 61,
-    "ultimaVolta": "2026-05-11"
-  },
-  "119716": {
-    "reativacoesPorMes": {
-      "2025-04": 1
-    },
-    "diasAusenteTotal": 53,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-02-10",
-        "voltou": "2025-04-04",
-        "dias": 53
-      }
-    ],
-    "maiorAusencia": 53,
-    "ultimaVolta": "2025-04-04"
-  },
-  "1885074": {
-    "reativacoesPorMes": {
-      "2026-06": 1,
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 138,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-06-01",
-        "voltou": "2026-07-18",
-        "dias": 47
-      },
-      {
-        "mes": "2026-06",
-        "ultimoPag": "2026-03-02",
-        "voltou": "2026-06-01",
-        "dias": 91
-      }
-    ],
-    "maiorAusencia": 91,
-    "ultimaVolta": "2026-07-18"
-  },
-  "2090422": {
-    "reativacoesPorMes": {
-      "2026-08": 1
-    },
-    "diasAusenteTotal": 52,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-08",
-        "ultimoPag": "2026-06-15",
-        "voltou": "2026-08-06",
-        "dias": 52
-      }
-    ],
-    "maiorAusencia": 52,
-    "ultimaVolta": "2026-08-06"
-  },
-  "1376999": {
-    "reativacoesPorMes": {
-      "2026-05": 1
-    },
-    "diasAusenteTotal": 50,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-05",
-        "ultimoPag": "2026-03-16",
-        "voltou": "2026-05-05",
-        "dias": 50
-      }
-    ],
-    "maiorAusencia": 50,
-    "ultimaVolta": "2026-05-05"
-  },
-  "24244": {
-    "reativacoesPorMes": {
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 56,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-03-02",
-        "voltou": "2026-04-27",
-        "dias": 56
-      }
-    ],
-    "maiorAusencia": 56,
-    "ultimaVolta": "2026-04-27"
-  },
-  "657248": {
-    "reativacoesPorMes": {
-      "2025-03": 1
-    },
-    "diasAusenteTotal": 52,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-03",
-        "ultimoPag": "2025-02-03",
-        "voltou": "2025-03-27",
-        "dias": 52
-      }
-    ],
-    "maiorAusencia": 52,
-    "ultimaVolta": "2025-03-27"
-  },
-  "1590333": {
-    "reativacoesPorMes": {
-      "2025-10": 1,
-      "2025-12": 1
-    },
-    "diasAusenteTotal": 208,
-    "totalReativ": 2,
-    "eventos": [
       {
         "mes": "2025-12",
-        "ultimoPag": "2025-10-09",
-        "voltou": "2025-12-01",
-        "dias": 53
+        "ultimoPag": "2025-10-21",
+        "voltou": "2025-12-17",
+        "dias": 57
       },
       {
-        "mes": "2025-10",
-        "ultimoPag": "2025-05-07",
-        "voltou": "2025-10-09",
-        "dias": 155
-      }
-    ],
-    "maiorAusencia": 155,
-    "ultimaVolta": "2025-12-01"
-  },
-  "1752353": {
-    "reativacoesPorMes": {
-      "2026-01": 1,
-      "2026-02": 1
-    },
-    "diasAusenteTotal": 189,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-02",
-        "ultimoPag": "2026-01-05",
-        "voltou": "2026-02-20",
+        "mes": "2025-08",
+        "ultimoPag": "2025-07-02",
+        "voltou": "2025-08-17",
         "dias": 46
       },
-      {
-        "mes": "2026-01",
-        "ultimoPag": "2025-08-15",
-        "voltou": "2026-01-05",
-        "dias": 143
-      }
-    ],
-    "maiorAusencia": 143,
-    "ultimaVolta": "2026-02-20"
-  },
-  "1217381": {
-    "reativacoesPorMes": {
-      "2025-06": 1
-    },
-    "diasAusenteTotal": 61,
-    "totalReativ": 1,
-    "eventos": [
       {
         "mes": "2025-06",
-        "ultimoPag": "2025-04-04",
-        "voltou": "2025-06-04",
-        "dias": 61
-      }
-    ],
-    "maiorAusencia": 61,
-    "ultimaVolta": "2025-06-04"
-  },
-  "2068618": {
-    "reativacoesPorMes": {
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 55,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-05-27",
-        "voltou": "2026-07-21",
-        "dias": 55
-      }
-    ],
-    "maiorAusencia": 55,
-    "ultimaVolta": "2026-07-21"
-  },
-  "619088": {
-    "reativacoesPorMes": {
-      "2025-11": 1
-    },
-    "diasAusenteTotal": 46,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-11",
-        "ultimoPag": "2025-09-25",
-        "voltou": "2025-11-10",
+        "ultimoPag": "2025-05-02",
+        "voltou": "2025-06-17",
         "dias": 46
       }
     ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2025-11-10"
+    "maiorAusencia": 57,
+    "ultimaVolta": "2026-02-16"
   },
-  "1509874": {
+  "1765600": {
     "reativacoesPorMes": {
-      "2025-04": 1,
-      "2025-09": 1
-    },
-    "diasAusenteTotal": 120,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-29",
-        "voltou": "2025-09-18",
-        "dias": 51
-      },
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-02-13",
-        "voltou": "2025-04-23",
-        "dias": 69
-      }
-    ],
-    "maiorAusencia": 69,
-    "ultimaVolta": "2025-09-18"
-  },
-  "313429": {
-    "reativacoesPorMes": {
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 53,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-02-08",
-        "voltou": "2026-04-02",
-        "dias": 53
-      }
-    ],
-    "maiorAusencia": 53,
-    "ultimaVolta": "2026-04-02"
-  },
-  "1448023": {
-    "reativacoesPorMes": {
-      "2025-05": 1,
       "2026-08": 1
     },
-    "diasAusenteTotal": 523,
-    "totalReativ": 2,
+    "diasAusenteTotal": 150,
+    "totalReativ": 1,
     "eventos": [
       {
         "mes": "2026-08",
-        "ultimoPag": "2025-05-29",
-        "voltou": "2026-08-11",
-        "dias": 439
-      },
-      {
-        "mes": "2025-05",
-        "ultimoPag": "2025-02-14",
-        "voltou": "2025-05-09",
-        "dias": 84
+        "ultimoPag": "2026-03-10",
+        "voltou": "2026-08-07",
+        "dias": 150
       }
     ],
-    "maiorAusencia": 439,
-    "ultimaVolta": "2026-08-11"
+    "maiorAusencia": 150,
+    "ultimaVolta": "2026-08-07"
   },
   "1415574": {
     "reativacoesPorMes": {
+      "2025-04": 1,
       "2025-07": 1,
       "2025-12": 1,
-      "2026-04": 1,
-      "2025-04": 1
+      "2026-04": 1
     },
     "diasAusenteTotal": 196,
     "totalReativ": 4,
@@ -1525,53 +519,22 @@
     "maiorAusencia": 54,
     "ultimaVolta": "2026-04-22"
   },
-  "1652126": {
+  "313429": {
     "reativacoesPorMes": {
-      "2025-08": 1,
-      "2026-04": 1,
-      "2026-03": 1
+      "2026-04": 1
     },
-    "diasAusenteTotal": 165,
-    "totalReativ": 3,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-02-19",
-        "voltou": "2026-04-13",
-        "dias": 53
-      },
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2026-01-28",
-        "voltou": "2026-03-18",
-        "dias": 49
-      },
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-06-17",
-        "voltou": "2025-08-19",
-        "dias": 63
-      }
-    ],
-    "maiorAusencia": 63,
-    "ultimaVolta": "2026-04-13"
-  },
-  "820612": {
-    "reativacoesPorMes": {
-      "2025-11": 1
-    },
-    "diasAusenteTotal": 47,
+    "diasAusenteTotal": 53,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2025-11",
-        "ultimoPag": "2025-09-26",
-        "voltou": "2025-11-12",
-        "dias": 47
+        "mes": "2026-04",
+        "ultimoPag": "2026-02-08",
+        "voltou": "2026-04-02",
+        "dias": 53
       }
     ],
-    "maiorAusencia": 47,
-    "ultimaVolta": "2025-11-12"
+    "maiorAusencia": 53,
+    "ultimaVolta": "2026-04-02"
   },
   "103213": {
     "reativacoesPorMes": {
@@ -1590,455 +553,114 @@
     "maiorAusencia": 60,
     "ultimaVolta": "2025-08-16"
   },
-  "1643270": {
+  "1190945": {
     "reativacoesPorMes": {
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 197,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2025-09-22",
-        "voltou": "2026-04-07",
-        "dias": 197
-      }
-    ],
-    "maiorAusencia": 197,
-    "ultimaVolta": "2026-04-07"
-  },
-  "1867647": {
-    "reativacoesPorMes": {
-      "2026-01": 1
-    },
-    "diasAusenteTotal": 69,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-01",
-        "ultimoPag": "2025-11-18",
-        "voltou": "2026-01-26",
-        "dias": 69
-      }
-    ],
-    "maiorAusencia": 69,
-    "ultimaVolta": "2026-01-26"
-  },
-  "1933943": {
-    "reativacoesPorMes": {
-      "2026-03": 1,
-      "2026-06": 1,
-      "2026-08": 1
-    },
-    "diasAusenteTotal": 163,
-    "totalReativ": 3,
-    "eventos": [
-      {
-        "mes": "2026-08",
-        "ultimoPag": "2026-06-15",
-        "voltou": "2026-08-04",
-        "dias": 50
-      },
-      {
-        "mes": "2026-06",
-        "ultimoPag": "2026-04-19",
-        "voltou": "2026-06-15",
-        "dias": 57
-      },
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2026-01-19",
-        "voltou": "2026-03-16",
-        "dias": 56
-      }
-    ],
-    "maiorAusencia": 57,
-    "ultimaVolta": "2026-08-04"
-  },
-  "1791824": {
-    "reativacoesPorMes": {
-      "2025-11": 1
-    },
-    "diasAusenteTotal": 55,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-11",
-        "ultimoPag": "2025-09-19",
-        "voltou": "2025-11-13",
-        "dias": 55
-      }
-    ],
-    "maiorAusencia": 55,
-    "ultimaVolta": "2025-11-13"
-  },
-  "713252": {
-    "reativacoesPorMes": {
-      "2025-03": 1
-    },
-    "diasAusenteTotal": 52,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-03",
-        "ultimoPag": "2025-02-04",
-        "voltou": "2025-03-28",
-        "dias": 52
-      }
-    ],
-    "maiorAusencia": 52,
-    "ultimaVolta": "2025-03-28"
-  },
-  "774035": {
-    "reativacoesPorMes": {
-      "2025-05": 1
-    },
-    "diasAusenteTotal": 81,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-05",
-        "ultimoPag": "2025-02-28",
-        "voltou": "2025-05-20",
-        "dias": 81
-      }
-    ],
-    "maiorAusencia": 81,
-    "ultimaVolta": "2025-05-20"
-  },
-  "1311213": {
-    "reativacoesPorMes": {
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 495,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2025-03-17",
-        "voltou": "2026-07-25",
-        "dias": 495
-      }
-    ],
-    "maiorAusencia": 495,
-    "ultimaVolta": "2026-07-25"
-  },
-  "1574022": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 107,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-04-22",
-        "voltou": "2025-08-07",
-        "dias": 107
-      }
-    ],
-    "maiorAusencia": 107,
-    "ultimaVolta": "2025-08-07"
-  },
-  "1369120": {
-    "reativacoesPorMes": {
-      "2026-05": 1
-    },
-    "diasAusenteTotal": 473,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-05",
-        "ultimoPag": "2025-01-20",
-        "voltou": "2026-05-08",
-        "dias": 473
-      }
-    ],
-    "maiorAusencia": 473,
-    "ultimaVolta": "2026-05-08"
-  },
-  "1791859": {
-    "reativacoesPorMes": {
-      "2026-03": 1,
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 193,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-05-29",
-        "voltou": "2026-07-14",
-        "dias": 46
-      },
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2025-10-20",
-        "voltou": "2026-03-16",
-        "dias": 147
-      }
-    ],
-    "maiorAusencia": 147,
-    "ultimaVolta": "2026-07-14"
-  },
-  "2007479": {
-    "reativacoesPorMes": {
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 116,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-04-06",
-        "voltou": "2026-07-31",
-        "dias": 116
-      }
-    ],
-    "maiorAusencia": 116,
-    "ultimaVolta": "2026-07-31"
-  },
-  "2043912": {
-    "reativacoesPorMes": {
-      "2026-06": 1
-    },
-    "diasAusenteTotal": 48,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-06",
-        "ultimoPag": "2026-05-06",
-        "voltou": "2026-06-23",
-        "dias": 48
-      }
-    ],
-    "maiorAusencia": 48,
-    "ultimaVolta": "2026-06-23"
-  },
-  "1578734": {
-    "reativacoesPorMes": {
-      "2025-05": 1,
-      "2025-11": 1,
-      "2026-03": 1
-    },
-    "diasAusenteTotal": 159,
-    "totalReativ": 3,
-    "eventos": [
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2026-01-05",
-        "voltou": "2026-03-04",
-        "dias": 58
-      },
-      {
-        "mes": "2025-11",
-        "ultimoPag": "2025-09-29",
-        "voltou": "2025-11-17",
-        "dias": 49
-      },
-      {
-        "mes": "2025-05",
-        "ultimoPag": "2025-03-28",
-        "voltou": "2025-05-19",
-        "dias": 52
-      }
-    ],
-    "maiorAusencia": 58,
-    "ultimaVolta": "2026-03-04"
-  },
-  "894067": {
-    "reativacoesPorMes": {
-      "2026-06": 1
-    },
-    "diasAusenteTotal": 46,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-06",
-        "ultimoPag": "2026-04-26",
-        "voltou": "2026-06-11",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2026-06-11"
-  },
-  "188095": {
-    "reativacoesPorMes": {
-      "2026-03": 1
-    },
-    "diasAusenteTotal": 56,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2026-01-21",
-        "voltou": "2026-03-18",
-        "dias": 56
-      }
-    ],
-    "maiorAusencia": 56,
-    "ultimaVolta": "2026-03-18"
-  },
-  "1829977": {
-    "reativacoesPorMes": {
-      "2026-03": 1
-    },
-    "diasAusenteTotal": 56,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2026-01-21",
-        "voltou": "2026-03-18",
-        "dias": 56
-      }
-    ],
-    "maiorAusencia": 56,
-    "ultimaVolta": "2026-03-18"
-  },
-  "1181984": {
-    "reativacoesPorMes": {
-      "2026-05": 1
-    },
-    "diasAusenteTotal": 47,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-05",
-        "ultimoPag": "2026-04-02",
-        "voltou": "2026-05-19",
-        "dias": 47
-      }
-    ],
-    "maiorAusencia": 47,
-    "ultimaVolta": "2026-05-19"
-  },
-  "503164": {
-    "reativacoesPorMes": {
-      "2025-09": 1
-    },
-    "diasAusenteTotal": 67,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-25",
-        "voltou": "2025-09-30",
-        "dias": 67
-      }
-    ],
-    "maiorAusencia": 67,
-    "ultimaVolta": "2025-09-30"
-  },
-  "1803582": {
-    "reativacoesPorMes": {
-      "2026-06": 1
+      "2025-06": 1
     },
     "diasAusenteTotal": 49,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2026-06",
-        "ultimoPag": "2026-04-28",
-        "voltou": "2026-06-16",
+        "mes": "2025-06",
+        "ultimoPag": "2025-05-08",
+        "voltou": "2025-06-26",
         "dias": 49
       }
     ],
     "maiorAusencia": 49,
-    "ultimaVolta": "2026-06-16"
+    "ultimaVolta": "2025-06-26"
   },
-  "663336": {
+  "1661979": {
     "reativacoesPorMes": {
-      "2025-03": 1
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 53,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-05-16",
+        "voltou": "2026-07-08",
+        "dias": 53
+      }
+    ],
+    "maiorAusencia": 53,
+    "ultimaVolta": "2026-07-08"
+  },
+  "10479": {
+    "reativacoesPorMes": {
+      "2025-10": 1,
+      "2025-12": 1
+    },
+    "diasAusenteTotal": 149,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2025-12",
+        "ultimoPag": "2025-10-21",
+        "voltou": "2025-12-19",
+        "dias": 59
+      },
+      {
+        "mes": "2025-10",
+        "ultimoPag": "2025-07-23",
+        "voltou": "2025-10-21",
+        "dias": 90
+      }
+    ],
+    "maiorAusencia": 90,
+    "ultimaVolta": "2025-12-19"
+  },
+  "409876": {
+    "reativacoesPorMes": {
+      "2025-08": 1
     },
     "diasAusenteTotal": 47,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2025-03",
-        "ultimoPag": "2025-01-31",
-        "voltou": "2025-03-19",
+        "mes": "2025-08",
+        "ultimoPag": "2025-07-02",
+        "voltou": "2025-08-18",
         "dias": 47
       }
     ],
     "maiorAusencia": 47,
-    "ultimaVolta": "2025-03-19"
+    "ultimaVolta": "2025-08-18"
   },
-  "45777": {
+  "1656666": {
     "reativacoesPorMes": {
-      "2026-07": 1
+      "2025-10": 1
     },
-    "diasAusenteTotal": 55,
+    "diasAusenteTotal": 47,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2026-07",
-        "ultimoPag": "2026-05-14",
-        "voltou": "2026-07-08",
-        "dias": 55
-      }
-    ],
-    "maiorAusencia": 55,
-    "ultimaVolta": "2026-07-08"
-  },
-  "646958": {
-    "reativacoesPorMes": {
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 62,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-02-26",
-        "voltou": "2026-04-29",
-        "dias": 62
-      }
-    ],
-    "maiorAusencia": 62,
-    "ultimaVolta": "2026-04-29"
-  },
-  "957264": {
-    "reativacoesPorMes": {
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 62,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-02-26",
-        "voltou": "2026-04-29",
-        "dias": 62
-      }
-    ],
-    "maiorAusencia": 62,
-    "ultimaVolta": "2026-04-29"
-  },
-  "661636": {
-    "reativacoesPorMes": {
-      "2025-05": 1,
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 94,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-05-22",
-        "voltou": "2026-07-08",
-        "dias": 47
-      },
-      {
-        "mes": "2025-05",
-        "ultimoPag": "2025-03-20",
-        "voltou": "2025-05-06",
+        "mes": "2025-10",
+        "ultimoPag": "2025-08-28",
+        "voltou": "2025-10-14",
         "dias": 47
       }
     ],
     "maiorAusencia": 47,
-    "ultimaVolta": "2026-07-08"
+    "ultimaVolta": "2025-10-14"
+  },
+  "50487": {
+    "reativacoesPorMes": {
+      "2025-08": 1
+    },
+    "diasAusenteTotal": 60,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-06-16",
+        "voltou": "2025-08-15",
+        "dias": 60
+      }
+    ],
+    "maiorAusencia": 60,
+    "ultimaVolta": "2025-08-15"
   },
   "567903": {
     "reativacoesPorMes": {
@@ -2081,175 +703,104 @@
     "maiorAusencia": 48,
     "ultimaVolta": "2025-11-12"
   },
-  "1597341": {
-    "reativacoesPorMes": {
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 320,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2025-06-08",
-        "voltou": "2026-04-24",
-        "dias": 320
-      }
-    ],
-    "maiorAusencia": 320,
-    "ultimaVolta": "2026-04-24"
-  },
-  "124451": {
-    "reativacoesPorMes": {
-      "2025-10": 1
-    },
-    "diasAusenteTotal": 52,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-10",
-        "ultimoPag": "2025-08-26",
-        "voltou": "2025-10-17",
-        "dias": 52
-      }
-    ],
-    "maiorAusencia": 52,
-    "ultimaVolta": "2025-10-17"
-  },
-  "1927282": {
-    "reativacoesPorMes": {
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 197,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-01-13",
-        "voltou": "2026-07-29",
-        "dias": 197
-      }
-    ],
-    "maiorAusencia": 197,
-    "ultimaVolta": "2026-07-29"
-  },
-  "812626": {
+  "1181984": {
     "reativacoesPorMes": {
       "2026-05": 1
     },
-    "diasAusenteTotal": 61,
+    "diasAusenteTotal": 47,
     "totalReativ": 1,
     "eventos": [
       {
         "mes": "2026-05",
-        "ultimoPag": "2026-03-12",
-        "voltou": "2026-05-12",
-        "dias": 61
+        "ultimoPag": "2026-04-02",
+        "voltou": "2026-05-19",
+        "dias": 47
       }
     ],
-    "maiorAusencia": 61,
-    "ultimaVolta": "2026-05-12"
+    "maiorAusencia": 47,
+    "ultimaVolta": "2026-05-19"
   },
-  "27008": {
+  "1885074": {
     "reativacoesPorMes": {
-      "2026-02": 1
+      "2026-06": 1,
+      "2026-07": 1
     },
-    "diasAusenteTotal": 64,
+    "diasAusenteTotal": 138,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-06-01",
+        "voltou": "2026-07-18",
+        "dias": 47
+      },
+      {
+        "mes": "2026-06",
+        "ultimoPag": "2026-03-02",
+        "voltou": "2026-06-01",
+        "dias": 91
+      }
+    ],
+    "maiorAusencia": 91,
+    "ultimaVolta": "2026-07-18"
+  },
+  "77837": {
+    "reativacoesPorMes": {
+      "2025-12": 1
+    },
+    "diasAusenteTotal": 86,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2026-02",
-        "ultimoPag": "2025-12-16",
-        "voltou": "2026-02-18",
-        "dias": 64
+        "mes": "2025-12",
+        "ultimoPag": "2025-09-17",
+        "voltou": "2025-12-12",
+        "dias": 86
       }
     ],
-    "maiorAusencia": 64,
-    "ultimaVolta": "2026-02-18"
+    "maiorAusencia": 86,
+    "ultimaVolta": "2025-12-12"
   },
-  "796597": {
+  "13337": {
     "reativacoesPorMes": {
-      "2026-02": 1
+      "2025-10": 1,
+      "2025-12": 1
+    },
+    "diasAusenteTotal": 206,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2025-12",
+        "ultimoPag": "2025-08-30",
+        "voltou": "2025-12-02",
+        "dias": 94
+      },
+      {
+        "mes": "2025-10",
+        "ultimoPag": "2025-07-01",
+        "voltou": "2025-10-21",
+        "dias": 112
+      }
+    ],
+    "maiorAusencia": 112,
+    "ultimaVolta": "2025-12-02"
+  },
+  "654724": {
+    "reativacoesPorMes": {
+      "2025-09": 1
     },
     "diasAusenteTotal": 46,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2026-02",
-        "ultimoPag": "2026-01-03",
-        "voltou": "2026-02-18",
+        "mes": "2025-09",
+        "ultimoPag": "2025-08-15",
+        "voltou": "2025-09-30",
         "dias": 46
       }
     ],
     "maiorAusencia": 46,
-    "ultimaVolta": "2026-02-18"
-  },
-  "621426": {
-    "reativacoesPorMes": {
-      "2025-05": 1
-    },
-    "diasAusenteTotal": 81,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-05",
-        "ultimoPag": "2025-02-28",
-        "voltou": "2025-05-20",
-        "dias": 81
-      }
-    ],
-    "maiorAusencia": 81,
-    "ultimaVolta": "2025-05-20"
-  },
-  "1592879": {
-    "reativacoesPorMes": {
-      "2025-09": 1
-    },
-    "diasAusenteTotal": 77,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-15",
-        "voltou": "2025-09-30",
-        "dias": 77
-      }
-    ],
-    "maiorAusencia": 77,
     "ultimaVolta": "2025-09-30"
-  },
-  "909617": {
-    "reativacoesPorMes": {
-      "2025-12": 1
-    },
-    "diasAusenteTotal": 49,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-12",
-        "ultimoPag": "2025-10-31",
-        "voltou": "2025-12-19",
-        "dias": 49
-      }
-    ],
-    "maiorAusencia": 49,
-    "ultimaVolta": "2025-12-19"
-  },
-  "48801": {
-    "reativacoesPorMes": {
-      "2026-08": 1
-    },
-    "diasAusenteTotal": 179,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-08",
-        "ultimoPag": "2026-02-12",
-        "voltou": "2026-08-10",
-        "dias": 179
-      }
-    ],
-    "maiorAusencia": 179,
-    "ultimaVolta": "2026-08-10"
   },
   "1746256": {
     "reativacoesPorMes": {
@@ -2268,6 +819,23 @@
     "maiorAusencia": 179,
     "ultimaVolta": "2026-08-10"
   },
+  "1529280": {
+    "reativacoesPorMes": {
+      "2025-08": 1
+    },
+    "diasAusenteTotal": 123,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-04-08",
+        "voltou": "2025-08-09",
+        "dias": 123
+      }
+    ],
+    "maiorAusencia": 123,
+    "ultimaVolta": "2025-08-09"
+  },
   "1771336": {
     "reativacoesPorMes": {
       "2025-11": 1
@@ -2285,53 +853,862 @@
     "maiorAusencia": 48,
     "ultimaVolta": "2025-11-10"
   },
-  "1433423": {
+  "1110791": {
     "reativacoesPorMes": {
-      "2025-09": 1,
+      "2025-11": 1,
       "2026-04": 1
     },
-    "diasAusenteTotal": 110,
+    "diasAusenteTotal": 92,
     "totalReativ": 2,
     "eventos": [
       {
         "mes": "2026-04",
-        "ultimoPag": "2026-03-01",
-        "voltou": "2026-04-27",
-        "dias": 57
+        "ultimoPag": "2026-03-08",
+        "voltou": "2026-04-23",
+        "dias": 46
+      },
+      {
+        "mes": "2025-11",
+        "ultimoPag": "2025-09-25",
+        "voltou": "2025-11-10",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 46,
+    "ultimaVolta": "2026-04-23"
+  },
+  "658517": {
+    "reativacoesPorMes": {
+      "2026-03": 1
+    },
+    "diasAusenteTotal": 60,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2026-01-17",
+        "voltou": "2026-03-18",
+        "dias": 60
+      }
+    ],
+    "maiorAusencia": 60,
+    "ultimaVolta": "2026-03-18"
+  },
+  "1536375": {
+    "reativacoesPorMes": {
+      "2025-04": 1,
+      "2025-07": 1,
+      "2025-12": 1
+    },
+    "diasAusenteTotal": 231,
+    "totalReativ": 3,
+    "eventos": [
+      {
+        "mes": "2025-12",
+        "ultimoPag": "2025-09-18",
+        "voltou": "2025-12-10",
+        "dias": 83
+      },
+      {
+        "mes": "2025-07",
+        "ultimoPag": "2025-04-25",
+        "voltou": "2025-07-10",
+        "dias": 76
+      },
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-02-12",
+        "voltou": "2025-04-25",
+        "dias": 72
+      }
+    ],
+    "maiorAusencia": 83,
+    "ultimaVolta": "2025-12-10"
+  },
+  "1245140": {
+    "reativacoesPorMes": {
+      "2025-09": 1
+    },
+    "diasAusenteTotal": 47,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-24",
+        "voltou": "2025-09-09",
+        "dias": 47
+      }
+    ],
+    "maiorAusencia": 47,
+    "ultimaVolta": "2025-09-09"
+  },
+  "1345663": {
+    "reativacoesPorMes": {
+      "2025-08": 1
+    },
+    "diasAusenteTotal": 81,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-06-06",
+        "voltou": "2025-08-26",
+        "dias": 81
+      }
+    ],
+    "maiorAusencia": 81,
+    "ultimaVolta": "2025-08-26"
+  },
+  "1700627": {
+    "reativacoesPorMes": {
+      "2025-09": 1,
+      "2026-01": 1
+    },
+    "diasAusenteTotal": 169,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-01",
+        "ultimoPag": "2025-10-14",
+        "voltou": "2026-01-16",
+        "dias": 94
       },
       {
         "mes": "2025-09",
-        "ultimoPag": "2025-07-31",
-        "voltou": "2025-09-22",
-        "dias": 53
+        "ultimoPag": "2025-07-04",
+        "voltou": "2025-09-17",
+        "dias": 75
       }
     ],
-    "maiorAusencia": 57,
-    "ultimaVolta": "2026-04-27"
+    "maiorAusencia": 94,
+    "ultimaVolta": "2026-01-16"
   },
-  "618541": {
+  "1592879": {
     "reativacoesPorMes": {
-      "2026-03": 1,
+      "2025-09": 1
+    },
+    "diasAusenteTotal": 77,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-15",
+        "voltou": "2025-09-30",
+        "dias": 77
+      }
+    ],
+    "maiorAusencia": 77,
+    "ultimaVolta": "2025-09-30"
+  },
+  "1842018": {
+    "reativacoesPorMes": {
+      "2026-05": 1
+    },
+    "diasAusenteTotal": 118,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-05",
+        "ultimoPag": "2026-01-31",
+        "voltou": "2026-05-29",
+        "dias": 118
+      }
+    ],
+    "maiorAusencia": 118,
+    "ultimaVolta": "2026-05-29"
+  },
+  "873969": {
+    "reativacoesPorMes": {
+      "2025-04": 1,
+      "2025-06": 1
+    },
+    "diasAusenteTotal": 102,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2025-06",
+        "ultimoPag": "2025-04-22",
+        "voltou": "2025-06-16",
+        "dias": 55
+      },
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-02-20",
+        "voltou": "2025-04-08",
+        "dias": 47
+      }
+    ],
+    "maiorAusencia": 55,
+    "ultimaVolta": "2025-06-16"
+  },
+  "1733": {
+    "reativacoesPorMes": {
+      "2025-08": 1
+    },
+    "diasAusenteTotal": 124,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-04-17",
+        "voltou": "2025-08-19",
+        "dias": 124
+      }
+    ],
+    "maiorAusencia": 124,
+    "ultimaVolta": "2025-08-19"
+  },
+  "45777": {
+    "reativacoesPorMes": {
       "2026-07": 1
     },
-    "diasAusenteTotal": 272,
+    "diasAusenteTotal": 55,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-05-14",
+        "voltou": "2026-07-08",
+        "dias": 55
+      }
+    ],
+    "maiorAusencia": 55,
+    "ultimaVolta": "2026-07-08"
+  },
+  "52771": {
+    "reativacoesPorMes": {
+      "2025-08": 1,
+      "2026-03": 1
+    },
+    "diasAusenteTotal": 270,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2025-08-20",
+        "voltou": "2026-03-17",
+        "dias": 209
+      },
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-06-20",
+        "voltou": "2025-08-20",
+        "dias": 61
+      }
+    ],
+    "maiorAusencia": 209,
+    "ultimaVolta": "2026-03-17"
+  },
+  "336": {
+    "reativacoesPorMes": {
+      "2025-10": 1
+    },
+    "diasAusenteTotal": 152,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-10",
+        "ultimoPag": "2025-05-16",
+        "voltou": "2025-10-15",
+        "dias": 152
+      }
+    ],
+    "maiorAusencia": 152,
+    "ultimaVolta": "2025-10-15"
+  },
+  "146795": {
+    "reativacoesPorMes": {
+      "2025-10": 1,
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 210,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2025-11-18",
+        "voltou": "2026-04-16",
+        "dias": 149
+      },
+      {
+        "mes": "2025-10",
+        "ultimoPag": "2025-08-15",
+        "voltou": "2025-10-15",
+        "dias": 61
+      }
+    ],
+    "maiorAusencia": 149,
+    "ultimaVolta": "2026-04-16"
+  },
+  "1098231": {
+    "reativacoesPorMes": {
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 47,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-06-14",
+        "voltou": "2026-07-31",
+        "dias": 47
+      }
+    ],
+    "maiorAusencia": 47,
+    "ultimaVolta": "2026-07-31"
+  },
+  "1618245": {
+    "reativacoesPorMes": {
+      "2026-03": 1,
+      "2025-07": 1,
+      "2025-09": 1,
+      "2025-11": 1
+    },
+    "diasAusenteTotal": 446,
+    "totalReativ": 4,
+    "eventos": [
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2025-06-03",
+        "voltou": "2026-03-09",
+        "dias": 279
+      },
+      {
+        "mes": "2025-11",
+        "ultimoPag": "2025-09-17",
+        "voltou": "2025-11-03",
+        "dias": 47
+      },
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-07",
+        "voltou": "2025-09-04",
+        "dias": 59
+      },
+      {
+        "mes": "2025-07",
+        "ultimoPag": "2025-05-02",
+        "voltou": "2025-07-02",
+        "dias": 61
+      }
+    ],
+    "maiorAusencia": 279,
+    "ultimaVolta": "2026-03-09"
+  },
+  "754709": {
+    "reativacoesPorMes": {
+      "2025-10": 1
+    },
+    "diasAusenteTotal": 63,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-10",
+        "ultimoPag": "2025-08-07",
+        "voltou": "2025-10-09",
+        "dias": 63
+      }
+    ],
+    "maiorAusencia": 63,
+    "ultimaVolta": "2025-10-09"
+  },
+  "24244": {
+    "reativacoesPorMes": {
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 56,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-03-02",
+        "voltou": "2026-04-27",
+        "dias": 56
+      }
+    ],
+    "maiorAusencia": 56,
+    "ultimaVolta": "2026-04-27"
+  },
+  "1594912": {
+    "reativacoesPorMes": {
+      "2025-08": 1,
+      "2026-03": 1
+    },
+    "diasAusenteTotal": 144,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2025-12-16",
+        "voltou": "2026-03-23",
+        "dias": 97
+      },
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-07-04",
+        "voltou": "2025-08-20",
+        "dias": 47
+      }
+    ],
+    "maiorAusencia": 97,
+    "ultimaVolta": "2026-03-23"
+  },
+  "1568965": {
+    "reativacoesPorMes": {
+      "2025-09": 1,
+      "2026-03": 1
+    },
+    "diasAusenteTotal": 273,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2025-09-24",
+        "voltou": "2026-03-27",
+        "dias": 184
+      },
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-06-27",
+        "voltou": "2025-09-24",
+        "dias": 89
+      }
+    ],
+    "maiorAusencia": 184,
+    "ultimaVolta": "2026-03-27"
+  },
+  "243791": {
+    "reativacoesPorMes": {
+      "2025-09": 1
+    },
+    "diasAusenteTotal": 62,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-02",
+        "voltou": "2025-09-02",
+        "dias": 62
+      }
+    ],
+    "maiorAusencia": 62,
+    "ultimaVolta": "2025-09-02"
+  },
+  "1271226": {
+    "reativacoesPorMes": {
+      "2025-04": 1,
+      "2025-06": 1
+    },
+    "diasAusenteTotal": 105,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2025-06",
+        "ultimoPag": "2025-04-23",
+        "voltou": "2025-06-13",
+        "dias": 51
+      },
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-02-28",
+        "voltou": "2025-04-23",
+        "dias": 54
+      }
+    ],
+    "maiorAusencia": 54,
+    "ultimaVolta": "2025-06-13"
+  },
+  "521558": {
+    "reativacoesPorMes": {
+      "2025-04": 1,
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 118,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-03-05",
+        "voltou": "2026-04-21",
+        "dias": 47
+      },
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-02-17",
+        "voltou": "2025-04-29",
+        "dias": 71
+      }
+    ],
+    "maiorAusencia": 71,
+    "ultimaVolta": "2026-04-21"
+  },
+  "1376999": {
+    "reativacoesPorMes": {
+      "2026-05": 1
+    },
+    "diasAusenteTotal": 50,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-05",
+        "ultimoPag": "2026-03-16",
+        "voltou": "2026-05-05",
+        "dias": 50
+      }
+    ],
+    "maiorAusencia": 50,
+    "ultimaVolta": "2026-05-05"
+  },
+  "812626": {
+    "reativacoesPorMes": {
+      "2026-05": 1
+    },
+    "diasAusenteTotal": 61,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-05",
+        "ultimoPag": "2026-03-12",
+        "voltou": "2026-05-12",
+        "dias": 61
+      }
+    ],
+    "maiorAusencia": 61,
+    "ultimaVolta": "2026-05-12"
+  },
+  "196201": {
+    "reativacoesPorMes": {
+      "2025-07": 1,
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 112,
     "totalReativ": 2,
     "eventos": [
       {
         "mes": "2026-07",
-        "ultimoPag": "2026-03-06",
-        "voltou": "2026-07-30",
-        "dias": 146
+        "ultimoPag": "2026-05-21",
+        "voltou": "2026-07-08",
+        "dias": 48
       },
       {
-        "mes": "2026-03",
-        "ultimoPag": "2025-10-31",
-        "voltou": "2026-03-06",
-        "dias": 126
+        "mes": "2025-07",
+        "ultimoPag": "2025-05-21",
+        "voltou": "2025-07-24",
+        "dias": 64
       }
     ],
-    "maiorAusencia": 146,
-    "ultimaVolta": "2026-07-30"
+    "maiorAusencia": 64,
+    "ultimaVolta": "2026-07-08"
+  },
+  "1589515": {
+    "reativacoesPorMes": {
+      "2025-05": 1,
+      "2025-07": 1,
+      "2025-12": 1
+    },
+    "diasAusenteTotal": 257,
+    "totalReativ": 3,
+    "eventos": [
+      {
+        "mes": "2025-12",
+        "ultimoPag": "2025-07-10",
+        "voltou": "2025-12-18",
+        "dias": 161
+      },
+      {
+        "mes": "2025-07",
+        "ultimoPag": "2025-05-21",
+        "voltou": "2025-07-10",
+        "dias": 50
+      },
+      {
+        "mes": "2025-05",
+        "ultimoPag": "2025-04-05",
+        "voltou": "2025-05-21",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 161,
+    "ultimaVolta": "2025-12-18"
+  },
+  "2041369": {
+    "reativacoesPorMes": {
+      "2026-08": 1
+    },
+    "diasAusenteTotal": 100,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-08",
+        "ultimoPag": "2026-05-04",
+        "voltou": "2026-08-12",
+        "dias": 100
+      }
+    ],
+    "maiorAusencia": 100,
+    "ultimaVolta": "2026-08-12"
+  },
+  "731799": {
+    "reativacoesPorMes": {
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 47,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-06-14",
+        "voltou": "2026-07-31",
+        "dias": 47
+      }
+    ],
+    "maiorAusencia": 47,
+    "ultimaVolta": "2026-07-31"
+  },
+  "787879": {
+    "reativacoesPorMes": {
+      "2025-11": 1
+    },
+    "diasAusenteTotal": 46,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-11",
+        "ultimoPag": "2025-09-18",
+        "voltou": "2025-11-03",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 46,
+    "ultimaVolta": "2025-11-03"
+  },
+  "1752353": {
+    "reativacoesPorMes": {
+      "2026-01": 1,
+      "2026-02": 1
+    },
+    "diasAusenteTotal": 189,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-02",
+        "ultimoPag": "2026-01-05",
+        "voltou": "2026-02-20",
+        "dias": 46
+      },
+      {
+        "mes": "2026-01",
+        "ultimoPag": "2025-08-15",
+        "voltou": "2026-01-05",
+        "dias": 143
+      }
+    ],
+    "maiorAusencia": 143,
+    "ultimaVolta": "2026-02-20"
+  },
+  "1514453": {
+    "reativacoesPorMes": {
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 46,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-06-11",
+        "voltou": "2026-07-27",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 46,
+    "ultimaVolta": "2026-07-27"
+  },
+  "198148": {
+    "reativacoesPorMes": {
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 55,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-05-21",
+        "voltou": "2026-07-15",
+        "dias": 55
+      }
+    ],
+    "maiorAusencia": 55,
+    "ultimaVolta": "2026-07-15"
+  },
+  "1189507": {
+    "reativacoesPorMes": {
+      "2026-01": 1
+    },
+    "diasAusenteTotal": 56,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-01",
+        "ultimoPag": "2025-11-19",
+        "voltou": "2026-01-14",
+        "dias": 56
+      }
+    ],
+    "maiorAusencia": 56,
+    "ultimaVolta": "2026-01-14"
+  },
+  "1597341": {
+    "reativacoesPorMes": {
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 320,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2025-06-08",
+        "voltou": "2026-04-24",
+        "dias": 320
+      }
+    ],
+    "maiorAusencia": 320,
+    "ultimaVolta": "2026-04-24"
+  },
+  "1608002": {
+    "reativacoesPorMes": {
+      "2026-03": 1
+    },
+    "diasAusenteTotal": 46,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2026-02-05",
+        "voltou": "2026-03-23",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 46,
+    "ultimaVolta": "2026-03-23"
+  },
+  "713811": {
+    "reativacoesPorMes": {
+      "2025-04": 1
+    },
+    "diasAusenteTotal": 59,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-02-15",
+        "voltou": "2025-04-15",
+        "dias": 59
+      }
+    ],
+    "maiorAusencia": 59,
+    "ultimaVolta": "2025-04-15"
+  },
+  "621426": {
+    "reativacoesPorMes": {
+      "2025-05": 1
+    },
+    "diasAusenteTotal": 81,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-05",
+        "ultimoPag": "2025-02-28",
+        "voltou": "2025-05-20",
+        "dias": 81
+      }
+    ],
+    "maiorAusencia": 81,
+    "ultimaVolta": "2025-05-20"
+  },
+  "2007479": {
+    "reativacoesPorMes": {
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 116,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-04-06",
+        "voltou": "2026-07-31",
+        "dias": 116
+      }
+    ],
+    "maiorAusencia": 116,
+    "ultimaVolta": "2026-07-31"
+  },
+  "844570": {
+    "reativacoesPorMes": {
+      "2026-01": 1
+    },
+    "diasAusenteTotal": 52,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-01",
+        "ultimoPag": "2025-11-28",
+        "voltou": "2026-01-19",
+        "dias": 52
+      }
+    ],
+    "maiorAusencia": 52,
+    "ultimaVolta": "2026-01-19"
+  },
+  "1582558": {
+    "reativacoesPorMes": {
+      "2025-09": 1
+    },
+    "diasAusenteTotal": 47,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-08-07",
+        "voltou": "2025-09-23",
+        "dias": 47
+      }
+    ],
+    "maiorAusencia": 47,
+    "ultimaVolta": "2025-09-23"
+  },
+  "1311213": {
+    "reativacoesPorMes": {
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 495,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2025-03-17",
+        "voltou": "2026-07-25",
+        "dias": 495
+      }
+    ],
+    "maiorAusencia": 495,
+    "ultimaVolta": "2026-07-25"
+  },
+  "17511": {
+    "reativacoesPorMes": {
+      "2025-12": 1
+    },
+    "diasAusenteTotal": 58,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-12",
+        "ultimoPag": "2025-10-27",
+        "voltou": "2025-12-24",
+        "dias": 58
+      }
+    ],
+    "maiorAusencia": 58,
+    "ultimaVolta": "2025-12-24"
   },
   "1840960": {
     "reativacoesPorMes": {
@@ -2374,7 +1751,7 @@
     "maiorAusencia": 55,
     "ultimaVolta": "2025-06-18"
   },
-  "654724": {
+  "44756": {
     "reativacoesPorMes": {
       "2025-09": 1
     },
@@ -2383,360 +1760,115 @@
     "eventos": [
       {
         "mes": "2025-09",
-        "ultimoPag": "2025-08-15",
-        "voltou": "2025-09-30",
+        "ultimoPag": "2025-07-25",
+        "voltou": "2025-09-09",
         "dias": 46
       }
     ],
     "maiorAusencia": 46,
-    "ultimaVolta": "2025-09-30"
-  },
-  "89170": {
-    "reativacoesPorMes": {
-      "2025-11": 1
-    },
-    "diasAusenteTotal": 58,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-11",
-        "ultimoPag": "2025-09-17",
-        "voltou": "2025-11-14",
-        "dias": 58
-      }
-    ],
-    "maiorAusencia": 58,
-    "ultimaVolta": "2025-11-14"
-  },
-  "1245140": {
-    "reativacoesPorMes": {
-      "2025-09": 1
-    },
-    "diasAusenteTotal": 47,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-24",
-        "voltou": "2025-09-09",
-        "dias": 47
-      }
-    ],
-    "maiorAusencia": 47,
     "ultimaVolta": "2025-09-09"
   },
-  "1232863": {
+  "1467676": {
     "reativacoesPorMes": {
-      "2025-09": 1
+      "2026-05": 1
     },
-    "diasAusenteTotal": 47,
+    "diasAusenteTotal": 89,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-24",
-        "voltou": "2025-09-09",
-        "dias": 47
+        "mes": "2026-05",
+        "ultimoPag": "2026-02-22",
+        "voltou": "2026-05-22",
+        "dias": 89
       }
     ],
-    "maiorAusencia": 47,
-    "ultimaVolta": "2025-09-09"
+    "maiorAusencia": 89,
+    "ultimaVolta": "2026-05-22"
   },
-  "98224": {
+  "369880": {
     "reativacoesPorMes": {
-      "2026-01": 1
+      "2025-08": 1
     },
-    "diasAusenteTotal": 56,
+    "diasAusenteTotal": 129,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2026-01",
-        "ultimoPag": "2025-11-26",
-        "voltou": "2026-01-21",
-        "dias": 56
+        "mes": "2025-08",
+        "ultimoPag": "2025-03-31",
+        "voltou": "2025-08-07",
+        "dias": 129
       }
     ],
-    "maiorAusencia": 56,
-    "ultimaVolta": "2026-01-21"
+    "maiorAusencia": 129,
+    "ultimaVolta": "2025-08-07"
   },
-  "1514453": {
+  "606611": {
     "reativacoesPorMes": {
       "2026-07": 1
-    },
-    "diasAusenteTotal": 46,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-06-11",
-        "voltou": "2026-07-27",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2026-07-27"
-  },
-  "1825305": {
-    "reativacoesPorMes": {
-      "2025-12": 1
-    },
-    "diasAusenteTotal": 54,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-12",
-        "ultimoPag": "2025-10-17",
-        "voltou": "2025-12-10",
-        "dias": 54
-      }
-    ],
-    "maiorAusencia": 54,
-    "ultimaVolta": "2025-12-10"
-  },
-  "1422450": {
-    "reativacoesPorMes": {
-      "2025-09": 1
-    },
-    "diasAusenteTotal": 69,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-06-25",
-        "voltou": "2025-09-02",
-        "dias": 69
-      }
-    ],
-    "maiorAusencia": 69,
-    "ultimaVolta": "2025-09-02"
-  },
-  "1407423": {
-    "reativacoesPorMes": {
-      "2025-02": 1
     },
     "diasAusenteTotal": 48,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2025-02",
-        "ultimoPag": "2025-01-09",
-        "voltou": "2025-02-26",
+        "mes": "2026-07",
+        "ultimoPag": "2026-05-30",
+        "voltou": "2026-07-17",
         "dias": 48
       }
     ],
     "maiorAusencia": 48,
-    "ultimaVolta": "2025-02-26"
+    "ultimaVolta": "2026-07-17"
   },
-  "152442": {
+  "188095": {
+    "reativacoesPorMes": {
+      "2026-03": 1
+    },
+    "diasAusenteTotal": 56,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2026-01-21",
+        "voltou": "2026-03-18",
+        "dias": 56
+      }
+    ],
+    "maiorAusencia": 56,
+    "ultimaVolta": "2026-03-18"
+  },
+  "1867647": {
     "reativacoesPorMes": {
       "2026-01": 1
     },
-    "diasAusenteTotal": 50,
+    "diasAusenteTotal": 69,
     "totalReativ": 1,
     "eventos": [
       {
         "mes": "2026-01",
         "ultimoPag": "2025-11-18",
-        "voltou": "2026-01-07",
-        "dias": 50
+        "voltou": "2026-01-26",
+        "dias": 69
       }
     ],
-    "maiorAusencia": 50,
-    "ultimaVolta": "2026-01-07"
+    "maiorAusencia": 69,
+    "ultimaVolta": "2026-01-26"
   },
-  "1623082": {
+  "657248": {
     "reativacoesPorMes": {
-      "2026-04": 1
+      "2025-03": 1
     },
     "diasAusenteTotal": 52,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2026-04",
-        "ultimoPag": "2026-03-07",
-        "voltou": "2026-04-28",
+        "mes": "2025-03",
+        "ultimoPag": "2025-02-03",
+        "voltou": "2025-03-27",
         "dias": 52
       }
     ],
     "maiorAusencia": 52,
-    "ultimaVolta": "2026-04-28"
-  },
-  "13337": {
-    "reativacoesPorMes": {
-      "2025-10": 1,
-      "2025-12": 1
-    },
-    "diasAusenteTotal": 206,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2025-12",
-        "ultimoPag": "2025-08-30",
-        "voltou": "2025-12-02",
-        "dias": 94
-      },
-      {
-        "mes": "2025-10",
-        "ultimoPag": "2025-07-01",
-        "voltou": "2025-10-21",
-        "dias": 112
-      }
-    ],
-    "maiorAusencia": 112,
-    "ultimaVolta": "2025-12-02"
-  },
-  "1794530": {
-    "reativacoesPorMes": {
-      "2025-12": 1
-    },
-    "diasAusenteTotal": 47,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-12",
-        "ultimoPag": "2025-10-23",
-        "voltou": "2025-12-09",
-        "dias": 47
-      }
-    ],
-    "maiorAusencia": 47,
-    "ultimaVolta": "2025-12-09"
-  },
-  "543364": {
-    "reativacoesPorMes": {
-      "2025-09": 1
-    },
-    "diasAusenteTotal": 54,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-31",
-        "voltou": "2025-09-23",
-        "dias": 54
-      }
-    ],
-    "maiorAusencia": 54,
-    "ultimaVolta": "2025-09-23"
-  },
-  "90371": {
-    "reativacoesPorMes": {
-      "2025-04": 1
-    },
-    "diasAusenteTotal": 60,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-02-28",
-        "voltou": "2025-04-29",
-        "dias": 60
-      }
-    ],
-    "maiorAusencia": 60,
-    "ultimaVolta": "2025-04-29"
-  },
-  "1279276": {
-    "reativacoesPorMes": {
-      "2025-07": 1
-    },
-    "diasAusenteTotal": 50,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-07",
-        "ultimoPag": "2025-06-09",
-        "voltou": "2025-07-29",
-        "dias": 50
-      }
-    ],
-    "maiorAusencia": 50,
-    "ultimaVolta": "2025-07-29"
-  },
-  "24540": {
-    "reativacoesPorMes": {
-      "2026-02": 1
-    },
-    "diasAusenteTotal": 46,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-02",
-        "ultimoPag": "2025-12-26",
-        "voltou": "2026-02-10",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2026-02-10"
-  },
-  "317706": {
-    "reativacoesPorMes": {
-      "2025-04": 1
-    },
-    "diasAusenteTotal": 57,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-02-17",
-        "voltou": "2025-04-15",
-        "dias": 57
-      }
-    ],
-    "maiorAusencia": 57,
-    "ultimaVolta": "2025-04-15"
-  },
-  "1816615": {
-    "reativacoesPorMes": {
-      "2026-06": 1
-    },
-    "diasAusenteTotal": 54,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-06",
-        "ultimoPag": "2026-04-15",
-        "voltou": "2026-06-08",
-        "dias": 54
-      }
-    ],
-    "maiorAusencia": 54,
-    "ultimaVolta": "2026-06-08"
-  },
-  "1637938": {
-    "reativacoesPorMes": {
-      "2025-11": 1
-    },
-    "diasAusenteTotal": 50,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-11",
-        "ultimoPag": "2025-09-29",
-        "voltou": "2025-11-18",
-        "dias": 50
-      }
-    ],
-    "maiorAusencia": 50,
-    "ultimaVolta": "2025-11-18"
-  },
-  "161072": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 120,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-04-14",
-        "voltou": "2025-08-12",
-        "dias": 120
-      }
-    ],
-    "maiorAusencia": 120,
-    "ultimaVolta": "2025-08-12"
+    "ultimaVolta": "2025-03-27"
   },
   "1806105": {
     "reativacoesPorMes": {
@@ -2762,588 +1894,46 @@
     "maiorAusencia": 98,
     "ultimaVolta": "2026-07-19"
   },
-  "44756": {
+  "820612": {
     "reativacoesPorMes": {
-      "2025-09": 1
-    },
-    "diasAusenteTotal": 46,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-25",
-        "voltou": "2025-09-09",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2025-09-09"
-  },
-  "47634": {
-    "reativacoesPorMes": {
-      "2025-10": 1
-    },
-    "diasAusenteTotal": 59,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-10",
-        "ultimoPag": "2025-08-08",
-        "voltou": "2025-10-06",
-        "dias": 59
-      }
-    ],
-    "maiorAusencia": 59,
-    "ultimaVolta": "2025-10-06"
-  },
-  "1733": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 124,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-04-17",
-        "voltou": "2025-08-19",
-        "dias": 124
-      }
-    ],
-    "maiorAusencia": 124,
-    "ultimaVolta": "2025-08-19"
-  },
-  "1719984": {
-    "reativacoesPorMes": {
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 288,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2025-09-21",
-        "voltou": "2026-07-06",
-        "dias": 288
-      }
-    ],
-    "maiorAusencia": 288,
-    "ultimaVolta": "2026-07-06"
-  },
-  "1289726": {
-    "reativacoesPorMes": {
-      "2025-05": 1
-    },
-    "diasAusenteTotal": 80,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-05",
-        "ultimoPag": "2025-02-26",
-        "voltou": "2025-05-17",
-        "dias": 80
-      }
-    ],
-    "maiorAusencia": 80,
-    "ultimaVolta": "2025-05-17"
-  },
-  "1468945": {
-    "reativacoesPorMes": {
-      "2025-07": 1
-    },
-    "diasAusenteTotal": 56,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-07",
-        "ultimoPag": "2025-06-05",
-        "voltou": "2025-07-31",
-        "dias": 56
-      }
-    ],
-    "maiorAusencia": 56,
-    "ultimaVolta": "2025-07-31"
-  },
-  "1568965": {
-    "reativacoesPorMes": {
-      "2025-09": 1,
-      "2026-03": 1
-    },
-    "diasAusenteTotal": 273,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2025-09-24",
-        "voltou": "2026-03-27",
-        "dias": 184
-      },
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-06-27",
-        "voltou": "2025-09-24",
-        "dias": 89
-      }
-    ],
-    "maiorAusencia": 184,
-    "ultimaVolta": "2026-03-27"
-  },
-  "1151598": {
-    "reativacoesPorMes": {
-      "2025-04": 1,
-      "2025-06": 1
-    },
-    "diasAusenteTotal": 102,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2025-06",
-        "ultimoPag": "2025-04-22",
-        "voltou": "2025-06-16",
-        "dias": 55
-      },
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-02-20",
-        "voltou": "2025-04-08",
-        "dias": 47
-      }
-    ],
-    "maiorAusencia": 55,
-    "ultimaVolta": "2025-06-16"
-  },
-  "873969": {
-    "reativacoesPorMes": {
-      "2025-04": 1,
-      "2025-06": 1
-    },
-    "diasAusenteTotal": 102,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2025-06",
-        "ultimoPag": "2025-04-22",
-        "voltou": "2025-06-16",
-        "dias": 55
-      },
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-02-20",
-        "voltou": "2025-04-08",
-        "dias": 47
-      }
-    ],
-    "maiorAusencia": 55,
-    "ultimaVolta": "2025-06-16"
-  },
-  "10479": {
-    "reativacoesPorMes": {
-      "2025-10": 1,
-      "2025-12": 1
-    },
-    "diasAusenteTotal": 149,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2025-12",
-        "ultimoPag": "2025-10-21",
-        "voltou": "2025-12-19",
-        "dias": 59
-      },
-      {
-        "mes": "2025-10",
-        "ultimoPag": "2025-07-23",
-        "voltou": "2025-10-21",
-        "dias": 90
-      }
-    ],
-    "maiorAusencia": 90,
-    "ultimaVolta": "2025-12-19"
-  },
-  "1626367": {
-    "reativacoesPorMes": {
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 46,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-03-04",
-        "voltou": "2026-04-19",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2026-04-19"
-  },
-  "655124": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 77,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-05-27",
-        "voltou": "2025-08-12",
-        "dias": 77
-      }
-    ],
-    "maiorAusencia": 77,
-    "ultimaVolta": "2025-08-12"
-  },
-  "1091249": {
-    "reativacoesPorMes": {
-      "2025-03": 1
-    },
-    "diasAusenteTotal": 55,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-03",
-        "ultimoPag": "2025-01-15",
-        "voltou": "2025-03-11",
-        "dias": 55
-      }
-    ],
-    "maiorAusencia": 55,
-    "ultimaVolta": "2025-03-11"
-  },
-  "1542336": {
-    "reativacoesPorMes": {
-      "2025-05": 1,
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 150,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-02-26",
-        "voltou": "2026-04-20",
-        "dias": 53
-      },
-      {
-        "mes": "2025-05",
-        "ultimoPag": "2025-02-18",
-        "voltou": "2025-05-26",
-        "dias": 97
-      }
-    ],
-    "maiorAusencia": 97,
-    "ultimaVolta": "2026-04-20"
-  },
-  "1549609": {
-    "reativacoesPorMes": {
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 72,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-02-09",
-        "voltou": "2026-04-22",
-        "dias": 72
-      }
-    ],
-    "maiorAusencia": 72,
-    "ultimaVolta": "2026-04-22"
-  },
-  "179103": {
-    "reativacoesPorMes": {
-      "2026-03": 1
-    },
-    "diasAusenteTotal": 46,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2026-02-05",
-        "voltou": "2026-03-23",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2026-03-23"
-  },
-  "1608002": {
-    "reativacoesPorMes": {
-      "2026-03": 1
-    },
-    "diasAusenteTotal": 46,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2026-02-05",
-        "voltou": "2026-03-23",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2026-03-23"
-  },
-  "754709": {
-    "reativacoesPorMes": {
-      "2025-10": 1
-    },
-    "diasAusenteTotal": 63,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-10",
-        "ultimoPag": "2025-08-07",
-        "voltou": "2025-10-09",
-        "dias": 63
-      }
-    ],
-    "maiorAusencia": 63,
-    "ultimaVolta": "2025-10-09"
-  },
-  "77837": {
-    "reativacoesPorMes": {
-      "2025-12": 1
-    },
-    "diasAusenteTotal": 86,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-12",
-        "ultimoPag": "2025-09-17",
-        "voltou": "2025-12-12",
-        "dias": 86
-      }
-    ],
-    "maiorAusencia": 86,
-    "ultimaVolta": "2025-12-12"
-  },
-  "1415689": {
-    "reativacoesPorMes": {
-      "2025-04": 1,
-      "2025-09": 1
-    },
-    "diasAusenteTotal": 167,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-06-28",
-        "voltou": "2025-09-24",
-        "dias": 88
-      },
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-02-03",
-        "voltou": "2025-04-23",
-        "dias": 79
-      }
-    ],
-    "maiorAusencia": 88,
-    "ultimaVolta": "2025-09-24"
-  },
-  "198148": {
-    "reativacoesPorMes": {
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 55,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-05-21",
-        "voltou": "2026-07-15",
-        "dias": 55
-      }
-    ],
-    "maiorAusencia": 55,
-    "ultimaVolta": "2026-07-15"
-  },
-  "1190945": {
-    "reativacoesPorMes": {
-      "2025-06": 1
-    },
-    "diasAusenteTotal": 49,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-06",
-        "ultimoPag": "2025-05-08",
-        "voltou": "2025-06-26",
-        "dias": 49
-      }
-    ],
-    "maiorAusencia": 49,
-    "ultimaVolta": "2025-06-26"
-  },
-  "1594912": {
-    "reativacoesPorMes": {
-      "2025-08": 1,
-      "2026-03": 1
-    },
-    "diasAusenteTotal": 144,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-03",
-        "ultimoPag": "2025-12-16",
-        "voltou": "2026-03-23",
-        "dias": 97
-      },
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-07-04",
-        "voltou": "2025-08-20",
-        "dias": 47
-      }
-    ],
-    "maiorAusencia": 97,
-    "ultimaVolta": "2026-03-23"
-  },
-  "1570013": {
-    "reativacoesPorMes": {
-      "2025-06": 1
-    },
-    "diasAusenteTotal": 64,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-06",
-        "ultimoPag": "2025-04-14",
-        "voltou": "2025-06-17",
-        "dias": 64
-      }
-    ],
-    "maiorAusencia": 64,
-    "ultimaVolta": "2025-06-17"
-  },
-  "1237877": {
-    "reativacoesPorMes": {
-      "2025-05": 1
-    },
-    "diasAusenteTotal": 49,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-05",
-        "ultimoPag": "2025-04-10",
-        "voltou": "2025-05-29",
-        "dias": 49
-      }
-    ],
-    "maiorAusencia": 49,
-    "ultimaVolta": "2025-05-29"
-  },
-  "1797546": {
-    "reativacoesPorMes": {
-      "2026-02": 1,
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 120,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-02-09",
-        "voltou": "2026-04-23",
-        "dias": 73
-      },
-      {
-        "mes": "2026-02",
-        "ultimoPag": "2025-12-24",
-        "voltou": "2026-02-09",
-        "dias": 47
-      }
-    ],
-    "maiorAusencia": 73,
-    "ultimaVolta": "2026-04-23"
-  },
-  "777208": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 92,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-05-13",
-        "voltou": "2025-08-13",
-        "dias": 92
-      }
-    ],
-    "maiorAusencia": 92,
-    "ultimaVolta": "2025-08-13"
-  },
-  "1983975": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 55,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-06-30",
-        "voltou": "2025-08-24",
-        "dias": 55
-      }
-    ],
-    "maiorAusencia": 55,
-    "ultimaVolta": "2025-08-24"
-  },
-  "328841": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 55,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-06-30",
-        "voltou": "2025-08-24",
-        "dias": 55
-      }
-    ],
-    "maiorAusencia": 55,
-    "ultimaVolta": "2025-08-24"
-  },
-  "1467676": {
-    "reativacoesPorMes": {
-      "2026-05": 1
-    },
-    "diasAusenteTotal": 89,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-05",
-        "ultimoPag": "2026-02-22",
-        "voltou": "2026-05-22",
-        "dias": 89
-      }
-    ],
-    "maiorAusencia": 89,
-    "ultimaVolta": "2026-05-22"
-  },
-  "662705": {
-    "reativacoesPorMes": {
-      "2025-10": 1
+      "2025-11": 1
     },
     "diasAusenteTotal": 47,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2025-10",
-        "ultimoPag": "2025-09-10",
-        "voltou": "2025-10-27",
+        "mes": "2025-11",
+        "ultimoPag": "2025-09-26",
+        "voltou": "2025-11-12",
         "dias": 47
       }
     ],
     "maiorAusencia": 47,
-    "ultimaVolta": "2025-10-27"
+    "ultimaVolta": "2025-11-12"
+  },
+  "1509874": {
+    "reativacoesPorMes": {
+      "2025-04": 1,
+      "2025-09": 1
+    },
+    "diasAusenteTotal": 120,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-29",
+        "voltou": "2025-09-18",
+        "dias": 51
+      },
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-02-13",
+        "voltou": "2025-04-23",
+        "dias": 69
+      }
+    ],
+    "maiorAusencia": 69,
+    "ultimaVolta": "2025-09-18"
   },
   "1548808": {
     "reativacoesPorMes": {
@@ -3369,22 +1959,158 @@
     "maiorAusencia": 63,
     "ultimaVolta": "2025-11-11"
   },
-  "1541323": {
+  "1816615": {
     "reativacoesPorMes": {
-      "2025-07": 1
+      "2026-06": 1
     },
-    "diasAusenteTotal": 137,
+    "diasAusenteTotal": 54,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2025-07",
-        "ultimoPag": "2025-02-17",
-        "voltou": "2025-07-04",
-        "dias": 137
+        "mes": "2026-06",
+        "ultimoPag": "2026-04-15",
+        "voltou": "2026-06-08",
+        "dias": 54
       }
     ],
-    "maiorAusencia": 137,
-    "ultimaVolta": "2025-07-04"
+    "maiorAusencia": 54,
+    "ultimaVolta": "2026-06-08"
+  },
+  "663336": {
+    "reativacoesPorMes": {
+      "2025-03": 1
+    },
+    "diasAusenteTotal": 47,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-03",
+        "ultimoPag": "2025-01-31",
+        "voltou": "2025-03-19",
+        "dias": 47
+      }
+    ],
+    "maiorAusencia": 47,
+    "ultimaVolta": "2025-03-19"
+  },
+  "1803582": {
+    "reativacoesPorMes": {
+      "2026-06": 1
+    },
+    "diasAusenteTotal": 49,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-06",
+        "ultimoPag": "2026-04-28",
+        "voltou": "2026-06-16",
+        "dias": 49
+      }
+    ],
+    "maiorAusencia": 49,
+    "ultimaVolta": "2026-06-16"
+  },
+  "1791824": {
+    "reativacoesPorMes": {
+      "2025-11": 1
+    },
+    "diasAusenteTotal": 55,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-11",
+        "ultimoPag": "2025-09-19",
+        "voltou": "2025-11-13",
+        "dias": 55
+      }
+    ],
+    "maiorAusencia": 55,
+    "ultimaVolta": "2025-11-13"
+  },
+  "1682781": {
+    "reativacoesPorMes": {
+      "2025-09": 1
+    },
+    "diasAusenteTotal": 62,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-04",
+        "voltou": "2025-09-04",
+        "dias": 62
+      }
+    ],
+    "maiorAusencia": 62,
+    "ultimaVolta": "2025-09-04"
+  },
+  "2068618": {
+    "reativacoesPorMes": {
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 55,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-05-27",
+        "voltou": "2026-07-21",
+        "dias": 55
+      }
+    ],
+    "maiorAusencia": 55,
+    "ultimaVolta": "2026-07-21"
+  },
+  "1815775": {
+    "reativacoesPorMes": {
+      "2026-06": 1
+    },
+    "diasAusenteTotal": 106,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-06",
+        "ultimoPag": "2026-03-09",
+        "voltou": "2026-06-23",
+        "dias": 106
+      }
+    ],
+    "maiorAusencia": 106,
+    "ultimaVolta": "2026-06-23"
+  },
+  "124451": {
+    "reativacoesPorMes": {
+      "2025-10": 1
+    },
+    "diasAusenteTotal": 52,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-10",
+        "ultimoPag": "2025-08-26",
+        "voltou": "2025-10-17",
+        "dias": 52
+      }
+    ],
+    "maiorAusencia": 52,
+    "ultimaVolta": "2025-10-17"
+  },
+  "1422450": {
+    "reativacoesPorMes": {
+      "2025-09": 1
+    },
+    "diasAusenteTotal": 69,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-06-25",
+        "voltou": "2025-09-02",
+        "dias": 69
+      }
+    ],
+    "maiorAusencia": 69,
+    "ultimaVolta": "2025-09-02"
   },
   "636413": {
     "reativacoesPorMes": {
@@ -3410,6 +2136,1247 @@
     "maiorAusencia": 52,
     "ultimaVolta": "2026-07-14"
   },
+  "1570013": {
+    "reativacoesPorMes": {
+      "2025-06": 1
+    },
+    "diasAusenteTotal": 64,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-06",
+        "ultimoPag": "2025-04-14",
+        "voltou": "2025-06-17",
+        "dias": 64
+      }
+    ],
+    "maiorAusencia": 64,
+    "ultimaVolta": "2025-06-17"
+  },
+  "1210327": {
+    "reativacoesPorMes": {
+      "2025-05": 1,
+      "2025-07": 1,
+      "2025-09": 1,
+      "2026-01": 1
+    },
+    "diasAusenteTotal": 201,
+    "totalReativ": 4,
+    "eventos": [
+      {
+        "mes": "2026-01",
+        "ultimoPag": "2025-11-14",
+        "voltou": "2026-01-05",
+        "dias": 52
+      },
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-21",
+        "voltou": "2025-09-09",
+        "dias": 50
+      },
+      {
+        "mes": "2025-07",
+        "ultimoPag": "2025-05-23",
+        "voltou": "2025-07-08",
+        "dias": 46
+      },
+      {
+        "mes": "2025-05",
+        "ultimoPag": "2025-03-13",
+        "voltou": "2025-05-05",
+        "dias": 53
+      }
+    ],
+    "maiorAusencia": 53,
+    "ultimaVolta": "2026-01-05"
+  },
+  "1812999": {
+    "reativacoesPorMes": {
+      "2026-08": 1
+    },
+    "diasAusenteTotal": 50,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-08",
+        "ultimoPag": "2026-06-22",
+        "voltou": "2026-08-11",
+        "dias": 50
+      }
+    ],
+    "maiorAusencia": 50,
+    "ultimaVolta": "2026-08-11"
+  },
+  "1590333": {
+    "reativacoesPorMes": {
+      "2025-10": 1,
+      "2025-12": 1
+    },
+    "diasAusenteTotal": 208,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2025-12",
+        "ultimoPag": "2025-10-09",
+        "voltou": "2025-12-01",
+        "dias": 53
+      },
+      {
+        "mes": "2025-10",
+        "ultimoPag": "2025-05-07",
+        "voltou": "2025-10-09",
+        "dias": 155
+      }
+    ],
+    "maiorAusencia": 155,
+    "ultimaVolta": "2025-12-01"
+  },
+  "152442": {
+    "reativacoesPorMes": {
+      "2026-01": 1
+    },
+    "diasAusenteTotal": 50,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-01",
+        "ultimoPag": "2025-11-18",
+        "voltou": "2026-01-07",
+        "dias": 50
+      }
+    ],
+    "maiorAusencia": 50,
+    "ultimaVolta": "2026-01-07"
+  },
+  "713252": {
+    "reativacoesPorMes": {
+      "2025-03": 1
+    },
+    "diasAusenteTotal": 52,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-03",
+        "ultimoPag": "2025-02-04",
+        "voltou": "2025-03-28",
+        "dias": 52
+      }
+    ],
+    "maiorAusencia": 52,
+    "ultimaVolta": "2025-03-28"
+  },
+  "93281": {
+    "reativacoesPorMes": {
+      "2025-04": 1
+    },
+    "diasAusenteTotal": 47,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-02-20",
+        "voltou": "2025-04-08",
+        "dias": 47
+      }
+    ],
+    "maiorAusencia": 47,
+    "ultimaVolta": "2025-04-08"
+  },
+  "1541278": {
+    "reativacoesPorMes": {
+      "2026-01": 1
+    },
+    "diasAusenteTotal": 56,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-01",
+        "ultimoPag": "2025-11-27",
+        "voltou": "2026-01-22",
+        "dias": 56
+      }
+    ],
+    "maiorAusencia": 56,
+    "ultimaVolta": "2026-01-22"
+  },
+  "324397": {
+    "reativacoesPorMes": {
+      "2026-05": 1
+    },
+    "diasAusenteTotal": 61,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-05",
+        "ultimoPag": "2026-03-11",
+        "voltou": "2026-05-11",
+        "dias": 61
+      }
+    ],
+    "maiorAusencia": 61,
+    "ultimaVolta": "2026-05-11"
+  },
+  "634486": {
+    "reativacoesPorMes": {
+      "2025-04": 1,
+      "2025-05": 1
+    },
+    "diasAusenteTotal": 116,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2025-05",
+        "ultimoPag": "2025-04-07",
+        "voltou": "2025-05-26",
+        "dias": 49
+      },
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-01-30",
+        "voltou": "2025-04-07",
+        "dias": 67
+      }
+    ],
+    "maiorAusencia": 67,
+    "ultimaVolta": "2025-05-26"
+  },
+  "23263": {
+    "reativacoesPorMes": {
+      "2026-02": 1
+    },
+    "diasAusenteTotal": 124,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-02",
+        "ultimoPag": "2025-10-17",
+        "voltou": "2026-02-18",
+        "dias": 124
+      }
+    ],
+    "maiorAusencia": 124,
+    "ultimaVolta": "2026-02-18"
+  },
+  "796597": {
+    "reativacoesPorMes": {
+      "2026-02": 1
+    },
+    "diasAusenteTotal": 46,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-02",
+        "ultimoPag": "2026-01-03",
+        "voltou": "2026-02-18",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 46,
+    "ultimaVolta": "2026-02-18"
+  },
+  "1237877": {
+    "reativacoesPorMes": {
+      "2025-05": 1
+    },
+    "diasAusenteTotal": 49,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-05",
+        "ultimoPag": "2025-04-10",
+        "voltou": "2025-05-29",
+        "dias": 49
+      }
+    ],
+    "maiorAusencia": 49,
+    "ultimaVolta": "2025-05-29"
+  },
+  "1415689": {
+    "reativacoesPorMes": {
+      "2025-04": 1,
+      "2025-09": 1
+    },
+    "diasAusenteTotal": 167,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-06-28",
+        "voltou": "2025-09-24",
+        "dias": 88
+      },
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-02-03",
+        "voltou": "2025-04-23",
+        "dias": 79
+      }
+    ],
+    "maiorAusencia": 88,
+    "ultimaVolta": "2025-09-24"
+  },
+  "1201385": {
+    "reativacoesPorMes": {
+      "2025-09": 1
+    },
+    "diasAusenteTotal": 46,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-18",
+        "voltou": "2025-09-02",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 46,
+    "ultimaVolta": "2025-09-02"
+  },
+  "1797546": {
+    "reativacoesPorMes": {
+      "2026-02": 1,
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 120,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-02-09",
+        "voltou": "2026-04-23",
+        "dias": 73
+      },
+      {
+        "mes": "2026-02",
+        "ultimoPag": "2025-12-24",
+        "voltou": "2026-02-09",
+        "dias": 47
+      }
+    ],
+    "maiorAusencia": 73,
+    "ultimaVolta": "2026-04-23"
+  },
+  "1927282": {
+    "reativacoesPorMes": {
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 197,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-01-13",
+        "voltou": "2026-07-29",
+        "dias": 197
+      }
+    ],
+    "maiorAusencia": 197,
+    "ultimaVolta": "2026-07-29"
+  },
+  "1719984": {
+    "reativacoesPorMes": {
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 288,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2025-09-21",
+        "voltou": "2026-07-06",
+        "dias": 288
+      }
+    ],
+    "maiorAusencia": 288,
+    "ultimaVolta": "2026-07-06"
+  },
+  "156269": {
+    "reativacoesPorMes": {
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 56,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-03-04",
+        "voltou": "2026-04-29",
+        "dias": 56
+      }
+    ],
+    "maiorAusencia": 56,
+    "ultimaVolta": "2026-04-29"
+  },
+  "98224": {
+    "reativacoesPorMes": {
+      "2026-01": 1
+    },
+    "diasAusenteTotal": 56,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-01",
+        "ultimoPag": "2025-11-26",
+        "voltou": "2026-01-21",
+        "dias": 56
+      }
+    ],
+    "maiorAusencia": 56,
+    "ultimaVolta": "2026-01-21"
+  },
+  "1814060": {
+    "reativacoesPorMes": {
+      "2026-05": 1,
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 175,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-05-14",
+        "voltou": "2026-07-07",
+        "dias": 54
+      },
+      {
+        "mes": "2026-05",
+        "ultimoPag": "2026-01-13",
+        "voltou": "2026-05-14",
+        "dias": 121
+      }
+    ],
+    "maiorAusencia": 121,
+    "ultimaVolta": "2026-07-07"
+  },
+  "1542336": {
+    "reativacoesPorMes": {
+      "2025-05": 1,
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 150,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-02-26",
+        "voltou": "2026-04-20",
+        "dias": 53
+      },
+      {
+        "mes": "2025-05",
+        "ultimoPag": "2025-02-18",
+        "voltou": "2025-05-26",
+        "dias": 97
+      }
+    ],
+    "maiorAusencia": 97,
+    "ultimaVolta": "2026-04-20"
+  },
+  "1279276": {
+    "reativacoesPorMes": {
+      "2025-07": 1
+    },
+    "diasAusenteTotal": 50,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-07",
+        "ultimoPag": "2025-06-09",
+        "voltou": "2025-07-29",
+        "dias": 50
+      }
+    ],
+    "maiorAusencia": 50,
+    "ultimaVolta": "2025-07-29"
+  },
+  "618541": {
+    "reativacoesPorMes": {
+      "2026-03": 1,
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 272,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-03-06",
+        "voltou": "2026-07-30",
+        "dias": 146
+      },
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2025-10-31",
+        "voltou": "2026-03-06",
+        "dias": 126
+      }
+    ],
+    "maiorAusencia": 146,
+    "ultimaVolta": "2026-07-30"
+  },
+  "655124": {
+    "reativacoesPorMes": {
+      "2025-08": 1
+    },
+    "diasAusenteTotal": 77,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-05-27",
+        "voltou": "2025-08-12",
+        "dias": 77
+      }
+    ],
+    "maiorAusencia": 77,
+    "ultimaVolta": "2025-08-12"
+  },
+  "89170": {
+    "reativacoesPorMes": {
+      "2025-11": 1
+    },
+    "diasAusenteTotal": 58,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-11",
+        "ultimoPag": "2025-09-17",
+        "voltou": "2025-11-14",
+        "dias": 58
+      }
+    ],
+    "maiorAusencia": 58,
+    "ultimaVolta": "2025-11-14"
+  },
+  "27008": {
+    "reativacoesPorMes": {
+      "2026-02": 1
+    },
+    "diasAusenteTotal": 64,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-02",
+        "ultimoPag": "2025-12-16",
+        "voltou": "2026-02-18",
+        "dias": 64
+      }
+    ],
+    "maiorAusencia": 64,
+    "ultimaVolta": "2026-02-18"
+  },
+  "1829977": {
+    "reativacoesPorMes": {
+      "2026-03": 1
+    },
+    "diasAusenteTotal": 56,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2026-01-21",
+        "voltou": "2026-03-18",
+        "dias": 56
+      }
+    ],
+    "maiorAusencia": 56,
+    "ultimaVolta": "2026-03-18"
+  },
+  "1091249": {
+    "reativacoesPorMes": {
+      "2025-03": 1
+    },
+    "diasAusenteTotal": 55,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-03",
+        "ultimoPag": "2025-01-15",
+        "voltou": "2025-03-11",
+        "dias": 55
+      }
+    ],
+    "maiorAusencia": 55,
+    "ultimaVolta": "2025-03-11"
+  },
+  "1957538": {
+    "reativacoesPorMes": {
+      "2026-06": 1
+    },
+    "diasAusenteTotal": 82,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-06",
+        "ultimoPag": "2026-03-13",
+        "voltou": "2026-06-03",
+        "dias": 82
+      }
+    ],
+    "maiorAusencia": 82,
+    "ultimaVolta": "2026-06-03"
+  },
+  "1232863": {
+    "reativacoesPorMes": {
+      "2025-09": 1
+    },
+    "diasAusenteTotal": 47,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-24",
+        "voltou": "2025-09-09",
+        "dias": 47
+      }
+    ],
+    "maiorAusencia": 47,
+    "ultimaVolta": "2025-09-09"
+  },
+  "661636": {
+    "reativacoesPorMes": {
+      "2025-05": 1,
+      "2026-07": 1
+    },
+    "diasAusenteTotal": 94,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-07",
+        "ultimoPag": "2026-05-22",
+        "voltou": "2026-07-08",
+        "dias": 47
+      },
+      {
+        "mes": "2025-05",
+        "ultimoPag": "2025-03-20",
+        "voltou": "2025-05-06",
+        "dias": 47
+      }
+    ],
+    "maiorAusencia": 47,
+    "ultimaVolta": "2026-07-08"
+  },
+  "1933943": {
+    "reativacoesPorMes": {
+      "2026-03": 1,
+      "2026-06": 1,
+      "2026-08": 1
+    },
+    "diasAusenteTotal": 163,
+    "totalReativ": 3,
+    "eventos": [
+      {
+        "mes": "2026-08",
+        "ultimoPag": "2026-06-15",
+        "voltou": "2026-08-04",
+        "dias": 50
+      },
+      {
+        "mes": "2026-06",
+        "ultimoPag": "2026-04-19",
+        "voltou": "2026-06-15",
+        "dias": 57
+      },
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2026-01-19",
+        "voltou": "2026-03-16",
+        "dias": 56
+      }
+    ],
+    "maiorAusencia": 57,
+    "ultimaVolta": "2026-08-04"
+  },
+  "145277": {
+    "reativacoesPorMes": {
+      "2025-07": 1
+    },
+    "diasAusenteTotal": 120,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-07",
+        "ultimoPag": "2025-03-17",
+        "voltou": "2025-07-15",
+        "dias": 120
+      }
+    ],
+    "maiorAusencia": 120,
+    "ultimaVolta": "2025-07-15"
+  },
+  "1369120": {
+    "reativacoesPorMes": {
+      "2026-05": 1
+    },
+    "diasAusenteTotal": 473,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-05",
+        "ultimoPag": "2025-01-20",
+        "voltou": "2026-05-08",
+        "dias": 473
+      }
+    ],
+    "maiorAusencia": 473,
+    "ultimaVolta": "2026-05-08"
+  },
+  "1840967": {
+    "reativacoesPorMes": {
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 168,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2025-10-30",
+        "voltou": "2026-04-16",
+        "dias": 168
+      }
+    ],
+    "maiorAusencia": 168,
+    "ultimaVolta": "2026-04-16"
+  },
+  "894067": {
+    "reativacoesPorMes": {
+      "2026-06": 1
+    },
+    "diasAusenteTotal": 46,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-06",
+        "ultimoPag": "2026-04-26",
+        "voltou": "2026-06-11",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 46,
+    "ultimaVolta": "2026-06-11"
+  },
+  "1982744": {
+    "reativacoesPorMes": {
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 48,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-03-12",
+        "voltou": "2026-04-29",
+        "dias": 48
+      }
+    ],
+    "maiorAusencia": 48,
+    "ultimaVolta": "2026-04-29"
+  },
+  "1832872": {
+    "reativacoesPorMes": {
+      "2026-02": 1
+    },
+    "diasAusenteTotal": 71,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-02",
+        "ultimoPag": "2025-11-24",
+        "voltou": "2026-02-03",
+        "dias": 71
+      }
+    ],
+    "maiorAusencia": 71,
+    "ultimaVolta": "2026-02-03"
+  },
+  "1186697": {
+    "reativacoesPorMes": {
+      "2026-06": 1
+    },
+    "diasAusenteTotal": 98,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-06",
+        "ultimoPag": "2026-03-10",
+        "voltou": "2026-06-16",
+        "dias": 98
+      }
+    ],
+    "maiorAusencia": 98,
+    "ultimaVolta": "2026-06-16"
+  },
+  "38164": {
+    "reativacoesPorMes": {
+      "2025-08": 1
+    },
+    "diasAusenteTotal": 81,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-06-06",
+        "voltou": "2025-08-26",
+        "dias": 81
+      }
+    ],
+    "maiorAusencia": 81,
+    "ultimaVolta": "2025-08-26"
+  },
+  "1448023": {
+    "reativacoesPorMes": {
+      "2025-05": 1,
+      "2026-08": 1
+    },
+    "diasAusenteTotal": 523,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-08",
+        "ultimoPag": "2025-05-29",
+        "voltou": "2026-08-11",
+        "dias": 439
+      },
+      {
+        "mes": "2025-05",
+        "ultimoPag": "2025-02-14",
+        "voltou": "2025-05-09",
+        "dias": 84
+      }
+    ],
+    "maiorAusencia": 439,
+    "ultimaVolta": "2026-08-11"
+  },
+  "1983975": {
+    "reativacoesPorMes": {
+      "2025-08": 1
+    },
+    "diasAusenteTotal": 55,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-06-30",
+        "voltou": "2025-08-24",
+        "dias": 55
+      }
+    ],
+    "maiorAusencia": 55,
+    "ultimaVolta": "2025-08-24"
+  },
+  "48801": {
+    "reativacoesPorMes": {
+      "2026-08": 1
+    },
+    "diasAusenteTotal": 179,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-08",
+        "ultimoPag": "2026-02-12",
+        "voltou": "2026-08-10",
+        "dias": 179
+      }
+    ],
+    "maiorAusencia": 179,
+    "ultimaVolta": "2026-08-10"
+  },
+  "179103": {
+    "reativacoesPorMes": {
+      "2026-03": 1
+    },
+    "diasAusenteTotal": 46,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2026-02-05",
+        "voltou": "2026-03-23",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 46,
+    "ultimaVolta": "2026-03-23"
+  },
+  "774035": {
+    "reativacoesPorMes": {
+      "2025-05": 1
+    },
+    "diasAusenteTotal": 81,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-05",
+        "ultimoPag": "2025-02-28",
+        "voltou": "2025-05-20",
+        "dias": 81
+      }
+    ],
+    "maiorAusencia": 81,
+    "ultimaVolta": "2025-05-20"
+  },
+  "89039": {
+    "reativacoesPorMes": {
+      "2025-08": 1,
+      "2026-06": 1
+    },
+    "diasAusenteTotal": 123,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-06",
+        "ultimoPag": "2026-04-24",
+        "voltou": "2026-06-25",
+        "dias": 62
+      },
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-06-25",
+        "voltou": "2025-08-25",
+        "dias": 61
+      }
+    ],
+    "maiorAusencia": 62,
+    "ultimaVolta": "2026-06-25"
+  },
+  "1298795": {
+    "reativacoesPorMes": {
+      "2025-07": 1
+    },
+    "diasAusenteTotal": 46,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-07",
+        "ultimoPag": "2025-05-30",
+        "voltou": "2025-07-15",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 46,
+    "ultimaVolta": "2025-07-15"
+  },
+  "1289726": {
+    "reativacoesPorMes": {
+      "2025-05": 1
+    },
+    "diasAusenteTotal": 80,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-05",
+        "ultimoPag": "2025-02-26",
+        "voltou": "2025-05-17",
+        "dias": 80
+      }
+    ],
+    "maiorAusencia": 80,
+    "ultimaVolta": "2025-05-17"
+  },
+  "1549609": {
+    "reativacoesPorMes": {
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 72,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-02-09",
+        "voltou": "2026-04-22",
+        "dias": 72
+      }
+    ],
+    "maiorAusencia": 72,
+    "ultimaVolta": "2026-04-22"
+  },
+  "1468945": {
+    "reativacoesPorMes": {
+      "2025-07": 1
+    },
+    "diasAusenteTotal": 56,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-07",
+        "ultimoPag": "2025-06-05",
+        "voltou": "2025-07-31",
+        "dias": 56
+      }
+    ],
+    "maiorAusencia": 56,
+    "ultimaVolta": "2025-07-31"
+  },
+  "170730": {
+    "reativacoesPorMes": {
+      "2025-08": 1
+    },
+    "diasAusenteTotal": 95,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-05-02",
+        "voltou": "2025-08-05",
+        "dias": 95
+      }
+    ],
+    "maiorAusencia": 95,
+    "ultimaVolta": "2025-08-05"
+  },
+  "1074486": {
+    "reativacoesPorMes": {
+      "2025-10": 1
+    },
+    "diasAusenteTotal": 152,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-10",
+        "ultimoPag": "2025-05-16",
+        "voltou": "2025-10-15",
+        "dias": 152
+      }
+    ],
+    "maiorAusencia": 152,
+    "ultimaVolta": "2025-10-15"
+  },
+  "402982": {
+    "reativacoesPorMes": {
+      "2026-03": 1
+    },
+    "diasAusenteTotal": 46,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2026-02-06",
+        "voltou": "2026-03-24",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 46,
+    "ultimaVolta": "2026-03-24"
+  },
+  "1637938": {
+    "reativacoesPorMes": {
+      "2025-11": 1
+    },
+    "diasAusenteTotal": 50,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-11",
+        "ultimoPag": "2025-09-29",
+        "voltou": "2025-11-18",
+        "dias": 50
+      }
+    ],
+    "maiorAusencia": 50,
+    "ultimaVolta": "2025-11-18"
+  },
+  "1626367": {
+    "reativacoesPorMes": {
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 46,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-03-04",
+        "voltou": "2026-04-19",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 46,
+    "ultimaVolta": "2026-04-19"
+  },
+  "1825305": {
+    "reativacoesPorMes": {
+      "2025-12": 1
+    },
+    "diasAusenteTotal": 54,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-12",
+        "ultimoPag": "2025-10-17",
+        "voltou": "2025-12-10",
+        "dias": 54
+      }
+    ],
+    "maiorAusencia": 54,
+    "ultimaVolta": "2025-12-10"
+  },
+  "503164": {
+    "reativacoesPorMes": {
+      "2025-09": 1
+    },
+    "diasAusenteTotal": 67,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-25",
+        "voltou": "2025-09-30",
+        "dias": 67
+      }
+    ],
+    "maiorAusencia": 67,
+    "ultimaVolta": "2025-09-30"
+  },
+  "90371": {
+    "reativacoesPorMes": {
+      "2025-04": 1
+    },
+    "diasAusenteTotal": 60,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-02-28",
+        "voltou": "2025-04-29",
+        "dias": 60
+      }
+    ],
+    "maiorAusencia": 60,
+    "ultimaVolta": "2025-04-29"
+  },
+  "1548772": {
+    "reativacoesPorMes": {
+      "2026-01": 1,
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 128,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-01-13",
+        "voltou": "2026-04-02",
+        "dias": 79
+      },
+      {
+        "mes": "2026-01",
+        "ultimoPag": "2025-11-25",
+        "voltou": "2026-01-13",
+        "dias": 49
+      }
+    ],
+    "maiorAusencia": 79,
+    "ultimaVolta": "2026-04-02"
+  },
+  "1623082": {
+    "reativacoesPorMes": {
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 52,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-03-07",
+        "voltou": "2026-04-28",
+        "dias": 52
+      }
+    ],
+    "maiorAusencia": 52,
+    "ultimaVolta": "2026-04-28"
+  },
+  "50443": {
+    "reativacoesPorMes": {
+      "2025-04": 1
+    },
+    "diasAusenteTotal": 46,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-03-07",
+        "voltou": "2025-04-22",
+        "dias": 46
+      }
+    ],
+    "maiorAusencia": 46,
+    "ultimaVolta": "2025-04-22"
+  },
+  "455308": {
+    "reativacoesPorMes": {
+      "2025-06": 1,
+      "2026-02": 1
+    },
+    "diasAusenteTotal": 355,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2026-02",
+        "ultimoPag": "2025-06-05",
+        "voltou": "2026-02-24",
+        "dias": 264
+      },
+      {
+        "mes": "2025-06",
+        "ultimoPag": "2025-03-06",
+        "voltou": "2025-06-05",
+        "dias": 91
+      }
+    ],
+    "maiorAusencia": 264,
+    "ultimaVolta": "2026-02-24"
+  },
+  "1853374": {
+    "reativacoesPorMes": {
+      "2026-03": 1
+    },
+    "diasAusenteTotal": 130,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2025-11-08",
+        "voltou": "2026-03-18",
+        "dias": 130
+      }
+    ],
+    "maiorAusencia": 130,
+    "ultimaVolta": "2026-03-18"
+  },
+  "993211": {
+    "reativacoesPorMes": {
+      "2025-07": 1
+    },
+    "diasAusenteTotal": 63,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-07",
+        "ultimoPag": "2025-05-19",
+        "voltou": "2025-07-21",
+        "dias": 63
+      }
+    ],
+    "maiorAusencia": 63,
+    "ultimaVolta": "2025-07-21"
+  },
+  "1457975": {
+    "reativacoesPorMes": {
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 58,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-02-20",
+        "voltou": "2026-04-19",
+        "dias": 58
+      }
+    ],
+    "maiorAusencia": 58,
+    "ultimaVolta": "2026-04-19"
+  },
   "34086": {
     "reativacoesPorMes": {
       "2025-05": 1,
@@ -3434,383 +3401,416 @@
     "maiorAusencia": 50,
     "ultimaVolta": "2025-12-02"
   },
-  "606611": {
+  "119716": {
     "reativacoesPorMes": {
-      "2026-07": 1
+      "2025-04": 1
+    },
+    "diasAusenteTotal": 53,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-02-10",
+        "voltou": "2025-04-04",
+        "dias": 53
+      }
+    ],
+    "maiorAusencia": 53,
+    "ultimaVolta": "2025-04-04"
+  },
+  "1541323": {
+    "reativacoesPorMes": {
+      "2025-07": 1
+    },
+    "diasAusenteTotal": 137,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-07",
+        "ultimoPag": "2025-02-17",
+        "voltou": "2025-07-04",
+        "dias": 137
+      }
+    ],
+    "maiorAusencia": 137,
+    "ultimaVolta": "2025-07-04"
+  },
+  "1407423": {
+    "reativacoesPorMes": {
+      "2025-02": 1
     },
     "diasAusenteTotal": 48,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2026-07",
-        "ultimoPag": "2026-05-30",
-        "voltou": "2026-07-17",
+        "mes": "2025-02",
+        "ultimoPag": "2025-01-09",
+        "voltou": "2025-02-26",
         "dias": 48
       }
     ],
     "maiorAusencia": 48,
-    "ultimaVolta": "2026-07-17"
+    "ultimaVolta": "2025-02-26"
   },
-  "1832872": {
+  "1578734": {
+    "reativacoesPorMes": {
+      "2025-05": 1,
+      "2025-11": 1,
+      "2026-03": 1
+    },
+    "diasAusenteTotal": 159,
+    "totalReativ": 3,
+    "eventos": [
+      {
+        "mes": "2026-03",
+        "ultimoPag": "2026-01-05",
+        "voltou": "2026-03-04",
+        "dias": 58
+      },
+      {
+        "mes": "2025-11",
+        "ultimoPag": "2025-09-29",
+        "voltou": "2025-11-17",
+        "dias": 49
+      },
+      {
+        "mes": "2025-05",
+        "ultimoPag": "2025-03-28",
+        "voltou": "2025-05-19",
+        "dias": 52
+      }
+    ],
+    "maiorAusencia": 58,
+    "ultimaVolta": "2026-03-04"
+  },
+  "2090422": {
+    "reativacoesPorMes": {
+      "2026-08": 1
+    },
+    "diasAusenteTotal": 52,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-08",
+        "ultimoPag": "2026-06-15",
+        "voltou": "2026-08-06",
+        "dias": 52
+      }
+    ],
+    "maiorAusencia": 52,
+    "ultimaVolta": "2026-08-06"
+  },
+  "1643270": {
+    "reativacoesPorMes": {
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 197,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2025-09-22",
+        "voltou": "2026-04-07",
+        "dias": 197
+      }
+    ],
+    "maiorAusencia": 197,
+    "ultimaVolta": "2026-04-07"
+  },
+  "1217381": {
+    "reativacoesPorMes": {
+      "2025-06": 1
+    },
+    "diasAusenteTotal": 61,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-06",
+        "ultimoPag": "2025-04-04",
+        "voltou": "2025-06-04",
+        "dias": 61
+      }
+    ],
+    "maiorAusencia": 61,
+    "ultimaVolta": "2025-06-04"
+  },
+  "1406410": {
+    "reativacoesPorMes": {
+      "2025-11": 1
+    },
+    "diasAusenteTotal": 219,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-11",
+        "ultimoPag": "2025-04-02",
+        "voltou": "2025-11-07",
+        "dias": 219
+      }
+    ],
+    "maiorAusencia": 219,
+    "ultimaVolta": "2025-11-07"
+  },
+  "1416085": {
+    "reativacoesPorMes": {
+      "2025-03": 1
+    },
+    "diasAusenteTotal": 61,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-03",
+        "ultimoPag": "2025-01-17",
+        "voltou": "2025-03-19",
+        "dias": 61
+      }
+    ],
+    "maiorAusencia": 61,
+    "ultimaVolta": "2025-03-19"
+  },
+  "1574022": {
+    "reativacoesPorMes": {
+      "2025-08": 1
+    },
+    "diasAusenteTotal": 107,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-04-22",
+        "voltou": "2025-08-07",
+        "dias": 107
+      }
+    ],
+    "maiorAusencia": 107,
+    "ultimaVolta": "2025-08-07"
+  },
+  "24540": {
     "reativacoesPorMes": {
       "2026-02": 1
     },
-    "diasAusenteTotal": 71,
+    "diasAusenteTotal": 46,
     "totalReativ": 1,
     "eventos": [
       {
         "mes": "2026-02",
-        "ultimoPag": "2025-11-24",
-        "voltou": "2026-02-03",
-        "dias": 71
+        "ultimoPag": "2025-12-26",
+        "voltou": "2026-02-10",
+        "dias": 46
       }
     ],
-    "maiorAusencia": 71,
-    "ultimaVolta": "2026-02-03"
+    "maiorAusencia": 46,
+    "ultimaVolta": "2026-02-10"
   },
-  "145277": {
+  "957264": {
     "reativacoesPorMes": {
-      "2025-07": 1
-    },
-    "diasAusenteTotal": 120,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-07",
-        "ultimoPag": "2025-03-17",
-        "voltou": "2025-07-15",
-        "dias": 120
-      }
-    ],
-    "maiorAusencia": 120,
-    "ultimaVolta": "2025-07-15"
-  },
-  "146795": {
-    "reativacoesPorMes": {
-      "2025-10": 1,
       "2026-04": 1
-    },
-    "diasAusenteTotal": 210,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2025-11-18",
-        "voltou": "2026-04-16",
-        "dias": 149
-      },
-      {
-        "mes": "2025-10",
-        "ultimoPag": "2025-08-15",
-        "voltou": "2025-10-15",
-        "dias": 61
-      }
-    ],
-    "maiorAusencia": 149,
-    "ultimaVolta": "2026-04-16"
-  },
-  "1189507": {
-    "reativacoesPorMes": {
-      "2026-01": 1
-    },
-    "diasAusenteTotal": 56,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-01",
-        "ultimoPag": "2025-11-19",
-        "voltou": "2026-01-14",
-        "dias": 56
-      }
-    ],
-    "maiorAusencia": 56,
-    "ultimaVolta": "2026-01-14"
-  },
-  "1682781": {
-    "reativacoesPorMes": {
-      "2025-09": 1
     },
     "diasAusenteTotal": 62,
     "totalReativ": 1,
     "eventos": [
       {
-        "mes": "2025-09",
-        "ultimoPag": "2025-07-04",
-        "voltou": "2025-09-04",
+        "mes": "2026-04",
+        "ultimoPag": "2026-02-26",
+        "voltou": "2026-04-29",
         "dias": 62
       }
     ],
     "maiorAusencia": 62,
-    "ultimaVolta": "2025-09-04"
+    "ultimaVolta": "2026-04-29"
   },
-  "1271690": {
-    "reativacoesPorMes": {
-      "2025-06": 1,
-      "2025-08": 1,
-      "2025-12": 1,
-      "2026-02": 1
-    },
-    "diasAusenteTotal": 195,
-    "totalReativ": 4,
-    "eventos": [
-      {
-        "mes": "2026-02",
-        "ultimoPag": "2026-01-01",
-        "voltou": "2026-02-16",
-        "dias": 46
-      },
-      {
-        "mes": "2025-12",
-        "ultimoPag": "2025-10-21",
-        "voltou": "2025-12-17",
-        "dias": 57
-      },
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-07-02",
-        "voltou": "2025-08-17",
-        "dias": 46
-      },
-      {
-        "mes": "2025-06",
-        "ultimoPag": "2025-05-02",
-        "voltou": "2025-06-17",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 57,
-    "ultimaVolta": "2026-02-16"
-  },
-  "54397": {
-    "reativacoesPorMes": {
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 266,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2025-07-14",
-        "voltou": "2026-04-06",
-        "dias": 266
-      }
-    ],
-    "maiorAusencia": 266,
-    "ultimaVolta": "2026-04-06"
-  },
-  "409876": {
+  "161072": {
     "reativacoesPorMes": {
       "2025-08": 1
     },
-    "diasAusenteTotal": 47,
+    "diasAusenteTotal": 120,
     "totalReativ": 1,
     "eventos": [
       {
         "mes": "2025-08",
-        "ultimoPag": "2025-07-02",
-        "voltou": "2025-08-18",
-        "dias": 47
+        "ultimoPag": "2025-04-14",
+        "voltou": "2025-08-12",
+        "dias": 120
       }
     ],
-    "maiorAusencia": 47,
-    "ultimaVolta": "2025-08-18"
+    "maiorAusencia": 120,
+    "ultimaVolta": "2025-08-12"
   },
-  "1589515": {
-    "reativacoesPorMes": {
-      "2025-05": 1,
-      "2025-07": 1,
-      "2025-12": 1
-    },
-    "diasAusenteTotal": 257,
-    "totalReativ": 3,
-    "eventos": [
-      {
-        "mes": "2025-12",
-        "ultimoPag": "2025-07-10",
-        "voltou": "2025-12-18",
-        "dias": 161
-      },
-      {
-        "mes": "2025-07",
-        "ultimoPag": "2025-05-21",
-        "voltou": "2025-07-10",
-        "dias": 50
-      },
-      {
-        "mes": "2025-05",
-        "ultimoPag": "2025-04-05",
-        "voltou": "2025-05-21",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 161,
-    "ultimaVolta": "2025-12-18"
-  },
-  "1582558": {
-    "reativacoesPorMes": {
-      "2025-09": 1
-    },
-    "diasAusenteTotal": 47,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-09",
-        "ultimoPag": "2025-08-07",
-        "voltou": "2025-09-23",
-        "dias": 47
-      }
-    ],
-    "maiorAusencia": 47,
-    "ultimaVolta": "2025-09-23"
-  },
-  "521558": {
-    "reativacoesPorMes": {
-      "2025-04": 1,
-      "2026-04": 1
-    },
-    "diasAusenteTotal": 118,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2026-04",
-        "ultimoPag": "2026-03-05",
-        "voltou": "2026-04-21",
-        "dias": 47
-      },
-      {
-        "mes": "2025-04",
-        "ultimoPag": "2025-02-17",
-        "voltou": "2025-04-29",
-        "dias": 71
-      }
-    ],
-    "maiorAusencia": 71,
-    "ultimaVolta": "2026-04-21"
-  },
-  "681828": {
-    "reativacoesPorMes": {
-      "2025-03": 1,
-      "2025-06": 1
-    },
-    "diasAusenteTotal": 140,
-    "totalReativ": 2,
-    "eventos": [
-      {
-        "mes": "2025-06",
-        "ultimoPag": "2025-03-12",
-        "voltou": "2025-06-09",
-        "dias": 89
-      },
-      {
-        "mes": "2025-03",
-        "ultimoPag": "2025-01-20",
-        "voltou": "2025-03-12",
-        "dias": 51
-      }
-    ],
-    "maiorAusencia": 89,
-    "ultimaVolta": "2025-06-09"
-  },
-  "1298795": {
-    "reativacoesPorMes": {
-      "2025-07": 1
-    },
-    "diasAusenteTotal": 46,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-07",
-        "ultimoPag": "2025-05-30",
-        "voltou": "2025-07-15",
-        "dias": 46
-      }
-    ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2025-07-15"
-  },
-  "1765600": {
-    "reativacoesPorMes": {
-      "2026-08": 1
-    },
-    "diasAusenteTotal": 150,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-08",
-        "ultimoPag": "2026-03-10",
-        "voltou": "2026-08-07",
-        "dias": 150
-      }
-    ],
-    "maiorAusencia": 150,
-    "ultimaVolta": "2026-08-07"
-  },
-  "50487": {
-    "reativacoesPorMes": {
-      "2025-08": 1
-    },
-    "diasAusenteTotal": 60,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2025-08",
-        "ultimoPag": "2025-06-16",
-        "voltou": "2025-08-15",
-        "dias": 60
-      }
-    ],
-    "maiorAusencia": 60,
-    "ultimaVolta": "2025-08-15"
-  },
-  "1098231": {
-    "reativacoesPorMes": {
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 47,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-06-14",
-        "voltou": "2026-07-31",
-        "dias": 47
-      }
-    ],
-    "maiorAusencia": 47,
-    "ultimaVolta": "2026-07-31"
-  },
-  "731799": {
-    "reativacoesPorMes": {
-      "2026-07": 1
-    },
-    "diasAusenteTotal": 47,
-    "totalReativ": 1,
-    "eventos": [
-      {
-        "mes": "2026-07",
-        "ultimoPag": "2026-06-14",
-        "voltou": "2026-07-31",
-        "dias": 47
-      }
-    ],
-    "maiorAusencia": 47,
-    "ultimaVolta": "2026-07-31"
-  },
-  "402982": {
+  "53378": {
     "reativacoesPorMes": {
       "2026-03": 1
     },
-    "diasAusenteTotal": 46,
+    "diasAusenteTotal": 101,
     "totalReativ": 1,
     "eventos": [
       {
         "mes": "2026-03",
-        "ultimoPag": "2026-02-06",
-        "voltou": "2026-03-24",
-        "dias": 46
+        "ultimoPag": "2025-12-16",
+        "voltou": "2026-03-27",
+        "dias": 101
       }
     ],
-    "maiorAusencia": 46,
-    "ultimaVolta": "2026-03-24"
+    "maiorAusencia": 101,
+    "ultimaVolta": "2026-03-27"
+  },
+  "1794536": {
+    "reativacoesPorMes": {
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 56,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-02-25",
+        "voltou": "2026-04-22",
+        "dias": 56
+      }
+    ],
+    "maiorAusencia": 56,
+    "ultimaVolta": "2026-04-22"
+  },
+  "182668": {
+    "reativacoesPorMes": {
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 68,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-02-13",
+        "voltou": "2026-04-22",
+        "dias": 68
+      }
+    ],
+    "maiorAusencia": 68,
+    "ultimaVolta": "2026-04-22"
+  },
+  "777208": {
+    "reativacoesPorMes": {
+      "2025-08": 1
+    },
+    "diasAusenteTotal": 92,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-05-13",
+        "voltou": "2025-08-13",
+        "dias": 92
+      }
+    ],
+    "maiorAusencia": 92,
+    "ultimaVolta": "2025-08-13"
+  },
+  "33269": {
+    "reativacoesPorMes": {
+      "2025-09": 1
+    },
+    "diasAusenteTotal": 65,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-09",
+        "ultimoPag": "2025-07-08",
+        "voltou": "2025-09-11",
+        "dias": 65
+      }
+    ],
+    "maiorAusencia": 65,
+    "ultimaVolta": "2025-09-11"
+  },
+  "909617": {
+    "reativacoesPorMes": {
+      "2025-12": 1
+    },
+    "diasAusenteTotal": 49,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-12",
+        "ultimoPag": "2025-10-31",
+        "voltou": "2025-12-19",
+        "dias": 49
+      }
+    ],
+    "maiorAusencia": 49,
+    "ultimaVolta": "2025-12-19"
+  },
+  "1151598": {
+    "reativacoesPorMes": {
+      "2025-04": 1,
+      "2025-06": 1
+    },
+    "diasAusenteTotal": 102,
+    "totalReativ": 2,
+    "eventos": [
+      {
+        "mes": "2025-06",
+        "ultimoPag": "2025-04-22",
+        "voltou": "2025-06-16",
+        "dias": 55
+      },
+      {
+        "mes": "2025-04",
+        "ultimoPag": "2025-02-20",
+        "voltou": "2025-04-08",
+        "dias": 47
+      }
+    ],
+    "maiorAusencia": 55,
+    "ultimaVolta": "2025-06-16"
+  },
+  "1794530": {
+    "reativacoesPorMes": {
+      "2025-12": 1
+    },
+    "diasAusenteTotal": 47,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-12",
+        "ultimoPag": "2025-10-23",
+        "voltou": "2025-12-09",
+        "dias": 47
+      }
+    ],
+    "maiorAusencia": 47,
+    "ultimaVolta": "2025-12-09"
+  },
+  "328841": {
+    "reativacoesPorMes": {
+      "2025-08": 1
+    },
+    "diasAusenteTotal": 55,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2025-08",
+        "ultimoPag": "2025-06-30",
+        "voltou": "2025-08-24",
+        "dias": 55
+      }
+    ],
+    "maiorAusencia": 55,
+    "ultimaVolta": "2025-08-24"
+  },
+  "646958": {
+    "reativacoesPorMes": {
+      "2026-04": 1
+    },
+    "diasAusenteTotal": 62,
+    "totalReativ": 1,
+    "eventos": [
+      {
+        "mes": "2026-04",
+        "ultimoPag": "2026-02-26",
+        "voltou": "2026-04-29",
+        "dias": 62
+      }
+    ],
+    "maiorAusencia": 62,
+    "ultimaVolta": "2026-04-29"
   }
 }
