@@ -884,10 +884,30 @@ function defasagem(e) {
   return peso * Math.max(1, 400 / mens);
 }
 
+// Primeiro mês de 2025 em diante que EXISTE na base. Os dados começam em
+// jul/2025 (piso da migração pro BigQuery, sem backfill), então "GMV desde 2025"
+// na prática conta a partir daí — o rótulo da coluna diz de quando é a soma pra
+// ninguém ler como se fosse o ano inteiro.
+function inicioGmv2025() {
+  const meses = (DADOS.mesesList || []).filter(m => m >= "2025-01");
+  return meses.length ? meses[0] : "2025-01";
+}
+function gmvDesde(e, desde) {
+  let v = 0;
+  for (const [m, dados] of Object.entries(e.mensal || {})) {
+    if (m >= desde) v += dados.valTotal || 0;
+  }
+  return v;
+}
+const MES_EXT = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+const rotuloMes = (m) => `${MES_EXT[Number(m.slice(5,7)) - 1]}/${m.slice(0,4)}`;
+
 function marcasComTamanho() {
+  const desde = inicioGmv2025();
   return empresasFiltradas()
     .filter(e => e.porte && e.porte !== "Indefinido")
-    .map(e => ({...e, _mens: e.valor_plano || e.valor_mensal || 0, _def: defasagem(e)}));
+    .map(e => ({...e, _mens: e.valor_plano || e.valor_mensal || 0, _def: defasagem(e),
+                _gmv25: gmvDesde(e, desde)}));
 }
 
 function renderTabTamanho() {
@@ -901,7 +921,8 @@ function renderTabTamanho() {
   if (el) {
     const coleta = todas.find(e => e.dataColetaTamanho)?.dataColetaTamanho || "—";
     el.textContent = `${todas.length} marcas com tamanho coletado · ${fila} na fila de upgrade `
-      + `(Grande ou Muito grande) · coleta de ${coleta}`;
+      + `(Grande ou Muito grande) · GMV somado a partir de ${rotuloMes(inicioGmv2025())} `
+      + `· coleta de ${coleta}`;
   }
 
   const porPorte = Object.fromEntries(PORTES.map(p=>[p,0]));
@@ -943,7 +964,8 @@ function renderTabTamanho() {
         ? fmtInt(r.seguidores) + (r.origemSeguidores==="manual" ? " (manual)" : "")
         : (r.seguidoresDesconhecidos?"perfil não achado":"—"),
      sort:r=>r.seguidores||0},
-    {label:"Instagram", fn:r=>r.instagram?`@${r.instagram}`:"—", sort:r=>r.instagram||""},
+    {label:`GMV desde ${rotuloMes(inicioGmv2025())}`, cls:"num",
+     fn:r=>r._gmv25?fmtBRL(r._gmv25):"—", sort:r=>r._gmv25||0},
     {label:"Loja física", fn:r=>r.temLojaFisica||"—", sort:r=>r.temLojaFisica||""},
     // teto da busca: "5+" avisa que pode haver mais lojas do que o Maps devolveu
     {label:"Unidades", cls:"num",
