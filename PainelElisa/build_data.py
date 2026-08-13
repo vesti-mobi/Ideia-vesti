@@ -15,6 +15,8 @@ Alertas (vermelho):
 from __future__ import annotations
 
 import json
+import re
+import unicodedata
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -61,6 +63,128 @@ def _primeiras_n(vendas_por_dia: dict[str, int], n: int) -> tuple[str | None, st
     return None, None
 
 
+# Regra 3: a 1a fatura paga da marca veio tao depois da entrada que so' pode ser
+# retorno. GUARDA_PISO evita o falso positivo obvio -- o espelho iugu_invoices so'
+# comeca em 2025-01-01, entao TODA marca anterior a isso teria a "1a fatura tardia".
+RETORNO_MIN_DIAS = 365
+GUARDA_PISO_DIAS = 180
+
+
+def _dias(a: str, b: str) -> int | None:
+    """dias de a ate b (ISO), ou None se alguma data faltar/for invalida."""
+    da, db = _parse_iso_date(a), _parse_iso_date(b)
+    return (db - da).days if da and db else None
+
+
+def _norm_marca(s: str) -> str:
+    s = unicodedata.normalize("NFKD", str(s or "")).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]+", "", s.lower())
+
+
+def _tamanho_da_marca(emp: dict, por_cnpj: dict, por_nome: dict) -> dict:
+    """Casa a marca com a planilha de tamanho: CNPJ primeiro, nome como queda.
+
+    O CNPJ e' o unico casamento confiavel -- a planilha das vendedoras chama a
+    marca de "Chik Bijux" e a base chama de "Lusby Salas suyo".
+    """
+    cnpj = re.sub(r"\D", "", emp.get("cnpj") or "")
+    t = por_cnpj.get(cnpj) if cnpj else None
+    casou_por = "cnpj" if t else ""
+    if not t:
+        t = por_nome.get(_norm_marca(emp.get("name")))
+        casou_por = "nome" if t else ""
+    if not t:
+        return {}
+    return {
+        # nome casa 1:N -- "NEW MIRE AVIAMENTOS" pegou 2 dominios de CNPJs
+        # diferentes na 1a rodada. O painel mostra isso pra ninguem tratar
+        # casamento por nome como se fosse certeza.
+        "casouPorTamanho": casou_por,
+        "unidadesNoTeto": bool(t.get("unidadesNoTeto")),
+        "seguidoresDesconhecidos": bool(t.get("seguidoresDesconhecidos")),
+        "seguidores": t.get("seguidores"),
+        "instagram": t.get("instagram") or "",
+        "instagramVerificado": bool(t.get("verificado")),
+        "temLojaFisica": t.get("temLojaFisica") or "",
+        "qtdUnidades": t.get("qtdUnidades") or 0,
+        "lojasEncontradas": t.get("enderecoObs") or "",
+        "porte": t.get("porte") or "Indefinido",
+        "planoPlanilha": t.get("plano") or "",
+        "mensalidadePlanilha": t.get("mensalidade") or 0,
+        "dataColetaTamanho": t.get("dataColeta") or "",
+    }
+
+
+def _eventos_ambiente(emp: dict, amb: dict, pag: dict, piso: str,
+                      reativ_eventos: list[dict]) -> list[dict]:
+    """Eventos de ATIVACAO/REATIVACAO da marca, do mais novo pro mais antigo.
+
+    Regra combinada fechada com a Laura em 13/08/2026. Nenhum sinal sozinho cobria
+    a lista das vendedoras, entao sao 4 origens complementares:
+
+      1. pagamento   - passou >=46 dias sem pagar e voltou (reativacao_elisa.json,
+                       criterio de 12/08). Pega Rery, Reve Brand, Chik Bijux, Julia Plus.
+      2. criacao     - dominio criado = ambiente ATIVADO. Pega Martina Franca e o
+                       dominio novo do Surf Center (cliente que volta com cadastro novo).
+      3. retorno     - 1a fatura paga >365d depois da entrada, com guarda do piso do
+                       espelho. Pega Lunar Fitwear (entrou em 2023, 1a fatura em 11/08/2026).
+      4. religamento - "Ligado?=Sim" na planilha do n8n cuja data NAO casa com fatura
+                       paga (ver _casa_com_pagamento em fetch_ambiente.py). Pega o
+                       Surf Center antigo, religado no form manual em 29/07/2026.
+
+    Fica de fora: marca que a vendedora classifica como reativacao mas que pagou em
+    dia e nunca foi desligada (caso Gabifit, maior atraso 40 dias) -- isso e'
+    classificacao comercial, nao existe no dado.
+
+    `desligamento` entra so' como contexto para a aba (Ligado?=Nao e' confiavel: o
+    ramo agendado do n8n so' bloqueia quem tem fatura 11 dias vencida).
+    """
+    out = []
+    entrada = (emp.get("dataEntrada") or "")[:10]
+
+    if entrada:                                                          # 2. criacao
+        out.append({"tipo": "ativacao", "origem": "criacao", "data": entrada,
+                    "mes": entrada[:7], "detalhe": "ambiente criado"})
+
+    for ev in reativ_eventos or []:                                      # 1. pagamento
+        quando = (ev.get("voltou") or "")[:10]
+        if quando:
+            out.append({"tipo": "reativacao", "origem": "pagamento", "data": quando,
+                        "mes": quando[:7], "dias": ev.get("dias") or 0,
+                        "detalhe": f"voltou a pagar apos {ev.get('dias') or 0} dias"})
+
+    primeira = (pag or {}).get("primeira") or ""                         # 3. retorno
+    if primeira and entrada:
+        desde_entrada = _dias(entrada, primeira)
+        depois_do_piso = _dias(piso, primeira) if piso else None
+        if (desde_entrada is not None and desde_entrada > RETORNO_MIN_DIAS
+                and depois_do_piso is not None and depois_do_piso >= GUARDA_PISO_DIAS):
+            out.append({"tipo": "reativacao", "origem": "retorno", "data": primeira,
+                        "mes": primeira[:7], "dias": desde_entrada,
+                        "detalhe": f"1a fatura {desde_entrada} dias apos a entrada"})
+
+    if amb and amb.get("religamentoReal") and amb.get("update"):         # 4. religamento
+        quando = amb["update"][:10]
+        if quando != entrada:
+            out.append({"tipo": "reativacao", "origem": "religamento", "data": quando,
+                        "mes": quando[:7], "detalhe": "ambiente religado (fora de fatura)"})
+
+    if amb and amb.get("ligado") is False and amb.get("update"):         # contexto
+        quando = amb["update"][:10]
+        out.append({"tipo": "desligamento", "origem": "bloqueio", "data": quando,
+                    "mes": quando[:7], "detalhe": "ambiente bloqueado"})
+
+    # mesma origem + mesmo dia = um evento so' (ex: religamento que ja entrou por pagamento)
+    vistos, unicos = set(), []
+    for ev in sorted(out, key=lambda e: e["data"], reverse=True):
+        chave = (ev["tipo"], ev["data"])
+        if chave in vistos:
+            continue
+        vistos.add(chave)
+        unicos.append(ev)
+    return unicos
+
+
 def _alertas(emp: dict, cad: dict, vp: dict, gmv_emp: dict) -> list[str]:
     out = []
     hoje = date.today()
@@ -90,6 +214,20 @@ def main():
     reativ    = _load(reativ_p) if reativ_p.exists() else {}
     links_p   = ROOT / "links_elisa.json"
     links     = _load(links_p) if links_p.exists() else {}
+    amb_p     = ROOT / "ambiente_elisa.json"
+    ambiente  = _load(amb_p) if amb_p.exists() else {}
+    tam_p     = ROOT / "tamanho_marca.json"
+    tamanho   = _load(tam_p) if tam_p.exists() else []
+    tam_cnpj, tam_nome = {}, {}
+    for t in tamanho:
+        if t.get("cnpj"):
+            tam_cnpj[t["cnpj"]] = t
+        if t.get("marca"):
+            tam_nome[_norm_marca(t["marca"])] = t
+    pag_p     = ROOT / "pagamentos_elisa.json"
+    pagtos    = _load(pag_p) if pag_p.exists() else {"piso": "", "dominios": {}}
+    pag_piso  = pagtos.get("piso") or ""
+    pag_dom   = pagtos.get("dominios") or {}
 
     enriched = []
     meses_set: set[str] = set()
@@ -154,6 +292,14 @@ def main():
             "reativEventos": (reativ.get(dom) or {}).get("eventos", []),
             "maiorAusencia": (reativ.get(dom) or {}).get("maiorAusencia", 0),
             "ultimaVolta": (reativ.get(dom) or {}).get("ultimaVolta", ""),
+            # Aba Reativacoes: [{tipo, origem, data, mes, detalhe}] -- regra das 4 origens
+            "ambienteEventos": _eventos_ambiente(
+                e, ambiente.get(dom) or {}, pag_dom.get(dom) or {}, pag_piso,
+                (reativ.get(dom) or {}).get("eventos", [])),
+            # Tamanho da marca (tamanho_marca.py): seguidores + loja fisica
+            **_tamanho_da_marca(e, tam_cnpj, tam_nome),
+            "ambienteLigado": (ambiente.get(dom) or {}).get("ligado", None),
+            "ambienteUpdate": (ambiente.get(dom) or {}).get("update", ""),
             "linksCompartilhados": (links.get(dom) or {}).get("linksCompartilhados", 0),
             "cliquesTotal": (links.get(dom) or {}).get("cliquesTotal", 0),
             "cliquesPorMes": (links.get(dom) or {}).get("cliquesPorMes", {}),

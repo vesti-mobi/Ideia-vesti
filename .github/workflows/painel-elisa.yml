@@ -18,7 +18,7 @@ jobs:
           python-version: '3.12'
 
       - name: Instalar dependencias Python
-        run: pip install google-cloud-bigquery
+        run: pip install google-cloud-bigquery google-auth
 
       - name: Gravar credencial BigQuery (SA key)
         env:
@@ -27,17 +27,18 @@ jobs:
           printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
 
-      - name: Rodar pipeline (fetch BQ + build)
+      - name: Rodar pipeline (fetch BQ + ambiente + build)
         working-directory: PainelElisa
         run: |
           python fetch_elisa_bq.py
+          python fetch_ambiente.py
           python build_data.py
 
       - name: Commit e push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          FILES="PainelElisa/dashboard_data.js PainelElisa/companies_elisa.json PainelElisa/gmv_elisa.json PainelElisa/cadastros_elisa.json PainelElisa/vestipago_elisa.json PainelElisa/reativacao_elisa.json PainelElisa/links_elisa.json"
+          FILES="PainelElisa/dashboard_data.js PainelElisa/companies_elisa.json PainelElisa/gmv_elisa.json PainelElisa/cadastros_elisa.json PainelElisa/vestipago_elisa.json PainelElisa/reativacao_elisa.json PainelElisa/links_elisa.json PainelElisa/pagamentos_elisa.json PainelElisa/ambiente_elisa.json"
           MSG="Atualizacao Painel Elisa $(date +'%d/%m/%Y %H:%M')"
           for i in 1 2 3 4 5; do
             git fetch -q origin main

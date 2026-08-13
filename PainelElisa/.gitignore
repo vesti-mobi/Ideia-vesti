@@ -2,3 +2,8 @@ __pycache__/
 _check_*.py
 .token
 .new_refresh_token
+.apify_token
+gemini-code-*.txt
+~$*.xlsx
+.cache_tamanho.json
+_maps_amostra.json

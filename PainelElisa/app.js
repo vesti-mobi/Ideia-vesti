@@ -5,7 +5,7 @@ const $ = (id) => document.getElementById(id);
 
 // state.chaves = lista de periodos selecionados (multi-selecao). 1 item = comportamento antigo.
 const CANAIS = ["Starter","Vesti","Uemtel","Atta","Parceiros"];
-const state = { periodo:"mensal", chaves:[], cs:"todas", canais:new Set(CANAIS), empresa:"todas", tab:"home", cadMes:"todos", upgMin:300000, soCoorte:true, reativMinDias:46, reativDrill:null };
+const state = { periodo:"mensal", chaves:[], cs:"todas", canais:new Set(CANAIS), empresa:"todas", tab:"home", cadMes:"todos", upgMin:300000, soCoorte:true, reativOrigem:"todas", reativDrill:null, portesSel:new Set() };
 const D = (typeof DADOS !== "undefined") ? DADOS : { empresas:[], mesesList:[], semanasList:[], anosList:[] };
 // parceiros que NAO entram no ranking "TOP 10 Parceiros" (viram canal proprio)
 const PARC_EXCL = new Set(["atta","attasoft","onix","uemtel","vesti","varejo vesti"]);
@@ -101,26 +101,16 @@ const mesMatch = (m) => {
   if (state.periodo === "anual") return state.chaves.some(k => m.slice(0,4) === k);
   return mesesSelecionados().has(m);
 };
-// nº de reativações da empresa nos períodos selecionados, respeitando o
-// atraso mínimo escolhido (conta os eventos; cai no agregado se não houver)
+// nº de ativações + reativações da empresa nos períodos selecionados.
+// Fonte = ambienteEventos (regra das 4 origens, ver _eventos_ambiente em
+// build_data.py). O critério antigo era só o gap de pagamento e deixava de fora
+// marca sem cobrança na Iugu e cliente que volta com cadastro novo.
 function reativNoPeriodo(e) {
-  const eventos = e.reativEventos;
-  if (eventos && eventos.length) {
-    let s = 0;
-    for (const ev of eventos) {
-      if ((ev.dias || 0) < state.reativMinDias) continue;
-      if (mesMatch(ev.mes)) s++;
-    }
-    return s;
-  }
-  const r = e.reativacoesPorMes || {};
-  if (state.periodo === "anual") {
-    let s = 0;
-    for (const [m, q] of Object.entries(r)) if (state.chaves.some(k => m.slice(0,4) === k)) s += q;
-    return s;
-  }
   let s = 0;
-  for (const mes of mesesSelecionados()) s += r[mes] || 0;
+  for (const ev of (e.ambienteEventos || [])) {
+    if (ev.tipo === "desligamento") continue;
+    if (mesMatch(ev.mes)) s++;
+  }
   return s;
 }
 
@@ -205,7 +195,12 @@ function renderKpis() {
   $("kpi-p5").textContent = fmtInt(p5);
   $("kpi-p25").textContent = fmtInt(p25);
   $("kpi-reativ").textContent = fmtInt(reativ);
-  $("kpi-reativ-sub").textContent = `marcas reativaram em ${mesK||"—"}`;
+  $("kpi-reativ-sub").textContent = `marcas ativadas/reativadas em ${mesK||"—"}`;
+  const tam = marcasComTamanho();
+  $("kpi-tamanho").textContent = fmtInt(tam.filter(e=>e._def > 0).length);
+  $("kpi-tamanho-sub").textContent = tam.length
+    ? `de ${fmtInt(tam.length)} marcas com tamanho coletado`
+    : "rode tamanho_marca.py";
   $("kpi-semvp").textContent = fmtInt(semVP);
   $("kpi-semfrete").textContent = fmtInt(semFrete);
   $("kpi-topstarter").textContent = fmtInt(lista.filter(e=>e.starter_interno).length);
@@ -559,20 +554,31 @@ function renderTabSemFrete() {
   ], lista.sort((a,b)=>a.name.localeCompare(b.name)).map(e=>({...e,_alert:true})));
 }
 
-// faixas de tempo sem pagar (o piso da coleta é 46 dias — ver SQL_REATIVACAO)
-const FAIXAS_REATIV = [
-  {nome:"46 a 60 dias",   min:46,  max:60,  cor:"#FDCB6E"},
-  {nome:"61 a 90 dias",   min:61,  max:90,  cor:"#F39C12"},
-  {nome:"91 a 180 dias",  min:91,  max:180, cor:"#E17055"},
-  {nome:"mais de 180 dias", min:181, max:1e9, cor:"#D63031"},
+// As 4 origens da aba (regra fechada com a Laura em 13/08/2026 — ver
+// _eventos_ambiente em build_data.py). Nenhum sinal sozinho cobria a lista das
+// vendedoras: marca sem cobrança na Iugu não tem gap de pagamento, e cliente que
+// volta com cadastro novo não tem histórico no domínio antigo.
+const ORIGENS_REATIV = [
+  {id:"criacao",     nome:"Ambiente ativado",   cor:"#00B894"},
+  {id:"pagamento",   nome:"Voltou a pagar",     cor:"#0984E3"},
+  {id:"retorno",     nome:"1ª fatura tardia",   cor:"#6C5CE7"},
+  {id:"religamento", nome:"Ambiente religado",  cor:"#E17055"},
 ];
 const somaFaixas = (o) => Object.values(o).reduce((s,v)=>s+v, 0);
-const faixaDe = (dias) => FAIXAS_REATIV.find(f => (dias||0) >= f.min && (dias||0) <= f.max);
+const nomeOrigem = (id) => (ORIGENS_REATIV.find(o=>o.id===id)||{}).nome || id;
 
-// clique numa barra filtra a tabela por canal + faixa; clicar de novo limpa
-function setReativDrill(canal, faixa) {
+// eventos de reativação/ativação da empresa no período e no filtro de origem
+function eventosReativ(e) {
+  return (e.ambienteEventos || []).filter(ev =>
+    ev.tipo !== "desligamento" &&
+    mesMatch(ev.mes) &&
+    (state.reativOrigem === "todas" || ev.origem === state.reativOrigem));
+}
+
+// clique numa barra filtra a tabela por canal + origem; clicar de novo limpa
+function setReativDrill(canal, origem) {
   const d = state.reativDrill;
-  state.reativDrill = (d && d.canal === canal && d.faixa === faixa) ? null : {canal, faixa};
+  state.reativDrill = (d && d.canal === canal && d.origem === origem) ? null : {canal, origem};
   renderActiveTab();
 }
 window.limparReativDrill = () => { state.reativDrill = null; renderActiveTab(); };
@@ -585,12 +591,9 @@ function renderTabReativ() {
   const porCanal = {};
   for (const e of lista) {
     const c = canalDe(e);
-    for (const ev of (e.reativEventos || [])) {
-      if ((ev.dias||0) < state.reativMinDias) continue;
-      if (!mesMatch(ev.mes)) continue;
-      const slot = porCanal[c] || (porCanal[c] = Object.fromEntries(FAIXAS_REATIV.map(f=>[f.nome,0])));
-      const faixa = FAIXAS_REATIV.find(f => (ev.dias||0) >= f.min && (ev.dias||0) <= f.max);
-      if (faixa) slot[faixa.nome]++;
+    for (const ev of eventosReativ(e)) {
+      const slot = porCanal[c] || (porCanal[c] = Object.fromEntries(ORIGENS_REATIV.map(o=>[o.nome,0])));
+      slot[nomeOrigem(ev.origem)]++;
     }
   }
   const canaisComDado = Object.keys(porCanal)
@@ -599,10 +602,10 @@ function renderTabReativ() {
     type:"bar",
     data:{
       labels: canaisComDado,
-      datasets: FAIXAS_REATIV.map((f,i)=>({
-        label: f.nome,
-        data: canaisComDado.map(c=>porCanal[c][f.nome]),
-        backgroundColor: f.cor,
+      datasets: ORIGENS_REATIV.map(o=>({
+        label: o.nome,
+        data: canaisComDado.map(c=>porCanal[c][o.nome]),
+        backgroundColor: o.cor,
       })),
     },
     options:{responsive:true, maintainAspectRatio:false,
@@ -616,49 +619,49 @@ function renderTabReativ() {
       },
       plugins:{legend:{position:"bottom"},
         tooltip:{callbacks:{
-          label:c=>`${c.dataset.label}: ${c.raw} retorno(s)`,
+          label:c=>`${c.dataset.label}: ${c.raw} marca(s)`,
           footer:items=>`total do canal: ${items.reduce((s,i)=>s+i.raw,0)} · clique para ver as marcas`}}},
-      scales:{x:{stacked:true}, y:{stacked:true, ticks:{precision:0}, title:{display:true, text:"retornos"}}}}
+      scales:{x:{stacked:true}, y:{stacked:true, ticks:{precision:0}, title:{display:true, text:"marcas"}}}}
   });
-  // uma linha por FATURA reativada: marca, quanto ficou inadimplente e quando voltou
+  // uma linha por EVENTO: marca, por que entrou (origem) e quando
   const drill = state.reativDrill;
   const rows = [];
   for (const e of lista) {
-    for (const ev of (e.reativEventos || [])) {
-      if (!mesMatch(ev.mes)) continue;
-      if ((ev.dias || 0) < state.reativMinDias) continue;
+    for (const ev of eventosReativ(e)) {
       if (drill) {                              // clique numa barra do gráfico
         if (canalDe(e) !== drill.canal) continue;
-        const f = faixaDe(ev.dias);
-        if (!f || f.nome !== drill.faixa) continue;
+        if (nomeOrigem(ev.origem) !== drill.origem) continue;
       }
-      rows.push({...e, _ultimoPag: ev.ultimoPag, _voltou: ev.voltou, _dias: ev.dias || 0,
+      rows.push({...e, _origem: ev.origem, _data: ev.data, _detalhe: ev.detalhe || "",
+                 _dias: ev.dias || 0, _novo: ev.origem === "criacao",
                  _alert: (ev.dias || 0) >= 91});
     }
   }
-  rows.sort((a,b)=>b._dias - a._dias);
+  rows.sort((a,b)=>(b._data||"").localeCompare(a._data||""));
   const el = $("reativ-resumo");
   if (el) {
     const marcas = new Set(rows.map(r=>r.domain_id)).size;
+    const novos = rows.filter(r=>r._novo).length;
     el.textContent = rows.length
-      ? `${rows.length} retornos de ${marcas} marcas em ${mesK||"—"} · a partir de ${state.reativMinDias} dias sem pagar`
-      : "Nenhum retorno com esses filtros.";
+      ? `${rows.length} eventos de ${marcas} marcas em ${mesK||"—"} · `
+        + `${novos} ativações e ${rows.length-novos} reativações`
+      : "Nenhum evento com esses filtros.";
   }
   const elD = $("reativ-drill");
   if (elD) {
     elD.innerHTML = drill
-      ? `<span class="drill-chip">${drill.canal} · ${drill.faixa}
+      ? `<span class="drill-chip">${drill.canal} · ${drill.origem}
            <button type="button" onclick="limparReativDrill()" title="Ver todos de novo">×</button></span>
          <span class="drill-hint">mostrando só as marcas desse pedaço da barra</span>`
-      : `<span class="drill-hint">Clique em um pedaço da barra para ver as marcas daquele canal e faixa.</span>`;
+      : `<span class="drill-hint">Clique em um pedaço da barra para ver as marcas daquele canal e origem.</span>`;
   }
   renderTable("tbl-reativ", [
     {label:"Marca", fn:r=>r.name, sort:r=>r.name},
     {label:"CS", fn:r=>r.cs, sort:r=>r.cs},
     {label:"Canal", fn:r=>r.canal, sort:r=>r.canal},
-    {label:"Último pagamento antes", fn:r=>r._ultimoPag||"—", sort:r=>r._ultimoPag||""},
-    {label:"Dias sem pagar", cls:"num", fn:r=>fmtInt(r._dias), sort:r=>r._dias},
-    {label:"Voltou em", fn:r=>r._voltou||"—", sort:r=>r._voltou||""},
+    {label:"O que aconteceu", fn:r=>nomeOrigem(r._origem), sort:r=>nomeOrigem(r._origem)},
+    {label:"Quando", fn:r=>r._data||"—", sort:r=>r._data||""},
+    {label:"Detalhe", fn:r=>r._detalhe||"—", sort:r=>r._detalhe||""},
     {label:"Mensalidade", cls:"num", fn:r=>{
       const v = r.valor_plano || r.valor_mensal; return v ? fmtBRL(v) : "—";
     }, sort:r=>r.valor_plano || r.valor_mensal || 0},
@@ -862,13 +865,103 @@ function renderTabUpgrade() {
   ], lista);
 }
 
+// ---------- Tamanho da marca (fila de upgrade de plano) ----------
+// Vem de tamanho_marca.py: seguidores do Instagram + lojas físicas no Google Maps,
+// a partir da planilha "Mensalidade até 400". A ideia é achar marca que ficou
+// grande mas continua num plano antigo e barato.
+const PORTES = ["Muito grande", "Grande", "Media", "Pequena", "Indefinido"];
+const PORTE_COR = {"Muito grande":"#D63031", "Grande":"#E17055", "Media":"#FDCB6E",
+                   "Pequena":"#74B9FF", "Indefinido":"#B2BEC3"};
+const PORTE_PESO = {"Muito grande":4, "Grande":3, "Media":2, "Pequena":1, "Indefinido":0};
+
+// Defasagem = marca grande pagando pouco. Quanto maior o porte e menor a
+// mensalidade, mais alta a prioridade de ligar oferecendo upgrade.
+function defasagem(e) {
+  const peso = PORTE_PESO[e.porte] || 0;
+  if (peso < 3) return 0;                       // só Grande e Muito grande entram na fila
+  const mens = e.valor_plano || e.valor_mensal || 0;
+  if (!mens) return peso;                       // sem mensalidade conhecida: mantém na fila
+  return peso * Math.max(1, 400 / mens);
+}
+
+function marcasComTamanho() {
+  return empresasFiltradas()
+    .filter(e => e.porte && e.porte !== "Indefinido")
+    .map(e => ({...e, _mens: e.valor_plano || e.valor_mensal || 0, _def: defasagem(e)}));
+}
+
+function renderTabTamanho() {
+  const todas = marcasComTamanho();
+  const lista = state.portesSel.size
+    ? todas.filter(e => state.portesSel.has(e.porte))
+    : todas;
+  const fila = todas.filter(e => e._def > 0).length;
+
+  const el = $("tam-hint");
+  if (el) {
+    const coleta = todas.find(e => e.dataColetaTamanho)?.dataColetaTamanho || "—";
+    el.textContent = `${todas.length} marcas com tamanho coletado · ${fila} na fila de upgrade `
+      + `(Grande ou Muito grande) · coleta de ${coleta}`;
+  }
+
+  const porPorte = Object.fromEntries(PORTES.map(p=>[p,0]));
+  for (const e of todas) porPorte[e.porte] = (porPorte[e.porte]||0) + 1;
+  makeChart("chart-tam-porte", {
+    type:"bar",
+    data:{labels:PORTES, datasets:[{label:"marcas", data:PORTES.map(p=>porPorte[p]),
+          backgroundColor:PORTES.map(p=>PORTE_COR[p])}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+             scales:{y:{ticks:{precision:0}}}}
+  });
+
+  // seguidores x mensalidade: o canto de cima à esquerda é a fila de upgrade
+  // (muito seguidor, mensalidade baixa)
+  makeChart("chart-tam-disp", {
+    type:"scatter",
+    data:{datasets: PORTES.filter(p=>porPorte[p]).map(p=>({
+      label:p,
+      data: todas.filter(e=>e.porte===p).map(e=>({x:e._mens||0, y:e.seguidores||0, m:e.name})),
+      backgroundColor: PORTE_COR[p], pointRadius:6, pointHoverRadius:9,
+    }))},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:"bottom"},
+        tooltip:{callbacks:{label:c=>
+          `${c.raw.m}: ${fmtInt(c.raw.y)} seguidores · ${c.raw.x?fmtBRL(c.raw.x):"sem mensalidade"}`}}},
+      scales:{
+        x:{title:{display:true,text:"mensalidade atual"}, ticks:{callback:v=>"R$"+v}},
+        y:{title:{display:true,text:"seguidores no Instagram"},
+           ticks:{callback:v=>v>=1000?(v/1000)+"k":v}}}}
+  });
+
+  renderTable("tbl-tamanho", [
+    {label:"Marca", fn:r=>r.name, sort:r=>r.name},
+    {label:"CS", fn:r=>r.cs, sort:r=>r.cs},
+    {label:"Canal", fn:r=>r.canal, sort:r=>r.canal},
+    {label:"Porte", fn:r=>r.porte, sort:r=>PORTE_PESO[r.porte]||0},
+    {label:"Seguidores", cls:"num",
+     fn:r=>r.seguidores?fmtInt(r.seguidores):(r.seguidoresDesconhecidos?"perfil não achado":"—"),
+     sort:r=>r.seguidores||0},
+    {label:"Instagram", fn:r=>r.instagram?`@${r.instagram}`:"—", sort:r=>r.instagram||""},
+    {label:"Loja física", fn:r=>r.temLojaFisica||"—", sort:r=>r.temLojaFisica||""},
+    // teto da busca: "5+" avisa que pode haver mais lojas do que o Maps devolveu
+    {label:"Unidades", cls:"num",
+     fn:r=>fmtInt(r.qtdUnidades||0) + (r.unidadesNoTeto?"+":""), sort:r=>r.qtdUnidades||0},
+    {label:"O que o Maps achou", fn:r=>r.lojasEncontradas||"—", sort:r=>r.lojasEncontradas||""},
+    {label:"Plano atual", fn:r=>r.plano||r.planoPlanilha||"—", sort:r=>r.plano||r.planoPlanilha||""},
+    {label:"Mensalidade", cls:"num", fn:r=>r._mens?fmtBRL(r._mens):"—", sort:r=>r._mens||0},
+    {label:"Filiais na Vesti", cls:"num", fn:r=>fmtInt(r.qtdFiliais||0), sort:r=>r.qtdFiliais||0},
+    {label:"Casou por", fn:r=>r.casouPorTamanho==="cnpj"?"CNPJ":"nome (conferir)",
+     sort:r=>r.casouPorTamanho||""},
+  ], lista.sort((a,b)=>b._def - a._def || (b.seguidores||0) - (a.seguidores||0)));
+}
+
 // ---------- Tab switching ----------
 const TAB_LABELS = {
   gmv:"GMV", vp:"VestiPago (Cartão + PIX)", cadastro:"Cadastro de Produtos",
   primeiras5:"Primeiras 5 Vendas", primeiras25:"Primeiras 25 Vendas",
-  reativ:"Reativações", topstarter:"TOP 10 Starter", topparceiros:"TOP 10 Parceiros",
+  reativ:"Ativações e reativações", topstarter:"TOP 10 Starter", topparceiros:"TOP 10 Parceiros",
   vpinativo:"Sem VP Ativo", freteinativo:"Sem Frete Ativo", travadas:"Marcas Travadas",
-  upgrade:"Oportunidades de Upgrade", links:"Links & Cliques"
+  upgrade:"Oportunidades de Upgrade", tamanho:"Tamanho da marca", links:"Links & Cliques"
 };
 
 function switchTab(tab) {
@@ -901,6 +994,7 @@ function renderActiveTab() {
   else if (state.tab === "travadas") renderTabTravadas();
   else if (state.tab === "reativ") renderTabReativ();
   else if (state.tab === "upgrade") renderTabUpgrade();
+  else if (state.tab === "tamanho") renderTabTamanho();
   else if (state.tab === "links") renderTabLinks();
 }
 
@@ -1061,8 +1155,12 @@ function bind() {
   $("filter-cad-mes").addEventListener("change", e=>{ state.cadMes=e.target.value; renderActiveTab(); });
   $("filter-upg-min").addEventListener("change", e=>{ state.upgMin=Number(e.target.value)||300000; renderActiveTab(); });
   // mudar filtro invalida a seleção feita no gráfico (o pedaço clicado pode nem existir mais)
-  $("filter-reativ-dias").addEventListener("change", e=>{
-    state.reativMinDias=Number(e.target.value)||46; state.reativDrill=null; renderActiveTab();
+  $("filter-tam-porte").addEventListener("change", e=>{
+    state.portesSel = e.target.value ? new Set([e.target.value]) : new Set();
+    renderActiveTab();
+  });
+  $("filter-reativ-origem").addEventListener("change", e=>{
+    state.reativOrigem=e.target.value||"todas"; state.reativDrill=null; renderActiveTab();
   });
   document.querySelectorAll(".chk-coorte").forEach(cb=>cb.addEventListener("change", e=>{
     state.soCoorte = e.target.checked;

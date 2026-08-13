@@ -98,7 +98,7 @@
         <div class="hl-val" id="kpi-p25">0</div><div class="hl-sub">marcas no período</div>
       </div>
       <div class="hl-card" onclick="switchTab('reativ')" style="background:linear-gradient(135deg,#A29BFE,#C5BEFF)">
-        <div class="hl-icon">🔄</div><div class="hl-label">Reativações</div>
+        <div class="hl-icon">🔄</div><div class="hl-label">Ativações e reativações</div>
         <div class="hl-val" id="kpi-reativ">0</div><div class="hl-sub" id="kpi-reativ-sub">marcas no mês</div>
       </div>
       <div class="hl-card" onclick="switchTab('topstarter')" style="background:linear-gradient(135deg,#E17055,#FF8863)">
@@ -124,6 +124,10 @@
       <div class="hl-card" onclick="switchTab('upgrade')" style="background:linear-gradient(135deg,#00B894,#26D0A5)">
         <div class="hl-icon">📈</div><div class="hl-label">Oportunidades de Upgrade</div>
         <div class="hl-val" id="kpi-upgrade">0</div><div class="hl-sub" id="kpi-upgrade-sub">marcas · 300 mil+ em 3 meses</div>
+      </div>
+      <div class="hl-card" onclick="switchTab('tamanho')" style="background:linear-gradient(135deg,#D63031,#FF7675)">
+        <div class="hl-icon">📐</div><div class="hl-label">Tamanho da marca</div>
+        <div class="hl-val" id="kpi-tamanho">0</div><div class="hl-sub" id="kpi-tamanho-sub">marcas grandes pagando pouco</div>
       </div>
       <div class="hl-card" onclick="switchTab('links')" style="background:linear-gradient(135deg,#FDCB6E,#FFE08A)">
         <div class="hl-icon">🔗</div><div class="hl-label">Links & Cliques</div>
@@ -194,28 +198,34 @@
   </div>
 
   <div id="tab-reativ" class="tab-panel">
-    <h2 class="tab-title">🔄 Reativações · <span class="periodo-label"></span></h2>
+    <h2 class="tab-title">🔄 Ativações e reativações · <span class="periodo-label"></span></h2>
     <p class="hint" style="margin-bottom:12px;color:var(--g);font-size:12px">
-      Critério: a marca passou <strong>mais de 45 dias sem pagar</strong> (pulou pelo menos um ciclo) e voltou a pagar.
-      Mede o intervalo entre uma fatura paga e a seguinte.
-      Não usamos mais "fatura paga em atraso": naquele critério 70% era atraso de 1 a 3 dias e o maior do banco era 30 dias,
-      porque a Iugu cancela a fatura antes disso — inadimplência longa nunca aparecia.
+      A marca entra aqui quando o <strong>ambiente é ativado ou volta a funcionar</strong>. São 4 origens, porque nenhum sinal
+      sozinho cobre todos os casos — marca cobrada fora da Iugu não tem intervalo de fatura, e cliente que volta com cadastro
+      novo não tem histórico no domínio antigo:<br>
+      <strong>Ambiente ativado</strong> — domínio criado.
+      <strong>Voltou a pagar</strong> — passou mais de 45 dias sem pagar e voltou.
+      <strong>1ª fatura tardia</strong> — a primeira fatura veio mais de um ano depois da entrada.
+      <strong>Ambiente religado</strong> — religado fora de um pagamento (form manual do n8n).<br>
+      Fica de fora quem pagou em dia e nunca foi desligada, mesmo que a vendedora classifique como reativação —
+      isso é classificação comercial e não existe no dado.
     </p>
     <div class="sub-filter">
-      <label>Tempo mínimo sem pagar:</label>
-      <select class="f-select" id="filter-reativ-dias">
-        <option value="46" selected>46 dias (tudo)</option>
-        <option value="61">61 dias</option>
-        <option value="91">91 dias</option>
-        <option value="181">mais de 180 dias</option>
+      <label>Origem:</label>
+      <select class="f-select" id="filter-reativ-origem">
+        <option value="todas" selected>todas</option>
+        <option value="criacao">Ambiente ativado</option>
+        <option value="pagamento">Voltou a pagar</option>
+        <option value="retorno">1ª fatura tardia</option>
+        <option value="religamento">Ambiente religado</option>
       </select>
       <span class="hint" id="reativ-resumo"></span>
     </div>
     <div class="chart-row one">
-      <div class="ch"><h4>Retornos por canal e tempo que a marca ficou sem pagar</h4><div class="cw"><canvas id="chart-reativ-evolucao"></canvas></div></div>
+      <div class="ch"><h4>Ativações e reativações por canal e origem</h4><div class="cw"><canvas id="chart-reativ-evolucao"></canvas></div></div>
     </div>
     <div class="drill-bar" id="reativ-drill"></div>
-    <div class="tbl-card"><h4>Marcas reativadas no mês selecionado</h4><div class="tbl-wrap"><table class="dt" id="tbl-reativ"></table></div></div>
+    <div class="tbl-card"><h4>Marcas ativadas ou reativadas no mês selecionado</h4><div class="tbl-wrap"><table class="dt" id="tbl-reativ"></table></div></div>
   </div>
 
   <div id="tab-topstarter" class="tab-panel">
@@ -288,6 +298,34 @@
       <div class="ch"><h4>Mensalidade atual das marcas elegíveis</h4><div class="cw"><canvas id="chart-upg-mens"></canvas></div></div>
     </div>
     <div class="tbl-card"><h4>Marcas elegíveis para upgrade</h4><div class="tbl-wrap"><table class="dt" id="tbl-upgrade"></table></div></div>
+  </div>
+
+  <div id="tab-tamanho" class="tab-panel">
+    <h2 class="tab-title">📐 Tamanho da marca</h2>
+    <p class="hint" style="margin-bottom:12px;color:var(--g);font-size:12px">
+      Quão grande a marca é <strong>fora</strong> da Vesti: seguidores no Instagram e lojas físicas no Google Maps.
+      Serve pra achar quem cresceu mas continua num plano antigo e barato — a lista sai ordenada por
+      <strong>porte alto + mensalidade baixa</strong>, que é a fila de quem ligar primeiro.<br>
+      Fonte: planilha <em>Mensalidade até 400</em>, coletada pelo <code>tamanho_marca.py</code>.
+      <strong>O número de lojas é indício, não certeza</strong> — o Google Maps devolve estabelecimentos de nome
+      parecido, então a coluna "O que o Maps achou" mostra o que foi encontrado pra você conferir antes de ligar.
+    </p>
+    <div class="sub-filter">
+      <label>Porte:</label>
+      <select class="f-select" id="filter-tam-porte">
+        <option value="" selected>todos</option>
+        <option value="Muito grande">Muito grande</option>
+        <option value="Grande">Grande</option>
+        <option value="Media">Média</option>
+        <option value="Pequena">Pequena</option>
+      </select>
+      <span class="hint" id="tam-hint"></span>
+    </div>
+    <div class="chart-row">
+      <div class="ch"><h4>Marcas por porte</h4><div class="cw"><canvas id="chart-tam-porte"></canvas></div></div>
+      <div class="ch"><h4>Seguidores × mensalidade atual</h4><div class="cw"><canvas id="chart-tam-disp"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>Fila de upgrade — maior porte e menor mensalidade primeiro</h4><div class="tbl-wrap"><table class="dt" id="tbl-tamanho"></table></div></div>
   </div>
 
   <div id="tab-links" class="tab-panel">

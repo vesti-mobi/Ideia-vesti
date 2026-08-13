@@ -33,6 +33,7 @@ OUT_CADASTROS = ROOT / "cadastros_elisa.json"
 OUT_VP        = ROOT / "vestipago_elisa.json"
 OUT_REATIV    = ROOT / "reativacao_elisa.json"
 OUT_LINKS     = ROOT / "links_elisa.json"
+OUT_PAGTOS    = ROOT / "pagamentos_elisa.json"
 
 PROJECT = "vesti-data-499015"
 DATASET = "vestilake_BI"
@@ -216,6 +217,38 @@ FROM com_gap g
 JOIN `{PROJECT}.{DATASET}.silver_companiesativos_iugu` sc ON sc.Customer_ID_Iugu = g.customer_id
 WHERE g.pag_anterior IS NOT NULL
   AND DATE_DIFF(g.paid_dt, g.pag_anterior, DAY) >= {GAP_MIN_DIAS}
+"""
+
+
+# -----------------------------------------------------------------------------
+# 6) DATAS DE PAGAMENTO por dominio -- insumo das regras 3 e 4 da aba Reativacoes
+#    (ver _eventos_ambiente em build_data.py):
+#      regra 3 "retorno"     : 1a fatura paga MUITO depois da entrada da marca
+#      regra 4 "religamento" : data de religamento na planilha do n8n que NAO
+#                              coincide com nenhuma fatura paga
+#
+#    `piso` e' a 1a data de pagamento do espelho inteiro (2025-01-01). Sem essa
+#    guarda a regra 3 acusaria toda marca anterior a 2025 como "retorno", porque
+#    o espelho simplesmente nao tem o historico dela.
+# -----------------------------------------------------------------------------
+SQL_PAGAMENTOS = f"""
+WITH pagas AS (
+  SELECT DISTINCT id, customer_id, DATE(SUBSTR(paid_at, 1, 10)) dt
+  FROM `{PROJECT}.{DATASET}.iugu_invoices`
+  WHERE status='paid' AND paid_at IS NOT NULL AND paid_at NOT IN ('None',''))
+SELECT CAST(sc.domain_id AS STRING) domain_id,
+       MIN(p.dt) primeira,
+       ARRAY_AGG(DISTINCT p.dt ORDER BY p.dt) datas
+FROM pagas p
+JOIN `{PROJECT}.{DATASET}.silver_companiesativos_iugu` sc
+  ON sc.Customer_ID_Iugu = p.customer_id
+GROUP BY 1
+"""
+
+SQL_PISO_PAGAMENTOS = f"""
+SELECT MIN(DATE(SUBSTR(paid_at, 1, 10))) piso
+FROM `{PROJECT}.{DATASET}.iugu_invoices`
+WHERE status='paid' AND paid_at IS NOT NULL AND paid_at NOT IN ('None','')
 """
 
 
@@ -427,6 +460,21 @@ def build_links(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
     return out
 
 
+def build_pagamentos(rows: list[dict], piso: str, empresas_by_dom: dict[str, dict]) -> dict:
+    """{piso, dominios: {dom: {primeira, datas[]}}} -- so' dominios do painel."""
+    def _iso(v):
+        return v.isoformat() if hasattr(v, "isoformat") else (str(v)[:10] if v else "")
+
+    doms: dict[str, dict] = {}
+    for r in rows:
+        dom = str(r.get("domain_id") or "").strip()
+        if dom not in empresas_by_dom:
+            continue
+        doms[dom] = {"primeira": _iso(r.get("primeira")),
+                     "datas": [_iso(d) for d in (r.get("datas") or [])]}
+    return {"piso": piso, "dominios": doms}
+
+
 def build_reativacao(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
     """Um evento por RETORNO: a marca passou `dias` sem pagar e voltou em `voltou`."""
     def _iso(v):
@@ -518,6 +566,8 @@ def coletar_do_bq(client: bigquery.Client):
     pp_rows     = run_query(client, SQL_PRIMEIRO_PEDIDO, "primeiro pedido cadastrado")
     reativ_rows = run_query(client, SQL_REATIVACAO, "reativacoes (45+ dias sem pagar)")
     links_rows  = run_query(client, SQL_LINKS, "links/cliques compartilhados")
+    pag_rows    = run_query(client, SQL_PAGAMENTOS, "datas de pagamento por dominio")
+    piso_rows   = run_query(client, SQL_PISO_PAGAMENTOS, "piso do espelho de faturas")
 
     # Produtos: so se `odbc_products` estiver ingerido (odbc_product_details NAO serve).
     if _table_exists(client, "odbc_products"):
@@ -528,7 +578,8 @@ def coletar_do_bq(client: bigquery.Client):
               "VAZIO (qtProdutos). Ingerir dbo.ODBC_Products e rodar de novo. "
               "Ver _MIGRACAO_BQ_STATUS.md.", file=sys.stderr, flush=True)
 
-    return emp_rows, gmv_rows, prod_rows, pp_rows, reativ_rows, links_rows
+    return (emp_rows, gmv_rows, prod_rows, pp_rows, reativ_rows, links_rows,
+            pag_rows, piso_rows)
 
 
 def main() -> None:
@@ -537,7 +588,8 @@ def main() -> None:
     client = bigquery.Client(project=PROJECT)
 
     prod_disponivel = _table_exists(client, "odbc_products")
-    emp_rows, gmv_rows, prod_rows, pp_rows, reativ_rows, links_rows = coletar_do_bq(client)
+    (emp_rows, gmv_rows, prod_rows, pp_rows, reativ_rows, links_rows,
+     pag_rows, piso_rows) = coletar_do_bq(client)
 
     empresas = build_empresas(emp_rows)
     OUT_COMPANIES.write_text(json.dumps(empresas, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -569,7 +621,14 @@ def main() -> None:
     links = build_links(links_rows, empresas_by_dom)
     OUT_LINKS.write_text(json.dumps(links, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"[write] {OUT_LINKS.name} ({len(links)} dominios com links)")
-    print("[ok] coleta BQ concluida. Rode build_data.py em seguida.")
+
+    piso = piso_rows[0].get("piso") if piso_rows else None
+    piso = piso.isoformat() if hasattr(piso, "isoformat") else (str(piso)[:10] if piso else "")
+    pagtos = build_pagamentos(pag_rows, piso, empresas_by_dom)
+    OUT_PAGTOS.write_text(json.dumps(pagtos, ensure_ascii=False), encoding="utf-8")
+    print(f"[write] {OUT_PAGTOS.name} ({len(pagtos['dominios'])} dominios, piso {piso})")
+
+    print("[ok] coleta BQ concluida. Rode fetch_ambiente.py e build_data.py em seguida.")
 
 
 if __name__ == "__main__":
