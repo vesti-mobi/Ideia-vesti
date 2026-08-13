@@ -939,7 +939,9 @@ function renderTabTamanho() {
     {label:"Canal", fn:r=>r.canal, sort:r=>r.canal},
     {label:"Porte", fn:r=>r.porte, sort:r=>PORTE_PESO[r.porte]||0},
     {label:"Seguidores", cls:"num",
-     fn:r=>r.seguidores?fmtInt(r.seguidores):(r.seguidoresDesconhecidos?"perfil não achado":"—"),
+     fn:r=>r.seguidores
+        ? fmtInt(r.seguidores) + (r.origemSeguidores==="manual" ? " (manual)" : "")
+        : (r.seguidoresDesconhecidos?"perfil não achado":"—"),
      sort:r=>r.seguidores||0},
     {label:"Instagram", fn:r=>r.instagram?`@${r.instagram}`:"—", sort:r=>r.instagram||""},
     {label:"Loja física", fn:r=>r.temLojaFisica||"—", sort:r=>r.temLojaFisica||""},

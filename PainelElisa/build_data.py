@@ -102,6 +102,8 @@ def _tamanho_da_marca(emp: dict, por_cnpj: dict, por_nome: dict) -> dict:
         "casouPorTamanho": casou_por,
         "unidadesNoTeto": bool(t.get("unidadesNoTeto")),
         "seguidoresDesconhecidos": bool(t.get("seguidoresDesconhecidos")),
+        # apify | manual (preenchido na aba Histórico) | planilha
+        "origemSeguidores": t.get("origemSeguidores") or "",
         "seguidores": t.get("seguidores"),
         "instagram": t.get("instagram") or "",
         "instagramVerificado": bool(t.get("verificado")),

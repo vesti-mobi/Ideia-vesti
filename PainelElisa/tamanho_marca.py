@@ -267,6 +267,31 @@ def _le_planilha() -> list[dict]:
     return marcas
 
 
+def le_seguidores_manuais() -> dict[str, int]:
+    """Seguidores preenchidos A MAO na aba 'Histórico'.
+
+    O Apify nao acha todo perfil (privado, renomeado, username errado na planilha).
+    Quem cuida do painel completa esses na propria aba, e a coleta seguinte tem que
+    RESPEITAR isso em vez de sobrescrever com vazio. Vale o valor mais recente de
+    cada marca -- a aba e' append, entao a ultima linha e' a mais nova.
+    """
+    if not XLSX.exists():
+        return {}
+    try:
+        ws = openpyxl.load_workbook(XLSX, data_only=True)[ABA_HISTORICO]
+    except KeyError:
+        return {}
+    out: dict[str, int] = {}
+    for linha in ws.iter_rows(min_row=2, values_only=True):
+        if not linha or not linha[0]:
+            continue
+        marca = _txt(linha[2] if len(linha) > 2 else "")
+        seg = _seguidores_para_int(linha[5] if len(linha) > 5 else None)
+        if marca and seg:
+            out[_norm(marca)] = seg          # sobrescreve: fica o mais recente
+    return out
+
+
 def _cidade_do_cnpj(cnpj: str, cache: dict) -> str:
     """Municipio/UF do cache da BrasilAPI (gerado por upgrade_planilha.py).
     Melhora MUITO a busca no Maps -- 'Marca Sao Paulo SP' acha; so' 'Marca' nao."""
@@ -492,7 +517,10 @@ def _porte(seguidores: int | None, unidades: int) -> str:
         if unidades >= 3:
             return "Grande"
         return "Media" if unidades >= 1 else "Indefinido"
-    if seguidores >= 500_000 or unidades >= 5:
+    # "unidades >= 5" sozinho NAO promove: 5 e' o teto da busca
+    # (MAX_LOCAIS_POR_BUSCA), entao significa "bateu o limite", nao "tem 5 lojas" --
+    # e o Maps ainda deixa passar homonimo. Pro topo, exige tamanho de audiencia junto.
+    if seguidores >= 500_000 or (unidades >= MAX_LOCAIS_POR_BUSCA and seguidores >= 100_000):
         return "Muito grande"
     if seguidores >= 100_000 or unidades >= 3:
         return "Grande"
@@ -504,12 +532,22 @@ def _porte(seguidores: int | None, unidades: int) -> str:
 def consolida(marcas: list[dict], insta: dict, maps: dict, cache_cnpj: dict) -> list[dict]:
     por_marca = maps.get("_por_marca", {})
     hoje = date.today().isoformat()
+    manuais = le_seguidores_manuais()
+    usou_manual = 0
     linhas = []
     for m in marcas:
         i = insta.get(_norm(m["instagram"])) if m["instagram"] else None
         seguidores = (i or {}).get("seguidores")
+        origem_seg = "apify" if seguidores is not None else ""
+        if seguidores is None:                           # 1a queda: preenchido a mao no Histórico
+            seguidores = manuais.get(_norm(m["marca"]))
+            if seguidores is not None:
+                origem_seg = "manual"
+                usou_manual += 1
         if seguidores is None:
-            seguidores = m.get("seguidoresPlanilha")     # fallback: o que ja' estava na planilha
+            seguidores = m.get("seguidoresPlanilha")     # 2a queda: o que ja' estava na aba de origem
+            if seguidores is not None:
+                origem_seg = "planilha"
 
         termo = por_marca.get(m["marca"], "")
         mp = maps.get(termo) or {}
@@ -540,6 +578,7 @@ def consolida(marcas: list[dict], insta: dict, maps: dict, cache_cnpj: dict) -> 
             # bateu o teto da busca: o numero real de lojas pode ser maior
             "unidadesNoTeto": unidades >= MAX_LOCAIS_POR_BUSCA,
             "seguidoresDesconhecidos": seguidores is None,
+            "origemSeguidores": origem_seg,
             "enderecoObs": obs,
             "plano": m["plano"],
             "mensalidade": m["mensalidade"],
@@ -547,6 +586,9 @@ def consolida(marcas: list[dict], insta: dict, maps: dict, cache_cnpj: dict) -> 
             "canal": m.get("canal", ""),
             "porte": _porte(seguidores, unidades),
         })
+    if usou_manual:
+        print(f"[seguidores] {usou_manual} marcas usaram o valor preenchido a mao no Histórico",
+              flush=True)
     return linhas
 
 
