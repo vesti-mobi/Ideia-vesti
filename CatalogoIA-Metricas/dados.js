@@ -1,6 +1,6 @@
 window.DADOS = {
-  "gerado_em": "2026-08-12T21:36:02.242Z",
-  "hoje": "2026-08-12",
+  "gerado_em": "2026-08-13T12:47:53.910Z",
+  "hoje": "2026-08-13",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
   "auto_publica_desde": "2026-08-10",
@@ -19,8 +19,8 @@ window.DADOS = {
     "com_conta": 10,
     "contas": 9,
     "produtos_total": 252,
-    "produtos_7d": 129,
-    "descricoes_total": 219,
+    "produtos_7d": 128,
+    "descricoes_total": 232,
     "total_estimado": true
   },
   "marcas": [
@@ -34,12 +34,12 @@ window.DADOS = {
       "estimado": false,
       "produtos_7d": 104,
       "ativa": true,
-      "acessos": 29,
-      "buscas": 237,
-      "descricoes": 132,
-      "envios": 157,
+      "acessos": 32,
+      "buscas": 257,
+      "descricoes": 145,
+      "envios": 170,
       "primeiro": "2026-08-10T19:02:35.392Z",
-      "ultimo": "2026-08-12T19:08:10.119Z",
+      "ultimo": "2026-08-13T00:59:42.345Z",
       "dias": 0
     },
     {
@@ -94,7 +94,7 @@ window.DADOS = {
       "envios": 12,
       "primeiro": "2026-07-28T11:47:18.529Z",
       "ultimo": "2026-08-12T12:05:03.861Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "andressa-vesti",
@@ -158,7 +158,7 @@ window.DADOS = {
       "email": "monnikamarikinhaloja@gmail.com",
       "produtos": 1,
       "estimado": false,
-      "produtos_7d": 1,
+      "produtos_7d": 0,
       "ativa": false,
       "acessos": 2,
       "buscas": 1,
@@ -438,7 +438,7 @@ window.DADOS = {
         "contas": 9,
         "produtos_total": 102,
         "produtos_7d": 102,
-        "descricoes_total": 129,
+        "descricoes_total": 142,
         "total_estimado": false,
         "produtos_atribuidos": 0
       },
@@ -453,12 +453,12 @@ window.DADOS = {
           "estimado": false,
           "produtos_7d": 102,
           "ativa": true,
-          "acessos": 20,
-          "buscas": 197,
-          "descricoes": 129,
-          "envios": 132,
+          "acessos": 23,
+          "buscas": 217,
+          "descricoes": 142,
+          "envios": 145,
           "primeiro": "2026-08-11T18:28:02.542Z",
-          "ultimo": "2026-08-12T19:08:10.119Z",
+          "ultimo": "2026-08-13T00:59:42.345Z",
           "dias": 0,
           "produtos_medidos": 102,
           "atribuido": 0
@@ -994,7 +994,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-12T12:05:03.861Z",
           "ultimo": "2026-08-12T12:05:03.861Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 0,
           "atribuido": 36
         },
