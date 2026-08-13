@@ -558,11 +558,15 @@ function renderTabSemFrete() {
 // _eventos_ambiente em build_data.py). Nenhum sinal sozinho cobria a lista das
 // vendedoras: marca sem cobrança na Iugu não tem gap de pagamento, e cliente que
 // volta com cadastro novo não tem histórico no domínio antigo.
+// "Ambiente religado" junta duas deteccoes (voltou a pagar depois de pular ciclo,
+// e religado sem pagamento na data). A Laura pediu um rotulo so' em 13/08: pra ela
+// e' o mesmo evento de negocio, muda so' como a Vesti ficou sabendo -- e em 13/08
+// pediu tambem pra tirar a coluna Detalhe, que era o unico lugar onde a diferenca
+// aparecia. O campo `detalhe` segue em dashboard_data.js, so' nao e' exibido.
 const ORIGENS_REATIV = [
   {id:"criacao",     nome:"Ambiente ativado",   cor:"#00B894"},
-  {id:"pagamento",   nome:"Voltou a pagar",     cor:"#0984E3"},
-  {id:"retorno",     nome:"1ª fatura tardia",   cor:"#6C5CE7"},
   {id:"religamento", nome:"Ambiente religado",  cor:"#E17055"},
+  {id:"retorno",     nome:"1ª fatura tardia",   cor:"#6C5CE7"},
 ];
 const somaFaixas = (o) => Object.values(o).reduce((s,v)=>s+v, 0);
 const nomeOrigem = (id) => (ORIGENS_REATIV.find(o=>o.id===id)||{}).nome || id;
@@ -632,7 +636,7 @@ function renderTabReativ() {
         if (canalDe(e) !== drill.canal) continue;
         if (nomeOrigem(ev.origem) !== drill.origem) continue;
       }
-      rows.push({...e, _origem: ev.origem, _data: ev.data, _detalhe: ev.detalhe || "",
+      rows.push({...e, _origem: ev.origem, _data: ev.data,
                  _dias: ev.dias || 0, _novo: ev.origem === "criacao",
                  _alert: (ev.dias || 0) >= 91});
     }
@@ -661,7 +665,6 @@ function renderTabReativ() {
     {label:"Canal", fn:r=>r.canal, sort:r=>r.canal},
     {label:"O que aconteceu", fn:r=>nomeOrigem(r._origem), sort:r=>nomeOrigem(r._origem)},
     {label:"Quando", fn:r=>r._data||"—", sort:r=>r._data||""},
-    {label:"Detalhe", fn:r=>r._detalhe||"—", sort:r=>r._detalhe||""},
     {label:"Mensalidade", cls:"num", fn:r=>{
       const v = r.valor_plano || r.valor_mensal; return v ? fmtBRL(v) : "—";
     }, sort:r=>r.valor_plano || r.valor_mensal || 0},

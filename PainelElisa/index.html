@@ -194,9 +194,9 @@
       sozinho cobre todos os casos — marca cobrada fora da Iugu não tem intervalo de fatura, e cliente que volta com cadastro
       novo não tem histórico no domínio antigo:<br>
       <strong>Ambiente ativado</strong> — domínio criado.
-      <strong>Voltou a pagar</strong> — passou mais de 45 dias sem pagar e voltou.
-      <strong>1ª fatura tardia</strong> — a primeira fatura veio mais de um ano depois da entrada.
-      <strong>Ambiente religado</strong> — religado fora de um pagamento (form manual do n8n).<br>
+      <strong>Ambiente religado</strong> — voltou a funcionar: ou pagou depois de mais de 45 dias sem pagar,
+      ou foi religado sem pagamento na data (form manual do n8n).
+      <strong>1ª fatura tardia</strong> — a primeira fatura veio mais de um ano depois da entrada.<br>
       Fica de fora quem pagou em dia e nunca foi desligada, mesmo que a vendedora classifique como reativação —
       isso é classificação comercial e não existe no dado.
     </p>
@@ -205,9 +205,8 @@
       <select class="f-select" id="filter-reativ-origem">
         <option value="todas" selected>todas</option>
         <option value="criacao">Ambiente ativado</option>
-        <option value="pagamento">Voltou a pagar</option>
-        <option value="retorno">1ª fatura tardia</option>
         <option value="religamento">Ambiente religado</option>
+        <option value="retorno">1ª fatura tardia</option>
       </select>
       <span class="hint" id="reativ-resumo"></span>
     </div>

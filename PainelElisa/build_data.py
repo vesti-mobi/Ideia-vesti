@@ -122,17 +122,23 @@ def _eventos_ambiente(emp: dict, amb: dict, pag: dict, piso: str,
     """Eventos de ATIVACAO/REATIVACAO da marca, do mais novo pro mais antigo.
 
     Regra combinada fechada com a Laura em 13/08/2026. Nenhum sinal sozinho cobria
-    a lista das vendedoras, entao sao 4 origens complementares:
+    a lista das vendedoras, entao sao 4 deteccoes complementares -- mas o painel
+    mostra so' 3 rotulos, porque a Laura pediu (13/08) que "voltou a pagar" e
+    "religado fora de fatura" aparecam juntos como AMBIENTE RELIGADO: para ela as
+    duas coisas sao o mesmo evento de negocio (o ambiente voltou a funcionar), o
+    que muda e' so' como a Vesti ficou sabendo. A frase do `detalhe` preserva a
+    diferenca linha a linha.
 
-      1. pagamento   - passou >=46 dias sem pagar e voltou (reativacao_elisa.json,
-                       criterio de 12/08). Pega Rery, Reve Brand, Chik Bijux, Julia Plus.
-      2. criacao     - dominio criado = ambiente ATIVADO. Pega Martina Franca e o
-                       dominio novo do Surf Center (cliente que volta com cadastro novo).
-      3. retorno     - 1a fatura paga >365d depois da entrada, com guarda do piso do
-                       espelho. Pega Lunar Fitwear (entrou em 2023, 1a fatura em 11/08/2026).
-      4. religamento - "Ligado?=Sim" na planilha do n8n cuja data NAO casa com fatura
-                       paga (ver _casa_com_pagamento em fetch_ambiente.py). Pega o
-                       Surf Center antigo, religado no form manual em 29/07/2026.
+      criacao     - dominio criado = ambiente ATIVADO. Pega Martina Franca e o
+                    dominio novo do Surf Center (cliente que volta com cadastro novo).
+      retorno     - 1a fatura paga >365d depois da entrada, com guarda do piso do
+                    espelho. Pega Lunar Fitwear (entrou em 2023, 1a fatura em 11/08/2026).
+      religamento - junta duas deteccoes:
+                    a) passou >=46 dias sem pagar e voltou (reativacao_elisa.json,
+                       criterio de 12/08) -- Rery, Reve Brand, Chik Bijux, Julia Plus;
+                    b) "Ligado?=Sim" na planilha do n8n cuja data NAO casa com fatura
+                       paga (ver _casa_com_pagamento em fetch_ambiente.py) -- Surf
+                       Center antigo, religado no form manual em 29/07/2026.
 
     Fica de fora: marca que a vendedora classifica como reativacao mas que pagou em
     dia e nunca foi desligada (caso Gabifit, maior atraso 40 dias) -- isso e'
@@ -148,10 +154,11 @@ def _eventos_ambiente(emp: dict, amb: dict, pag: dict, piso: str,
         out.append({"tipo": "ativacao", "origem": "criacao", "data": entrada,
                     "mes": entrada[:7], "detalhe": "ambiente criado"})
 
-    for ev in reativ_eventos or []:                                      # 1. pagamento
+    # religamento (a): voltou a pagar depois de pular ciclo
+    for ev in reativ_eventos or []:
         quando = (ev.get("voltou") or "")[:10]
         if quando:
-            out.append({"tipo": "reativacao", "origem": "pagamento", "data": quando,
+            out.append({"tipo": "reativacao", "origem": "religamento", "data": quando,
                         "mes": quando[:7], "dias": ev.get("dias") or 0,
                         "detalhe": f"voltou a pagar apos {ev.get('dias') or 0} dias"})
 
@@ -165,11 +172,12 @@ def _eventos_ambiente(emp: dict, amb: dict, pag: dict, piso: str,
                         "mes": primeira[:7], "dias": desde_entrada,
                         "detalhe": f"1a fatura {desde_entrada} dias apos a entrada"})
 
-    if amb and amb.get("religamentoReal") and amb.get("update"):         # 4. religamento
+    # religamento (b): religado sem pagamento na data -- form manual do n8n ou CNPJ
+    if amb and amb.get("religamentoReal") and amb.get("update"):
         quando = amb["update"][:10]
         if quando != entrada:
             out.append({"tipo": "reativacao", "origem": "religamento", "data": quando,
-                        "mes": quando[:7], "detalhe": "ambiente religado (fora de fatura)"})
+                        "mes": quando[:7], "detalhe": "religado sem pagamento na data"})
 
     if amb and amb.get("ligado") is False and amb.get("update"):         # contexto
         quando = amb["update"][:10]
