@@ -1016,8 +1016,8 @@
   },
   "1415574": {
     "ligado": true,
-    "update": "2026-06-24",
-    "religamentoReal": false,
+    "update": "2026-08-13",
+    "religamentoReal": true,
     "nomePlanilha": "MODAS CARLA",
     "canalPlanilha": "Vesti"
   },
@@ -2801,8 +2801,8 @@
   },
   "146795": {
     "ligado": true,
-    "update": "2026-07-21",
-    "religamentoReal": false,
+    "update": "2026-08-13",
+    "religamentoReal": true,
     "nomePlanilha": "Vitral",
     "canalPlanilha": "Attasoft"
   },
@@ -4474,15 +4474,15 @@
   },
   "243791": {
     "ligado": true,
-    "update": "2026-07-10",
-    "religamentoReal": false,
+    "update": "2026-08-13",
+    "religamentoReal": true,
     "nomePlanilha": "Morena Charme",
     "canalPlanilha": "Vesti"
   },
   "1217203": {
     "ligado": true,
-    "update": "2026-07-13",
-    "religamentoReal": false,
+    "update": "2026-08-13",
+    "religamentoReal": true,
     "nomePlanilha": "Gazzy",
     "canalPlanilha": "Starter"
   },
@@ -4495,8 +4495,8 @@
   },
   "1672566": {
     "ligado": true,
-    "update": "2026-07-13",
-    "religamentoReal": false,
+    "update": "2026-08-13",
+    "religamentoReal": true,
     "nomePlanilha": "STRANGER COMPANY",
     "canalPlanilha": "Vesti"
   },
@@ -4600,8 +4600,8 @@
   },
   "67489": {
     "ligado": true,
-    "update": "2026-07-14",
-    "religamentoReal": false,
+    "update": "2026-08-13",
+    "religamentoReal": true,
     "nomePlanilha": "Lily Daisy",
     "canalPlanilha": "Attasoft"
   },
@@ -5356,7 +5356,7 @@
   },
   "2035554": {
     "ligado": false,
-    "update": "2026-08-10",
+    "update": "2026-08-13",
     "religamentoReal": false,
     "nomePlanilha": "Aline Mezzari Brand",
     "canalPlanilha": "Vesti"
@@ -5881,8 +5881,8 @@
   },
   "1271226": {
     "ligado": true,
-    "update": "2026-07-13",
-    "religamentoReal": false,
+    "update": "2026-08-13",
+    "religamentoReal": true,
     "nomePlanilha": "Favorita Modas",
     "canalPlanilha": "Varejo Vesti"
   },
@@ -5944,8 +5944,8 @@
   },
   "1746701": {
     "ligado": true,
-    "update": "2026-07-14",
-    "religamentoReal": false,
+    "update": "2026-08-13",
+    "religamentoReal": true,
     "nomePlanilha": "Matheus José da Silva",
     "canalPlanilha": "ProRoi"
   },
@@ -7218,8 +7218,8 @@
   },
   "2103135": {
     "ligado": true,
-    "update": "2026-08-04",
-    "religamentoReal": false,
+    "update": "2026-08-13",
+    "religamentoReal": true,
     "nomePlanilha": "",
     "canalPlanilha": ""
   },
@@ -7453,5 +7453,12 @@
     "religamentoReal": false,
     "nomePlanilha": "Sheila rodrigues",
     "canalPlanilha": "Starter"
+  },
+  "2133502": {
+    "ligado": false,
+    "update": "2026-08-13",
+    "religamentoReal": false,
+    "nomePlanilha": "",
+    "canalPlanilha": ""
   }
 }
