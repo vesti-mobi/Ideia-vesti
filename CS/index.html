@@ -488,7 +488,8 @@ if(_ss('get')==='1'){
                             receitaAntecipacao, linksGerados, linksPagos }],
                   series:[{ semana, cliente, linksGerados, linksPagos, valor }] },
      churn:     { series:[{ semana, cliente, churns }] },   // tabela vem de `clientes`
-     tarefas:   [{ tarefa, data, tipo, cs }]
+     tarefas:   [{ tarefa, data, tipo, situacao:'Concluída'|'A fazer'|…,
+                   concluidaEm, cs }]
    }
 
    Obs.: o campo `cliente` dentro de `series` é o que permite os gráficos
@@ -651,8 +652,11 @@ const MOCK = (function buildMock(){
 
   const tipos=['Reunião de acompanhamento','Onboarding','Renovação','Suporte crítico','Treinamento','Revisão de plano'];
   const tarefas = Array.from({length:52},()=>{
-    const tipo=pick(tipos), c=pick(clientes);
-    return { tarefa: tipo+' — '+c.nome, data: dia(int(-14,60)), tipo, cs: c.cs };
+    const tipo=pick(tipos), c=pick(clientes), data=dia(int(-14,60));
+    // no mock, o que já passou tem grande chance de estar concluído
+    const situacao = data<dia(0) ? (r()<0.75?'Concluída':'A fazer') : (r()<0.1?'Concluída':'A fazer');
+    return { tarefa: tipo+' — '+c.nome, data, tipo, situacao,
+             concluidaEm: situacao==='Concluída'?data:null, cs: c.cs };
   }).sort((a,b)=>b.data.localeCompare(a.data));
 
   clientes.forEach(c=>{ delete c._plano; delete c._inativo; delete c._semAcesso });
@@ -1025,28 +1029,35 @@ const TABS = [
   {
     id:'tarefas', grupo:'Operação', nav:'Tarefas', cor:'#B54A72', cor2:'#1E74C8',
     titulo:'Tarefas',
-    desc:'Agenda do time de CS: o que foi feito, o que está por vir e de que tipo é cada compromisso.',
-    filtros:['cs','periodo'],
+    desc:'Agenda do time de CS: o que já foi concluído, o que está a fazer e o que está atrasado. A situação vem do HubSpot, não da data.',
+    filtros:['cs','periodo','statusTarefa'],
     tabela:'Tarefas', chaveCliente:'tarefa',
     colunas:[
       {k:'tarefa', l:'Tarefa', tipo:'texto'},
       {k:'data', l:'Data', tipo:'dataRel'},
-      {k:'tipo', l:'Tipo', tipo:'tag'},
+      {k:'situacao', l:'Situação', tipo:'situacaoTarefa'},
       {k:'cs', l:'Responsável', tipo:'cs'},
     ],
     linhas:()=>DATA.tarefas,
-    kpis:(rows)=>[
-      {l:'Tarefas na visão', v:fmt.int(rows.length), s:'no período filtrado'},
-      {l:'Agendadas', v:fmt.int(rows.filter(r=>diasDe(r.data)<0).length), s:'ainda por acontecer'},
-      {l:'Concluídas', v:fmt.int(rows.filter(r=>diasDe(r.data)>=0).length), s:'já realizadas'},
-      {l:'Tipo mais frequente', v:maisFrequente(rows,'tipo'), s:'na visão atual'},
-    ]
+    kpis:(rows)=>{
+      const feitas = rows.filter(feita), aFazer = rows.filter(r=>!feita(r));
+      return [
+        {l:'Tarefas na visão', v:fmt.int(rows.length), s:'no período filtrado'},
+        {l:'Concluídas', v:fmt.int(feitas.length), s:pctTexto(feitas.length,rows.length)+' do total'},
+        {l:'A fazer', v:fmt.int(aFazer.length), s:fmt.int(aFazer.filter(r=>diasDe(r.data)<0).length)+' ainda por vencer'},
+        {l:'Atrasadas', v:fmt.int(aFazer.filter(r=>diasDe(r.data)>0).length), s:'venceram sem conclusão'},
+      ];
+    }
   },
 ];
 
 const soma=(a,k)=>a.reduce((s,x)=>s+(Number(x[k])||0),0);
 const media=(a,k)=>a.length?soma(a,k)/a.length:0;
 const pctTexto=(p,t)=>t?Math.round(p/t*100)+'%':'—';
+/* Situação da tarefa é o hs_task_status do HubSpot — nada a ver com a data.
+   Tudo que não é "Concluída" (a fazer, em andamento, aguardando, adiada) conta
+   como pendente; atrasada é pendente com data já vencida. */
+const feita=r=>r.situacao==='Concluída';
 function maisFrequente(a,k){const m={};a.forEach(x=>m[x[k]]=(m[x[k]]||0)+1);const e=Object.entries(m).sort((x,y)=>y[1]-x[1])[0];return e?e[0]:'—'}
 function piorSemana(s){const m={};s.forEach(x=>m[x.semana]=(m[x.semana]||0)+x.churns);const e=Object.entries(m).sort((a,b)=>b[1]-a[1])[0];return e&&e[1]?fmt.wk(e[0]):'—'}
 /* Fechado = SOMENTE 'Ganho'. 'Em aberto' não conta nem como ganho nem como perdido. */
@@ -1066,7 +1077,7 @@ function kpisDeal(rows){
 /* ============================================================================
    5. ESTADO
    ========================================================================== */
-const FILTROS_PADRAO_BASE = { cliente:'', statusDeal:'todos', cs:'todos', situacao:'Cancelado', statusCliente:'todos' };
+const FILTROS_PADRAO_BASE = { cliente:'', statusDeal:'todos', cs:'todos', situacao:'Cancelado', statusCliente:'todos', statusTarefa:'todos' };
 const filtrosPadrao = ()=>Object.assign({}, FILTROS_PADRAO_BASE, { semanas: ultimasSemanas(12) });
 const estado = {
   aba: 'clientes',
@@ -1138,11 +1149,23 @@ function filtrarLinhas(t){
   if(t.filtros.includes('statusDeal') && f.statusDeal!=='todos'){
     rows = rows.filter(r=>r.status===f.statusDeal);
   }
+  if(t.filtros.includes('statusTarefa') && f.statusTarefa!=='todos'){
+    rows = f.statusTarefa==='feitas'    ? rows.filter(feita)
+         : f.statusTarefa==='aFazer'    ? rows.filter(r=>!feita(r))
+         : f.statusTarefa==='atrasadas' ? rows.filter(r=>!feita(r) && diasDe(r.data)>0)
+         : rows;
+  }
   // período: só recorta linhas que carregam data própria. Onde a linha é um
   // agregado (tabela geral, produtos), o período já entrou na agregação.
   if(t.filtros.includes('periodo')){
     const temData = rows.some(r=>r.data);
-    if(temData) rows = rows.filter(r=>!r.data || dentroDaJanela(semanaDoAno(r.data)));
+    /* O seletor de semanas só vai até a semana atual, então tarefa com data
+       futura ficaria invisível — e ela é justamente a agenda do que vem. Quando
+       a semana atual está na seleção ("estou olhando o agora"), o que está por
+       vir entra junto. */
+    const futuroVale = t.id==='tarefas' && estado.filtros.semanas.has(DATA.meta.semanaAtual);
+    if(temData) rows = rows.filter(r=>!r.data || dentroDaJanela(semanaDoAno(r.data))
+      || (futuroVale && semanaDoAno(r.data) > DATA.meta.semanaAtual));
   }
 
   const o = estado.ordem[t.id];
@@ -1276,6 +1299,11 @@ function renderFiltros(t){
     add('Status', sel([['todos','Todos os status'],['Ganho','Somente ganhos'],
       ['Perdido','Somente perdidos'],['Em aberto','Somente em aberto']],
       estado.filtros.statusDeal, v=>estado.filtros.statusDeal=v));
+  }
+  if(t.filtros.includes('statusTarefa')){
+    add('Situação', sel([['todos','Concluídas e a fazer'],['feitas','Só concluídas'],
+      ['aFazer','Só a fazer'],['atrasadas','Só atrasadas']],
+      estado.filtros.statusTarefa, v=>estado.filtros.statusTarefa=v));
   }
   if(t.filtros.includes('situacao')){
     add('Situação', sel([['Cancelado','Cancelados'],['Em risco','Em risco (ativos)'],['todos','Todos']],
@@ -1586,8 +1614,16 @@ function celula(r,c){
       const x = relativo(v);
       td.innerHTML = `<span class="health ${x.cls}"><i></i>${x.txt}</span><span class="cell-sub">${fmt.date(v)}</span>`;
       break }
+    /* A legenda embaixo da data fala do PRAZO (venceu, vence hoje, ainda vai
+       vencer). Se foi feita ou não, quem diz é a coluna Situação. */
     case 'dataRel': { const d = diasDe(v);
-      td.innerHTML = `<span class="cell-main">${fmt.date(v)}</span><span class="cell-sub">${d<0?'agendada':'concluída'}</span>`; break }
+      const prazo = d<0 ? 'em '+Math.abs(d)+' d' : d===0 ? 'vence hoje' : 'venceu há '+d+' d';
+      td.innerHTML = `<span class="cell-main">${fmt.date(v)}</span><span class="cell-sub">${prazo}</span>`; break }
+    case 'situacaoTarefa': {
+      if(feita(r)){ td.innerHTML = '<span class="pill ok"><i></i>Concluída</span>'; break }
+      const atrasada = diasDe(r.data)>0;
+      td.innerHTML = `<span class="pill ${atrasada?'bad':'open'}"><i></i>${v||'A fazer'}</span>`
+        + (atrasada?'<span class="cell-sub">atrasada</span>':''); break }
     case 'barPct': {
       const w = Math.max(0,Math.min(100,v));
       td.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;justify-content:flex-end">

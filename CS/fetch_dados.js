@@ -484,17 +484,27 @@ async function puxarHubSpot() {
 
   const desde = Date.UTC(ANO, 0, 1);
   const tasksRaw = await buscarTudo('tasks',
-    ['hs_task_subject', 'hs_timestamp', 'hs_task_type', 'hs_task_status', 'hubspot_owner_id'],
+    ['hs_task_subject', 'hs_timestamp', 'hs_task_type', 'hs_task_status',
+     'hs_task_completion_date', 'hubspot_owner_id'],
     [{ filters: [{ propertyName: 'hs_timestamp', operator: 'GTE', value: String(desde) }] }],
     [{ propertyName: 'hs_timestamp', direction: 'DESCENDING' }]);
-  const TIPOS = { TODO: 'A fazer', CALL: 'Ligação', EMAIL: 'E-mail', MEETING: 'Reunião', LINKED_IN_MESSAGE: 'LinkedIn' };
+  /* Tipo é o formato do compromisso (hoje 100% TODO no HubSpot da Vesti) e
+     situação é hs_task_status — é a situação que separa feito de por fazer. */
+  const TIPOS = { TODO: 'Tarefa', CALL: 'Ligação', EMAIL: 'E-mail', MEETING: 'Reunião', LINKED_IN_MESSAGE: 'LinkedIn' };
+  const SITUACOES = { COMPLETED: 'Concluída', NOT_STARTED: 'A fazer', IN_PROGRESS: 'Em andamento',
+                      WAITING: 'Aguardando', DEFERRED: 'Adiada' };
   const tarefas = tasksRaw.map(t => ({
     tarefa: t.properties.hs_task_subject || '(sem assunto)',
     data: iso(t.properties.hs_timestamp),
     tipo: TIPOS[t.properties.hs_task_type] || t.properties.hs_task_type || 'Outro',
+    situacao: SITUACOES[t.properties.hs_task_status] || t.properties.hs_task_status || 'A fazer',
+    concluidaEm: iso(t.properties.hs_task_completion_date),
     cs: owners[t.properties.hubspot_owner_id] || '(sem responsável)',
   })).filter(t => t.data && Number(t.data.slice(0, 4)) === ANO && CS_TAREFAS.includes(t.cs));
+  const feitas = tarefas.filter(t => t.situacao === 'Concluída').length;
   console.log('  tarefas (só o time de CS)'.padEnd(44) + String(tarefas.length).padStart(8));
+  console.log('    concluídas / a fazer'.padEnd(44)
+    + (feitas + ' / ' + (tarefas.length - feitas)).padStart(8));
 
   return { negocios, tarefas };
 }
@@ -752,6 +762,8 @@ function montar(bqd, hsd) {
                    + 'Jay & Co e Landê Oficial = Upgrade.',
         cs: 'Marcas de anjos que saíram da carteira (' + ANJOS_FORA.join(', ') + ') aparecem como "Sem CS". '
           + 'A aba Tarefas mostra só: ' + CS_TAREFAS.join(', ') + '.',
+        tarefas: 'Situação vem de hs_task_status no HubSpot (Concluída / A fazer), não é derivada da data. '
+               + 'Tarefas com data futura aparecem quando a semana atual está na seleção — é a agenda do que vem.',
         churn: 'Derivado do Iugu: sem fatura paga há mais de ' + DIAS_CHURN + ' dias e sem fatura futura em aberto.',
         negocios: 'Pipeline "Expand (Upgrades)" do HubSpot. Cross-sell x upsell classificado pelo nome do negócio '
                 + '(sem escopo de line items na API). Fechado = somente estágio "Ganho (Expand)".',

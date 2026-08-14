@@ -32,6 +32,20 @@ Precisa de:
 
 Sem HubSpot o painel carrega mesmo assim: Cross-sell, Upsell e Tarefas ficam vazias.
 
+### Automático, todo dia às 04:00 BRT
+
+O workflow `.github/workflows/painel-clientes-cs.yml` no `vesti-mobi/dados` roda a
+mesma carga (`node CS/fetch_dados.js`) às 07:00 UTC e commita o `CS/dados.js`.
+Como o painel inteiro — todas as abas, tabelas e gráficos — lê desse único
+arquivo, uma carga atualiza tudo. Usa os secrets `GCP_SA_KEY` e `HUBSPOT_TOKEN`,
+que já existem no repositório, e aborta sem commitar se o `dados.js` sair com
+menos de 1 MB (sinal de que alguma fonte falhou). Dá para rodar na mão pela aba
+Actions ("Painel de Clientes CS" → Run workflow). A cópia local do arquivo é o
+`atualizar-painel.yml` aqui na pasta.
+
+⚠️ O `index.html` e o `README.md` **não** são publicados pelo workflow — mudança
+de layout continua indo por `node publicar.js`.
+
 ## De onde vem cada coluna
 
 | Aba | Campo | Fonte |
@@ -53,7 +67,8 @@ Sem HubSpot o painel carrega mesmo assim: Cross-sell, Upsell e Tarefas ficam vaz
 | Vesti Pago | valor / fee / antecipação | `MongoDB_Pedidos_Geral` com provider Vesti Pago |
 | Vesti Pago | links | pedidos com `settings_source = 'Link de cobrança'` |
 | Churn | data | derivado do Iugu (ver abaixo) |
-| Tarefas | tudo | HubSpot `tasks` |
+| Tarefas | tarefa / data / responsável | HubSpot `tasks` |
+| Tarefas | Situação | `hs_task_status` — `COMPLETED` = Concluída, o resto = A fazer |
 
 ## Ressalvas que mudam a leitura do número
 
@@ -124,7 +139,16 @@ contra R$ 909.346 de fee, 0,97% de divergência (estornos). A base está correta
 10. **Teto de R$ 50.000 por pedido**, o mesmo filtro do CS-Sucesso e do PainelElisa,
    para os números baterem entre os painéis.
 
-11. **Só 2026.** Todas as séries são semanas 1..atual do ano corrente, porque o painel
+11. **Tarefa concluída x a fazer vem do HubSpot, não da data.** A coluna antiga
+    "Tipo" mostrava `hs_task_type`, que hoje é `TODO` em 100% das tarefas — daí a
+    tabela inteira dizer "A fazer". Quem separa é `hs_task_status`: em 2026 são
+    246 tarefas do time de CS, 37 concluídas e 209 a fazer (205 delas já
+    vencidas). O filtro **Situação** corta em concluídas, a fazer e atrasadas
+    (a fazer com data vencida). Tarefa com data futura aparece quando a semana
+    atual está na seleção de semanas — o seletor só vai até a semana corrente, e
+    sem isso a agenda do que vem ficaria invisível.
+
+12. **Só 2026.** Todas as séries são semanas 1..atual do ano corrente, porque o painel
     inteiro é "semana do ano". Negócios e tarefas de anos anteriores ficam de fora
     (o pipeline Expand existe desde 2021; 101 dos 1.108 negócios têm data em 2026).
 
