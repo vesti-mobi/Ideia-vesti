@@ -52,6 +52,7 @@ de layout continua indo por `node publicar.js`.
 |---|---|---|
 | Todas | CS responsável | `odbc_domains.angel_id` → `odbc_angels.name` |
 | Tabela geral | Integração | `odbc_domains.integration_id` → `odbc_integrations.name` |
+| Tabela geral | Data de cadastro | `odbc_domains.created_at` — entrada da marca na Vesti |
 | Tabela geral | Plano | item mais caro da última fatura Iugu paga (tirando desconto/Oráculo) |
 | Tabela geral | Último pedido | `MAX(MongoDB_Pedidos_Geral.settings_createdAt)` |
 | Tabela geral | Pedidos / Valor / Ticket | `MongoDB_Pedidos_Geral`, pagos, por semana |
@@ -77,6 +78,13 @@ Estão também dentro do painel: clique no selo do topo direito.
 **Já validados contra fonte independente (13/08):** interchange e antecipação foram
 cruzados pedido a pedido com `vestipago_transaction_detail` — 28.559 pedidos, R$ 910.311
 contra R$ 909.346 de fee, 0,97% de divergência (estornos). A base está correta.
+
+0. **Data de cadastro = criação do domínio** (`odbc_domains.created_at`), ao lado
+   de "Último acesso" na tabela geral, com o tempo de casa embaixo ("7a 4m").
+   Está preenchida em 100% das 2.372 marcas, de 23/08/2016 até hoje, e nenhuma
+   empresa em `odbc_companies` foi criada antes do domínio dela — então o
+   domínio é mesmo a porta de entrada. Das 964 marcas com atividade em 2026, a
+   safra maior é 2025 (170) e 2020 (139).
 
 1. **Último acesso na plataforma não tem fonte.** Não existe coluna de login/sessão
    de lojista em nenhuma tabela do `vestilake_BI` — procurei por `login`, `acess`,
@@ -164,3 +172,6 @@ contra R$ 909.346 de fee, 0,97% de divergência (estornos). A base está correta
 - Os gráficos obedecem só a cliente + CS. Filtros de linha (status do negócio,
   situação do churn) não mexem no histórico, de propósito.
 - Exportar CSV exporta exatamente as linhas e colunas visíveis.
+- **"Hoje" é o dia de verdade do navegador.** Era uma data fixa (13/08/2026) de
+  quando o painel foi escrito; com a carga diária, tudo que é relativo ("há X
+  dias", tarefa atrasada, tempo de casa) tem que andar com o calendário.

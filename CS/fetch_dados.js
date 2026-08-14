@@ -614,6 +614,8 @@ function montar(bqd, hsd) {
       status: dataChurn ? 'inativo' : (ultimoPed && ultimoPed >= limiteChurn ? 'ativo' : 'inativo'),
       integracao: m.integracao,
       plano: (fat && fat.ultima && fat.ultima.plano) ? String(fat.ultima.plano) : 'Sem plano',
+      // entrada da marca na Vesti = criação do domínio (odbc_domains.created_at)
+      dataCadastro: m.criacao || null,
       ultimoAcesso: null,                    // sem fonte no BigQuery — ver README
       ultimoPedido: ultimoPed,
       vencimento: fat ? fat.proximo_venc : null,
@@ -742,6 +744,9 @@ function montar(bqd, hsd) {
       tetoPedido: TETO_PEDIDO,
       avisos: {
         ultimoAcesso: 'Sem fonte: não existe coluna de login/sessão do lojista no vestilake_BI.',
+        dataCadastro: 'Data de cadastro = odbc_domains.created_at (criação do domínio da marca). '
+                    + 'Completo em todas as marcas, de ago/2016 até hoje. Nenhuma empresa em '
+                    + 'odbc_companies foi criada antes do domínio dela, então o domínio é mesmo a entrada na Vesti.',
         mensalidade: 'Receita mensalidade = SÓ as linhas de plano da fatura Iugu. Oráculo, Filial, '
                + 'Assistente e taxa de ativação saem em "Outros (Iugu)" — juntos eram 25% do que '
                + 'antes ia todo para a coluna de mensalidade. Os dois entram na Receita total.',

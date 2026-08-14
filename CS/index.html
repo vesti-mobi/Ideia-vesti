@@ -463,6 +463,7 @@ if(_ss('get')==='1'){
      // --- cadastro: atributos que NÃO dependem do período ---
      clientes: [{
        nome, cs, status:'ativo'|'inativo', integracao, plano,
+       dataCadastro:'AAAA-MM-DD',   // entrada na Vesti (criação do domínio)
        ultimoAcesso:'AAAA-MM-DD',   // login na PLATAFORMA VESTI (não é o Tino)
        ultimoPedido:'AAAA-MM-DD',
        vencimento:'AAAA-MM-DD',
@@ -542,6 +543,7 @@ const MOCK = (function buildMock(){
     return {
       nome, cs: CS_TIME[i%CS_TIME.length],
       status: inativo?'inativo':'ativo', integracao, plano,
+      dataCadastro: dia(int(120, 3200)),   // de ~4 meses a ~9 anos de casa
       ultimoAcesso: dia(semAcesso),
       ultimoPedido: dia(inativo?int(30,70):int(0,6)),
       vencimento: '2026-09-'+String(int(1,28)).padStart(2,'0'),
@@ -690,13 +692,25 @@ const fmt = {
   moneyCompact:v=>'R$ '+fmt.compact(v),
   wk:s=>'S'+String(s).padStart(2,'0')
 };
-const hoje = new Date(2026,7,13);
+/* Hoje de verdade. Era uma data fixa (13/08/2026) de quando o painel foi
+   escrito; com a carga rodando todo dia às 04:00 BRT, "há X dias", "atrasada"
+   e tempo de casa precisam andar junto com o calendário. */
+const hoje = (()=>{ const d=new Date(); d.setHours(0,0,0,0); return d })();
 function diasDe(iso){ if(!iso) return null; const [y,m,d]=iso.split('-').map(Number); return Math.round((hoje-new Date(y,m-1,d))/864e5); }
 function relativo(iso){
   const d = diasDe(iso); if(d==null) return {txt:'—',cls:''};
   const cls = d<=7?'h-ok':d<=30?'h-warn':'h-bad';
   const txt = d<0?'em '+Math.abs(d)+' d':d===0?'hoje':d===1?'ontem':'há '+d+' dias';
   return {txt,cls};
+}
+/* "3a 2m", "7m", "há 12 d" — tempo desde o cadastro, em passo grosso. */
+function tempoDeCasa(iso){
+  const d = diasDe(iso); if(d==null) return '';
+  const meses = Math.floor(d/30.44);
+  if(meses < 1) return 'há '+Math.max(d,0)+' d';
+  if(meses < 12) return meses+' '+(meses===1?'mês':'meses');
+  const anos = Math.floor(meses/12), resto = meses%12;
+  return anos+'a'+(resto?' '+resto+'m':'');
 }
 function semanaDoAno(iso){ if(!iso) return null;
   const [y,m,d]=iso.split('-').map(Number); const dt=new Date(Date.UTC(y,m-1,d));
@@ -826,7 +840,7 @@ const TABS = [
   {
     id:'clientes', grupo:'Carteira', nav:'Tabela geral', cor:'#0E7A73', cor2:'#B7791F',
     titulo:'Tabela geral dos clientes',
-    desc:'Uma linha por cliente com contrato, uso e composição de receita. Pedidos e receita são somados dentro do período selecionado. <b>Último acesso</b> ainda não tem fonte: o BigQuery não guarda login de lojista.',
+    desc:'Uma linha por cliente com contrato, uso e composição de receita. Pedidos e receita são somados dentro do período selecionado. <b>Data de cadastro</b> é a entrada da marca na Vesti (criação do domínio), com o tempo de casa embaixo. <b>Último acesso</b> ainda não tem fonte: o BigQuery não guarda login de lojista.',
     filtros:['cliente','cs','statusCliente','periodo'],
     tabela:'Clientes', chaveCliente:'nome',
     colunas:[
@@ -835,6 +849,7 @@ const TABS = [
       {k:'status', l:'Status', tipo:'status'},
       {k:'integracao', l:'Integração', tipo:'tag'},
       {k:'plano', l:'Plano', tipo:'tag'},
+      {k:'dataCadastro', l:'Data de cadastro', tipo:'cadastro'},
       {k:'ultimoAcesso', l:'Último acesso', tipo:'rel'},
       {k:'ultimoPedido', l:'Último pedido', tipo:'rel'},
       {k:'pedidos', l:'Pedidos', tipo:'int', r:true},
@@ -1638,6 +1653,12 @@ function celula(r,c){
     case 'money': td.textContent = fmt.money(v); break;
     case 'moneyC': td.textContent = fmt.moneyC(v); break;
     case 'date': td.textContent = fmt.date(v); break;
+    /* Data de cadastro com o tempo de casa embaixo — é o que se quer saber
+       olhando a coluna ("entrou quando?" vira "está há quanto tempo?"). */
+    case 'cadastro': {
+      if(!v){ td.textContent = '—'; break }
+      td.innerHTML = `<span class="cell-main">${fmt.date(v)}</span><span class="cell-sub">${tempoDeCasa(v)}</span>`;
+      break }
     default: td.textContent = v==null?'—':v;
   }
   return td;
