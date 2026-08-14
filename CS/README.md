@@ -1,6 +1,6 @@
 # Painel de Clientes — CS
 
-Painel estático de 8 abas, grão semanal (semana ISO do ano corrente).
+Painel estático de 9 abas, grão semanal (semana ISO do ano corrente).
 
 ```
 index.html          o painel (layout + lógica, sem dependência externa)
@@ -30,7 +30,8 @@ Precisa de:
   PainelElisa usa. Só roda `SELECT`.
 - **HubSpot** — `HUBSPOT_TOKEN`; por padrão lê de `../CS-Sucesso-do-cliente/.env`.
 
-Sem HubSpot o painel carrega mesmo assim: Cross-sell, Upsell e Tarefas ficam vazias.
+Sem HubSpot o painel carrega mesmo assim: Cross-sell, Upsell, Tarefas e Tickets
+ficam vazias.
 
 ### Automático, todo dia às 04:00 BRT
 
@@ -53,6 +54,7 @@ de layout continua indo por `node publicar.js`.
 | Todas | CS responsável | `odbc_domains.angel_id` → `odbc_angels.name` |
 | Tabela geral | Integração | `odbc_domains.integration_id` → `odbc_integrations.name` |
 | Tabela geral | Data de cadastro | `odbc_domains.created_at` — entrada da marca na Vesti |
+| Todas | Canal | `odbc_domains.partner_id` → `odbc_partners.name` |
 | Tabela geral | Plano | item mais caro da última fatura Iugu paga (tirando desconto/Oráculo) |
 | Tabela geral | Último pedido | `MAX(MongoDB_Pedidos_Geral.settings_createdAt)` |
 | Tabela geral | Pedidos / Valor / Ticket | `MongoDB_Pedidos_Geral`, pagos, por semana |
@@ -70,6 +72,9 @@ de layout continua indo por `node publicar.js`.
 | Churn | data | derivado do Iugu (ver abaixo) |
 | Tarefas | tarefa / data / responsável | HubSpot `tasks` |
 | Tarefas | Situação | `hs_task_status` — `COMPLETED` = Concluída, o resto = A fazer |
+| Tickets | ticket / pipeline / estágio | HubSpot `tickets`, todos os pipelines |
+| Tickets | Situação | estágio marcado como fechado (`metadata.ticketState`) ou `closed_date` preenchida |
+| Tickets | Cliente e Canal | empresa associada ao ticket → marca do cadastro (nome, nome sem ruído ou CNPJ) |
 
 ## Ressalvas que mudam a leitura do número
 
@@ -78,6 +83,24 @@ Estão também dentro do painel: clique no selo do topo direito.
 **Já validados contra fonte independente (13/08):** interchange e antecipação foram
 cruzados pedido a pedido com `vestipago_transaction_detail` — 28.559 pedidos, R$ 910.311
 contra R$ 909.346 de fee, 0,97% de divergência (estornos). A base está correta.
+
+**Conferência da Alcance Loja Fábrica, julho/2026 (14/08).** Suspeita de que a
+receita estivesse "puxando PIX". Não está — **PIX não entra em nenhuma linha de
+receita**, porque `payment_transaction_vestiPagoValue` vem nulo em PIX (ressalva
+2). Os R$ 44,6k de julho (semanas 27–31) se decompõem assim:
+
+| Origem | Valor | De onde |
+|---|---|---|
+| Interchange | R$ 31.562 | cartão STARKBANK: R$ 22.211 de fee + R$ 9.352 de antifraude |
+| Antecipação | R$ 11.405 | R$ 60.571 cobrados do lojista × 18,85% |
+| Mensalidade + Outros | R$ 1.619 | fatura Iugu da semana 29 |
+| **PIX** | **R$ 0** | R$ 41.849 transacionados, fee nulo na fonte |
+
+O GMV da marca no mesmo mês é R$ 5,1M, mas R$ 3,95M disso são pedidos **pagos
+por fora** (provider nulo, ressalva 6): aparecem em "Valor dos pedidos" e não
+geram receita nenhuma. Se o número parecer alto, o candidato é a **antecipação**
+(26% dos 44k) — é a única parcela estimada, por um fator médio da carteira e não
+por medição pedido a pedido (ressalva 4).
 
 0. **Data de cadastro = criação do domínio** (`odbc_domains.created_at`), ao lado
    de "Último acesso" na tabela geral, com o tempo de casa embaixo ("7a 4m").
@@ -156,7 +179,25 @@ contra R$ 909.346 de fee, 0,97% de divergência (estornos). A base está correta
     atual está na seleção de semanas — o seletor só vai até a semana corrente, e
     sem isso a agenda do que vem ficaria invisível.
 
-12. **Só 2026.** Todas as séries são semanas 1..atual do ano corrente, porque o painel
+12. **Canal = parceiro dono da conta.** `odbc_domains.partner_id` →
+    `odbc_partners.name`: Vesti, Attasoft, Uemtel, Trial, Starter, Varejo Vesti,
+    Treino, Onix, Glads, ProRoi, Tizeefy, Up Agency, Ve Vantagens. Quem está sem
+    parceiro ou com `"N/A"` aparece como **Sem canal**. O filtro aceita mais de um
+    canal ao mesmo tempo e nenhum marcado quer dizer todos. Atenção: `odbc_partners`
+    vem com cada linha **duplicada** no espelho — o join agrupa antes, senão o
+    cadastro dobraria de tamanho.
+
+13. **Tickets: o cliente vem da empresa associada, não do assunto.** O ticket é
+    ligado à marca do cadastro em três tentativas — nome igual, nome sem ruído
+    (`chaveMarca()` tira "Ltda", "Modas", pontuação) e, por último, CNPJ
+    (propriedades `cnpj` e `hs_tax_id` da empresa no HubSpot). Numa amostra de 121
+    empresas isso levou o casamento de 54% para 76%. Ticket que não casa continua
+    na lista, só fica **Sem canal** — sumir com ticket por causa de cadastro seria
+    pior que mostrá-lo sem canal. A busca do HubSpot só pagina até 10.000
+    resultados por consulta, então a carga de tickets é quebrada **mês a mês**
+    (`buscarPorMes`); sem isso o resto sumiria em silêncio, sem erro.
+
+14. **Só 2026.** Todas as séries são semanas 1..atual do ano corrente, porque o painel
     inteiro é "semana do ano". Negócios e tarefas de anos anteriores ficam de fora
     (o pipeline Expand existe desde 2021; 101 dos 1.108 negócios têm data em 2026).
 
@@ -167,8 +208,11 @@ contra R$ 909.346 de fee, 0,97% de divergência (estornos). A base está correta
   desmarca o mês inteiro; os atalhos põem as últimas 4/12/26 semanas ou o ano todo.
   O recorte vale de verdade em todas as abas — a tabela geral e as três abas de
   produto são somadas a partir das séries semanais, não de um total anual pronto.
-- **Filtro de CS** existe na tabela geral, Oráculo, Tino, Vesti Pago e Tarefas, e
-  recorta tabela *e* gráfico.
+- **Filtro de CS** existe na tabela geral, Oráculo, Tino, Vesti Pago, Tarefas e
+  Tickets, e recorta tabela *e* gráfico.
+- **Filtro de Canal** é de seleção múltipla (nenhum marcado = todos) e vale na
+  tabela geral, nas três abas de produto, no Churn e nos Tickets. Nas abas que
+  agregam por cliente, o canal é buscado no cadastro pelo nome da marca.
 - Os gráficos obedecem só a cliente + CS. Filtros de linha (status do negócio,
   situação do churn) não mexem no histórico, de propósito.
 - Exportar CSV exporta exatamente as linhas e colunas visíveis.

@@ -206,6 +206,8 @@ button,input,select{font:inherit;color:inherit}
 .wk-s:hover{border-color:var(--acc-line)}
 .wk-s.on{background:var(--acc);border-color:var(--acc);color:#fff}
 .wk-s.hoje{box-shadow:0 0 0 2px var(--acc-soft)}
+/* chip de canal: mesmo botão das semanas, mas com texto em vez de número */
+.wk-s.canal{font-family:var(--f-body);font-size:11.5px;padding:5px 9px;color:var(--ink-2)}
 .btn{
   border:1px solid var(--line);background:var(--surface);
   border-radius:var(--r-sm);padding:7px 13px;font-size:12.5px;cursor:pointer;
@@ -463,6 +465,7 @@ if(_ss('get')==='1'){
      // --- cadastro: atributos que NÃO dependem do período ---
      clientes: [{
        nome, cs, status:'ativo'|'inativo', integracao, plano,
+       canal,                       // parceiro dono da conta: Vesti, Attasoft, Uemtel…
        dataCadastro:'AAAA-MM-DD',   // entrada na Vesti (criação do domínio)
        ultimoAcesso:'AAAA-MM-DD',   // login na PLATAFORMA VESTI (não é o Tino)
        ultimoPedido:'AAAA-MM-DD',
@@ -490,7 +493,10 @@ if(_ss('get')==='1'){
                   series:[{ semana, cliente, linksGerados, linksPagos, valor }] },
      churn:     { series:[{ semana, cliente, churns }] },   // tabela vem de `clientes`
      tarefas:   [{ tarefa, data, tipo, situacao:'Concluída'|'A fazer'|…,
-                   concluidaEm, cs }]
+                   concluidaEm, cs }],
+     tickets:   [{ ticket, cliente, canal, pipeline, estagio,
+                   situacao:'Aberto'|'Encerrado', categoria, prioridade, origem,
+                   cs, data, fechadoEm, diasParaFechar }]
    }
 
    Obs.: o campo `cliente` dentro de `series` é o que permite os gráficos
@@ -676,6 +682,15 @@ const MOCK = (function buildMock(){
 
 const DATA = DADOS_REAIS ? window.PAINEL_DATA : MOCK;
 
+/* Campos novos (canal, tickets) podem faltar no mock e num dados.js antigo:
+   o painel abre do mesmo jeito, só com a aba e o filtro vazios. */
+if(!DATA.tickets) DATA.tickets = [];
+DATA.clientes.forEach(c=>{ if(!c.canal) c.canal = 'Sem canal' });
+if(!DATA.meta.canais){
+  DATA.meta.canais = [...new Set(DATA.clientes.map(c=>c.canal))]
+    .sort((a,b)=> a==='Sem canal' ? 1 : b==='Sem canal' ? -1 : a.localeCompare(b,'pt-BR'));
+}
+
 /* ============================================================================
    2. FORMATADORES
    ========================================================================== */
@@ -789,6 +804,9 @@ function clientesAgregados(){
 
 /* CS de cada cliente, para as tabelas de produto herdarem o responsável. */
 const CS_POR_CLIENTE = (()=>{ const m={}; DATA.clientes.forEach(c=>m[c.nome]=c.cs); return m })();
+/* Canal de cada cliente, para as abas que agregam por nome (produtos, churn)
+   responderem ao filtro de canal sem carregar a coluna. */
+const CANAL_POR_CLIENTE = (()=>{ const m={}; DATA.clientes.forEach(c=>m[c.nome]=c.canal); return m })();
 
 /* As abas de produto também respeitam o Período: a tabela é somada a partir
    da série semanal, e não de um total anual pré-calculado. Sem isso o filtro
@@ -840,13 +858,14 @@ const TABS = [
   {
     id:'clientes', grupo:'Carteira', nav:'Tabela geral', cor:'#0E7A73', cor2:'#B7791F',
     titulo:'Tabela geral dos clientes',
-    desc:'Uma linha por cliente com contrato, uso e composição de receita. Pedidos e receita são somados dentro do período selecionado. <b>Data de cadastro</b> é a entrada da marca na Vesti (criação do domínio), com o tempo de casa embaixo. <b>Último acesso</b> ainda não tem fonte: o BigQuery não guarda login de lojista.',
-    filtros:['cliente','cs','statusCliente','periodo'],
+    desc:'Uma linha por cliente com contrato, uso e composição de receita. Pedidos e receita são somados dentro do período selecionado. <b>Data de cadastro</b> é a entrada da marca na Vesti (criação do domínio), com o tempo de casa embaixo. <b>Canal</b> é o parceiro dono da conta (Vesti, Attasoft, Uemtel…). <b>Último acesso</b> ainda não tem fonte: o BigQuery não guarda login de lojista.',
+    filtros:['cliente','cs','canal','statusCliente','periodo'],
     tabela:'Clientes', chaveCliente:'nome',
     colunas:[
       {k:'nome', l:'Cliente', tipo:'cliente'},
       COL_CS,
       {k:'status', l:'Status', tipo:'status'},
+      {k:'canal', l:'Canal', tipo:'tag'},
       {k:'integracao', l:'Integração', tipo:'tag'},
       {k:'plano', l:'Plano', tipo:'tag'},
       {k:'dataCadastro', l:'Data de cadastro', tipo:'cadastro'},
@@ -903,7 +922,7 @@ const TABS = [
     id:'oraculo', grupo:'Produtos', nav:'Uso do Oráculo', cor:'#1E74C8', cor2:'#B7791F',
     titulo:'Uso do Oráculo',
     desc:'Volume de atendimentos, participação da IA e o GMV gerado. <b>Iniciado</b> = venda direta + influenciada pelo Oráculo; <b>iniciado e finalizado</b> = só a venda direta, fechada dentro do Oráculo.',
-    filtros:['cliente','cs','periodo'],
+    filtros:['cliente','cs','canal','periodo'],
     tabela:'Clientes', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente', tipo:'cliente'},
@@ -937,7 +956,7 @@ const TABS = [
     id:'tino', grupo:'Produtos', nav:'Uso do Tino', cor:'#B7791F', cor2:'#0E7A73',
     titulo:'Uso do Tino',
     desc:'Engajamento medido em cliques nos links compartilhados pelos vendedores. A segunda linha do gráfico é o <b>GMV total da marca</b> na semana, para comparar tendências — não é receita atribuída ao Tino.',
-    filtros:['cliente','cs','periodo'],
+    filtros:['cliente','cs','canal','periodo'],
     tabela:'Clientes', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente', tipo:'cliente'},
@@ -971,7 +990,7 @@ const TABS = [
     id:'vestiPago', grupo:'Produtos', nav:'Vesti Pago', cor:'#2E7D46', cor2:'#1E74C8',
     titulo:'Vesti Pago',
     desc:'Volume transacionado, receita de fee e de antecipação, e quantos links de cobrança cada cliente emitiu — e quantos foram pagos. <b>A receita cobre só cartão</b>: em PIX o fee da Vesti não é registrado na fonte, embora o valor transacionado inclua os dois.',
-    filtros:['cliente','cs','periodo'],
+    filtros:['cliente','cs','canal','periodo'],
     tabela:'Clientes', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente', tipo:'cliente'},
@@ -1007,7 +1026,7 @@ const TABS = [
     id:'churn', grupo:'Carteira', nav:'Churn', cor:'#C0453B', cor2:'#7B8595',
     titulo:'Churn',
     desc:'Cancelamentos e o risco de quem ainda está na base. Churn é derivado do Iugu: sem fatura paga há mais de 45 dias e sem fatura futura em aberto.',
-    filtros:['cliente','periodo','situacao'],
+    filtros:['cliente','canal','periodo','situacao'],
     tabela:'Clientes', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente', tipo:'cliente'},
@@ -1064,6 +1083,41 @@ const TABS = [
       ];
     }
   },
+  {
+    id:'tickets', grupo:'Operação', nav:'Tickets', cor:'#1E74C8', cor2:'#C0453B',
+    titulo:'Tickets do suporte',
+    desc:'Tickets do HubSpot abertos no ano, de todos os pipelines — Suporte, VestiPago, Integrações e os demais. O período filtra pela <b>data de abertura</b>. Encerrado é o que o HubSpot marcou como fechado; o resto continua em aberto, por mais antigo que seja.',
+    filtros:['cliente','cs','canal','pipeline','periodo','statusTicket'],
+    tabela:'Tickets', chaveCliente:'cliente',
+    colunas:[
+      {k:'ticket', l:'Ticket', tipo:'ticket'},
+      {k:'cliente', l:'Cliente', tipo:'clienteCanal'},
+      {k:'pipeline', l:'Pipeline', tipo:'tag'},
+      {k:'estagio', l:'Estágio', tipo:'tag'},
+      {k:'situacao', l:'Situação', tipo:'situacaoTicket'},
+      {k:'prioridade', l:'Prioridade', tipo:'prioridade'},
+      {k:'origem', l:'Origem', tipo:'tag'},
+      {k:'cs', l:'Responsável', tipo:'cs'},
+      {k:'data', l:'Abertura', tipo:'dataTicket'},
+    ],
+    linhas:()=>DATA.tickets,
+    kpis:(rows)=>{
+      const fechados = rows.filter(r=>r.situacao==='Encerrado');
+      const abertos = rows.filter(r=>r.situacao!=='Encerrado');
+      const comTempo = fechados.filter(r=>r.diasParaFechar!=null);
+      const medio = comTempo.length ? soma(comTempo,'diasParaFechar')/comTempo.length : null;
+      /* Idade do que está aberto: é o número que mostra fila parada, e não
+         aparece na média de fechamento (que só olha ticket já resolvido). */
+      const velho = abertos.filter(r=>diasDe(r.data)>30).length;
+      return [
+        {l:'Tickets na visão', v:fmt.int(rows.length), s:'abertos no período filtrado'},
+        {l:'Encerrados', v:fmt.int(fechados.length), s:pctTexto(fechados.length,rows.length)+' do total'},
+        {l:'Ainda abertos', v:fmt.int(abertos.length), s:fmt.int(velho)+' há mais de 30 dias'},
+        {l:'Tempo médio até encerrar', v:medio==null?'—':(Math.round(medio*10)/10).toLocaleString('pt-BR')+' d',
+         s:`${comTempo.length} tickets com data de fechamento`},
+      ];
+    }
+  },
 ];
 
 const soma=(a,k)=>a.reduce((s,x)=>s+(Number(x[k])||0),0);
@@ -1092,8 +1146,12 @@ function kpisDeal(rows){
 /* ============================================================================
    5. ESTADO
    ========================================================================== */
-const FILTROS_PADRAO_BASE = { cliente:'', statusDeal:'todos', cs:'todos', situacao:'Cancelado', statusCliente:'todos', statusTarefa:'todos' };
-const filtrosPadrao = ()=>Object.assign({}, FILTROS_PADRAO_BASE, { semanas: ultimasSemanas(12) });
+const FILTROS_PADRAO_BASE = { cliente:'', statusDeal:'todos', cs:'todos', situacao:'Cancelado',
+  statusCliente:'todos', statusTarefa:'todos', statusTicket:'todos', pipeline:'todos' };
+/* `canais` vazio quer dizer "todos" — assim o filtro nasce sem nada marcado e
+   marcar um canal já é o recorte, sem precisar desmarcar os outros 14. */
+const filtrosPadrao = ()=>Object.assign({}, FILTROS_PADRAO_BASE,
+  { semanas: ultimasSemanas(12), canais: new Set() });
 const estado = {
   aba: 'clientes',
   filtros: filtrosPadrao(),
@@ -1158,6 +1216,20 @@ function filtrarLinhas(t){
   if(t.filtros.includes('cs') && f.cs!=='todos'){
     rows = rows.filter(r=>r.cs===f.cs);
   }
+  /* Canal: seleção múltipla, vazia = todos. A linha pode trazer o canal (ticket,
+     tabela geral) ou não (abas de produto, que agregam por cliente) — nesse caso
+     pergunta ao cadastro pelo nome do cliente. */
+  if(t.filtros.includes('canal') && f.canais.size){
+    rows = rows.filter(r=>f.canais.has(r.canal || CANAL_POR_CLIENTE[r[chave]] || 'Sem canal'));
+  }
+  if(t.filtros.includes('pipeline') && f.pipeline!=='todos'){
+    rows = rows.filter(r=>r.pipeline===f.pipeline);
+  }
+  if(t.filtros.includes('statusTicket') && f.statusTicket!=='todos'){
+    rows = f.statusTicket==='abertos'
+      ? rows.filter(r=>r.situacao!=='Encerrado')
+      : rows.filter(r=>r.situacao==='Encerrado');
+  }
   if(t.filtros.includes('statusCliente') && f.statusCliente!=='todos'){
     rows = rows.filter(r=>r.status===f.statusCliente);
   }
@@ -1210,6 +1282,9 @@ function escopoClientes(t){
   if(t.filtros.includes('cs') && f.cs!=='todos'){
     const porCs = new Set(DATA.clientes.filter(c=>c.cs===f.cs).map(c=>c.nome));
     nomes = nomes.filter(n=>porCs.has(n));
+  }
+  if(t.filtros.includes('canal') && f.canais.size){
+    nomes = nomes.filter(n=>f.canais.has(CANAL_POR_CLIENTE[n]||'Sem canal'));
   }
   return new Set(nomes);
 }
@@ -1299,11 +1374,20 @@ function renderFiltros(t){
     /* A lista de CS sai das linhas da própria aba: Tarefas é só o time de CS,
        as abas de carteira incluem "Sem CS". Assim o filtro nunca oferece um
        nome que não devolve nada. */
-    const fonte = t.id==='tarefas' ? DATA.tarefas.map(x=>x.cs) : DATA.clientes.map(c=>c.cs);
+    const fonte = t.id==='tarefas' ? DATA.tarefas.map(x=>x.cs)
+                : t.id==='tickets' ? DATA.tickets.map(x=>x.cs)
+                : DATA.clientes.map(c=>c.cs);
     const nomes = [...new Set(fonte)].filter(Boolean).sort((a,b)=>
       a==='Sem CS' ? 1 : b==='Sem CS' ? -1 : a.localeCompare(b,'pt-BR'));
-    add('CS responsável', sel([['todos','Todo o time'],...nomes.map(n=>[n,n])],
-      estado.filtros.cs, v=>estado.filtros.cs=v));
+    add(t.id==='tickets' ? 'Responsável' : 'CS responsável',
+      sel([['todos', t.id==='tickets' ? 'Todos os responsáveis' : 'Todo o time'],...nomes.map(n=>[n,n])],
+        estado.filtros.cs, v=>estado.filtros.cs=v));
+  }
+  if(t.filtros.includes('canal')) add('Canal', seletorDeCanais());
+  if(t.filtros.includes('pipeline')){
+    const pipes = [...new Set(DATA.tickets.map(x=>x.pipeline))].filter(Boolean).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    add('Pipeline', sel([['todos','Todos os pipelines'],...pipes.map(p=>[p,p])],
+      estado.filtros.pipeline, v=>estado.filtros.pipeline=v));
   }
   if(t.filtros.includes('periodo')) add('Semanas', seletorDeSemanas());
   if(t.filtros.includes('statusCliente')){
@@ -1324,12 +1408,56 @@ function renderFiltros(t){
     add('Situação', sel([['Cancelado','Cancelados'],['Em risco','Em risco (ativos)'],['todos','Todos']],
       estado.filtros.situacao, v=>estado.filtros.situacao=v));
   }
+  if(t.filtros.includes('statusTicket')){
+    add('Situação', sel([['todos','Abertos e encerrados'],['abertos','Só abertos'],['encerrados','Só encerrados']],
+      estado.filtros.statusTicket, v=>estado.filtros.statusTicket=v));
+  }
 
   const acts = el('div',{class:'filters-actions'});
   const limpar = el('button',{class:'btn btn-ghost',type:'button'},'Limpar filtros');
   limpar.onclick=()=>{estado.filtros=filtrosPadrao();renderPagina()};
   acts.appendChild(limpar);
   box.appendChild(acts);
+  return box;
+}
+
+/* --- seletor de canais: múltipla escolha, nenhum marcado = todos --- */
+function seletorDeCanais(){
+  const sel = estado.filtros.canais;
+  const lista = DATA.meta.canais || [];
+  const box = el('div',{class:'wk-pick'});
+
+  const resumo = ()=> !sel.size ? 'todos os canais'
+    : sel.size===1 ? [...sel][0]
+    : sel.size+' canais';
+
+  const botao = el('button',{class:'wk-btn',type:'button'},
+    '<span>'+resumo()+'</span><svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>');
+  const painel = el('div',{class:'wk-pop'});
+  if(estado.canalAberto) painel.classList.add('aberto');
+  botao.onclick = (e)=>{ e.stopPropagation();
+    estado.canalAberto = !estado.canalAberto;
+    painel.classList.toggle('aberto', estado.canalAberto);
+  };
+
+  const quick = el('div',{class:'wk-quick'});
+  const todos = el('button',{class:'wk-chip',type:'button'},'Todos');
+  todos.onclick=(e)=>{e.stopPropagation(); sel.clear(); renderPagina()};
+  quick.appendChild(todos);
+  painel.appendChild(quick);
+
+  const chips = el('div',{class:'wk-chips'});
+  lista.forEach(c=>{
+    const on = sel.has(c);
+    const b = el('button',{class:'wk-s canal'+(on?' on':''),type:'button',
+      title:'Marcas do canal '+c},c);
+    b.onclick=(e)=>{e.stopPropagation(); on?sel.delete(c):sel.add(c); renderPagina()};
+    chips.appendChild(b);
+  });
+  painel.appendChild(chips);
+  painel.onclick = e => e.stopPropagation();
+
+  box.appendChild(botao); box.appendChild(painel);
   return box;
 }
 
@@ -1619,6 +1747,7 @@ function celula(r,c){
       const cls = v==='Alto'?'bad':v==='Médio'?'warn':'ok';
       td.innerHTML = v?`<span class="pill ${cls}"><i></i>${v}</span>`:'—'; break }
     case 'tag': {
+      if(v==null || v===''){ td.textContent = '—'; break }   // origem e categoria podem faltar
       const cls = c.k==='plano' ? ' t-'+String(v).replace(/\s+/g,'') : '';
       const hue = c.k==='tipo' ? ` data-hue="${hueDe(v)}"` : '';
       td.innerHTML = `<span class="tag${cls}"${hue}>${v}</span>`; break }
@@ -1639,6 +1768,29 @@ function celula(r,c){
       const atrasada = diasDe(r.data)>0;
       td.innerHTML = `<span class="pill ${atrasada?'bad':'open'}"><i></i>${v||'A fazer'}</span>`
         + (atrasada?'<span class="cell-sub">atrasada</span>':''); break }
+    /* Assunto do ticket com a categoria embaixo: a categoria é o que agrupa
+       ("Configuração de frete", "Ativação VestiPago (PIX)") e o assunto é o
+       caso individual. */
+    case 'ticket': td.innerHTML = `<span class="cell-main" style="font-weight:600">${v}</span>`
+        // categoria pode vir com mais de um valor, separados por ";" no HubSpot
+        + (r.categoria?`<span class="cell-sub">${String(r.categoria).split(';').join(' · ')}</span>`:''); break;
+    case 'clienteCanal': td.innerHTML = `<span class="cell-main">${v||'—'}</span>`
+        + `<span class="cell-sub">${r.canal||'Sem canal'}</span>`; break;
+    case 'situacaoTicket': td.innerHTML = v==='Encerrado'
+        ? '<span class="pill ok"><i></i>Encerrado</span>'
+        : '<span class="pill open"><i></i>Aberto</span>'; break;
+    case 'prioridade': {
+      const cls = v==='Urgente'||v==='Alta' ? 'bad' : v==='Média' ? 'warn' : 'ok';
+      td.innerHTML = v?`<span class="pill ${cls}"><i></i>${v}</span>`:'—'; break }
+    /* Abertura com o desfecho embaixo: quantos dias levou para encerrar, ou há
+       quantos dias está parado em aberto. */
+    case 'dataTicket': {
+      if(!v){ td.textContent = '—'; break }
+      const sub = r.situacao==='Encerrado'
+        ? (r.diasParaFechar==null ? 'encerrado' : 'fechou em '+r.diasParaFechar+' d')
+        : 'aberto há '+Math.max(0,diasDe(v))+' d';
+      td.innerHTML = `<span class="cell-main">${fmt.date(v)}</span><span class="cell-sub">${sub}</span>`;
+      break }
     case 'barPct': {
       const w = Math.max(0,Math.min(100,v));
       td.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;justify-content:flex-end">
@@ -1724,12 +1876,12 @@ window.__cs_boot = function(){
 };
 if(document.getElementById('app').style.display !== 'none') window.__cs_boot();
 
-/* clicar fora fecha o seletor de semanas */
+/* clicar fora fecha os seletores de semanas e de canais */
 document.addEventListener('click', ()=>{
-  if(!estado.pickerAberto) return;
+  if(!estado.pickerAberto && !estado.canalAberto) return;
   estado.pickerAberto = false;
-  const p = document.querySelector('.wk-pop.aberto');
-  if(p) p.classList.remove('aberto');
+  estado.canalAberto = false;
+  document.querySelectorAll('.wk-pop.aberto').forEach(p=>p.classList.remove('aberto'));
 });
 
 window.addEventListener('resize', debounce(()=>renderPagina(), 180));

@@ -96,6 +96,7 @@ async function puxarBQ() {
   const cadastro = await q('cadastro de marcas (domínio + CS)', `
     WITH dom AS (
       SELECT CAST(ID AS STRING) id, name, angel_id, integration_type, integration_id, created_at,
+             CAST(partner_id AS STRING) partner_id,
              ROW_NUMBER() OVER (PARTITION BY ID ORDER BY updated_At DESC) rn
       FROM ${DS}.odbc_domains
       WHERE LOWER(IFNULL(modulos,'')) LIKE '%vendas%'
@@ -112,14 +113,22 @@ async function puxarBQ() {
     integ AS (
       SELECT CAST(SAFE_CAST(id AS FLOAT64) AS INT64) id, ANY_VALUE(name) nome
       FROM ${DS}.odbc_integrations GROUP BY 1
+    ),
+    /* Canal = parceiro dono da conta (Vesti, Attasoft, Uemtel, Trial, Starter…).
+       odbc_partners vem com cada linha duplicada no espelho, daí o GROUP BY. */
+    part AS (
+      SELECT CAST(id AS STRING) id, ANY_VALUE(name) nome
+      FROM ${DS}.odbc_partners GROUP BY 1
     )
     SELECT d.id, d.name nome, d.integration_type, i.nome integracao_nome,
            a.name cs, c.tax_document cnpj, c.social_name, c.status status_empresa,
-           SUBSTR(CAST(d.created_at AS STRING),1,10) criacao
+           SUBSTR(CAST(d.created_at AS STRING),1,10) criacao,
+           p.nome canal
     FROM dom d
     LEFT JOIN comp c ON c.domain_id = d.id AND c.rn = 1
     LEFT JOIN ${DS}.odbc_angels a ON CAST(a.id AS STRING) = CAST(d.angel_id AS STRING)
     LEFT JOIN integ i ON i.id = CAST(SAFE_CAST(d.integration_id AS FLOAT64) AS INT64)
+    LEFT JOIN part p ON p.id = d.partner_id
     WHERE d.rn = 1`);
 
   const pedidos = await q('pedidos por marca × semana', `
@@ -359,6 +368,60 @@ async function buscarTudo(objeto, props, filtros, sort) {
   return out;
 }
 
+/* A busca do HubSpot só pagina até 10.000 resultados por consulta — acima disso
+   o `after` simplesmente para de andar e o resto some sem erro. Tickets do ano
+   passam desse teto, então a janela é quebrada MÊS A MÊS e cada pedaço fica
+   folgadamente abaixo do limite. */
+async function buscarPorMes(objeto, props, propData, ano, ateMes, filtroExtra) {
+  const out = [];
+  for (let m = 0; m <= ateMes; m++) {
+    const ini = Date.UTC(ano, m, 1), fim = Date.UTC(ano, m + 1, 1);
+    const filtros = [{ filters: [
+      { propertyName: propData, operator: 'GTE', value: String(ini) },
+      { propertyName: propData, operator: 'LT', value: String(fim) },
+      ...(filtroExtra || []),
+    ] }];
+    const lote = await buscarTudo(objeto, props, filtros,
+      [{ propertyName: propData, direction: 'ASCENDING' }]);
+    if (lote.length >= 10000) console.log('    ! ' + MESES_LOG[m] + ' bateu o teto de 10.000');
+    out.push(...lote);
+  }
+  return out;
+}
+const MESES_LOG = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+/* Empresa associada a cada objeto (deal, ticket). Vem em lotes de 100 e é mais
+   confiável que tentar ler o nome da marca do assunto. */
+async function empresasAssociadas(objeto, ids) {
+  const empresaDo = {};
+  for (let i = 0; i < ids.length; i += 100) {
+    const lote = ids.slice(i, i + 100).map(id => ({ id: String(id) }));
+    try {
+      const j = await hs('POST', `/crm/v4/associations/${objeto}/companies/batch/read`, { inputs: lote });
+      (j.results || []).forEach(r => {
+        if (r.to && r.to.length) empresaDo[r.from.id] = r.to[0].toObjectId;
+      });
+    } catch (e) { /* associação é opcional */ }
+  }
+  const nome = {}, doc = {};
+  const idsEmpresa = [...new Set(Object.values(empresaDo))];
+  for (let i = 0; i < idsEmpresa.length; i += 100) {
+    try {
+      const j = await hs('POST', '/crm/v3/objects/companies/batch/read',
+        { properties: ['name', 'cnpj', 'hs_tax_id'],
+          inputs: idsEmpresa.slice(i, i + 100).map(id => ({ id: String(id) })) });
+      (j.results || []).forEach(c => {
+        nome[c.id] = c.properties.name;
+        // o CNPJ mora em duas propriedades diferentes conforme quem cadastrou
+        const d = [c.properties.cnpj, c.properties.hs_tax_id]
+          .map(soDigitos).find(x => x.length >= 11);
+        if (d) doc[c.id] = d;
+      });
+    } catch (e) { /* idem */ }
+  }
+  return { empresaDo, nome, doc };
+}
+
 /* Classificação do negócio a partir do nome. O HubSpot guarda cross-sell e
    upsell juntos no pipeline "Expand (Upgrades)"; o produto aparece no nome
    ("Oraculo | Marca", "Filial Integrada - Marca", "Marca - Upgrade"...).
@@ -391,6 +454,14 @@ const semAcento = s => String(s || '').normalize('NFC').toLowerCase()
   .replace(/[áàâãäéèêëíìîïóòôõöúùûüçñ]/g, c => ACENTOS[c])
   .replace(/\s+/g, ' ').trim();
 
+/* Chave grosseira de marca: tira acento, pontuação, forma jurídica e as
+   palavras que quase toda confecção usa. Serve só para casar a empresa do
+   HubSpot com a marca do cadastro quando o nome não bate letra a letra
+   ("Bella Modas Ltda" = "bella"). */
+const chaveMarca = s => semAcento(s)
+  .replace(/\b(ltda|me|epp|eireli|s\/a|sa|comercio|confeccoes|confeccao|moda|modas|store|oficial)\b/g, '')
+  .replace(/[^a-z0-9]/g, '');
+
 /* Negócios cujo nome não diz o produto. Decididos com a Laura em 13/08/2026. */
 const EXCECOES = [
   { re: /kelly rodrigues store fortaleza/, produto: 'Filial',           cat: 'cross' },
@@ -420,7 +491,7 @@ function marcaDoNome(nome, cls) {
 
 async function puxarHubSpot() {
   console.log('\n[HubSpot]');
-  if (!HS_TOKEN) { console.log('  sem HUBSPOT_TOKEN — negócios e tarefas ficam vazios'); return { negocios: [], tarefas: [] }; }
+  if (!HS_TOKEN) { console.log('  sem HUBSPOT_TOKEN — negócios, tarefas e tickets ficam vazios'); return { negocios: [], tarefas: [], tickets: [] }; }
 
   const owners = {};
   let after;
@@ -445,25 +516,8 @@ async function puxarHubSpot() {
   console.log('  negócios (pipeline Expand)'.padEnd(44) + String(deals.length).padStart(8));
 
   // empresa associada -> nome do cliente (mais confiável que raspar o nome do deal)
-  const empresaDoDeal = {};
-  for (let i = 0; i < deals.length; i += 100) {
-    const lote = deals.slice(i, i + 100).map(d => ({ id: d.id }));
-    try {
-      const j = await hs('POST', '/crm/v4/associations/deals/companies/batch/read', { inputs: lote });
-      (j.results || []).forEach(r => {
-        if (r.to && r.to.length) empresaDoDeal[r.from.id] = r.to[0].toObjectId;
-      });
-    } catch (e) { /* associação é opcional */ }
-  }
-  const idsEmpresa = [...new Set(Object.values(empresaDoDeal))];
-  const nomeEmpresa = {};
-  for (let i = 0; i < idsEmpresa.length; i += 100) {
-    try {
-      const j = await hs('POST', '/crm/v3/objects/companies/batch/read',
-        { properties: ['name'], inputs: idsEmpresa.slice(i, i + 100).map(id => ({ id: String(id) })) });
-      (j.results || []).forEach(c => nomeEmpresa[c.id] = c.properties.name);
-    } catch (e) { /* idem */ }
-  }
+  const { empresaDo: empresaDoDeal, nome: nomeEmpresa } =
+    await empresasAssociadas('deals', deals.map(d => d.id));
   console.log('  empresas associadas'.padEnd(44) + String(Object.keys(nomeEmpresa).length).padStart(8));
 
   const negocios = deals.map(d => {
@@ -506,7 +560,70 @@ async function puxarHubSpot() {
   console.log('    concluídas / a fazer'.padEnd(44)
     + (feitas + ' / ' + (tarefas.length - feitas)).padStart(8));
 
-  return { negocios, tarefas };
+  const tickets = await puxarTickets(owners);
+
+  return { negocios, tarefas, tickets };
+}
+
+/* ---------------------------------------------------------------- tickets
+   Todos os pipelines de ticket (Suporte, VestiPago, Integrações, Marketing,
+   Comercial, Aplicativo, Inadimplente, Oráculo) — o pipeline vira coluna e
+   filtro no painel, então nenhum é descartado aqui. */
+const ORIGEM_TICKET = { CHAT: 'Chat', EMAIL: 'E-mail', FORM: 'Formulário', PHONE: 'Telefone',
+                        CONVERSATION: 'Conversa', INTEGRATION: 'Integração', API: 'API' };
+const PRIORIDADE = { LOW: 'Baixa', MEDIUM: 'Média', HIGH: 'Alta', URGENT: 'Urgente' };
+
+async function puxarTickets(owners) {
+  const pipes = await hs('GET', '/crm/v3/pipelines/tickets');
+  const nomePipe = {}, nomeEstagio = {}, estagioFecha = {};
+  pipes.results.forEach(p => {
+    nomePipe[p.id] = (p.label || '').trim();
+    (p.stages || []).forEach(s => {
+      nomeEstagio[s.id] = (s.label || '').trim();
+      /* Quem decide se o ticket está encerrado é o próprio HubSpot
+         (metadata.ticketState). O rótulo só entra como reserva, para pipeline
+         customizado que não marcou o estágio final. */
+      estagioFecha[s.id] = (s.metadata && s.metadata.ticketState === 'CLOSED')
+        || /encerrad|fechad|finalizad|conclu[íi]d/i.test(s.label || '');
+    });
+  });
+
+  const brutos = await buscarPorMes('tickets',
+    ['subject', 'hs_pipeline', 'hs_pipeline_stage', 'hs_ticket_category', 'hs_ticket_priority',
+     'source_type', 'createdate', 'closed_date', 'hubspot_owner_id'],
+    'createdate', ANO, HOJE.getUTCMonth());
+  console.log('  tickets (todos os pipelines)'.padEnd(44) + String(brutos.length).padStart(8));
+
+  const { empresaDo, nome: nomeEmpresa, doc: cnpjEmpresa } =
+    await empresasAssociadas('tickets', brutos.map(t => t.id));
+  console.log('  tickets com empresa associada'.padEnd(44) + String(Object.keys(empresaDo).length).padStart(8));
+
+  const tickets = brutos.map(t => {
+    const p = t.properties;
+    const fechado = !!p.closed_date || !!estagioFecha[p.hs_pipeline_stage];
+    const abertura = iso(p.createdate), fim = iso(p.closed_date);
+    return {
+      ticket: p.subject || '(sem assunto)',
+      empresa: nomeEmpresa[empresaDo[t.id]] || null,   // vira `cliente` na montagem
+      empresaCnpj: cnpjEmpresa[empresaDo[t.id]] || null,
+      pipeline: nomePipe[p.hs_pipeline] || 'Outro',
+      estagio: nomeEstagio[p.hs_pipeline_stage] || '—',
+      situacao: fechado ? 'Encerrado' : 'Aberto',
+      categoria: p.hs_ticket_category || null,
+      prioridade: PRIORIDADE[p.hs_ticket_priority] || null,
+      origem: ORIGEM_TICKET[p.source_type] || p.source_type || null,
+      cs: owners[p.hubspot_owner_id] || '(sem responsável)',
+      data: abertura,
+      fechadoEm: fim,
+      diasParaFechar: (abertura && fim)
+        ? Math.max(0, Math.round((new Date(fim) - new Date(abertura)) / 864e5)) : null,
+    };
+  }).filter(t => t.data && Number(t.data.slice(0, 4)) === ANO);
+  const encerrados = tickets.filter(t => t.situacao === 'Encerrado').length;
+  console.log('    encerrados / abertos'.padEnd(44)
+    + (encerrados + ' / ' + (tickets.length - encerrados)).padStart(8));
+
+  return tickets;
 }
 
 // ================================================================ 3. MONTAGEM
@@ -522,7 +639,10 @@ function montar(bqd, hsd) {
       dom: c.id,
       nome: (c.nome || c.social_name || 'Domínio ' + c.id).trim(),
       cs: (c.cs && c.cs !== 'N/A' && !ANJOS_FORA.includes(c.cs)) ? c.cs : 'Sem CS',
+      social: c.social_name || null,
       integracao: c.integracao_nome || c.integration_type || 'Sem integração',
+      // canal = parceiro dono da conta; "N/A" no cadastro é o mesmo que sem canal
+      canal: (c.canal && c.canal !== 'N/A') ? c.canal : 'Sem canal',
       cnpj: soDigitos(c.cnpj),
       statusEmpresa: c.status_empresa,
       criacao: c.criacao,
@@ -613,6 +733,7 @@ function montar(bqd, hsd) {
       nome: m.nome, cs: m.cs,
       status: dataChurn ? 'inativo' : (ultimoPed && ultimoPed >= limiteChurn ? 'ativo' : 'inativo'),
       integracao: m.integracao,
+      canal: m.canal,
       plano: (fat && fat.ultima && fat.ultima.plano) ? String(fat.ultima.plano) : 'Sem plano',
       // entrada da marca na Vesti = criação do domínio (odbc_domains.created_at)
       dataCadastro: m.criacao || null,
@@ -734,10 +855,49 @@ function montar(bqd, hsd) {
   console.log('  marcas com atividade em ' + ANO + ''.padEnd(20) + String(clientesFinal.length).padStart(13));
 
   const csLista = [...new Set(clientesFinal.map(c => c.cs))].sort();
+  const canaisLista = [...new Set(clientesFinal.map(c => c.canal))]
+    .sort((a, b) => a === 'Sem canal' ? 1 : b === 'Sem canal' ? -1 : a.localeCompare(b, 'pt-BR'));
+
+  /* Ticket -> marca do painel pelo nome da empresa associada no HubSpot
+     (normalizado, sem acento). Casando, o ticket herda o canal e passa a
+     obedecer ao filtro de canal; sem casar, fica "Sem canal" mas continua
+     visível — sumir com ticket por causa de cadastro seria pior. */
+  const marcaPorNome = new Map(), marcaPorChave = new Map(), marcaPorCnpj = new Map();
+  porDom.forEach(m => {
+    [m.nome, m.social].filter(Boolean).forEach(n => {
+      const k = semAcento(n);
+      if (k && !marcaPorNome.has(k)) marcaPorNome.set(k, m);
+      const c = chaveMarca(n);
+      if (c.length > 3 && !marcaPorChave.has(c)) marcaPorChave.set(c, m);
+    });
+    if (m.cnpj && !marcaPorCnpj.has(m.cnpj)) marcaPorCnpj.set(m.cnpj, m);
+  });
+  let ticketsCasados = 0;
+  const tickets = (hsd.tickets || []).map(t => {
+    /* Três tentativas, da mais para a menos exata. O nome cru resolve a maioria;
+       a chave sem ruído ("Ltda", "Modas", pontuação) pega a diferença entre o
+       nome da empresa no HubSpot e o do domínio; o CNPJ salva os casos em que
+       o nome no HubSpot é outro ("Claribel Confeções - Starter - Uemtel"). */
+    const m = (t.empresa && marcaPorNome.get(semAcento(t.empresa)))
+           || (t.empresa && marcaPorChave.get(chaveMarca(t.empresa)))
+           || (t.empresaCnpj && marcaPorCnpj.get(t.empresaCnpj))
+           || null;
+    if (m) ticketsCasados++;
+    const o = Object.assign({}, t, {
+      cliente: m ? m.nome : (t.empresa || '(sem marca)'),
+      canal: m ? m.canal : 'Sem canal',
+    });
+    delete o.empresa; delete o.empresaCnpj;
+    return o;
+  });
+  if (tickets.length) {
+    console.log('  tickets ligados a marca do painel'.padEnd(44)
+      + (ticketsCasados + '/' + tickets.length).padStart(8));
+  }
 
   return {
     meta: {
-      ano: ANO, semanaAtual: SEMANA_ATUAL, cs: csLista,
+      ano: ANO, semanaAtual: SEMANA_ATUAL, cs: csLista, canais: canaisLista,
       geradoEm: new Date().toISOString(),
       fatorAntecipacaoVesti: FATOR_ANTECIPACAO_VESTI,
       diasChurn: DIAS_CHURN,
@@ -769,6 +929,15 @@ function montar(bqd, hsd) {
           + 'A aba Tarefas mostra só: ' + CS_TAREFAS.join(', ') + '.',
         tarefas: 'Situação vem de hs_task_status no HubSpot (Concluída / A fazer), não é derivada da data. '
                + 'Tarefas com data futura aparecem quando a semana atual está na seleção — é a agenda do que vem.',
+        canal: 'Canal = parceiro dono da conta (odbc_domains.partner_id -> odbc_partners.name): '
+             + 'Vesti, Attasoft, Uemtel, Trial, Starter, Varejo Vesti… Marca sem parceiro ou com "N/A" '
+             + 'aparece como "Sem canal". O filtro aceita mais de um canal ao mesmo tempo.',
+        tickets: 'Tickets de TODOS os pipelines do HubSpot (Suporte, VestiPago, Integrações, Marketing, '
+               + 'Comercial, Aplicativo, Inadimplente, Oráculo), abertos no ano. Encerrado = o HubSpot '
+               + 'marcou o estágio como fechado ou preencheu a data de fechamento. O cliente vem da '
+               + 'empresa associada ao ticket; quando essa empresa não casa com nenhuma marca do '
+               + 'cadastro, o ticket fica sem canal (mas continua na lista). O período filtra pela '
+               + 'data de abertura.',
         churn: 'Derivado do Iugu: sem fatura paga há mais de ' + DIAS_CHURN + ' dias e sem fatura futura em aberto.',
         negocios: 'Pipeline "Expand (Upgrades)" do HubSpot. Cross-sell x upsell classificado pelo nome do negócio '
                 + '(sem escopo de line items na API). Fechado = somente estágio "Ganho (Expand)".',
@@ -783,6 +952,7 @@ function montar(bqd, hsd) {
     vestiPago: { tabela: vpTab, series: vpSeries },
     churn: { series: churnSeries },
     tarefas: hsd.tarefas,
+    tickets,
   };
 }
 
@@ -794,7 +964,7 @@ function montar(bqd, hsd) {
   const bqd = await puxarBQ();
   const hsd = await puxarHubSpot().catch(e => {
     console.log('  HubSpot falhou: ' + e.message.slice(0, 160));
-    return { negocios: [], tarefas: [] };
+    return { negocios: [], tarefas: [], tickets: [] };
   });
   const data = montar(bqd, hsd);
 
@@ -807,6 +977,9 @@ function montar(bqd, hsd) {
   console.log('  séries carteira ' + data.clientesSeries.length);
   console.log('  negócios        ' + data.negocios.length);
   console.log('  tarefas         ' + data.tarefas.length);
+  console.log('  tickets         ' + data.tickets.length
+    + ' (' + data.tickets.filter(t => t.situacao === 'Aberto').length + ' abertos)');
+  console.log('  canais          ' + data.meta.canais.join(', '));
   console.log('  oráculo         ' + data.oraculo.tabela.length + ' marcas / ' + data.oraculo.series.length + ' semanas-marca');
   console.log('  tino            ' + data.tino.tabela.length + ' marcas / ' + data.tino.series.length);
   console.log('  vesti pago      ' + data.vestiPago.tabela.length + ' marcas / ' + data.vestiPago.series.length);
