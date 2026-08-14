@@ -21,9 +21,9 @@
     "canalPlanilha": ""
   },
   "1329765": {
-    "ligado": false,
-    "update": "2026-08-12",
-    "religamentoReal": false,
+    "ligado": true,
+    "update": "2026-08-14",
+    "religamentoReal": true,
     "nomePlanilha": "Sisal Jeans",
     "canalPlanilha": "Vesti"
   },
@@ -1017,7 +1017,7 @@
   "1415574": {
     "ligado": true,
     "update": "2026-08-13",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "MODAS CARLA",
     "canalPlanilha": "Vesti"
   },
@@ -1842,8 +1842,8 @@
   },
   "25804": {
     "ligado": true,
-    "update": "2026-07-14",
-    "religamentoReal": false,
+    "update": "2026-08-14",
+    "religamentoReal": true,
     "nomePlanilha": "TRICOMIX",
     "canalPlanilha": "Vesti"
   },
@@ -2178,7 +2178,7 @@
   },
   "1819670": {
     "ligado": true,
-    "update": "2026-07-13",
+    "update": "2026-08-13",
     "religamentoReal": false,
     "nomePlanilha": "Fashion Noire",
     "canalPlanilha": "Vesti"
@@ -2802,7 +2802,7 @@
   "146795": {
     "ligado": true,
     "update": "2026-08-13",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Vitral",
     "canalPlanilha": "Attasoft"
   },
@@ -3921,8 +3921,8 @@
   },
   "89170": {
     "ligado": true,
-    "update": "2026-07-15",
-    "religamentoReal": false,
+    "update": "2026-08-14",
+    "religamentoReal": true,
     "nomePlanilha": "Sedanbi",
     "canalPlanilha": "Attasoft"
   },
@@ -4195,13 +4195,13 @@
   "1444714": {
     "ligado": true,
     "update": "2026-08-13",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "ThreeSix 3/6",
     "canalPlanilha": "Starter"
   },
   "1391220": {
     "ligado": true,
-    "update": "2026-07-14",
+    "update": "2026-08-13",
     "religamentoReal": false,
     "nomePlanilha": "Little Star",
     "canalPlanilha": "Vesti"
@@ -4426,7 +4426,7 @@
   "157684": {
     "ligado": true,
     "update": "2026-08-13",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Encantto Estilo",
     "canalPlanilha": "Vesti"
   },
@@ -4460,7 +4460,7 @@
   },
   "1531346": {
     "ligado": true,
-    "update": "2026-07-13",
+    "update": "2026-08-13",
     "religamentoReal": true,
     "nomePlanilha": "L.A Store",
     "canalPlanilha": "Trial"
@@ -4475,14 +4475,14 @@
   "243791": {
     "ligado": true,
     "update": "2026-08-13",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Morena Charme",
     "canalPlanilha": "Vesti"
   },
   "1217203": {
     "ligado": true,
     "update": "2026-08-13",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Gazzy",
     "canalPlanilha": "Starter"
   },
@@ -4496,7 +4496,7 @@
   "1672566": {
     "ligado": true,
     "update": "2026-08-13",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "STRANGER COMPANY",
     "canalPlanilha": "Vesti"
   },
@@ -4509,8 +4509,8 @@
   },
   "858226": {
     "ligado": true,
-    "update": "2026-07-10",
-    "religamentoReal": false,
+    "update": "2026-08-14",
+    "religamentoReal": true,
     "nomePlanilha": "Niran Confeccoes",
     "canalPlanilha": "Vesti"
   },
@@ -4579,8 +4579,8 @@
   },
   "606820": {
     "ligado": true,
-    "update": "2026-07-21",
-    "religamentoReal": false,
+    "update": "2026-08-14",
+    "religamentoReal": true,
     "nomePlanilha": "Other Girls",
     "canalPlanilha": "Vesti"
   },
@@ -4601,7 +4601,7 @@
   "67489": {
     "ligado": true,
     "update": "2026-08-13",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Lily Daisy",
     "canalPlanilha": "Attasoft"
   },
@@ -5076,7 +5076,7 @@
   },
   "2016411": {
     "ligado": true,
-    "update": "2026-07-13",
+    "update": "2026-08-13",
     "religamentoReal": false,
     "nomePlanilha": "SKYLER ACESSORIOS",
     "canalPlanilha": "Vesti"
@@ -5882,21 +5882,21 @@
   "1271226": {
     "ligado": true,
     "update": "2026-08-13",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Favorita Modas",
     "canalPlanilha": "Varejo Vesti"
   },
   "132814": {
     "ligado": true,
-    "update": "2026-07-13",
+    "update": "2026-08-13",
     "religamentoReal": false,
     "nomePlanilha": "Cubo Cubo",
     "canalPlanilha": "Starter"
   },
   "126426": {
     "ligado": true,
-    "update": "2026-07-13",
-    "religamentoReal": false,
+    "update": "2026-08-14",
+    "religamentoReal": true,
     "nomePlanilha": "Crisfael",
     "canalPlanilha": "Vesti"
   },
@@ -5945,7 +5945,7 @@
   "1746701": {
     "ligado": true,
     "update": "2026-08-13",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Matheus José da Silva",
     "canalPlanilha": "ProRoi"
   },
@@ -7218,10 +7218,10 @@
   },
   "2103135": {
     "ligado": true,
-    "update": "2026-08-13",
+    "update": "2026-08-14",
     "religamentoReal": true,
-    "nomePlanilha": "",
-    "canalPlanilha": ""
+    "nomePlanilha": "Riquezzi Jeans",
+    "canalPlanilha": "Vesti"
   },
   "1682781": {
     "ligado": true,
@@ -7338,7 +7338,7 @@
   "1140146": {
     "ligado": true,
     "update": "2026-08-13",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Meiatrês",
     "canalPlanilha": "Vesti"
   },
@@ -7459,6 +7459,13 @@
     "update": "2026-08-13",
     "religamentoReal": false,
     "nomePlanilha": "",
+    "canalPlanilha": ""
+  },
+  "974097": {
+    "ligado": true,
+    "update": "2026-08-14",
+    "religamentoReal": true,
+    "nomePlanilha": "Stefane Caroline Rocha",
     "canalPlanilha": ""
   }
 }
