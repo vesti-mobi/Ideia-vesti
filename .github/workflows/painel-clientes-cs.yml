@@ -1,0 +1,74 @@
+# Cópia local do workflow que roda no vesti-mobi/dados.
+# No repositório ele vive em .github/workflows/painel-clientes-cs.yml
+#
+# Roda todo dia às 04:00 BRT (07:00 UTC), refaz o CS/dados.js inteiro
+# (BigQuery + HubSpot) e commita. Todas as abas, tabelas e gráficos do painel
+# saem desse único arquivo, então uma carga atualiza o painel inteiro.
+#
+# Secrets usados (já existem no repo): GCP_SA_KEY, HUBSPOT_TOKEN
+
+name: Painel de Clientes CS
+
+on:
+  schedule:
+    - cron: '0 7 * * *'   # 04:00 BRT
+  workflow_dispatch:
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # o fetch_dados.js resolve o @google-cloud/bigquery na RAIZ do repo
+      - name: Instalar dependencias Node
+        run: npm install --no-audit --no-fund
+
+      - name: Gravar credencial BigQuery (SA key)
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
+
+      - name: Rodar carga (BigQuery + HubSpot)
+        working-directory: CS
+        env:
+          HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
+        run: node fetch_dados.js
+
+      # trava de sanidade: dados.js tem ~6 MB. Se vier um arquivo minúsculo,
+      # alguma fonte falhou e é melhor não publicar por cima do que está no ar.
+      - name: Conferir o tamanho do dados.js
+        run: |
+          BYTES=$(stat -c%s CS/dados.js)
+          echo "dados.js: $((BYTES/1048576)) MB"
+          if [ "$BYTES" -lt 1000000 ]; then
+            echo "dados.js veio pequeno demais ($BYTES bytes) — abortando sem commit"
+            exit 1
+          fi
+
+      - name: Commit e push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          MSG="Painel de Clientes CS: dados de $(TZ=America/Sao_Paulo date +'%d/%m/%Y %H:%M')"
+          cp CS/dados.js "$RUNNER_TEMP/dados.js"
+          for i in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset -q --hard origin/main
+            cp "$RUNNER_TEMP/dados.js" CS/dados.js
+            git add CS/dados.js
+            if git diff --cached --quiet; then echo "sem mudancas"; exit 0; fi
+            git commit -q -m "$MSG"
+            if git push; then echo "push ok (tentativa $i)"; exit 0; fi
+            echo "push falhou (tentativa $i), re-sincronizando..."
+            sleep 3
+          done
+          echo "push falhou apos varias tentativas"; exit 1
