@@ -1,6 +1,6 @@
 window.DADOS = {
-  "gerado_em": "2026-08-14T21:16:24.327Z",
-  "hoje": "2026-08-14",
+  "gerado_em": "2026-08-15T12:20:58.033Z",
+  "hoje": "2026-08-15",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
   "auto_publica_desde": "2026-08-10",
@@ -94,7 +94,7 @@ window.DADOS = {
       "envios": 12,
       "primeiro": "2026-07-28T11:47:18.529Z",
       "ultimo": "2026-08-12T12:05:03.861Z",
-      "dias": 2
+      "dias": 3
     },
     {
       "slug": "andressa-vesti",
@@ -112,7 +112,7 @@ window.DADOS = {
       "envios": 12,
       "primeiro": "2026-08-10T16:01:03.796Z",
       "ultimo": "2026-08-14T12:06:46.387Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "optimist-jeans",
@@ -292,7 +292,7 @@ window.DADOS = {
       "envios": 0,
       "primeiro": "2026-08-04T14:28:52.117Z",
       "ultimo": "2026-08-14T11:49:55.525Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "ttng",
@@ -994,7 +994,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-12T12:05:03.861Z",
           "ultimo": "2026-08-12T12:05:03.861Z",
-          "dias": 2,
+          "dias": 3,
           "produtos_medidos": 0,
           "atribuido": 36
         },
@@ -1014,7 +1014,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T12:06:46.387Z",
           "ultimo": "2026-08-14T12:06:46.387Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 0,
           "atribuido": 8
         },
@@ -1214,7 +1214,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T11:49:43.332Z",
           "ultimo": "2026-08-14T11:49:55.525Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 0,
           "atribuido": 0
         },
