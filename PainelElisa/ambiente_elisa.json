@@ -3395,8 +3395,8 @@
     "canalPlanilha": "Starter"
   },
   "1433423": {
-    "ligado": true,
-    "update": "2026-07-31",
+    "ligado": false,
+    "update": "2026-08-16",
     "religamentoReal": false,
     "nomePlanilha": "Ary Fashions Femininas",
     "canalPlanilha": "Uemtel"
@@ -3914,7 +3914,7 @@
   },
   "184076": {
     "ligado": true,
-    "update": "2026-08-03",
+    "update": "2026-08-15",
     "religamentoReal": false,
     "nomePlanilha": "Chaville",
     "canalPlanilha": "Attasoft"
@@ -4363,7 +4363,7 @@
   "231324": {
     "ligado": true,
     "update": "2026-08-15",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "VN11",
     "canalPlanilha": "Attasoft"
   },
@@ -4754,7 +4754,7 @@
   },
   "1058361": {
     "ligado": true,
-    "update": "2026-07-15",
+    "update": "2026-08-15",
     "religamentoReal": false,
     "nomePlanilha": "Mary Acessórios",
     "canalPlanilha": "Vesti"
@@ -4894,7 +4894,7 @@
   },
   "1072349": {
     "ligado": true,
-    "update": "2026-07-15",
+    "update": "2026-08-15",
     "religamentoReal": false,
     "nomePlanilha": "Vistamy Jeans",
     "canalPlanilha": "Vesti"
@@ -4930,7 +4930,7 @@
   "144574": {
     "ligado": true,
     "update": "2026-08-15",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Hellen Carolina",
     "canalPlanilha": "Vesti"
   },
@@ -5174,7 +5174,7 @@
   },
   "432686": {
     "ligado": true,
-    "update": "2026-07-15",
+    "update": "2026-08-15",
     "religamentoReal": false,
     "nomePlanilha": "Maria Bella",
     "canalPlanilha": "Vesti"
@@ -5496,7 +5496,7 @@
   },
   "1815775": {
     "ligado": true,
-    "update": "2026-07-29",
+    "update": "2026-08-15",
     "religamentoReal": false,
     "nomePlanilha": "Naide Piriguet",
     "canalPlanilha": "Uemtel"
@@ -6007,21 +6007,21 @@
   },
   "1858600": {
     "ligado": true,
-    "update": "2026-07-15",
+    "update": "2026-08-15",
     "religamentoReal": false,
     "nomePlanilha": "Solange Kohira",
     "canalPlanilha": ""
   },
   "1323666": {
     "ligado": true,
-    "update": "2026-08-03",
+    "update": "2026-08-15",
     "religamentoReal": false,
     "nomePlanilha": "Maribell",
     "canalPlanilha": ""
   },
   "1250663": {
     "ligado": true,
-    "update": "2026-07-15",
+    "update": "2026-08-15",
     "religamentoReal": false,
     "nomePlanilha": "Ana Luisa Rocha Aragao",
     "canalPlanilha": ""
@@ -6035,14 +6035,14 @@
   },
   "1926419": {
     "ligado": true,
-    "update": "2026-07-15",
+    "update": "2026-08-15",
     "religamentoReal": false,
     "nomePlanilha": "Conceito MIKA",
     "canalPlanilha": "Vesti"
   },
   "212047": {
     "ligado": true,
-    "update": "2026-07-15",
+    "update": "2026-08-15",
     "religamentoReal": false,
     "nomePlanilha": "Michael Leandro Kim",
     "canalPlanilha": "N/A"
@@ -6056,14 +6056,14 @@
   },
   "1251509": {
     "ligado": true,
-    "update": "2026-07-15",
+    "update": "2026-08-15",
     "religamentoReal": true,
     "nomePlanilha": "Perola Oriental",
     "canalPlanilha": "Ve Vantagens"
   },
   "1376305": {
     "ligado": true,
-    "update": "2026-07-15",
+    "update": "2026-08-15",
     "religamentoReal": true,
     "nomePlanilha": "Perola Oriental Bom Retiro",
     "canalPlanilha": "Ve Vantagens"
@@ -6091,14 +6091,14 @@
   },
   "1377761": {
     "ligado": true,
-    "update": "2026-07-15",
+    "update": "2026-08-15",
     "religamentoReal": false,
     "nomePlanilha": "Vtrih Confecções",
     "canalPlanilha": "Starter"
   },
   "713811": {
     "ligado": true,
-    "update": "2026-07-28",
+    "update": "2026-08-15",
     "religamentoReal": false,
     "nomePlanilha": "Stefani",
     "canalPlanilha": "Vesti"
@@ -7467,5 +7467,12 @@
     "religamentoReal": false,
     "nomePlanilha": "Stefane Caroline Rocha",
     "canalPlanilha": ""
+  },
+  "2144393": {
+    "ligado": true,
+    "update": "2026-08-15",
+    "religamentoReal": false,
+    "nomePlanilha": "CHAVILLE FASHION",
+    "canalPlanilha": "Attasoft"
   }
 }
