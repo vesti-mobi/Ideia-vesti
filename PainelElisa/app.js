@@ -114,6 +114,48 @@ function reativNoPeriodo(e) {
   return s;
 }
 
+// Numeros desenhados na barra — pedido da Laura (17/08): ver os valores sem passar
+// o mouse. O Chart.js 4 nao tem datalabels nativo e o painel nao carrega plugin de
+// CDN alem dele, entao desenhamos a mao. Em barra EMPILHADA sai o valor de cada
+// faixa dentro dela (so quando cabe, senao vira borrao) e o total da coluna logo
+// acima. Passa-se no config do grafico (`plugins:[valoresNaBarra]`), entao vale so
+// onde for pedido. Respeita a legenda: dataset escondido nao conta no total.
+const valoresNaBarra = {
+  id: "valoresNaBarra",
+  afterDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    const totais = [], topoY = [], topoX = [];
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.font = "600 11px system-ui, -apple-system, 'Segoe UI', sans-serif";
+    chart.data.datasets.forEach((ds, di) => {
+      // isDatasetVisible cobre os dois jeitos de esconder (clique na legenda e
+      // `hidden` no dataset); meta.hidden sozinho vem null no primeiro caso.
+      if (chart.isDatasetVisible && !chart.isDatasetVisible(di)) return;
+      const meta = chart.getDatasetMeta(di);
+      if (meta.hidden) return;
+      meta.data.forEach((barra, i) => {
+        const v = Number(ds.data[i]) || 0;
+        if (!v) return;
+        totais[i] = (totais[i] || 0) + v;
+        if (topoY[i] === undefined || barra.y < topoY[i]) { topoY[i] = barra.y; topoX[i] = barra.x; }
+        const base = barra.base === undefined ? barra.y : barra.base;
+        if (Math.abs(base - barra.y) < 14) return;   // faixa fina: o numero nao cabe
+        ctx.fillStyle = "#fff";
+        ctx.textBaseline = "middle";
+        ctx.fillText(v, barra.x, (barra.y + base) / 2);
+      });
+    });
+    ctx.fillStyle = Chart.defaults.color || "#666";
+    ctx.textBaseline = "bottom";
+    totais.forEach((t, i) => {
+      if (!t || topoY[i] === undefined) return;
+      ctx.fillText(t, topoX[i], topoY[i] - 4);
+    });
+    ctx.restore();
+  },
+};
+
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 function makeChart(id, cfg) {
   destroyChart(id);
@@ -604,6 +646,7 @@ function renderTabReativ() {
     .sort((a,b)=>somaFaixas(porCanal[b])-somaFaixas(porCanal[a]));
   makeChart("chart-reativ-evolucao", {
     type:"bar",
+    plugins:[valoresNaBarra],   // numeros visiveis sem passar o mouse
     data:{
       labels: canaisComDado,
       datasets: ORIGENS_REATIV.map(o=>({
@@ -613,6 +656,7 @@ function renderTabReativ() {
       })),
     },
     options:{responsive:true, maintainAspectRatio:false,
+      layout:{padding:{top:18}},   // espaco pro total desenhado acima da barra
       onClick:(evt, els, chart)=>{
         if (!els.length) return;
         const el = els[0];
