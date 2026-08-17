@@ -753,6 +753,82 @@ def _load_cancelled_ids() -> set:
         return set()
 
 
+def _ids_nao_pagos(candidatos: list[dict]) -> set:
+    """orderIds que a API declara HOJE como NAO PAGOS entre os candidatos a
+    persistir (pagamento recusado ou estornado depois da venda).
+
+    Por que existe: um pedido cujo pagamento virou `isPaid=false` /
+    `consolidatedPaymentStatus=REFUSED` sai do retorno de fetch_orders() — nao por
+    drop da API, e sim porque a coleta filtra `payment.isPaid=true`. Sem esta
+    checagem a persistencia segurava esse pedido para sempre e o "a pagar" do
+    fluxo ficava inflado. Caso que motivou (17/08/2026): Nova Versao 8054/8055/
+    8056/8171 e Maria Chica 5951 — R$ 2.236,02 de gross futuro fantasma, R$ 332,48
+    deles caindo em "hoje".
+
+    Como: 1 varredura por marca com `filter[payment.isPaid]=false` (projecao
+    enxuta, so isPaid + consolidatedPaymentStatus) e intersecao pelos _id. NAO da
+    para achar esses pedidos por janela de paidAt — o paidAt deles virou null.
+
+    Pedido que NAO aparecer aqui continua persistido: aquele e o drop da API, que e
+    exatamente o caso que a persistencia existe para cobrir. Falha de token ou de
+    rede tambem nao descarta ninguem (fail open) — melhor inflar um pouco do que
+    apagar cauda legitima.
+    """
+    token = os.environ.get("VESTI_ORDER_TOKEN", "").strip()
+    if not token:
+        print("[persist] sem VESTI_ORDER_TOKEN — nao consigo checar pagamento "
+              "recusado; persistindo todos os candidatos", file=sys.stderr)
+        return set()
+    headers = {"accept": "application/json", "Authorization": "Bearer " + token}
+    por_marca: dict[str, dict[str, dict]] = {}
+    for p in candidatos:
+        oid = p.get("orderId")
+        cid = p.get("companyId") or ""
+        if oid:
+            por_marca.setdefault(cid, {})[oid] = p
+
+    recusados: set = set()
+    for cid, ids in por_marca.items():
+        base = {
+            "filter[companyId]": cid,
+            "filter[payment.isPaid]": "false",
+            # projecao enxuta: 1000 pedidos em ~160KB no lugar de ~1,3MB
+            "select": "orderNumber,companyId,payment.isPaid,"
+                      "payment.consolidatedPaymentStatus",
+            "limit": PAGE_LIMIT,
+        }
+        try:
+            page = 1
+            total_pages = None
+            while True:
+                params = dict(base)
+                params["page"] = page
+                d = _get_json(API_URL + "?" + urllib.parse.urlencode(params), headers)
+                items = d.get("data", []) if isinstance(d, dict) else (d or [])
+                if total_pages is None:
+                    total_pages = int(d.get("totalPages") or 1) if isinstance(d, dict) else 1
+                for o in items:
+                    oid = o.get("_id") or o.get("id") or ""
+                    p = ids.get(oid)
+                    if not p:
+                        continue
+                    pay = o.get("payment") or {}
+                    recusados.add(oid)
+                    print(f"[persist]   descartado: {p.get('nomeFantasia')} pedido "
+                          f"{p.get('orderNumber')} — API diz isPaid="
+                          f"{pay.get('isPaid')} / {pay.get('consolidatedPaymentStatus')}")
+                if not items or (total_pages and page >= total_pages):
+                    break
+                page += 1
+                if PAGE_DELAY > 0:
+                    time.sleep(PAGE_DELAY)
+        except Exception as e:
+            print(f"[persist] checagem de pagamento falhou para {cid} "
+                  f"({type(e).__name__}: {e}) — mantendo os candidatos dessa marca",
+                  file=sys.stderr)
+    return recusados
+
+
 def _persist_fluxo_orders(fresh: dict) -> dict:
     """Preserva pedidos de FLUXO (nao-antecipados) ja vistos que a API deixou de
     devolver neste run, pra a cauda 'a pagar' nao desaparecer quando a API dropa
@@ -765,6 +841,8 @@ def _persist_fluxo_orders(fresh: dict) -> dict:
       - so re-insere FLUXO (nao-antecipado) — a aba Antecipacao segue o retrato
         fresco da API, sem alteracao;
       - nao re-insere cancelados;
+      - nao re-insere pedido cujo PAGAMENTO a API declara nao pago (recusado/
+        estornado) — ver _ids_nao_pagos();
       - PODA: so mantem o pedido persistido enquanto ele tiver ao menos uma parcela
         vencendo hoje ou no futuro (BRT); quando todas venceram, ele sai sozinho.
     """
@@ -776,7 +854,7 @@ def _persist_fluxo_orders(fresh: dict) -> dict:
     canc_ids = _load_cancelled_ids()
     brt_today = (datetime.now(timezone.utc) - timedelta(hours=3)).strftime("%Y-%m-%d")
 
-    readd = []
+    candidatos = []
     for p in existing["pedidos"]:
         oid = p.get("orderId")
         if not oid or oid in fresh_ids:        # presente no fresco -> fresco vence
@@ -788,8 +866,24 @@ def _persist_fluxo_orders(fresh: dict) -> dict:
         dues = [(pc.get("dueAt") or "")[:10] for pc in p.get("parcelas", [])]
         if not any(d and d >= brt_today for d in dues):   # todas venceram -> poda
             continue
+        candidatos.append(p)
+
+    if not candidatos:
+        return fresh
+
+    # Pagamento recusado/estornado nao e divida: esse pedido sai do retorno da API
+    # por causa do filtro isPaid=true, e sem esta checagem a persistencia o
+    # segurava para sempre (fantasma no "a pagar").
+    recusados = _ids_nao_pagos(candidatos)
+    readd = []
+    for p in candidatos:
+        if p.get("orderId") in recusados:
+            continue
         p["_persistido"] = True                # marcador (transparencia/debug)
         readd.append(p)
+    if recusados:
+        print(f"[persist] {len(recusados)} pedido(s) NAO persistido(s): a API diz "
+              f"que o pagamento nao esta pago (recusado/estornado)")
 
     if not readd:
         return fresh
