@@ -165,7 +165,8 @@ por medição pedido a pedido (ressalva 4).
    Priscila Argolo) aparecem como "Sem CS". A aba Tarefas mostra só o time em
    `CS_TAREFAS` — Luana, Thamiris, Cristiane, Elisa, Gabriella, Alexia e Tatiane.
    O filtro de CS de cada aba é montado a partir das linhas dela, então nunca
-   oferece um nome que não devolve nada.
+   oferece um nome que não devolve nada. Cross-sell, Upsell e Churn passaram a
+   mostrar a coluna **CS** junto com o filtro.
 
 10. **Teto de R$ 50.000 por pedido**, o mesmo filtro do CS-Sucesso e do PainelElisa,
    para os números baterem entre os painéis.
@@ -208,8 +209,13 @@ por medição pedido a pedido (ressalva 4).
   desmarca o mês inteiro; os atalhos põem as últimas 4/12/26 semanas ou o ano todo.
   O recorte vale de verdade em todas as abas — a tabela geral e as três abas de
   produto são somadas a partir das séries semanais, não de um total anual pronto.
-- **Filtro de CS** existe na tabela geral, Oráculo, Tino, Vesti Pago, Tarefas e
-  Tickets, e recorta tabela *e* gráfico.
+- **Filtro de CS** existe em **todas as abas** e é de seleção múltipla (nenhum
+  marcado = todo o time), com atalhos "Todos" e "Inverter". Recorta tabela *e*
+  gráfico. Em Cross-sell e Upsell o responsável é o dono do negócio no HubSpot,
+  caindo no CS da carteira quando o negócio não tem dono; em Tarefas e Tickets é
+  o dono do registro; nas demais, o CS da carteira da marca. O mesmo responsável
+  gravado com nome curto na carteira e completo no registro ("Jennyfer Rabelo" ×
+  "Jennyfer Rabelo dos Santos") é juntado num único filtro por `normalizarCs()`.
 - **Filtro de Canal** é de seleção múltipla (nenhum marcado = todos) e vale na
   tabela geral, nas três abas de produto, no Churn e nos Tickets. Nas abas que
   agregam por cliente, o canal é buscado no cadastro pelo nome da marca.

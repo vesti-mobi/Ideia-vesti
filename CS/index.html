@@ -808,6 +808,31 @@ const CS_POR_CLIENTE = (()=>{ const m={}; DATA.clientes.forEach(c=>m[c.nome]=c.c
    responderem ao filtro de canal sem carregar a coluna. */
 const CANAL_POR_CLIENTE = (()=>{ const m={}; DATA.clientes.forEach(c=>m[c.nome]=c.canal); return m })();
 
+/* Responsável de uma linha, para o filtro de CS valer em qualquer aba: em
+   Tarefas e Tickets é o dono do registro no HubSpot; nas demais é o CS da
+   carteira, com o nome da própria linha como reserva. */
+function csDaLinha(t,r){
+  const chave = t.chaveCliente || 'cliente';
+  return normalizarCs(r.cs) || CS_POR_CLIENTE[r[chave]] || 'Sem CS';
+}
+/* O HubSpot grava o mesmo responsável com nome curto na carteira e completo no
+   dono do registro ("Jennyfer Rabelo" × "Jennyfer Rabelo dos Santos"). Sem
+   juntar os dois, a mesma pessoa apareceria como dois filtros. */
+const NOMES_CS = [...new Set(DATA.clientes.map(c=>c.cs))].filter(n=>n && n!=='Sem CS');
+function normalizarCs(n){
+  if(!n) return '';
+  return NOMES_CS.find(c=>c!==n && (n.startsWith(c+' ') || c.startsWith(n+' '))) || n;
+}
+/* Lista de responsáveis oferecida pelo filtro: sai das linhas da própria aba,
+   assim o seletor nunca oferece um nome que não devolve nada. */
+function csDaAba(t){
+  const fonte = ['tarefas','tickets','crossSell','upsell'].includes(t.id)
+    ? t.linhas().map(r=>csDaLinha(t,r))
+    : DATA.clientes.map(c=>c.cs || 'Sem CS');
+  return [...new Set(fonte)].filter(Boolean).sort((a,b)=>
+    /^\(?Sem/i.test(a) ? 1 : /^\(?Sem/i.test(b) ? -1 : a.localeCompare(b,'pt-BR'));
+}
+
 /* As abas de produto também respeitam o Período: a tabela é somada a partir
    da série semanal, e não de um total anual pré-calculado. Sem isso o filtro
    de período mexeria só nos gráficos e a tabela mentiria. */
@@ -854,6 +879,13 @@ function linhasChurn(){
    ========================================================================== */
 const COL_CS = {k:'cs', l:'CS', tipo:'cs'};
 
+/* Negócios de uma categoria com o responsável resolvido: o dono do negócio no
+   HubSpot vem primeiro; sem ele, cai no CS da carteira daquela marca. */
+function negociosDe(categoria){
+  return DATA.negocios.filter(n=>n.categoria===categoria)
+    .map(n=>Object.assign({}, n, {cs: normalizarCs(n.cs) || CS_POR_CLIENTE[n.cliente] || 'Sem CS'}));
+}
+
 const TABS = [
   {
     id:'clientes', grupo:'Carteira', nav:'Tabela geral', cor:'#0E7A73', cor2:'#B7791F',
@@ -894,28 +926,30 @@ const TABS = [
     id:'crossSell', grupo:'Crescimento', nav:'Cross-sell', cor:'#4048B8', cor2:'#12968D',
     titulo:'Cross-sell',
     desc:'Negócios de produto novo na carteira existente. Vêm do pipeline <b>Expand (Upgrades)</b> do HubSpot, onde cross-sell e upsell ficam juntos — a categoria sai do produto no nome do negócio.',
-    filtros:['cliente','periodo','statusDeal'],
+    filtros:['cliente','cs','periodo','statusDeal'],
     tabela:'Negócios', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente / Negócio', tipo:'clienteNegocio'},
+      COL_CS,
       {k:'valor', l:'Valor', tipo:'money', r:true, forte:true},
       {k:'status', l:'Status', tipo:'ganho'},
     ],
-    linhas:()=>DATA.negocios.filter(n=>n.categoria==='cross'),
+    linhas:()=>negociosDe('cross'),
     kpis:(rows)=>kpisDeal(rows)
   },
   {
     id:'upsell', grupo:'Crescimento', nav:'Upsell', cor:'#8046C4', cor2:'#12968D',
     titulo:'Upsell',
     desc:'Expansões do que o cliente já tem — filial, multiloja, upgrade de plano. Mesmo pipeline <b>Expand (Upgrades)</b> do cross-sell; fechado é só o estágio "Ganho (Expand)".',
-    filtros:['cliente','periodo','statusDeal'],
+    filtros:['cliente','cs','periodo','statusDeal'],
     tabela:'Negócios', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente / Negócio', tipo:'clienteNegocio'},
+      COL_CS,
       {k:'valor', l:'Valor', tipo:'money', r:true, forte:true},
       {k:'status', l:'Status', tipo:'ganho'},
     ],
-    linhas:()=>DATA.negocios.filter(n=>n.categoria==='up'),
+    linhas:()=>negociosDe('up'),
     kpis:(rows)=>kpisDeal(rows)
   },
   {
@@ -1026,10 +1060,11 @@ const TABS = [
     id:'churn', grupo:'Carteira', nav:'Churn', cor:'#C0453B', cor2:'#7B8595',
     titulo:'Churn',
     desc:'Cancelamentos e o risco de quem ainda está na base. Churn é derivado do Iugu: sem fatura paga há mais de 45 dias e sem fatura futura em aberto.',
-    filtros:['cliente','canal','periodo','situacao'],
+    filtros:['cliente','cs','canal','periodo','situacao'],
     tabela:'Clientes', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente', tipo:'cliente'},
+      COL_CS,
       {k:'plano', l:'Plano', tipo:'tag'},
       {k:'data', l:'Data do churn', tipo:'date'},
       {k:'riscoChurn', l:'Risco de churn', tipo:'risco'},
@@ -1146,12 +1181,12 @@ function kpisDeal(rows){
 /* ============================================================================
    5. ESTADO
    ========================================================================== */
-const FILTROS_PADRAO_BASE = { cliente:'', statusDeal:'todos', cs:'todos', situacao:'Cancelado',
+const FILTROS_PADRAO_BASE = { cliente:'', statusDeal:'todos', situacao:'Cancelado',
   statusCliente:'todos', statusTarefa:'todos', statusTicket:'todos', pipeline:'todos' };
-/* `canais` vazio quer dizer "todos" — assim o filtro nasce sem nada marcado e
-   marcar um canal já é o recorte, sem precisar desmarcar os outros 14. */
+/* `canais` e `cs` vazios querem dizer "todos" — assim o filtro nasce sem nada
+   marcado e marcar um item já é o recorte, sem precisar desmarcar os outros. */
 const filtrosPadrao = ()=>Object.assign({}, FILTROS_PADRAO_BASE,
-  { semanas: ultimasSemanas(12), canais: new Set() });
+  { semanas: ultimasSemanas(12), canais: new Set(), cs: new Set() });
 const estado = {
   aba: 'clientes',
   filtros: filtrosPadrao(),
@@ -1213,8 +1248,8 @@ function filtrarLinhas(t){
     rows = rows.filter(r=>String(r[chave]||'').toLowerCase().includes(q)
                        || String(r.negocio||'').toLowerCase().includes(q));
   }
-  if(t.filtros.includes('cs') && f.cs!=='todos'){
-    rows = rows.filter(r=>r.cs===f.cs);
+  if(t.filtros.includes('cs') && f.cs.size){
+    rows = rows.filter(r=>f.cs.has(csDaLinha(t,r)));
   }
   /* Canal: seleção múltipla, vazia = todos. A linha pode trazer o canal (ticket,
      tabela geral) ou não (abas de produto, que agregam por cliente) — nesse caso
@@ -1279,9 +1314,8 @@ function escopoClientes(t){
     const q = f.cliente.toLowerCase();
     nomes = nomes.filter(n=>n.toLowerCase().includes(q));
   }
-  if(t.filtros.includes('cs') && f.cs!=='todos'){
-    const porCs = new Set(DATA.clientes.filter(c=>c.cs===f.cs).map(c=>c.nome));
-    nomes = nomes.filter(n=>porCs.has(n));
+  if(t.filtros.includes('cs') && f.cs.size){
+    nomes = nomes.filter(n=>f.cs.has(CS_POR_CLIENTE[n]||'Sem CS'));
   }
   if(t.filtros.includes('canal') && f.canais.size){
     nomes = nomes.filter(n=>f.canais.has(CANAL_POR_CLIENTE[n]||'Sem canal'));
@@ -1371,17 +1405,7 @@ function renderFiltros(t){
     add('Nome do cliente', i);
   }
   if(t.filtros.includes('cs')){
-    /* A lista de CS sai das linhas da própria aba: Tarefas é só o time de CS,
-       as abas de carteira incluem "Sem CS". Assim o filtro nunca oferece um
-       nome que não devolve nada. */
-    const fonte = t.id==='tarefas' ? DATA.tarefas.map(x=>x.cs)
-                : t.id==='tickets' ? DATA.tickets.map(x=>x.cs)
-                : DATA.clientes.map(c=>c.cs);
-    const nomes = [...new Set(fonte)].filter(Boolean).sort((a,b)=>
-      a==='Sem CS' ? 1 : b==='Sem CS' ? -1 : a.localeCompare(b,'pt-BR'));
-    add(t.id==='tickets' ? 'Responsável' : 'CS responsável',
-      sel([['todos', t.id==='tickets' ? 'Todos os responsáveis' : 'Todo o time'],...nomes.map(n=>[n,n])],
-        estado.filtros.cs, v=>estado.filtros.cs=v));
+    add(t.id==='tickets' ? 'Responsável' : 'CS responsável', seletorDeCs(t));
   }
   if(t.filtros.includes('canal')) add('Canal', seletorDeCanais());
   if(t.filtros.includes('pipeline')){
@@ -1418,6 +1442,52 @@ function renderFiltros(t){
   limpar.onclick=()=>{estado.filtros=filtrosPadrao();renderPagina()};
   acts.appendChild(limpar);
   box.appendChild(acts);
+  return box;
+}
+
+/* --- seletor de CS: múltipla escolha, nenhum marcado = todo o time --- */
+function seletorDeCs(t){
+  const sel = estado.filtros.cs;
+  const lista = csDaAba(t);
+  const box = el('div',{class:'wk-pick'});
+  const rotulo = t.id==='tickets' ? 'responsáveis' : 'CS';
+
+  const resumo = ()=> !sel.size ? (t.id==='tickets' ? 'todos os responsáveis' : 'todo o time')
+    : sel.size===1 ? [...sel][0]
+    : sel.size+' '+rotulo;
+
+  const botao = el('button',{class:'wk-btn',type:'button'},
+    '<span>'+resumo()+'</span><svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>');
+  const painel = el('div',{class:'wk-pop'});
+  if(estado.csAberto) painel.classList.add('aberto');
+  botao.onclick = (e)=>{ e.stopPropagation();
+    estado.csAberto = !estado.csAberto;
+    painel.classList.toggle('aberto', estado.csAberto);
+  };
+
+  const quick = el('div',{class:'wk-quick'});
+  const todos = el('button',{class:'wk-chip',type:'button'},'Todos');
+  todos.onclick=(e)=>{e.stopPropagation(); sel.clear(); renderPagina()};
+  quick.appendChild(todos);
+  const nenhum = el('button',{class:'wk-chip',type:'button'},'Inverter');
+  nenhum.onclick=(e)=>{e.stopPropagation();
+    const novo = lista.filter(n=>!sel.has(n));
+    sel.clear(); novo.forEach(n=>sel.add(n)); renderPagina()};
+  quick.appendChild(nenhum);
+  painel.appendChild(quick);
+
+  const chips = el('div',{class:'wk-chips'});
+  lista.forEach(n=>{
+    const on = sel.has(n);
+    const b = el('button',{class:'wk-s canal'+(on?' on':''),type:'button',
+      title:'Linhas de '+n},n);
+    b.onclick=(e)=>{e.stopPropagation(); on?sel.delete(n):sel.add(n); renderPagina()};
+    chips.appendChild(b);
+  });
+  painel.appendChild(chips);
+  painel.onclick = e => e.stopPropagation();
+
+  box.appendChild(botao); box.appendChild(painel);
   return box;
 }
 
@@ -1876,11 +1946,12 @@ window.__cs_boot = function(){
 };
 if(document.getElementById('app').style.display !== 'none') window.__cs_boot();
 
-/* clicar fora fecha os seletores de semanas e de canais */
+/* clicar fora fecha os seletores de semanas, de canais e de CS */
 document.addEventListener('click', ()=>{
-  if(!estado.pickerAberto && !estado.canalAberto) return;
+  if(!estado.pickerAberto && !estado.canalAberto && !estado.csAberto) return;
   estado.pickerAberto = false;
   estado.canalAberto = false;
+  estado.csAberto = false;
   document.querySelectorAll('.wk-pop.aberto').forEach(p=>p.classList.remove('aberto'));
 });
 
