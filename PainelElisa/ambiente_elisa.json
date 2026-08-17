@@ -995,7 +995,7 @@
   },
   "124451": {
     "ligado": true,
-    "update": "2026-07-27",
+    "update": "2026-08-16",
     "religamentoReal": false,
     "nomePlanilha": "Bestie",
     "canalPlanilha": "Attasoft"
@@ -1492,7 +1492,7 @@
   },
   "164810": {
     "ligado": true,
-    "update": "2026-07-16",
+    "update": "2026-08-16",
     "religamentoReal": false,
     "nomePlanilha": "AFETTO",
     "canalPlanilha": "Attasoft"
@@ -1821,8 +1821,8 @@
   },
   "1191066": {
     "ligado": true,
-    "update": "2026-07-15",
-    "religamentoReal": false,
+    "update": "2026-08-17",
+    "religamentoReal": true,
     "nomePlanilha": "Lesly Modas",
     "canalPlanilha": "Vesti"
   },
@@ -1961,7 +1961,7 @@
   },
   "1823782": {
     "ligado": true,
-    "update": "2026-07-16",
+    "update": "2026-08-16",
     "religamentoReal": false,
     "nomePlanilha": "Équilibrée",
     "canalPlanilha": "Starter"
@@ -2234,10 +2234,10 @@
   },
   "1186697": {
     "ligado": true,
-    "update": "2026-07-16",
+    "update": "2026-08-16",
     "religamentoReal": false,
     "nomePlanilha": "Drika Confeccoes",
-    "canalPlanilha": "Vesti"
+    "canalPlanilha": "Starter"
   },
   "1189766": {
     "ligado": true,
@@ -2304,7 +2304,7 @@
   },
   "1169508": {
     "ligado": true,
-    "update": "2026-07-17",
+    "update": "2026-08-16",
     "religamentoReal": false,
     "nomePlanilha": "Carla Simone Vieira Da Silva",
     "canalPlanilha": "Varejo Vesti"
@@ -2857,7 +2857,7 @@
   },
   "1562486": {
     "ligado": true,
-    "update": "2026-07-16",
+    "update": "2026-08-16",
     "religamentoReal": false,
     "nomePlanilha": "Asha Plus",
     "canalPlanilha": "Starter"
@@ -4046,8 +4046,8 @@
     "canalPlanilha": "Attasoft"
   },
   "1240668": {
-    "ligado": true,
-    "update": "2026-07-06",
+    "ligado": false,
+    "update": "2026-08-17",
     "religamentoReal": false,
     "nomePlanilha": "Marcelo Medeiros",
     "canalPlanilha": "Vesti"
@@ -5069,7 +5069,7 @@
   },
   "1271690": {
     "ligado": true,
-    "update": "2026-07-14",
+    "update": "2026-08-16",
     "religamentoReal": false,
     "nomePlanilha": "Colly Atacado",
     "canalPlanilha": "Vesti"
@@ -6147,21 +6147,21 @@
   },
   "1225915": {
     "ligado": true,
-    "update": "2026-07-16",
+    "update": "2026-08-16",
     "religamentoReal": false,
     "nomePlanilha": "Divas Vero",
     "canalPlanilha": "Vesti"
   },
   "1938037": {
     "ligado": true,
-    "update": "2026-07-16",
+    "update": "2026-08-16",
     "religamentoReal": false,
     "nomePlanilha": "AFETTO",
     "canalPlanilha": "Attasoft"
   },
   "1931006": {
     "ligado": true,
-    "update": "2026-07-16",
+    "update": "2026-08-16",
     "religamentoReal": false,
     "nomePlanilha": "Handle Jeans",
     "canalPlanilha": "Starter"
@@ -6328,8 +6328,8 @@
     "canalPlanilha": "Vesti"
   },
   "1979643": {
-    "ligado": true,
-    "update": "2026-07-20",
+    "ligado": false,
+    "update": "2026-08-17",
     "religamentoReal": false,
     "nomePlanilha": "confeccionesvioletaempresa@gmail.com",
     "canalPlanilha": "Uemtel"
@@ -6545,8 +6545,8 @@
     "canalPlanilha": "Attasoft"
   },
   "2043912": {
-    "ligado": true,
-    "update": "2026-07-22",
+    "ligado": false,
+    "update": "2026-08-17",
     "religamentoReal": false,
     "nomePlanilha": "Roma Style",
     "canalPlanilha": "Uemtel"
