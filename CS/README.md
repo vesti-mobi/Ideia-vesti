@@ -223,6 +223,26 @@ por medição pedido a pedido (ressalva 4).
    `DOMINIOS_EXTRA` no `fetch_dados.js`; se aparecer outra assim, é só
    acrescentar o domínio lá.
 
+9e. **"Nunca acessaram" tem três números possíveis — o painel usa o do Tino.**
+   No admin do Tino o card diz **12** e a tabela logo abaixo diz **16**; a
+   primeira versão desta aba dizia **19**. Os três medem coisas diferentes:
+   **12** = marcas sem nenhuma atividade registrada (é `total_brands` menos
+   `company_list`, a régua do card); **16** = marcas com `login_days = 0`;
+   **19** era 16 + 3 marcas que não têm linha em `login_days` — essas três
+   (andressa_vesti, per_pochi, refugio_modas) TÊM atividade, então contá-las como
+   "nunca acessou" estava errado. A diferença de 12 para 16 são quatro marcas
+   (delia_modas, miss_manu, daline, stefani) que entram pelo **SSO da Vesti**: o
+   evento é `sso_login_vesti` e não conta em `login_days`. Elas aparecem na
+   coluna Situação como "entra sem login (SSO)".
+
+9f. **A série do Tino não pode sair de `companies_chart` (18/08).** Essa rota
+   devolve no máximo **20 linhas** — é o top 20 da tela do Tino, e o corte vale
+   mesmo passando a lista de empresas no corpo (25 slugs explícitos voltam 20).
+   Como a série era montada com uma chamada por semana, as semanas cheias (S29 em
+   diante) vinham truncadas exatamente onde a CS mais olha: 205 pares
+   semana-marca contra **311** reais. Agora é uma chamada de `timeline`
+   (granularity=week) e uma de `metrics` por marca, 4 em paralelo.
+
 10. **Teto de R$ 50.000 por pedido**, o mesmo filtro do CS-Sucesso e do PainelElisa,
    para os números baterem entre os painéis.
 

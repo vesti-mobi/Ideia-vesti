@@ -486,9 +486,10 @@ if(_ss('get')==='1'){
 
      oraculo:   { tabela:[{ cliente, cs, pctIA, atendimentos, gmvIniciado, gmvFinalizado }],
                   series:[{ semana, cliente, atendimentos, gmvIniciado, gmvFinalizado }] },
-     tino:      { tabela:[{ cliente, cs, eventos, sessoes, eventosTotal, diasAcesso,
-                            ultimoAcessoTino, statusTino, nuncaUsou, semCadastro }],
-                  series:[{ semana, cliente, eventos, sessoes, receita }],
+     tino:      { tabela:[{ cliente, cs, eventos, eventosAno, sessoesAno, diasAcesso,
+                            ultimoAcessoTino, statusTino, nuncaUsou, nuncaLogou,
+                            semCadastro, foraDaCarteira }],
+                  series:[{ semana, cliente, cs, eventos, receita }],
                   kpis:{ total_brands, active_brands, never_accessed },
                   tiposDeEvento:[{ event_type, cnt }] },
      vestiPago: { tabela:[{ cliente, cs, valorTransacionado, receitaFee,
@@ -606,7 +607,7 @@ const MOCK = (function buildMock(){
   });
   const tinoSeries = serie((c,s)=>{
     const ev = Math.max(4, Math.round(18+s*1.1+int(-9,12)) * (c._plano==='Enterprise'?2:1));
-    return { eventos:ev, sessoes: Math.max(1,Math.round(ev/6)), receita: Math.round(ev*(6+r()*7)) };
+    return { eventos:ev, receita: Math.round(ev*(6+r()*7)) };
   });
   const pagoSeries = serie((c,s)=>{
     const ger = Math.max(2, Math.round(12+s*0.8+int(-5,9)));
@@ -648,10 +649,10 @@ const MOCK = (function buildMock(){
     atendimentos: at[c.nome], gmvIniciado: gi[c.nome], gmvFinalizado: gf[c.nome]
   }));
 
-  const ev=porCliente(tinoSeries,'eventos'), se=porCliente(tinoSeries,'sessoes');
+  const ev=porCliente(tinoSeries,'eventos');
   const tinoTab = clientes.map(c=>({
-    cliente:c.nome, cs:c.cs, eventos: ev[c.nome], sessoes: se[c.nome],
-    eventosTotal: Math.round(ev[c.nome]*1.6), diasAcesso: int(0,60),
+    cliente:c.nome, cs:c.cs, eventos: ev[c.nome],
+    eventosAno: ev[c.nome], sessoesAno: Math.max(1,Math.round(ev[c.nome]/6)), diasAcesso: int(0,60),
     ultimoAcessoTino: dia(-int(0,40)), statusTino:'Ativa', nuncaUsou:false, semCadastro:false
   }));
 
@@ -1010,8 +1011,8 @@ const TABS = [
       {k:'cliente', l:'Cliente', tipo:'cliente'},
       COL_CS,
       {k:'eventos', l:'Eventos no período', tipo:'int', r:true, forte:true},
-      {k:'sessoes', l:'Sessões no período', tipo:'int', r:true},
-      {k:'eventosTotal', l:'Eventos no total', tipo:'int', r:true},
+      {k:'eventosAno', l:'Eventos no ano', tipo:'int', r:true},
+      {k:'sessoesAno', l:'Sessões no ano', tipo:'int', r:true},
       {k:'diasAcesso', l:'Dias com acesso', tipo:'int', r:true},
       {k:'ultimoAcessoTino', l:'Último acesso no Tino', tipo:'usoTino'},
       {k:'statusTino', l:'Situação', tipo:'statusTino'},
@@ -1020,10 +1021,9 @@ const TABS = [
        principal da CS, então não pode sumir por não ter evento no período. */
     linhas:()=>{
       const noPeriodo = {};
-      agregarPorCliente(DATA.tino.series,['eventos','sessoes']).forEach(a=>noPeriodo[a.cliente]=a);
+      agregarPorCliente(DATA.tino.series,['eventos']).forEach(a=>noPeriodo[a.cliente]=a);
       return DATA.tino.tabela.map(x=>Object.assign({}, x, {
         eventos:(noPeriodo[x.cliente]||{}).eventos||0,
-        sessoes:(noPeriodo[x.cliente]||{}).sessoes||0,
       }));
     },
     seriePropria:true,
@@ -1038,7 +1038,7 @@ const TABS = [
       {l:'Eventos', v:fmt.compact(soma(serie,'eventos')), s:'no período'},
       {l:'Marcas com Tino', v:fmt.int(rows.length), s:tinoKpiTexto()},
       {l:'Usando no período', v:fmt.int(rows.filter(r=>r.eventos>0).length), s:`de ${rows.length} marcas na visão`},
-      {l:'Nunca acessaram', v:fmt.int(rows.filter(r=>r.nuncaUsou).length), s:'têm o produto e nunca entraram'},
+      {l:'Nunca acessaram', v:fmt.int(rows.filter(r=>r.nuncaUsou).length), s:'nenhuma atividade registrada'},
     ]
   },
   {
@@ -1892,8 +1892,11 @@ function celula(r,c){
         ? '<span class="pill ok"><i></i>Sim</span>'
         : '<span class="pill bad"><i></i>Não</span>'; break;
     case 'statusTino': {
+      /* Marca que usa o Tino mas nunca aparece com dia de login entra por SSO da
+         Vesti — dizer "nunca acessou" nesse caso seria mentira. */
       const semCad = r.semCadastro ? '<span class="cell-sub">sem marca no cadastro</span>'
-        : r.foraDaCarteira ? '<span class="cell-sub">fora do painel (só compras)</span>' : '';
+        : r.foraDaCarteira ? '<span class="cell-sub">fora do painel (só compras)</span>'
+        : (r.nuncaLogou && !r.nuncaUsou) ? '<span class="cell-sub">entra sem login (SSO)</span>' : '';
       td.innerHTML = (v==='Inativa'
         ? '<span class="pill bad"><i></i>Inativa</span>'
         : '<span class="pill ok"><i></i>Ativa</span>') + semCad; break }

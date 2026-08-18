@@ -442,36 +442,58 @@ async function puxarTino() {
   const kpis = await tinoPost('customer_kpis', tudo);
   const acessos = await tinoPost('login_days', tudo);
   const lista = await tinoPost('company_list', tudo);
-  const eventosTotais = await tinoPost('companies_chart', tudo);
   const tipos = await tinoPost('event_types',
-    { date_from: `${ANO}-01-01`, date_to: hoje, companies: [], granularity: 'day' });
-
-  /* Eventos por marca × semana: a rota devolve o total do período, então é uma
-     chamada por semana do ano. São ~33 chamadas de ~1s — cabe no orçamento da
-     carga diária, e é a única forma de ter a série semanal por marca. */
-  const porSemana = [];
-  for (let s = 1; s <= SEMANA_ATUAL; s++) {
-    const [ini, fim] = limitesDaSemana(s, ANO);
-    if (ini > hoje) break;
-    const linhas = await tinoPost('companies_chart',
-      { date_from: ini, date_to: fim > hoje ? hoje : fim, companies: [], granularity: 'day' });
-    (linhas || []).forEach(l => porSemana.push({
-      sem: s, company: l.company, eventos: num(l.total_events), sessoes: num(l.sessions),
-    }));
-    process.stdout.write('\r  eventos por semana: ' + s + '/' + SEMANA_ATUAL);
-  }
-  console.log('');
+    { date_from: ANO + '-01-01', date_to: hoje, companies: [], granularity: 'day' });
 
   const marcas = new Map();
   (acessos || []).forEach(a => marcas.set(a.company, a));
   (lista || []).forEach(c => { if (!marcas.has(c)) marcas.set(c, { company: c }); });
+  const slugs = [...marcas.keys()];
+  /* company_list = marcas que registraram alguma atividade. É por ela que a API
+     define "nunca acessou" no KPI (total_brands - company_list = 12 hoje). */
+  const comAtividade = new Set(lista || []);
+
+  /* POR QUE UMA CHAMADA POR MARCA, e não uma companies_chart por semana:
+     companies_chart devolve no MÁXIMO 20 linhas — é o top 20 da tela do Tino, e
+     o corte vale mesmo passando a lista de empresas no corpo (25 slugs
+     explícitos voltam 20). Nas semanas cheias (S29 em diante) isso truncava
+     justamente as semanas que a CS mais olha, e as marcas de cauda sumiam da
+     série. `timeline` com granularity=week e uma empresa por chamada não tem
+     teto e já devolve a semana ISO pronta ("2026-W29"); `metrics` da mesma
+     empresa fecha os totais (eventos e sessões). São 2 chamadas por marca,
+     ~180 no total, rodando 4 em paralelo. */
+  const porSemana = [], totalDe = new Map();
+  const doAno = { date_from: ANO + '-01-01', date_to: hoje };
+  let feitas = 0;
+  async function puxarMarca(slug) {
+    const [serie, tot] = await Promise.all([
+      tinoPost('timeline', { ...doAno, granularity: 'week', companies: [slug] }),
+      tinoPost('metrics', { ...doAno, granularity: 'day', companies: [slug] }),
+    ]);
+    (serie || []).forEach(l => {
+      const m = String(l.period || '').match(/^(\d{4})-W(\d{1,2})$/);
+      if (!m || Number(m[1]) !== ANO) return;
+      porSemana.push({ sem: Number(m[2]), company: slug, eventos: num(l.cnt) });
+    });
+    totalDe.set(slug, { eventos: num((tot || {}).total_events), sessoes: num((tot || {}).sessions) });
+    process.stdout.write('\r  eventos por marca: ' + (++feitas) + '/' + slugs.length + '   ');
+  }
+  for (let i = 0; i < slugs.length; i += 4) {
+    await Promise.all(slugs.slice(i, i + 4).map(puxarMarca));
+  }
+  console.log('');
+
   console.log('  marcas com Tino'.padEnd(44) + String(marcas.size).padStart(8));
   console.log('  total_brands (KPI da própria API)'.padEnd(44) + String((kpis || {}).total_brands || 0).padStart(8));
   console.log('  eventos no ano'.padEnd(44)
     + String(porSemana.reduce((t, x) => t + x.eventos, 0)).padStart(8));
+  console.log('  nunca acessaram (sem atividade nenhuma)'.padEnd(44)
+    + String(slugs.filter(x => !comAtividade.has(x)).length).padStart(8));
+  console.log('    nunca fizeram login (login_days = 0)'.padEnd(44)
+    + String((acessos || []).filter(a => !num(a.login_days)).length).padStart(8));
 
   return { kpis: kpis || {}, acessos: acessos || [], marcas: [...marcas.values()],
-           eventosTotais: eventosTotais || [], porSemana, tipos: tipos || [] };
+           comAtividade, totalDe, porSemana, tipos: tipos || [] };
 }
 
 // =============================================================== 2. HUBSPOT
@@ -1154,7 +1176,7 @@ function montar(bqd, hsd, tinoDados) {
       foraDaCarteira.forEach((v, k) => console.log('    ' + k.padEnd(28) + (v.nome + ' · ' + v.cs)));
     }
 
-    const acc = new Map();              // slug -> {eventos, sessoes}
+    const acc = new Map();              // slug -> {eventos} do período
     tinoDados.porSemana.forEach(r => {
       if (!semanaOk(r.sem)) return;
       const dom = domDaCompany.get(r.company);
@@ -1162,30 +1184,34 @@ function montar(bqd, hsd, tinoDados) {
       tinoSeries.push({
         semana: r.sem, cliente,
         cs: dom ? csDe(dom) : ((foraDaCarteira.get(r.company) || {}).cs || 'Sem CS'),
-        eventos: r.eventos, sessoes: r.sessoes,
+        eventos: r.eventos,
         receita: dom ? (gmvSemana.get(dom + '|' + r.sem) || 0) : 0,
       });
-      somaEm(acc, r.company, { eventos: r.eventos, sessoes: r.sessoes });
+      somaEm(acc, r.company, { eventos: r.eventos });
     });
 
-    const totalDe = new Map();
-    tinoDados.eventosTotais.forEach(e => totalDe.set(e.company, e));
+
     tinoDados.marcas.forEach(m => {
       const dom = domDaCompany.get(m.company);
-      const t = totalDe.get(m.company) || {};
+      const t = tinoDados.totalDe.get(m.company) || {};
       const a = acc.get(m.company) || {};
       const f = foraDaCarteira.get(m.company);
       tinoTab.push({
         cliente: nomeDaCompany.get(m.company),
         cs: dom ? csDe(dom) : (f ? f.cs : 'Sem CS'),
         eventos: a.eventos || 0,
-        sessoes: a.sessoes || 0,
-        eventosTotal: num(t.total_events),
+        eventosAno: num(t.eventos),
+        sessoesAno: num(t.sessoes),
         diasAcesso: num(m.login_days),
         ultimoAcessoTino: m.last_login || null,
         statusTino: m.status === 'inactive' ? 'Inativa' : 'Ativa',
         entrouEm: m.created_at ? String(m.created_at).slice(0, 10) : null,
-        nuncaUsou: !m.last_login,
+        /* "Nunca acessou" = nenhuma atividade registrada, que é como o próprio
+           Tino conta no card do admin. NÃO é "login_days = 0": quatro marcas
+           entram sem que a API registre dia de login (SSO da Vesti) e por isso
+           apareciam como se nunca tivessem entrado. */
+        nuncaUsou: !tinoDados.comAtividade.has(m.company),
+        nuncaLogou: !num(m.login_days),
         /* Só é "sem cadastro" quem não existe na Vesti. Quem existe mas está
            fora do painel (conta de compras) aparece com nome e CS de verdade. */
         semCadastro: !dom && !f,
