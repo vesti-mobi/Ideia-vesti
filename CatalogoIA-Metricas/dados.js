@@ -1,6 +1,6 @@
 window.DADOS = {
-  "gerado_em": "2026-08-17T21:18:08.014Z",
-  "hoje": "2026-08-17",
+  "gerado_em": "2026-08-18T12:26:37.647Z",
+  "hoje": "2026-08-18",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
   "auto_publica_desde": "2026-08-10",
@@ -12,14 +12,14 @@ window.DADOS = {
   },
   "kpis": {
     "liberadas": 16,
-    "ativas": 3,
+    "ativas": 2,
     "usando": 9,
     "nunca_usaram": 7,
     "paradas": 4,
     "com_conta": 10,
     "contas": 9,
     "produtos_total": 254,
-    "produtos_7d": 120,
+    "produtos_7d": 47,
     "descricoes_total": 251,
     "total_estimado": true
   },
@@ -32,14 +32,14 @@ window.DADOS = {
       "email": "nicoboco.shop@nicoboco.com.br",
       "produtos": 104,
       "estimado": false,
-      "produtos_7d": 102,
+      "produtos_7d": 43,
       "ativa": true,
-      "acessos": 53,
-      "buscas": 297,
+      "acessos": 56,
+      "buscas": 302,
       "descricoes": 152,
-      "envios": 177,
+      "envios": 178,
       "primeiro": "2026-08-10T19:02:35.392Z",
-      "ultimo": "2026-08-17T20:48:06.018Z",
+      "ultimo": "2026-08-18T12:17:29.871Z",
       "dias": 0
     },
     {
@@ -50,8 +50,8 @@ window.DADOS = {
       "email": "missmilliebr@gmail.com",
       "produtos": 56,
       "estimado": true,
-      "produtos_7d": 10,
-      "ativa": true,
+      "produtos_7d": 1,
+      "ativa": false,
       "acessos": 5,
       "buscas": 28,
       "descricoes": 29,
@@ -94,7 +94,7 @@ window.DADOS = {
       "envios": 12,
       "primeiro": "2026-07-28T11:47:18.529Z",
       "ultimo": "2026-08-12T12:05:03.861Z",
-      "dias": 5
+      "dias": 6
     },
     {
       "slug": "andressa-vesti",
@@ -104,7 +104,7 @@ window.DADOS = {
       "email": "andressavazpinto@gmail.commx",
       "produtos": 9,
       "estimado": false,
-      "produtos_7d": 8,
+      "produtos_7d": 3,
       "ativa": true,
       "acessos": 23,
       "buscas": 51,
@@ -112,7 +112,7 @@ window.DADOS = {
       "envios": 12,
       "primeiro": "2026-08-10T16:01:03.796Z",
       "ultimo": "2026-08-14T12:06:46.387Z",
-      "dias": 3
+      "dias": 4
     },
     {
       "slug": "optimist-jeans",
@@ -416,8 +416,8 @@ window.DADOS = {
     {
       "inicio": "2026-08-17",
       "fim": "2026-08-23",
-      "produtos": 2,
-      "ativas": 0,
+      "produtos": 3,
+      "ativas": 1,
       "usaram": 3,
       "cadastros": 9,
       "novos": 0
@@ -437,7 +437,7 @@ window.DADOS = {
         "com_conta": 10,
         "contas": 9,
         "produtos_total": 105,
-        "produtos_7d": 105,
+        "produtos_7d": 46,
         "descricoes_total": 157,
         "total_estimado": false,
         "produtos_atribuidos": 0
@@ -451,14 +451,14 @@ window.DADOS = {
           "email": "nicoboco.shop@nicoboco.com.br",
           "produtos": 102,
           "estimado": false,
-          "produtos_7d": 102,
+          "produtos_7d": 43,
           "ativa": true,
-          "acessos": 44,
-          "buscas": 257,
+          "acessos": 47,
+          "buscas": 262,
           "descricoes": 149,
-          "envios": 152,
+          "envios": 153,
           "primeiro": "2026-08-11T18:28:02.542Z",
-          "ultimo": "2026-08-17T20:48:03.246Z",
+          "ultimo": "2026-08-18T12:17:29.871Z",
           "dias": 0,
           "produtos_medidos": 102,
           "atribuido": 0
@@ -889,12 +889,12 @@ window.DADOS = {
         {
           "inicio": "2026-08-17",
           "fim": "2026-08-23",
-          "produtos": 1,
-          "ativas": 0,
+          "produtos": 2,
+          "ativas": 1,
           "usaram": 1,
           "cadastros": 9,
           "novos": 0,
-          "produtos_medidos": 1,
+          "produtos_medidos": 2,
           "atribuido": 0
         }
       ]
@@ -994,7 +994,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-12T12:05:03.861Z",
           "ultimo": "2026-08-12T12:05:03.861Z",
-          "dias": 5,
+          "dias": 6,
           "produtos_medidos": 0,
           "atribuido": 36
         },
@@ -1014,7 +1014,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T12:06:46.387Z",
           "ultimo": "2026-08-14T12:06:46.387Z",
-          "dias": 3,
+          "dias": 4,
           "produtos_medidos": 0,
           "atribuido": 8
         },
@@ -1364,13 +1364,13 @@ window.DADOS = {
         {
           "inicio": "2026-08-17",
           "fim": "2026-08-23",
-          "produtos": 2,
+          "produtos": 3,
           "ativas": 0,
           "usaram": 2,
           "cadastros": 9,
           "novos": 0,
           "produtos_medidos": 1,
-          "atribuido": 1
+          "atribuido": 2
         }
       ]
     }
