@@ -129,6 +129,23 @@ por medição pedido a pedido (ressalva 4).
    "Interchange" e "Receita (fee)" cobrem só o cartão; **valor transacionado cobre
    os dois** e está quebrado em Cartão e PIX na aba.
 
+2b. **A fatura do Iugu acha a marca por CNPJ e, se falhar, pelo nome (18/08).**
+   A fatura não traz domínio, então o casamento é por CNPJ — e em 2026 **925
+   faturas pagas (R$ 564k, 13% do faturamento Iugu) estão num CNPJ que não existe
+   no cadastro**. Foi o caso da Sawary: paga R$ 4.078/mês no CNPJ
+   00.422.351/0001-90 e o cadastro dela tem 82.364.623/0001-08 — a receita sumia
+   da linha dela (e o CNPJ do Iugu ainda aparece no cadastro de um terceiro,
+   "Mary Elias"). Agora, quando o CNPJ não acha ninguém, a fatura procura pelo
+   **nome do pagador**: o Iugu grava "Marca = RAZÃO SOCIAL LTDA", então tanto o
+   apelido quanto a razão servem. Casamento **exato** depois de normalizar e só
+   quando aponta para UMA marca. Isso resgatou 336 linhas (~R$ 154k). O mesmo
+   resgate vale para **plano, vencimento e churn**, que saem da mesma fatura —
+   sem ele, marca que paga em dia podia ser marcada como cancelada.
+   Sobram R$ 410k sem dono, e a divisão é: **R$ 146k de contas que existem mas
+   estão como "só compras"** (mesmo caso de [[DOMINIOS_EXTRA]], resolvível
+   incluindo a marca) e **R$ 282k cujo nome não bate com domínio nenhum** — esses
+   precisam de correção de cadastro, não de código.
+
 3. **Mensalidade é só o plano.** A fatura do Iugu junta plano, Oráculo, Filial,
    Assistente e taxa de ativação no mesmo `total_cents`, e só **75,2%** é plano.
    Por isso a soma é feita linha a linha do item: o plano vai para "Mensalidade"
@@ -196,6 +213,15 @@ por medição pedido a pedido (ressalva 4).
    busca, export (23,8k eventos no ano). O casamento com o cadastro é por nome
    (a API só devolve o slug): **90 das 92** casaram; Lete Moda e Praia e Santho
    Pano ficam na tabela com "sem marca no cadastro".
+
+9d. **Duas marcas entram no painel fora da regra de módulos (18/08).**
+   A carteira é "domínio com módulo de vendas", filtro que impede o painel de
+   encher de conta de lojista comprador. **Lete Moda Praia** (Summer House, CS
+   Jennyfer) e **Santho Pano** (Donna Sami, CS Luana) estão no cadastro como
+   *só compras*, mas têm CS, canal, pedidos e usam o Tino — foi por isso que a
+   aba do Tino as mostrou como "sem marca no cadastro". Entram pela lista
+   `DOMINIOS_EXTRA` no `fetch_dados.js`; se aparecer outra assim, é só
+   acrescentar o domínio lá.
 
 10. **Teto de R$ 50.000 por pedido**, o mesmo filtro do CS-Sucesso e do PainelElisa,
    para os números baterem entre os painéis.

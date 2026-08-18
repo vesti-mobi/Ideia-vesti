@@ -41,6 +41,17 @@ const TETO_PEDIDO = 50000;
    Recalculado a cada execução; a constante abaixo é só o fallback. */
 let FATOR_ANTECIPACAO_VESTI = 0.188;
 
+/* Marcas que entram no painel MESMO sem o módulo de vendas no cadastro.
+   A carteira é montada por "modulos contém vendas", que é o filtro que impede o
+   painel de encher de conta de lojista comprador. Estas duas caem fora por esse
+   filtro, mas são marcas de verdade: têm CS, canal, pedidos e usam o Tino.
+   Decidido com a Laura em 18/08/2026, depois de a aba do Tino mostrá-las como
+   "sem marca no cadastro". Se aparecer outra assim, é só acrescentar aqui. */
+const DOMINIOS_EXTRA = [
+  '1593235',   // Lete Moda Praia (Summer House) — CS Jennyfer, canal Starter
+  '1833676',   // Santho Pano (Donna Sami)       — CS Luana, canal Vesti
+];
+
 /* Churn: marca sem fatura paga há mais de N dias e sem fatura futura em aberto. */
 const DIAS_CHURN = 45;
 
@@ -100,7 +111,8 @@ async function puxarBQ() {
              CAST(partner_id AS STRING) partner_id,
              ROW_NUMBER() OVER (PARTITION BY ID ORDER BY updated_At DESC) rn
       FROM ${DS}.odbc_domains
-      WHERE LOWER(IFNULL(modulos,'')) LIKE '%vendas%'
+      WHERE (LOWER(IFNULL(modulos,'')) LIKE '%vendas%'
+             OR CAST(ID AS STRING) IN (${DOMINIOS_EXTRA.map(x => "'" + x + "'").join(',')}))
         AND LOWER(IFNULL(name,'')) NOT LIKE '%teste%'
         AND LOWER(IFNULL(name,'')) NOT LIKE '%andressa vesti%'
     ),
@@ -140,6 +152,36 @@ async function puxarBQ() {
     LEFT JOIN part p ON p.id = d.partner_id
     LEFT JOIN orac o ON o.dom = d.id
     WHERE d.rn = 1`);
+
+  /* Marcas que existem na Vesti mas ficam FORA do painel porque o cadastro não
+     tem o módulo de vendas (conta só de compras). Elas não entram em nenhuma aba
+     — servem só para dar nome e CS a uma marca do Tino que não casou com a
+     carteira, como Lete Moda Praia e Santho Pano. Por isso o casamento contra
+     esta lista é só por nome EXATO: com 16 mil linhas, palpite por semelhança
+     erraria mais do que acertaria. */
+  const cadastroFora = await q('marcas fora da carteira (só compras, com CS)', `
+    WITH dom AS (
+      SELECT CAST(ID AS STRING) id, ANY_VALUE(name) name,
+             ANY_VALUE(CAST(angel_id AS STRING)) angel_id,
+             ANY_VALUE(CAST(partner_id AS STRING)) partner_id
+      FROM ${DS}.odbc_domains
+      WHERE LOWER(IFNULL(modulos,'')) NOT LIKE '%vendas%'
+        AND CAST(ID AS STRING) NOT IN (${DOMINIOS_EXTRA.map(x => "'" + x + "'").join(',')})
+        AND angel_id IS NOT NULL AND CAST(angel_id AS STRING) NOT IN ('', 'N/A')
+        AND LOWER(IFNULL(name,'')) NOT LIKE '%teste%'
+      GROUP BY ID
+    ),
+    comp AS (
+      SELECT CAST(domain_id AS STRING) domain_id, ANY_VALUE(social_name) social_name,
+             ANY_VALUE(company_name) company_name
+      FROM ${DS}.odbc_companies GROUP BY 1
+    ),
+    part AS (SELECT CAST(id AS STRING) id, ANY_VALUE(name) nome FROM ${DS}.odbc_partners GROUP BY 1)
+    SELECT d.id, d.name nome, c.social_name, c.company_name, a.name cs, p.nome canal
+    FROM dom d
+    LEFT JOIN comp c ON c.domain_id = d.id
+    LEFT JOIN ${DS}.odbc_angels a ON CAST(a.id AS STRING) = d.angel_id
+    LEFT JOIN part p ON p.id = d.partner_id`);
 
   const pedidos = await q('pedidos por marca × semana', `
     SELECT CAST(domainId AS STRING) dom,
@@ -258,7 +300,7 @@ async function puxarBQ() {
   const mensalidade = await q('Iugu: plano × outros, por CNPJ × semana', `
     WITH itens AS (
       SELECT id, items_id,
-             ANY_VALUE(payer_cpf_cnpj) cnpj, ANY_VALUE(status) status,
+             ANY_VALUE(payer_cpf_cnpj) cnpj, ANY_VALUE(payer_name) payer, ANY_VALUE(status) status,
              ANY_VALUE(items_description) item,
              ANY_VALUE(SAFE_CAST(items_price_cents AS FLOAT64)) cents,
              ANY_VALUE(COALESCE(due_date, SUBSTR(created_at_iso,1,10))) due
@@ -267,6 +309,10 @@ async function puxarBQ() {
       GROUP BY id, items_id
     )
     SELECT REGEXP_REPLACE(cnpj,'[^0-9]','') cnpj,
+           /* payer_name entra para o resgate por nome: quando o CNPJ da fatura
+              não existe no cadastro (caso Sawary), é por ele que a fatura acha
+              a marca. O Iugu grava "Marca = RAZÃO SOCIAL LTDA". */
+           ANY_VALUE(payer) payer,
            EXTRACT(ISOWEEK FROM DATE(due)) sem,
            ROUND(SUM(IF(
              LOWER(IFNULL(item,'')) LIKE '%oraculo%' OR LOWER(IFNULL(item,'')) LIKE '%oráculo%'
@@ -284,14 +330,14 @@ async function puxarBQ() {
     WHERE status IN ('paid','externally_paid') AND due IS NOT NULL
       AND EXTRACT(ISOYEAR FROM DATE(due)) = ${ANO}
       AND EXTRACT(ISOWEEK FROM DATE(due)) <= ${SEMANA_ATUAL}
-    GROUP BY 1,2`);
+    GROUP BY 1,3`);
 
   /* O plano não é uma coluna: é a linha de item mais cara da fatura, tirando
      desconto/Oráculo. Mesma regra do CS-Sucesso, para os dois painéis
      mostrarem o mesmo nome de plano. */
   const faturas = await q('Iugu: vencimento, plano e última paga', `
     WITH linhas AS (
-      SELECT id, payer_cpf_cnpj cnpj, status,
+      SELECT id, payer_cpf_cnpj cnpj, payer_name payer, status,
              SAFE_CAST(total_cents AS FLOAT64) cents,
              COALESCE(due_date, SUBSTR(created_at_iso,1,10)) due,
              items_description item, SAFE_CAST(items_price_cents AS FLOAT64) ipc
@@ -308,12 +354,12 @@ async function puxarBQ() {
       GROUP BY id
     ),
     inv AS (
-      SELECT id, ANY_VALUE(cnpj) cnpj, ANY_VALUE(status) status,
+      SELECT id, ANY_VALUE(cnpj) cnpj, ANY_VALUE(payer) payer, ANY_VALUE(status) status,
              ANY_VALUE(cents) cents, ANY_VALUE(due) due
       FROM linhas GROUP BY id
     ),
     inv2 AS (SELECT inv.*, p.plano FROM inv LEFT JOIN plano_da_fatura p USING(id))
-    SELECT REGEXP_REPLACE(cnpj,'[^0-9]','') cnpj,
+    SELECT REGEXP_REPLACE(cnpj,'[^0-9]','') cnpj, ANY_VALUE(payer) payer,
            MIN(IF(status='pending' AND due >= CAST(CURRENT_DATE() AS STRING), due, NULL)) proximo_venc,
            MAX(IF(status IN ('paid','externally_paid'), due, NULL)) ultima_paga,
            ARRAY_AGG(IF(status IN ('paid','externally_paid') AND plano IS NOT NULL,
@@ -322,7 +368,7 @@ async function puxarBQ() {
     FROM inv2
     GROUP BY 1`);
 
-  return { cadastro, pedidos, ultimoPedido, vestipago, oraculoGmv, oraculoAtend,
+  return { cadastro, cadastroFora, pedidos, ultimoPedido, vestipago, oraculoGmv, oraculoAtend,
            interchange, mensalidade, faturas };
 }
 
@@ -790,13 +836,13 @@ async function puxarTickets(owners) {
    ("cambos" = "Cambos Jeans", "miss_manu" = "MissManu"). Numa conferência com
    as 92 marcas do Tino isso casou 90; as que sobram aparecem sem CS.
    Compara contra nome do domínio, razão social e nome fantasia da empresa. */
-const RUIDO_TINO = /\b(ltda|me|epp|eireli|sa|comercio|confeccao|confeccoes|de|do|da|das|dos|pecas|vestuario|acessorios|moda|modas|store|oficial|atacado|jeans|demo)\b/g;
+const RUIDO_TINO = /\b(ltda|me|epp|eireli|sa|e|comercio|confeccao|confeccoes|de|do|da|das|dos|pecas|vestuario|acessorios|moda|modas|store|oficial|atacado|jeans|demo)\b/g;
 const chaveTino = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
   .toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(RUIDO_TINO, ' ').replace(/\s+/g, ' ').trim();
 const nomeBonito = slug => String(slug || '').replace(/_/g, ' ')
   .split(' ').filter(Boolean).map(p => p[0].toUpperCase() + p.slice(1)).join(' ');
 
-function casarMarcaTino(porDom) {
+function casarMarcaTino(porDom, fora) {
   const cands = [];
   porDom.forEach(m => {
     const chaves = [...new Set([m.nome, m.social, m.fantasia].map(chaveTino).filter(Boolean))];
@@ -808,6 +854,17 @@ function casarMarcaTino(porDom) {
     const k2 = k.replace(/ /g, '');
     if (!semEspaco.has(k2)) semEspaco.set(k2, c);
   }));
+  /* Índice das marcas de fora da carteira: só nome exato (ver cadastroFora). */
+  const foraIdx = new Map();
+  (fora || []).forEach(f => {
+    [f.nome, f.social_name, f.company_name].forEach(n => {
+      const k = chaveTino(n);
+      if (k && !foraIdx.has(k)) foraIdx.set(k, f);
+      const k2 = k && k.replace(/ /g, '');
+      if (k2 && !foraIdx.has(k2)) foraIdx.set(k2, f);
+    });
+  });
+
   return function (slug) {
     const k = chaveTino(slug.replace(/_/g, ' '));
     if (!k) return null;
@@ -818,7 +875,13 @@ function casarMarcaTino(porDom) {
       const ct = ck.split(' ');
       return toks.every(t => ct.includes(t)) || ct.every(t => toks.includes(t));
     }));
-    if (!parciais.length) return null;
+    if (!parciais.length) {
+      const f = foraIdx.get(k) || foraIdx.get(k.replace(/ /g, ''));
+      if (!f) return null;
+      // Não é domínio da carteira: devolve só o rótulo, para a aba do Tino
+      // mostrar o nome certo e o CS em vez de "Sem CS".
+      return { fora: true, nome: (f.nome || '').trim(), cs: f.cs || 'Sem CS' };
+    }
     // empate: o nome mais curto é o mais provável (menos qualificadores colados)
     return parciais.sort((a, b) => a.nome.length - b.nome.length)[0].dom;
   };
@@ -883,17 +946,63 @@ function montar(bqd, hsd, tinoDados) {
   console.log('    interchange líquido + antifraude'.padEnd(44)
     + fmtBR(bqd.interchange.reduce((t, r) => t + num(r.fee_vesti) + num(r.antifraude), 0)).padStart(8));
 
-  // mensalidade entra por CNPJ -> domínio
+  /* Mensalidade entra por CNPJ -> domínio. Quando o CNPJ da fatura não existe no
+     cadastro, tenta pelo NOME: o Iugu grava o pagador como "Marca = RAZÃO SOCIAL
+     LTDA", então tanto o apelido quanto a razão servem de chave.
+     Por que isso existe: a Sawary paga R$ 4.078/mês no CNPJ 00.422.351/0001-90 e
+     o cadastro dela tem outro CNPJ (82.364.623/0001-08) — a fatura não achava a
+     marca e a receita sumia da linha dela. Em 2026 são 925 faturas pagas
+     (R$ 564k, 13% do faturamento Iugu) com CNPJ fora do cadastro.
+     O casamento por nome é só EXATO depois de normalizar (chaveMarca tira forma
+     jurídica e ruído) e só vale quando aponta para UMA marca — nome parecido
+     entre marcas diferentes é comum demais para arriscar palpite. */
   const domPorCnpj = new Map();
   porDom.forEach(m => { if (m.cnpj) if (!domPorCnpj.has(m.cnpj)) domPorCnpj.set(m.cnpj, m.dom); });
-  let mensAplicada = 0;
+
+  const domPorNome = new Map(), nomeAmbiguo = new Set();
+  porDom.forEach(m => {
+    [m.nome, m.social, m.fantasia].forEach(n => {
+      const k = chaveMarca(n || '');
+      if (!k || k.length < 4) return;
+      if (domPorNome.has(k) && domPorNome.get(k) !== m.dom) nomeAmbiguo.add(k);
+      else domPorNome.set(k, m.dom);
+    });
+  });
+  nomeAmbiguo.forEach(k => domPorNome.delete(k));
+
+  /* "Sawary = SAWARY CONFECCOES LTDA" -> tenta "sawary" e "sawary confeccoes". */
+  function domDaFatura(r) {
+    const porCnpj = domPorCnpj.get(r.cnpj);
+    if (porCnpj) return porCnpj;
+    const partes = String(r.payer || '').split('=');
+    for (const parte of partes) {
+      const k = chaveMarca(parte);
+      if (k && k.length >= 4 && domPorNome.has(k)) return domPorNome.get(k);
+    }
+    return null;
+  }
+
+  let mensAplicada = 0, mensPorNome = 0, mensPerdida = 0, valorPerdido = 0;
+  const perdidas = new Map();
   bqd.mensalidade.forEach(r => {
-    const dom = domPorCnpj.get(r.cnpj);
-    if (!dom || !semanaOk(r.sem)) return;
+    if (!semanaOk(r.sem)) return;
+    const dom = domDaFatura(r);
+    if (!dom) {
+      mensPerdida++; valorPerdido += num(r.plano) + num(r.outros);
+      const chave = (r.payer || r.cnpj || '(sem pagador)').slice(0, 46);
+      perdidas.set(chave, r2((perdidas.get(chave) || 0) + num(r.plano) + num(r.outros)));
+      return;
+    }
+    if (!domPorCnpj.get(r.cnpj)) mensPorNome++;
     somaEm(serieCli, dom + '|' + r.sem, { receitaMensalidade: r.plano, receitaOutrosIugu: r.outros });
     mensAplicada++;
   });
   console.log('  linhas de mensalidade casadas'.padEnd(44) + String(mensAplicada).padStart(8));
+  console.log('    dessas, resgatadas pelo nome do pagador'.padEnd(44) + String(mensPorNome).padStart(8));
+  console.log('    ainda sem marca'.padEnd(44)
+    + (mensPerdida + ' / ' + fmtBR(valorPerdido)).padStart(8));
+  [...perdidas.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5)
+    .forEach(([q, v]) => console.log('      ' + q.padEnd(48) + fmtBR(v).padStart(12)));
 
   const clientesSeries = [];
   serieCli.forEach((v, k) => {
@@ -913,8 +1022,22 @@ function montar(bqd, hsd, tinoDados) {
   const ultPedido = new Map();
   bqd.ultimoPedido.forEach(r => ultPedido.set(r.dom, r.ultimo));
 
-  const fatPorCnpj = new Map();
-  bqd.faturas.forEach(r => fatPorCnpj.set(r.cnpj, r));
+  /* Plano, vencimento e churn saem da MESMA fatura, e por isso precisam do mesmo
+     resgate por nome do pagador. Sem ele, a marca cujo CNPJ não bate ficava
+     "Sem plano", sem vencimento e — pior — candidata a churn, porque a regra é
+     "sem fatura paga há 45 dias e sem fatura futura". */
+  const fatPorCnpj = new Map(), fatPorNome = new Map();
+  bqd.faturas.forEach(r => {
+    fatPorCnpj.set(r.cnpj, r);
+    String(r.payer || '').split('=').forEach(parte => {
+      const k = chaveMarca(parte);
+      if (k && k.length >= 4 && !fatPorNome.has(k)) fatPorNome.set(k, r);
+    });
+  });
+  const faturaDaMarca = (m) => (m.cnpj && fatPorCnpj.get(m.cnpj))
+    || fatPorNome.get(chaveMarca(m.nome || ''))
+    || fatPorNome.get(chaveMarca(m.social || ''))
+    || null;
 
   const hojeIso = HOJE.toISOString().slice(0, 10);
   const limiteChurn = new Date(HOJE.getTime() - DIAS_CHURN * 864e5).toISOString().slice(0, 10);
@@ -935,7 +1058,7 @@ function montar(bqd, hsd, tinoDados) {
 
   const clientes = [];
   porDom.forEach(m => {
-    const fat = m.cnpj ? fatPorCnpj.get(m.cnpj) : null;
+    const fat = faturaDaMarca(m);
     const ultimoPed = ultPedido.get(m.dom) || null;
     // churn = sem fatura paga há mais de DIAS_CHURN dias e sem fatura futura em aberto
     let dataChurn = null;
@@ -1008,14 +1131,28 @@ function montar(bqd, hsd, tinoDados) {
   const tinoSeries = [], tinoTab = [];
   let tinoKpis = {}, tinoTipos = [], domComTino = new Set();
   if (tinoDados) {
-    const casar = casarMarcaTino(porDom);
+    const casar = casarMarcaTino(porDom, bqd.cadastroFora);
     const domDaCompany = new Map();     // slug do Tino -> domínio da carteira
     const nomeDaCompany = new Map();    // slug do Tino -> nome exibido
+    const foraDaCarteira = new Map();   // slug do Tino -> { nome, cs } de quem só tem "compras"
     tinoDados.marcas.forEach(m => {
-      const dom = casar(m.company);
-      if (dom) { domDaCompany.set(m.company, dom); domComTino.add(dom); }
-      nomeDaCompany.set(m.company, dom ? nomeDe(dom) : nomeBonito(m.company));
+      const achado = casar(m.company);
+      /* Três desfechos: domínio da carteira, marca que existe na Vesti mas está
+         fora do painel (só módulo de compras), ou nada. */
+      if (achado && achado.fora) {
+        foraDaCarteira.set(m.company, achado);
+        nomeDaCompany.set(m.company, achado.nome || nomeBonito(m.company));
+      } else if (achado) {
+        domDaCompany.set(m.company, achado); domComTino.add(achado);
+        nomeDaCompany.set(m.company, nomeDe(achado));
+      } else {
+        nomeDaCompany.set(m.company, nomeBonito(m.company));
+      }
     });
+    if (foraDaCarteira.size) {
+      console.log('  marcas do Tino fora da carteira'.padEnd(44) + String(foraDaCarteira.size).padStart(8));
+      foraDaCarteira.forEach((v, k) => console.log('    ' + k.padEnd(28) + (v.nome + ' · ' + v.cs)));
+    }
 
     const acc = new Map();              // slug -> {eventos, sessoes}
     tinoDados.porSemana.forEach(r => {
@@ -1023,7 +1160,8 @@ function montar(bqd, hsd, tinoDados) {
       const dom = domDaCompany.get(r.company);
       const cliente = nomeDaCompany.get(r.company) || nomeBonito(r.company);
       tinoSeries.push({
-        semana: r.sem, cliente, cs: dom ? csDe(dom) : 'Sem CS',
+        semana: r.sem, cliente,
+        cs: dom ? csDe(dom) : ((foraDaCarteira.get(r.company) || {}).cs || 'Sem CS'),
         eventos: r.eventos, sessoes: r.sessoes,
         receita: dom ? (gmvSemana.get(dom + '|' + r.sem) || 0) : 0,
       });
@@ -1036,9 +1174,10 @@ function montar(bqd, hsd, tinoDados) {
       const dom = domDaCompany.get(m.company);
       const t = totalDe.get(m.company) || {};
       const a = acc.get(m.company) || {};
+      const f = foraDaCarteira.get(m.company);
       tinoTab.push({
         cliente: nomeDaCompany.get(m.company),
-        cs: dom ? csDe(dom) : 'Sem CS',
+        cs: dom ? csDe(dom) : (f ? f.cs : 'Sem CS'),
         eventos: a.eventos || 0,
         sessoes: a.sessoes || 0,
         eventosTotal: num(t.total_events),
@@ -1047,7 +1186,10 @@ function montar(bqd, hsd, tinoDados) {
         statusTino: m.status === 'inactive' ? 'Inativa' : 'Ativa',
         entrouEm: m.created_at ? String(m.created_at).slice(0, 10) : null,
         nuncaUsou: !m.last_login,
-        semCadastro: !dom,
+        /* Só é "sem cadastro" quem não existe na Vesti. Quem existe mas está
+           fora do painel (conta de compras) aparece com nome e CS de verdade. */
+        semCadastro: !dom && !f,
+        foraDaCarteira: !!f,
       });
     });
     tinoKpis = tinoDados.kpis;

@@ -1892,7 +1892,8 @@ function celula(r,c){
         ? '<span class="pill ok"><i></i>Sim</span>'
         : '<span class="pill bad"><i></i>Não</span>'; break;
     case 'statusTino': {
-      const semCad = r.semCadastro ? '<span class="cell-sub">sem marca no cadastro</span>' : '';
+      const semCad = r.semCadastro ? '<span class="cell-sub">sem marca no cadastro</span>'
+        : r.foraDaCarteira ? '<span class="cell-sub">fora do painel (só compras)</span>' : '';
       td.innerHTML = (v==='Inativa'
         ? '<span class="pill bad"><i></i>Inativa</span>'
         : '<span class="pill ok"><i></i>Ativa</span>') + semCad; break }
