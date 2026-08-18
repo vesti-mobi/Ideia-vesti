@@ -48,10 +48,10 @@ const DIAS_CHURN = 45;
    assim a coluna e o filtro contam a mesma história. */
 const ANJOS_FORA = ['Shirley Silva', 'Priscila Argolo'];
 
-/* A aba Tarefas mostra só o time de CS. Qualquer outro dono de tarefa no
+/* A aba Reuniões mostra só o time de CS. Reunião de qualquer outro dono no
    HubSpot (vendas, parceiros, sem responsável) fica de fora. */
-const CS_TAREFAS = ['Luana Coutinho', 'Thamiris Ribeiro', 'Cristiane Canatelli',
-                    'Elisa Marques', 'Gabriella Busto', 'Alexia Oliveira', 'Tatiane Ayres'];
+const CS_TIME = ['Luana Coutinho', 'Thamiris Ribeiro', 'Cristiane Canatelli',
+                 'Elisa Marques', 'Gabriella Busto', 'Alexia Oliveira', 'Tatiane Ayres'];
 
 // ---------------------------------------------------------------- utilidades
 function isoWeek(d) {
@@ -68,6 +68,7 @@ function dataDaSemana(s, ano) {           // quinta-feira da semana ISO
   return seg.toISOString().slice(0, 10);
 }
 const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+const fmtBR = v => 'R$ ' + Math.round(num(v)).toLocaleString('pt-BR');
 const r2 = v => Math.round(num(v) * 100) / 100;
 const soDigitos = v => String(v || '').replace(/\D/g, '');
 const iso = v => {
@@ -108,6 +109,13 @@ async function puxarBQ() {
              ROW_NUMBER() OVER (PARTITION BY domain_id ORDER BY created_at ASC) rn
       FROM ${DS}.odbc_companies
     ),
+    /* Domínios que têm Oráculo: quem já registrou atendimento na base do produto.
+       É o sinal mais direto de "usa" — a fatura do Iugu junta tudo num total só. */
+    orac AS (
+      SELECT DISTINCT CAST(domain_id AS STRING) dom
+      FROM ${DS}.oraculo_Atendimentos
+      WHERE SAFE_CAST(domain_id AS INT64) IS NOT NULL
+    ),
     /* integration_id chega como "7.0" (float em texto) e odbc_integrations.id é
        inteiro — juntar direto não casa nada. Normaliza pelos dois lados. */
     integ AS (
@@ -121,14 +129,16 @@ async function puxarBQ() {
       FROM ${DS}.odbc_partners GROUP BY 1
     )
     SELECT d.id, d.name nome, d.integration_type, i.nome integracao_nome,
-           a.name cs, c.tax_document cnpj, c.social_name, c.status status_empresa,
+           a.name cs, c.tax_document cnpj, c.social_name, c.company_name, c.status status_empresa,
            SUBSTR(CAST(d.created_at AS STRING),1,10) criacao,
-           p.nome canal
+           p.nome canal,
+           o.dom IS NOT NULL tem_oraculo
     FROM dom d
     LEFT JOIN comp c ON c.domain_id = d.id AND c.rn = 1
     LEFT JOIN ${DS}.odbc_angels a ON CAST(a.id AS STRING) = CAST(d.angel_id AS STRING)
     LEFT JOIN integ i ON i.id = CAST(SAFE_CAST(d.integration_id AS FLOAT64) AS INT64)
     LEFT JOIN part p ON p.id = d.partner_id
+    LEFT JOIN orac o ON o.dom = d.id
     WHERE d.rn = 1`);
 
   const pedidos = await q('pedidos por marca × semana', `
@@ -196,6 +206,27 @@ async function puxarBQ() {
   if (fatorRows[0] && fatorRows[0].fator > 0) FATOR_ANTECIPACAO_VESTI = fatorRows[0].fator;
   console.log('     -> fator antecipação Vesti = ' + (FATOR_ANTECIPACAO_VESTI * 100).toFixed(2) + '%');
 
+  /* INTERCHANGE LÍQUIDO — o que sobra para a Vesti depois do banco.
+     O fee do cartão cobrado do lojista (vestiPagoValue) não é receita inteira da
+     Vesti: ele se divide em `mdrCardBrandValue`, que vai para o adquirente
+     (IUGU / STARKBANK / PAGARME), e `mdrVestiValue`, que fica aqui. Conferido na
+     base de 2026: 955.864 = 842.685 (banco) + 113.179 (Vesti), bate na casa do
+     centavo nos três provedores.
+     Por isso o interchange passa a ser medido em vestipago_transaction_detail e
+     não mais em MongoDB_Pedidos_Geral: só esta tabela tem a quebra do MDR.
+     Antifraude continua inteiro — é cobrança da Vesti, não taxa de banco. */
+  const interchange = await q('interchange líquido por marca × semana', `
+    SELECT CAST(domainId AS STRING) dom,
+      EXTRACT(ISOWEEK FROM DATE(CAST(paidAt AS TIMESTAMP))) sem,
+      ROUND(SUM(SAFE_CAST(vestiPagoValue AS FLOAT64)),2) fee_bruto,
+      ROUND(SUM(SAFE_CAST(mdrCardBrandValue AS FLOAT64)),2) taxa_banco,
+      ROUND(SUM(SAFE_CAST(mdrVestiValue AS FLOAT64)),2) fee_vesti,
+      ROUND(SUM(SAFE_CAST(antifraudValue AS FLOAT64)),2) antifraude
+    FROM ${DS}.vestipago_transaction_detail
+    WHERE paidAt IS NOT NULL AND SAFE_CAST(domainId AS INT64) IS NOT NULL
+      AND ${FILTRO_SEMANA('paidAt')}
+    GROUP BY 1,2`);
+
   const oraculoGmv = await q('Oráculo: GMV por marca × semana', `
     SELECT CAST(domainId AS STRING) dom,
       EXTRACT(ISOWEEK FROM DATE(CAST(settings_createdAt AS TIMESTAMP))) sem,
@@ -216,37 +247,9 @@ async function puxarBQ() {
       AND ${FILTRO_SEMANA('DataReferencia')}
     GROUP BY 1,2`);
 
-  const tino = await q('Tino: cliques por marca × semana', `
-    WITH ud AS (
-      SELECT CAST(id AS STRING) uid, ANY_VALUE(CAST(domain_id AS STRING)) dom
-      FROM ${DS}.odbc_users WHERE domain_id IS NOT NULL GROUP BY 1
-    )
-    SELECT ud.dom,
-      EXTRACT(ISOWEEK FROM DATE(CAST(r.rankings_created_at AS TIMESTAMP))) sem,
-      SUM(SAFE_CAST(r.rankings_shared_links AS INT64)) cliques
-    FROM ${DS}.sucessodocliente_rankings r
-    JOIN ud ON ud.uid = CAST(r.USERS_ID AS STRING)
-    WHERE r.rankings_created_at IS NOT NULL
-      AND SAFE_CAST(r.rankings_created_at AS TIMESTAMP) < TIMESTAMP '2100-01-01'
-      AND ${FILTRO_SEMANA('r.rankings_created_at')}
-    GROUP BY 1,2`);
-
-  /* Último uso do Tino: a data mais recente em que a marca compartilhou link.
-     Vai além de 2026 de propósito — é o que responde "quando essa marca usou
-     pela última vez" e "quem nunca usou". */
-  const tinoUltimo = await q('Tino: último uso por marca', `
-    WITH ud AS (
-      SELECT CAST(id AS STRING) uid, ANY_VALUE(CAST(domain_id AS STRING)) dom
-      FROM ${DS}.odbc_users WHERE domain_id IS NOT NULL GROUP BY 1
-    )
-    SELECT ud.dom,
-           SUBSTR(CAST(MAX(CAST(r.rankings_created_at AS TIMESTAMP)) AS STRING),1,10) ultimo,
-           SUM(SAFE_CAST(r.rankings_shared_links AS INT64)) cliques_total
-    FROM ${DS}.sucessodocliente_rankings r
-    JOIN ud ON ud.uid = CAST(r.USERS_ID AS STRING)
-    WHERE r.rankings_created_at IS NOT NULL
-      AND SAFE_CAST(r.rankings_created_at AS TIMESTAMP) < TIMESTAMP '2100-01-01'
-    GROUP BY 1`);
+  /* O Tino saiu do BigQuery (ver puxarTino, seção 1B). A tabela
+     sucessodocliente_rankings só tinha os links compartilhados ("cliques"), e ela
+     nem sabe quem tem o produto: quem manda nisso é a base do próprio Tino. */
 
   /* Mensalidade tem que ser mensalidade. A fatura do Iugu junta plano, Oráculo,
      Filial, Assistente e taxa de ativação no mesmo total — só 75% é plano. Por
@@ -320,7 +323,109 @@ async function puxarBQ() {
     GROUP BY 1`);
 
   return { cadastro, pedidos, ultimoPedido, vestipago, oraculoGmv, oraculoAtend,
-           tino, tinoUltimo, mensalidade, faturas };
+           interchange, mensalidade, faturas };
+}
+
+// ============================================================ 1B. API DO TINO
+/* Por que não vem mais do BigQuery: o espelho só tem os links compartilhados
+   (`sucessodocliente_rankings`), e a partir dele a única resposta possível era
+   "quem clicou". Quem TEM o Tino, quem nunca entrou, quantos eventos a marca
+   gerou — isso só existe na base do produto, atrás desta API.
+   O painel do Tino (admin.tino.vesti.com.br) usa exatamente estas rotas.
+
+   Rotas usadas (todas POST, corpo {date_from, date_to, companies[], granularity}):
+     customer_kpis     -> total_brands / active / inactive / never_accessed
+     login_days        -> por marca: created_at, last_login, login_days, status
+     company_list      -> marcas com atividade no período
+     companies_chart   -> por marca: total_events e sessions no período
+     event_types       -> composição dos eventos (product_expand, filter_apply…)
+
+   Credencial: TINO_USER / TINO_PASS. NÃO tem valor padrão no código — este
+   repositório é público. Em CI, secrets do vesti-mobi/dados. */
+const TINO_URL = process.env.TINO_URL
+  || 'https://allblue-tinindo-tracking-667335277398.us-central1.run.app';
+const TINO_USER = process.env.TINO_USER || '';
+const TINO_PASS = process.env.TINO_PASS || '';
+
+function tinoPost(rota, corpo) {
+  return new Promise((res, rej) => {
+    const b = JSON.stringify(corpo);
+    const u = new URL(TINO_URL + '/' + rota);
+    const req = https.request({
+      hostname: u.hostname, path: u.pathname, method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(b),
+        'X-Dashboard-User': TINO_USER,
+        'X-Dashboard-Password': TINO_PASS,
+      },
+    }, r => {
+      let d = '';
+      r.on('data', c => d += c);
+      r.on('end', () => {
+        if (r.statusCode !== 200) return rej(new Error(`Tino /${rota} -> ${r.statusCode}: ${d.slice(0, 200)}`));
+        try { res(JSON.parse(d).data); } catch (e) { rej(e); }
+      });
+    });
+    req.on('error', rej);
+    req.setTimeout(60000, () => req.destroy(new Error(`Tino /${rota}: timeout`)));
+    req.end(b);
+  });
+}
+
+/* Segunda e domingo (UTC) de uma semana ISO — a API recorta por data, não por
+   semana, então cada semana do painel vira uma janela de 7 dias. */
+function limitesDaSemana(s, ano) {
+  const base = new Date(Date.UTC(ano, 0, 4));
+  const seg = new Date(base);
+  seg.setUTCDate(base.getUTCDate() - ((base.getUTCDay() + 6) % 7) + (s - 1) * 7);
+  const dom = new Date(seg);
+  dom.setUTCDate(seg.getUTCDate() + 6);
+  return [seg.toISOString().slice(0, 10), dom.toISOString().slice(0, 10)];
+}
+
+async function puxarTino() {
+  console.log('\n[Tino] ' + TINO_URL);
+  if (!TINO_USER || !TINO_PASS) {
+    console.log('  sem TINO_USER/TINO_PASS — a aba do Tino fica vazia');
+    return null;
+  }
+  const hoje = HOJE.toISOString().slice(0, 10);
+  const tudo = { date_from: '2020-01-01', date_to: hoje, companies: [], granularity: 'day' };
+
+  const kpis = await tinoPost('customer_kpis', tudo);
+  const acessos = await tinoPost('login_days', tudo);
+  const lista = await tinoPost('company_list', tudo);
+  const eventosTotais = await tinoPost('companies_chart', tudo);
+  const tipos = await tinoPost('event_types',
+    { date_from: `${ANO}-01-01`, date_to: hoje, companies: [], granularity: 'day' });
+
+  /* Eventos por marca × semana: a rota devolve o total do período, então é uma
+     chamada por semana do ano. São ~33 chamadas de ~1s — cabe no orçamento da
+     carga diária, e é a única forma de ter a série semanal por marca. */
+  const porSemana = [];
+  for (let s = 1; s <= SEMANA_ATUAL; s++) {
+    const [ini, fim] = limitesDaSemana(s, ANO);
+    if (ini > hoje) break;
+    const linhas = await tinoPost('companies_chart',
+      { date_from: ini, date_to: fim > hoje ? hoje : fim, companies: [], granularity: 'day' });
+    (linhas || []).forEach(l => porSemana.push({
+      sem: s, company: l.company, eventos: num(l.total_events), sessoes: num(l.sessions),
+    }));
+    process.stdout.write('\r  eventos por semana: ' + s + '/' + SEMANA_ATUAL);
+  }
+  console.log('');
+
+  const marcas = new Map();
+  (acessos || []).forEach(a => marcas.set(a.company, a));
+  (lista || []).forEach(c => { if (!marcas.has(c)) marcas.set(c, { company: c }); });
+  console.log('  marcas com Tino'.padEnd(44) + String(marcas.size).padStart(8));
+  console.log('  total_brands (KPI da própria API)'.padEnd(44) + String((kpis || {}).total_brands || 0).padStart(8));
+  console.log('  eventos no ano'.padEnd(44)
+    + String(porSemana.reduce((t, x) => t + x.eventos, 0)).padStart(8));
+
+  return { kpis: kpis || {}, acessos: acessos || [], marcas: [...marcas.values()],
+           eventosTotais: eventosTotais || [], porSemana, tipos: tipos || [] };
 }
 
 // =============================================================== 2. HUBSPOT
@@ -491,7 +596,7 @@ function marcaDoNome(nome, cls) {
 
 async function puxarHubSpot() {
   console.log('\n[HubSpot]');
-  if (!HS_TOKEN) { console.log('  sem HUBSPOT_TOKEN — negócios, tarefas e tickets ficam vazios'); return { negocios: [], tarefas: [], tickets: [] }; }
+  if (!HS_TOKEN) { console.log('  sem HUBSPOT_TOKEN — negócios, reuniões e tickets ficam vazios'); return { negocios: [], reunioes: [], tickets: [] }; }
 
   const owners = {};
   let after;
@@ -536,33 +641,85 @@ async function puxarHubSpot() {
     };
   }).filter(n => n.data && Number(n.data.slice(0, 4)) === ANO);
 
-  const desde = Date.UTC(ANO, 0, 1);
-  const tasksRaw = await buscarTudo('tasks',
-    ['hs_task_subject', 'hs_timestamp', 'hs_task_type', 'hs_task_status',
-     'hs_task_completion_date', 'hubspot_owner_id'],
-    [{ filters: [{ propertyName: 'hs_timestamp', operator: 'GTE', value: String(desde) }] }],
-    [{ propertyName: 'hs_timestamp', direction: 'DESCENDING' }]);
-  /* Tipo é o formato do compromisso (hoje 100% TODO no HubSpot da Vesti) e
-     situação é hs_task_status — é a situação que separa feito de por fazer. */
-  const TIPOS = { TODO: 'Tarefa', CALL: 'Ligação', EMAIL: 'E-mail', MEETING: 'Reunião', LINKED_IN_MESSAGE: 'LinkedIn' };
-  const SITUACOES = { COMPLETED: 'Concluída', NOT_STARTED: 'A fazer', IN_PROGRESS: 'Em andamento',
-                      WAITING: 'Aguardando', DEFERRED: 'Adiada' };
-  const tarefas = tasksRaw.map(t => ({
-    tarefa: t.properties.hs_task_subject || '(sem assunto)',
-    data: iso(t.properties.hs_timestamp),
-    tipo: TIPOS[t.properties.hs_task_type] || t.properties.hs_task_type || 'Outro',
-    situacao: SITUACOES[t.properties.hs_task_status] || t.properties.hs_task_status || 'A fazer',
-    concluidaEm: iso(t.properties.hs_task_completion_date),
-    cs: owners[t.properties.hubspot_owner_id] || '(sem responsável)',
-  })).filter(t => t.data && Number(t.data.slice(0, 4)) === ANO && CS_TAREFAS.includes(t.cs));
-  const feitas = tarefas.filter(t => t.situacao === 'Concluída').length;
-  console.log('  tarefas (só o time de CS)'.padEnd(44) + String(tarefas.length).padStart(8));
-  console.log('    concluídas / a fazer'.padEnd(44)
-    + (feitas + ' / ' + (tarefas.length - feitas)).padStart(8));
+  const reunioes = await puxarReunioes(owners);
 
   const tickets = await puxarTickets(owners);
 
-  return { negocios, tarefas, tickets };
+  return { negocios, reunioes, tickets };
+}
+
+/* ------------------------------------------------------------- reuniões
+   Mesma leitura do painel PlanilhasEPainelCS
+   (https://vesti-mobi.github.io/dados/PlanilhasEPainelCS/): reunião realizada
+   pelo time de CS e, do outro lado, o negócio que foi fechado depois dela.
+
+   A atribuição é a mesma de lá, para os dois painéis contarem a mesma coisa: o
+   negócio ganho é creditado à ÚLTIMA reunião daquela empresa (com aquele CS)
+   anterior ao fechamento. Sem isso, uma empresa com cinco reuniões e um negócio
+   viraria cinco negócios. Reunião que não tem negócio depois fica "Sem negócio";
+   reunião futura fica "Agendada". */
+async function puxarReunioes(owners) {
+  const desde = Date.UTC(ANO, 0, 1);
+  const brutas = await buscarTudo('meetings',
+    ['hs_meeting_title', 'hs_meeting_start_time', 'hs_meeting_outcome', 'hubspot_owner_id'],
+    [{ filters: [{ propertyName: 'hs_meeting_start_time', operator: 'GTE', value: String(desde) }] }],
+    [{ propertyName: 'hs_meeting_start_time', direction: 'DESCENDING' }]);
+
+  const { empresaDo, nome: nomeEmpresa } =
+    await empresasAssociadas('meetings', brutas.map(m => m.id));
+
+  const reunioes = brutas.map(m => ({
+    reuniao: m.properties.hs_meeting_title || '(sem assunto)',
+    data: iso(m.properties.hs_meeting_start_time),
+    cliente: nomeEmpresa[empresaDo[m.id]] || '(sem empresa)',
+    empresaId: empresaDo[m.id] || null,
+    cs: owners[m.properties.hubspot_owner_id] || '(sem responsável)',
+    resultado: 'Sem negócio',
+    negocio: null,
+    valor: 0,
+  })).filter(r => r.data && Number(r.data.slice(0, 4)) === ANO && CS_TIME.includes(r.cs));
+  console.log('  reuniões (só o time de CS)'.padEnd(44) + String(reunioes.length).padStart(8));
+
+  /* Negócios ganhos de QUALQUER pipeline — o time fecha filial, upgrade e
+     Vesti Pago em pipelines diferentes, e o painel das planilhas conta todos. */
+  const ganhos = await buscarTudo('deals',
+    ['dealname', 'amount', 'closedate', 'hs_is_closed_won'],
+    [{ filters: [
+      { propertyName: 'hs_is_closed_won', operator: 'EQ', value: 'true' },
+      { propertyName: 'closedate', operator: 'GTE', value: String(desde) },
+    ] }],
+    [{ propertyName: 'closedate', direction: 'DESCENDING' }]);
+  const { empresaDo: empresaDoDeal } = await empresasAssociadas('deals', ganhos.map(d => d.id));
+
+  // (empresa) -> reuniões ordenadas da mais antiga para a mais nova
+  const porEmpresa = new Map();
+  reunioes.forEach(r => {
+    if (!r.empresaId) return;
+    if (!porEmpresa.has(r.empresaId)) porEmpresa.set(r.empresaId, []);
+    porEmpresa.get(r.empresaId).push(r);
+  });
+  porEmpresa.forEach(l => l.sort((a, b) => a.data.localeCompare(b.data)));
+
+  let creditados = 0, semReuniao = 0;
+  ganhos.forEach(d => {
+    const emp = empresaDoDeal[d.id];
+    const fecha = iso(d.properties.closedate);
+    const lista = emp && fecha ? porEmpresa.get(emp) : null;
+    if (!lista) { semReuniao++; return; }
+    const anteriores = lista.filter(r => r.data <= fecha);
+    if (!anteriores.length) { semReuniao++; return; }
+    const r = anteriores[anteriores.length - 1];
+    r.resultado = 'Fechou negócio';
+    r.negocio = d.properties.dealname || '';
+    r.valor = r2(r.valor + num(d.properties.amount));
+    creditados++;
+  });
+  const hoje = HOJE.toISOString().slice(0, 10);
+  reunioes.forEach(r => { if (r.resultado === 'Sem negócio' && r.data > hoje) r.resultado = 'Agendada'; });
+  console.log('  negócios ganhos no ano'.padEnd(44) + String(ganhos.length).padStart(8));
+  console.log('    creditados a uma reunião / sem reunião'.padEnd(44)
+    + (creditados + ' / ' + semReuniao).padStart(8));
+  return reunioes.map(({ empresaId, ...r }) => r);
 }
 
 /* ---------------------------------------------------------------- tickets
@@ -627,7 +784,47 @@ async function puxarTickets(owners) {
 }
 
 // ================================================================ 3. MONTAGEM
-function montar(bqd, hsd) {
+/* Slug do Tino ("opera_kids") -> marca da carteira. A API não devolve domínio
+   nem CNPJ, só o slug, então o casamento é por nome, em três tentativas:
+   nome igual, nome sem espaços e, por último, um nome contido no outro
+   ("cambos" = "Cambos Jeans", "miss_manu" = "MissManu"). Numa conferência com
+   as 92 marcas do Tino isso casou 90; as que sobram aparecem sem CS.
+   Compara contra nome do domínio, razão social e nome fantasia da empresa. */
+const RUIDO_TINO = /\b(ltda|me|epp|eireli|sa|comercio|confeccao|confeccoes|de|do|da|das|dos|pecas|vestuario|acessorios|moda|modas|store|oficial|atacado|jeans|demo)\b/g;
+const chaveTino = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(RUIDO_TINO, ' ').replace(/\s+/g, ' ').trim();
+const nomeBonito = slug => String(slug || '').replace(/_/g, ' ')
+  .split(' ').filter(Boolean).map(p => p[0].toUpperCase() + p.slice(1)).join(' ');
+
+function casarMarcaTino(porDom) {
+  const cands = [];
+  porDom.forEach(m => {
+    const chaves = [...new Set([m.nome, m.social, m.fantasia].map(chaveTino).filter(Boolean))];
+    if (chaves.length) cands.push({ dom: m.dom, nome: m.nome, chaves });
+  });
+  const exato = new Map(), semEspaco = new Map();
+  cands.forEach(c => c.chaves.forEach(k => {
+    if (!exato.has(k)) exato.set(k, c);
+    const k2 = k.replace(/ /g, '');
+    if (!semEspaco.has(k2)) semEspaco.set(k2, c);
+  }));
+  return function (slug) {
+    const k = chaveTino(slug.replace(/_/g, ' '));
+    if (!k) return null;
+    if (exato.has(k)) return exato.get(k).dom;
+    if (semEspaco.has(k.replace(/ /g, ''))) return semEspaco.get(k.replace(/ /g, '')).dom;
+    const toks = k.split(' ');
+    const parciais = cands.filter(c => c.chaves.some(ck => {
+      const ct = ck.split(' ');
+      return toks.every(t => ct.includes(t)) || ct.every(t => toks.includes(t));
+    }));
+    if (!parciais.length) return null;
+    // empate: o nome mais curto é o mais provável (menos qualificadores colados)
+    return parciais.sort((a, b) => a.nome.length - b.nome.length)[0].dom;
+  };
+}
+
+function montar(bqd, hsd, tinoDados) {
   console.log('\n[montagem]');
   const semanaOk = s => Number.isFinite(s) && s >= 1 && s <= SEMANA_ATUAL;
 
@@ -640,12 +837,14 @@ function montar(bqd, hsd) {
       nome: (c.nome || c.social_name || 'Domínio ' + c.id).trim(),
       cs: (c.cs && c.cs !== 'N/A' && !ANJOS_FORA.includes(c.cs)) ? c.cs : 'Sem CS',
       social: c.social_name || null,
+      fantasia: c.company_name || null,
       integracao: c.integracao_nome || c.integration_type || 'Sem integração',
       // canal = parceiro dono da conta; "N/A" no cadastro é o mesmo que sem canal
       canal: (c.canal && c.canal !== 'N/A') ? c.canal : 'Sem canal',
       cnpj: soDigitos(c.cnpj),
       statusEmpresa: c.status_empresa,
       criacao: c.criacao,
+      temOraculo: !!c.tem_oraculo,
     });
   });
   console.log('  marcas no cadastro'.padEnd(44) + String(porDom.size).padStart(8));
@@ -663,10 +862,26 @@ function montar(bqd, hsd) {
     if (!semanaOk(r.sem) || !porDom.has(r.dom)) return;
     somaEm(serieCli, r.dom + '|' + r.sem, {
       pedidos: r.pedidos, pedidosPagos: r.pagos, valorPedidos: r.valor,
-      receitaInterchange: num(r.vp) + num(r.af),
       receitaAntecipacao: num(r.antec) * FATOR_ANTECIPACAO_VESTI,
     });
   });
+
+  /* Interchange já LÍQUIDO do banco. Vem de vestipago_transaction_detail (a única
+     fonte com a quebra do MDR) e não mais dos pedidos — por isso ele entra aqui,
+     numa passada própria, e não junto do laço acima. */
+  let feeBruto = 0, taxaBanco = 0;
+  bqd.interchange.forEach(r => {
+    if (!semanaOk(r.sem) || !porDom.has(r.dom)) return;
+    feeBruto += num(r.fee_bruto); taxaBanco += num(r.taxa_banco);
+    somaEm(serieCli, r.dom + '|' + r.sem, {
+      receitaInterchange: num(r.fee_vesti) + num(r.antifraude),
+      taxaBanco: num(r.taxa_banco),
+    });
+  });
+  console.log('  fee de cartão bruto no ano'.padEnd(44) + fmtBR(feeBruto).padStart(8));
+  console.log('    taxa paga aos bancos (Iugu/Stark/Pagarme)'.padEnd(44) + fmtBR(taxaBanco).padStart(8));
+  console.log('    interchange líquido + antifraude'.padEnd(44)
+    + fmtBR(bqd.interchange.reduce((t, r) => t + num(r.fee_vesti) + num(r.antifraude), 0)).padStart(8));
 
   // mensalidade entra por CNPJ -> domínio
   const domPorCnpj = new Map();
@@ -743,6 +958,11 @@ function montar(bqd, hsd) {
       riscoChurn: av.risco,
       motivosRisco: av.motivos,
       dataChurn,
+      /* Produtos contratados. Oráculo vem do próprio produto (tem atendimento
+         registrado); Tino é preenchido logo abaixo, depois que a lista de marcas
+         da API do Tino é casada com o cadastro. */
+      temOraculo: !!m.temOraculo,
+      temTino: false,
       _dom: m.dom, _cnpj: m.cnpj,
     });
   });
@@ -776,38 +996,78 @@ function montar(bqd, hsd) {
     atendimentos: v.at, gmvIniciado: r2(v.gi), gmvFinalizado: r2(v.gf),
   })).filter(x => x.atendimentos || x.gmvIniciado);
 
-  const tinoSeries = [], tinoAcc = new Map();
-  const gmvSemana = new Map();     // dom|sem -> valor pago, para a linha de receita do Tino
+  /* ---- Tino (API do produto)
+     A lista de marcas agora é a da PRÓPRIA base do Tino: quem tem o produto é
+     quem está lá, não quem apareceu clicando no espelho do BigQuery. Cada marca
+     do Tino é casada com o cadastro por nome (ver casarMarcaTino); marca que não
+     casa continua na tabela, só sem CS — sumir com cliente por causa de cadastro
+     seria pior que mostrá-lo sem CS. */
+  const gmvSemana = new Map();     // dom|sem -> valor pago, para a linha de GMV do Tino
   bqd.pedidos.forEach(r => { if (semanaOk(r.sem)) gmvSemana.set(r.dom + '|' + r.sem, num(r.valor)); });
-  bqd.tino.forEach(r => {
-    if (!semanaOk(r.sem) || !porDom.has(r.dom)) return;
-    tinoSeries.push({
-      semana: r.sem, cliente: nomeDe(r.dom),
-      cliques: num(r.cliques), receita: gmvSemana.get(r.dom + '|' + r.sem) || 0,
+
+  const tinoSeries = [], tinoTab = [];
+  let tinoKpis = {}, tinoTipos = [], domComTino = new Set();
+  if (tinoDados) {
+    const casar = casarMarcaTino(porDom);
+    const domDaCompany = new Map();     // slug do Tino -> domínio da carteira
+    const nomeDaCompany = new Map();    // slug do Tino -> nome exibido
+    tinoDados.marcas.forEach(m => {
+      const dom = casar(m.company);
+      if (dom) { domDaCompany.set(m.company, dom); domComTino.add(dom); }
+      nomeDaCompany.set(m.company, dom ? nomeDe(dom) : nomeBonito(m.company));
     });
-    somaEm(tinoAcc, r.dom, { cliques: num(r.cliques) });
-  });
-  /* A tabela do Tino lista TODA marca da carteira, inclusive quem nunca usou —
-     é justamente essa lista que a CS precisa atacar. Último acesso e cliques
-     no total são de toda a história, não só do ano. */
-  const tinoUlt = new Map();
-  bqd.tinoUltimo.forEach(r => tinoUlt.set(r.dom, r));
-  const tinoTab = [];
-  porDom.forEach(m => {
-    const u = tinoUlt.get(m.dom);
-    tinoTab.push({
-      cliente: m.nome, cs: m.cs,
-      cliques: (tinoAcc.get(m.dom) || {}).cliques || 0,
-      ultimoAcessoTino: u ? u.ultimo : null,
-      cliquesTotal: u ? num(u.cliques_total) : 0,
-      nuncaUsou: !u,
+
+    const acc = new Map();              // slug -> {eventos, sessoes}
+    tinoDados.porSemana.forEach(r => {
+      if (!semanaOk(r.sem)) return;
+      const dom = domDaCompany.get(r.company);
+      const cliente = nomeDaCompany.get(r.company) || nomeBonito(r.company);
+      tinoSeries.push({
+        semana: r.sem, cliente, cs: dom ? csDe(dom) : 'Sem CS',
+        eventos: r.eventos, sessoes: r.sessoes,
+        receita: dom ? (gmvSemana.get(dom + '|' + r.sem) || 0) : 0,
+      });
+      somaEm(acc, r.company, { eventos: r.eventos, sessoes: r.sessoes });
     });
+
+    const totalDe = new Map();
+    tinoDados.eventosTotais.forEach(e => totalDe.set(e.company, e));
+    tinoDados.marcas.forEach(m => {
+      const dom = domDaCompany.get(m.company);
+      const t = totalDe.get(m.company) || {};
+      const a = acc.get(m.company) || {};
+      tinoTab.push({
+        cliente: nomeDaCompany.get(m.company),
+        cs: dom ? csDe(dom) : 'Sem CS',
+        eventos: a.eventos || 0,
+        sessoes: a.sessoes || 0,
+        eventosTotal: num(t.total_events),
+        diasAcesso: num(m.login_days),
+        ultimoAcessoTino: m.last_login || null,
+        statusTino: m.status === 'inactive' ? 'Inativa' : 'Ativa',
+        entrouEm: m.created_at ? String(m.created_at).slice(0, 10) : null,
+        nuncaUsou: !m.last_login,
+        semCadastro: !dom,
+      });
+    });
+    tinoKpis = tinoDados.kpis;
+    tinoTipos = tinoDados.tipos;
+  }
+
+  /* O fee da aba Vesti Pago segue a MESMA régua do interchange da tabela geral:
+     já sem a taxa do banco. Manter um bruto aqui e um líquido lá faria a mesma
+     receita aparecer com dois valores no mesmo painel. O valor transacionado e
+     os links continuam vindo dos pedidos — só o fee troca de fonte. */
+  const feeLiquido = new Map();
+  bqd.interchange.forEach(r => {
+    if (!semanaOk(r.sem)) return;
+    feeLiquido.set(r.dom + '|' + r.sem, num(r.fee_vesti) + num(r.antifraude));
   });
 
   const vpSeries = [], vpAcc = new Map();
   bqd.vestipago.forEach(r => {
     if (!semanaOk(r.sem) || !porDom.has(r.dom)) return;
-    const fee = num(r.vp) + num(r.af);
+    const fee = feeLiquido.get(r.dom + '|' + r.sem) || 0;
     const antec = num(r.antec) * FATOR_ANTECIPACAO_VESTI;
     vpSeries.push({
       semana: r.sem, cliente: nomeDe(r.dom),
@@ -851,6 +1111,11 @@ function montar(bqd, hsd) {
     ...churnSeries.map(x => x.cliente),
   ]);
   const clientesFinal = clientes.filter(c => ativos.has(c.nome));
+  clientesFinal.forEach(c => { c.temTino = domComTino.has(c._dom); });
+  console.log('  marcas com Tino na tabela geral'.padEnd(44)
+    + String(clientesFinal.filter(c => c.temTino).length).padStart(8));
+  console.log('  marcas com Oráculo na tabela geral'.padEnd(44)
+    + String(clientesFinal.filter(c => c.temOraculo).length).padStart(8));
   clientesFinal.forEach(c => { delete c._dom; delete c._cnpj; });
   console.log('  marcas com atividade em ' + ANO + ''.padEnd(20) + String(clientesFinal.length).padStart(13));
 
@@ -910,9 +1175,16 @@ function montar(bqd, hsd) {
         mensalidade: 'Receita mensalidade = SÓ as linhas de plano da fatura Iugu. Oráculo, Filial, '
                + 'Assistente e taxa de ativação saem em "Outros (Iugu)" — juntos eram 25% do que '
                + 'antes ia todo para a coluna de mensalidade. Os dois entram na Receita total.',
-        receita: 'Interchange = payment_transaction_vestiPagoValue + antifraudValue (pedidos pagos). '
+        receita: 'Interchange = fee do cartão MENOS a taxa do banco, mais o antifraude — ou seja, '
+               + 'mdrVestiValue + antifraudValue em vestipago_transaction_detail. O que o lojista paga de fee '
+               + '(vestiPagoValue) se divide em mdrCardBrandValue, que vai para o adquirente (Iugu, Starkbank, '
+               + 'Pagarme), e mdrVestiValue, que fica com a Vesti — em 2026, 88% do fee é do banco. '
+               + 'O antifraude continua inteiro: é cobrança da Vesti, não taxa de banco. '
                + 'Antecipação = payment_transaction_antecipationValue x ' + FATOR_ANTECIPACAO_VESTI
-               + ' (parcela da Vesti, medida em vestipago_transaction_detail).',
+               + ' (parcela da Vesti, medida na mesma tabela) — essa também já é líquida do banco.',
+        feeLiquido: 'Receita (fee) da aba Vesti Pago e Interchange da tabela geral são a MESMA régua: '
+                  + 'fee do cartão menos o MDR do banco, mais o antifraude. A semana do fee é a do '
+                  + 'pagamento (paidAt), a das outras colunas é a do pedido — daí uma diferença de ~1%.',
         feePix: 'ATENÇÃO: o fee da Vesti só existe para CARTÃO. Em PIX o campo vem nulo tanto em '
               + 'MongoDB_Pedidos_Geral quanto em vestipago_transaction_detail — e PIX é ~53% das '
               + 'transações Vesti Pago. Logo "Receita (fee)" e "Interchange" cobrem só o cartão; '
@@ -926,9 +1198,13 @@ function montar(bqd, hsd) {
                    + 'Exceções decididas na revisão: Kelly Rodrigues Store Fortaleza = Filial; '
                    + 'Jay & Co e Landê Oficial = Upgrade.',
         cs: 'Marcas de anjos que saíram da carteira (' + ANJOS_FORA.join(', ') + ') aparecem como "Sem CS". '
-          + 'A aba Tarefas mostra só: ' + CS_TAREFAS.join(', ') + '.',
-        tarefas: 'Situação vem de hs_task_status no HubSpot (Concluída / A fazer), não é derivada da data. '
-               + 'Tarefas com data futura aparecem quando a semana atual está na seleção — é a agenda do que vem.',
+          + 'A aba Reuniões mostra só: ' + CS_TIME.join(', ') + '.',
+        reunioes: 'Reuniões do HubSpot (objeto meetings) do time de CS, pela data de início. Mesma leitura do '
+               + 'painel PlanilhasEPainelCS: o negócio ganho é creditado à ÚLTIMA reunião daquela empresa antes '
+               + 'do fechamento, para uma empresa com cinco reuniões e um negócio não virar cinco negócios. '
+               + 'Negócio ganho de qualquer pipeline conta. Reunião com data futura fica "Agendada".',
+        produtos: 'Tem Tino = a marca está na base do próprio Tino (API do produto), casada com o cadastro pelo '
+               + 'nome. Tem Oráculo = a marca tem atendimento registrado em oraculo_Atendimentos.',
         canal: 'Canal = parceiro dono da conta (odbc_domains.partner_id -> odbc_partners.name): '
              + 'Vesti, Attasoft, Uemtel, Trial, Starter, Varejo Vesti… Marca sem parceiro ou com "N/A" '
              + 'aparece como "Sem canal". O filtro aceita mais de um canal ao mesmo tempo.',
@@ -947,11 +1223,13 @@ function montar(bqd, hsd) {
     clientesSeries: clientesSeries.filter(x => ativos.has(x.cliente)),
     negocios: hsd.negocios,
     oraculo: { tabela: oraculoTab, series: oraculoSeries },
-    // a tabela do Tino traz toda a carteira do painel, com ou sem uso
-    tino: { tabela: tinoTab.filter(x => ativos.has(x.cliente)), series: tinoSeries },
+    /* A tabela do Tino traz as marcas que TÊM o produto (a lista vem da API do
+       Tino), inclusive quem nunca entrou — é justamente essa lista que a CS
+       precisa atacar. Não é filtrada por "teve atividade no painel". */
+    tino: { tabela: tinoTab, series: tinoSeries, kpis: tinoKpis, tiposDeEvento: tinoTipos },
     vestiPago: { tabela: vpTab, series: vpSeries },
     churn: { series: churnSeries },
-    tarefas: hsd.tarefas,
+    reunioes: hsd.reunioes,
     tickets,
   };
 }
@@ -964,9 +1242,15 @@ function montar(bqd, hsd) {
   const bqd = await puxarBQ();
   const hsd = await puxarHubSpot().catch(e => {
     console.log('  HubSpot falhou: ' + e.message.slice(0, 160));
-    return { negocios: [], tarefas: [], tickets: [] };
+    return { negocios: [], reunioes: [], tickets: [] };
   });
-  const data = montar(bqd, hsd);
+  /* Tino: se a API cair, o painel carrega sem a aba em vez de abortar a carga
+     inteira — o resto dos dados não tem nada a ver com ela. */
+  const tinoDados = await puxarTino().catch(e => {
+    console.log('  Tino falhou: ' + e.message.slice(0, 160));
+    return null;
+  });
+  const data = montar(bqd, hsd, tinoDados);
 
   const saida = path.join(__dirname, 'dados.js');
   fs.writeFileSync(saida, 'window.PAINEL_DATA = ' + JSON.stringify(data) + ';\n', 'utf8');
@@ -976,12 +1260,14 @@ function montar(bqd, hsd) {
   console.log('  clientes        ' + data.clientes.length);
   console.log('  séries carteira ' + data.clientesSeries.length);
   console.log('  negócios        ' + data.negocios.length);
-  console.log('  tarefas         ' + data.tarefas.length);
+  console.log('  reuniões        ' + data.reunioes.length
+    + ' (' + data.reunioes.filter(r => r.resultado === 'Fechou negócio').length + ' com negócio fechado)');
   console.log('  tickets         ' + data.tickets.length
     + ' (' + data.tickets.filter(t => t.situacao === 'Aberto').length + ' abertos)');
   console.log('  canais          ' + data.meta.canais.join(', '));
   console.log('  oráculo         ' + data.oraculo.tabela.length + ' marcas / ' + data.oraculo.series.length + ' semanas-marca');
-  console.log('  tino            ' + data.tino.tabela.length + ' marcas / ' + data.tino.series.length);
+  console.log('  tino            ' + data.tino.tabela.length + ' marcas com o produto / '
+    + data.tino.series.length + ' semanas-marca');
   console.log('  vesti pago      ' + data.vestiPago.tabela.length + ' marcas / ' + data.vestiPago.series.length);
   console.log('  churn           ' + data.churn.series.length);
 })().catch(e => { console.error('\nFALHOU:', e.message); process.exit(1); });

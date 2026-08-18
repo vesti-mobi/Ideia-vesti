@@ -29,9 +29,13 @@ Precisa de:
   `C:\Users\Laura\Downloads\vesti-data-499015-7ea468dae45e.json`, a mesma chave que o
   PainelElisa usa. Só roda `SELECT`.
 - **HubSpot** — `HUBSPOT_TOKEN`; por padrão lê de `../CS-Sucesso-do-cliente/.env`.
+- **Tino** — `TINO_USER` / `TINO_PASS`, a mesma credencial do painel
+  `admin.tino.vesti.com.br`. **Sem valor padrão no código de propósito**: o
+  `vesti-mobi/dados` é público.
 
-Sem HubSpot o painel carrega mesmo assim: Cross-sell, Upsell, Tarefas e Tickets
-ficam vazias.
+Sem HubSpot o painel carrega mesmo assim: Cross-sell, Upsell, Reuniões e Tickets
+ficam vazias. Sem a credencial do Tino, a aba do Tino e a coluna "Tino" da
+tabela geral ficam vazias — o resto carrega igual.
 
 ### Automático, todo dia às 04:00 BRT
 
@@ -58,7 +62,7 @@ de layout continua indo por `node publicar.js`.
 | Tabela geral | Plano | item mais caro da última fatura Iugu paga (tirando desconto/Oráculo) |
 | Tabela geral | Último pedido | `MAX(MongoDB_Pedidos_Geral.settings_createdAt)` |
 | Tabela geral | Pedidos / Valor / Ticket | `MongoDB_Pedidos_Geral`, pagos, por semana |
-| Tabela geral | Interchange | `payment_transaction_vestiPagoValue + antifraudValue` |
+| Tabela geral | Interchange | `vestipago_transaction_detail`: `mdrVestiValue + antifraudValue` — fee **já sem a taxa do banco** |
 | Tabela geral | Mensalidade | linhas de **plano** das faturas Iugu pagas, casadas por CNPJ |
 | Tabela geral | Outros (Iugu) | demais linhas da fatura: Oráculo, Filial, Assistente, Ativação |
 | Tabela geral | Antecipação | `payment_transaction_antecipationValue` × fator Vesti |
@@ -66,12 +70,14 @@ de layout continua indo por `node publicar.js`.
 | Cross-sell / Upsell | tudo | HubSpot, pipeline **Expand (Upgrades)** |
 | Oráculo | atendimentos / % IA | `oraculo_Atendimentos` (`source` IA/HUMAN) |
 | Oráculo | GMV | `oraculo_Pedidos.Tipo_Venda_Oraculo` |
-| Tino | cliques e último acesso | `sucessodocliente_rankings` (`rankings_shared_links`, `rankings_created_at`) |
+| Tabela geral | Tino / Oráculo | Tino: marca presente na base do produto (API do Tino). Oráculo: tem atendimento em `oraculo_Atendimentos` |
+| Tino | marcas, eventos, sessões, dias de acesso | **API do Tino** — `companies_chart`, `login_days`, `customer_kpis` |
 | Vesti Pago | valor / fee / antecipação | `MongoDB_Pedidos_Geral` com provider Vesti Pago |
 | Vesti Pago | links | pedidos com `settings_source = 'Link de cobrança'` |
 | Churn | data | derivado do Iugu (ver abaixo) |
-| Tarefas | tarefa / data / responsável | HubSpot `tasks` |
-| Tarefas | Situação | `hs_task_status` — `COMPLETED` = Concluída, o resto = A fazer |
+| Reuniões | reunião / data / responsável | HubSpot `meetings` (`hs_meeting_start_time` + owner) |
+| Reuniões | Cliente | empresa associada à reunião no HubSpot |
+| Reuniões | Resultado | negócio ganho (qualquer pipeline) creditado à última reunião daquela empresa antes do fechamento |
 | Tickets | ticket / pipeline / estágio | HubSpot `tickets`, todos os pipelines |
 | Tickets | Situação | estágio marcado como fechado (`metadata.ticketState`) ou `closed_date` preenchida |
 | Tickets | Cliente e Canal | empresa associada ao ticket → marca do cadastro (nome, nome sem ruído ou CNPJ) |
@@ -115,7 +121,7 @@ por medição pedido a pedido (ressalva 4).
    (muda a cada edição de cadastro e está parado desde 25/06). A coluna existe no
    layout e mostra `—` até alguém expor esse campo no espelho; o KPI de abandono usa
    **último pedido** no lugar. Já o **último acesso no Tino** existe e está na aba do
-   Tino: é a data mais recente em que a marca compartilhou link.
+   Tino: é o `last_login` da API do produto.
 
 2. **O fee da Vesti só existe para cartão.** Em PIX o campo vem nulo tanto em
    `MongoDB_Pedidos_Geral` quanto em `vestipago_transaction_detail`, e PIX é ~53%
@@ -168,17 +174,44 @@ por medição pedido a pedido (ressalva 4).
    oferece um nome que não devolve nada. Cross-sell, Upsell e Churn passaram a
    mostrar a coluna **CS** junto com o filtro.
 
+9b. **Interchange agora é líquido do banco (18/08).** O fee de cartão que o
+   lojista paga (`vestiPagoValue`) não é receita inteira da Vesti: ele se divide
+   em `mdrCardBrandValue`, que vai para o adquirente (Iugu, Starkbank, Pagarme),
+   e `mdrVestiValue`, que fica com a Vesti. Em 2026 são R$ 953k de fee, dos quais
+   **R$ 840k (88%) são do banco** — a coluna Interchange passou a ser
+   `mdrVestiValue + antifraudValue` = **R$ 450k**, e a Receita total caiu junto.
+   O antifraude continua inteiro: é cobrança da Vesti, não taxa de banco. Por
+   isso o interchange saiu de `MongoDB_Pedidos_Geral` e passou a ser medido em
+   `vestipago_transaction_detail`, a única tabela com a quebra do MDR (a
+   diferença entre as duas bases é ~1%, já conferida em 13/08). A antecipação já
+   era líquida, pelo fator `antecipationVestiFee/antecipationValue`.
+
+9c. **O Tino não vem mais do BigQuery (18/08).** `sucessodocliente_rankings` só
+   tinha os links compartilhados ("cliques") e não sabe quem *tem* o produto. A
+   aba passou a ler a **API do Tino** (a mesma de `admin.tino.vesti.com.br`):
+   `customer_kpis` dá o total de marcas — **92**, o número que o time usa —,
+   `login_days` dá último acesso, dias de acesso e situação, e
+   `companies_chart` dá **eventos** e sessões, uma chamada por semana. Evento é
+   o que o Tino registra: login, troca de aba, filtro, abertura de produto,
+   busca, export (23,8k eventos no ano). O casamento com o cadastro é por nome
+   (a API só devolve o slug): **90 das 92** casaram; Lete Moda e Praia e Santho
+   Pano ficam na tabela com "sem marca no cadastro".
+
 10. **Teto de R$ 50.000 por pedido**, o mesmo filtro do CS-Sucesso e do PainelElisa,
    para os números baterem entre os painéis.
 
-11. **Tarefa concluída x a fazer vem do HubSpot, não da data.** A coluna antiga
-    "Tipo" mostrava `hs_task_type`, que hoje é `TODO` em 100% das tarefas — daí a
-    tabela inteira dizer "A fazer". Quem separa é `hs_task_status`: em 2026 são
-    246 tarefas do time de CS, 37 concluídas e 209 a fazer (205 delas já
-    vencidas). O filtro **Situação** corta em concluídas, a fazer e atrasadas
-    (a fazer com data vencida). Tarefa com data futura aparece quando a semana
-    atual está na seleção de semanas — o seletor só vai até a semana corrente, e
-    sem isso a agenda do que vem ficaria invisível.
+11. **Reuniões no lugar de Tarefas (18/08).** A aba de Tarefas saiu e entrou
+    **Reuniões**, com a mesma leitura do painel
+    [PlanilhasEPainelCS](https://vesti-mobi.github.io/dados/PlanilhasEPainelCS/):
+    reunião realizada de um lado, negócio fechado do outro. A fonte é o objeto
+    `meetings` do HubSpot (289 no ano, do time em `CS_TIME`), e o cliente vem da
+    empresa associada à reunião. O **negócio ganho é creditado à última reunião
+    daquela empresa antes do fechamento** — sem isso, uma empresa com cinco
+    reuniões e um negócio viraria cinco negócios. Negócio ganho de qualquer
+    pipeline conta (o time fecha filial, upgrade e Vesti Pago em pipelines
+    diferentes); dos 370 ganhos em 2026, 59 caíram em alguma reunião — o resto
+    fechou sem reunião registrada. Reunião com data futura aparece como
+    **Agendada** quando a semana atual está na seleção.
 
 12. **Canal = parceiro dono da conta.** `odbc_domains.partner_id` →
     `odbc_partners.name`: Vesti, Attasoft, Uemtel, Trial, Starter, Varejo Vesti,

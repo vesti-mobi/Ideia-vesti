@@ -486,14 +486,17 @@ if(_ss('get')==='1'){
 
      oraculo:   { tabela:[{ cliente, cs, pctIA, atendimentos, gmvIniciado, gmvFinalizado }],
                   series:[{ semana, cliente, atendimentos, gmvIniciado, gmvFinalizado }] },
-     tino:      { tabela:[{ cliente, cs, cliques }],
-                  series:[{ semana, cliente, cliques, receita }] },
+     tino:      { tabela:[{ cliente, cs, eventos, sessoes, eventosTotal, diasAcesso,
+                            ultimoAcessoTino, statusTino, nuncaUsou, semCadastro }],
+                  series:[{ semana, cliente, eventos, sessoes, receita }],
+                  kpis:{ total_brands, active_brands, never_accessed },
+                  tiposDeEvento:[{ event_type, cnt }] },
      vestiPago: { tabela:[{ cliente, cs, valorTransacionado, receitaFee,
                             receitaAntecipacao, linksGerados, linksPagos }],
                   series:[{ semana, cliente, linksGerados, linksPagos, valor }] },
      churn:     { series:[{ semana, cliente, churns }] },   // tabela vem de `clientes`
-     tarefas:   [{ tarefa, data, tipo, situacao:'Concluída'|'A fazer'|…,
-                   concluidaEm, cs }],
+     reunioes:  [{ reuniao, data, cliente, cs, valor,
+                   resultado:'Fechou negócio'|'Sem negócio'|'Agendada', negocio }],
      tickets:   [{ ticket, cliente, canal, pipeline, estagio,
                    situacao:'Aberto'|'Encerrado', categoria, prioridade, origem,
                    cs, data, fechadoEm, diasParaFechar }]
@@ -555,6 +558,7 @@ const MOCK = (function buildMock(){
       vencimento: '2026-09-'+String(int(1,28)).padStart(2,'0'),
       riscoChurn: 'Baixo',   // recalculado abaixo, depois de definir quem cancelou
       dataChurn: null,
+      temTino: r()<0.6, temOraculo: r()<0.45,
       _semAcesso: semAcesso, _plano: plano, _inativo: inativo,
     };
   });
@@ -601,8 +605,8 @@ const MOCK = (function buildMock(){
              gmvIniciado:gmvIni, gmvFinalizado: Math.round(gmvIni*(0.34+r()*0.32)) };
   });
   const tinoSeries = serie((c,s)=>{
-    const cl = Math.max(4, Math.round(18+s*1.1+int(-9,12)) * (c._plano==='Enterprise'?2:1));
-    return { cliques:cl, receita: Math.round(cl*(6+r()*7)) };
+    const ev = Math.max(4, Math.round(18+s*1.1+int(-9,12)) * (c._plano==='Enterprise'?2:1));
+    return { eventos:ev, sessoes: Math.max(1,Math.round(ev/6)), receita: Math.round(ev*(6+r()*7)) };
   });
   const pagoSeries = serie((c,s)=>{
     const ger = Math.max(2, Math.round(12+s*0.8+int(-5,9)));
@@ -644,8 +648,12 @@ const MOCK = (function buildMock(){
     atendimentos: at[c.nome], gmvIniciado: gi[c.nome], gmvFinalizado: gf[c.nome]
   }));
 
-  const cl = porCliente(tinoSeries,'cliques');
-  const tinoTab = clientes.map(c=>({cliente:c.nome, cs:c.cs, cliques: cl[c.nome]}));
+  const ev=porCliente(tinoSeries,'eventos'), se=porCliente(tinoSeries,'sessoes');
+  const tinoTab = clientes.map(c=>({
+    cliente:c.nome, cs:c.cs, eventos: ev[c.nome], sessoes: se[c.nome],
+    eventosTotal: Math.round(ev[c.nome]*1.6), diasAcesso: int(0,60),
+    ultimoAcessoTino: dia(-int(0,40)), statusTino:'Ativa', nuncaUsou:false, semCadastro:false
+  }));
 
   const lg=porCliente(pagoSeries,'linksGerados'),
         lp=porCliente(pagoSeries,'linksPagos'),
@@ -658,13 +666,13 @@ const MOCK = (function buildMock(){
     linksGerados: lg[c.nome], linksPagos: lp[c.nome]
   }));
 
-  const tipos=['Reunião de acompanhamento','Onboarding','Renovação','Suporte crítico','Treinamento','Revisão de plano'];
-  const tarefas = Array.from({length:52},()=>{
-    const tipo=pick(tipos), c=pick(clientes), data=dia(int(-14,60));
-    // no mock, o que já passou tem grande chance de estar concluído
-    const situacao = data<dia(0) ? (r()<0.75?'Concluída':'A fazer') : (r()<0.1?'Concluída':'A fazer');
-    return { tarefa: tipo+' — '+c.nome, data, tipo, situacao,
-             concluidaEm: situacao==='Concluída'?data:null, cs: c.cs };
+  const tipos=['Reunião de acompanhamento','Onboarding','Renovação','Alinhamento trimestral','Treinamento','Revisão de plano'];
+  const reunioes = Array.from({length:52},()=>{
+    const tipo=pick(tipos), c=pick(clientes), data=dia(int(-14,20));
+    const resultado = data>dia(0) ? 'Agendada' : (r()<0.25?'Fechou negócio':'Sem negócio');
+    return { reuniao: tipo, data, cliente: c.nome, cs: c.cs, resultado,
+             negocio: resultado==='Fechou negócio' ? 'Upgrade de plano — '+c.nome : null,
+             valor: resultado==='Fechou negócio' ? int(400,4000) : 0 };
   }).sort((a,b)=>b.data.localeCompare(a.data));
 
   clientes.forEach(c=>{ delete c._plano; delete c._inativo; delete c._semAcesso });
@@ -676,15 +684,19 @@ const MOCK = (function buildMock(){
     tino:{ tabela:tinoTab, series:tinoSeries },
     vestiPago:{ tabela:pagoTab, series:pagoSeries },
     churn:{ series:churnSeries },
-    tarefas
+    reunioes
   };
 })();
 
 const DATA = DADOS_REAIS ? window.PAINEL_DATA : MOCK;
 
-/* Campos novos (canal, tickets) podem faltar no mock e num dados.js antigo:
-   o painel abre do mesmo jeito, só com a aba e o filtro vazios. */
+/* Campos novos (canal, tickets, reuniões, Tino por API) podem faltar no mock e
+   num dados.js antigo: o painel abre do mesmo jeito, só com a aba e o filtro
+   vazios. */
 if(!DATA.tickets) DATA.tickets = [];
+if(!DATA.reunioes) DATA.reunioes = [];
+if(!DATA.tino) DATA.tino = {tabela:[], series:[]};
+if(!DATA.tino.kpis) DATA.tino.kpis = {};
 DATA.clientes.forEach(c=>{ if(!c.canal) c.canal = 'Sem canal' });
 if(!DATA.meta.canais){
   DATA.meta.canais = [...new Set(DATA.clientes.map(c=>c.canal))]
@@ -809,7 +821,7 @@ const CS_POR_CLIENTE = (()=>{ const m={}; DATA.clientes.forEach(c=>m[c.nome]=c.c
 const CANAL_POR_CLIENTE = (()=>{ const m={}; DATA.clientes.forEach(c=>m[c.nome]=c.canal); return m })();
 
 /* Responsável de uma linha, para o filtro de CS valer em qualquer aba: em
-   Tarefas e Tickets é o dono do registro no HubSpot; nas demais é o CS da
+   Reuniões e Tickets é o dono do registro no HubSpot; nas demais é o CS da
    carteira, com o nome da própria linha como reserva. */
 function csDaLinha(t,r){
   const chave = t.chaveCliente || 'cliente';
@@ -826,7 +838,7 @@ function normalizarCs(n){
 /* Lista de responsáveis oferecida pelo filtro: sai das linhas da própria aba,
    assim o seletor nunca oferece um nome que não devolve nada. */
 function csDaAba(t){
-  const fonte = ['tarefas','tickets','crossSell','upsell'].includes(t.id)
+  const fonte = ['reunioes','tickets','crossSell','upsell'].includes(t.id)
     ? t.linhas().map(r=>csDaLinha(t,r))
     : DATA.clientes.map(c=>c.cs || 'Sem CS');
   return [...new Set(fonte)].filter(Boolean).sort((a,b)=>
@@ -890,7 +902,7 @@ const TABS = [
   {
     id:'clientes', grupo:'Carteira', nav:'Tabela geral', cor:'#0E7A73', cor2:'#B7791F',
     titulo:'Tabela geral dos clientes',
-    desc:'Uma linha por cliente com contrato, uso e composição de receita. Pedidos e receita são somados dentro do período selecionado. <b>Data de cadastro</b> é a entrada da marca na Vesti (criação do domínio), com o tempo de casa embaixo. <b>Canal</b> é o parceiro dono da conta (Vesti, Attasoft, Uemtel…). <b>Último acesso</b> ainda não tem fonte: o BigQuery não guarda login de lojista.',
+    desc:'Uma linha por cliente com contrato, uso e composição de receita. Pedidos e receita são somados dentro do período selecionado. <b>Data de cadastro</b> é a entrada da marca na Vesti (criação do domínio), com o tempo de casa embaixo. <b>Canal</b> é o parceiro dono da conta (Vesti, Attasoft, Uemtel…). <b>Tino</b> e <b>Oráculo</b> dizem se a marca tem o produto — o Tino vem da base do próprio produto, o Oráculo de ter atendimento registrado. <b>Interchange</b> já é líquido: o fee do cartão menos a taxa do banco. <b>Último acesso</b> ainda não tem fonte: o BigQuery não guarda login de lojista.',
     filtros:['cliente','cs','canal','statusCliente','periodo'],
     tabela:'Clientes', chaveCliente:'nome',
     colunas:[
@@ -900,6 +912,8 @@ const TABS = [
       {k:'canal', l:'Canal', tipo:'tag'},
       {k:'integracao', l:'Integração', tipo:'tag'},
       {k:'plano', l:'Plano', tipo:'tag'},
+      {k:'temTino', l:'Tino', tipo:'temProduto'},
+      {k:'temOraculo', l:'Oráculo', tipo:'temProduto'},
       {k:'dataCadastro', l:'Data de cadastro', tipo:'cadastro'},
       {k:'ultimoAcesso', l:'Último acesso', tipo:'rel'},
       {k:'ultimoPedido', l:'Último pedido', tipo:'rel'},
@@ -989,41 +1003,48 @@ const TABS = [
   {
     id:'tino', grupo:'Produtos', nav:'Uso do Tino', cor:'#B7791F', cor2:'#0E7A73',
     titulo:'Uso do Tino',
-    desc:'Engajamento medido em cliques nos links compartilhados pelos vendedores. A segunda linha do gráfico é o <b>GMV total da marca</b> na semana, para comparar tendências — não é receita atribuída ao Tino.',
+    desc:'Engajamento medido em <b>eventos</b> registrados pelo próprio Tino — login, troca de aba, filtro, abertura de produto, busca, export. A lista de marcas é a da base do Tino: quem está aqui tem o produto, inclusive quem nunca entrou. A segunda linha do gráfico é o <b>GMV total da marca</b> na semana, para comparar tendências — não é receita atribuída ao Tino.',
     filtros:['cliente','cs','canal','periodo'],
     tabela:'Clientes', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente', tipo:'cliente'},
       COL_CS,
-      {k:'cliques', l:'Cliques no período', tipo:'int', r:true, forte:true},
-      {k:'cliquesTotal', l:'Cliques no total', tipo:'int', r:true},
+      {k:'eventos', l:'Eventos no período', tipo:'int', r:true, forte:true},
+      {k:'sessoes', l:'Sessões no período', tipo:'int', r:true},
+      {k:'eventosTotal', l:'Eventos no total', tipo:'int', r:true},
+      {k:'diasAcesso', l:'Dias com acesso', tipo:'int', r:true},
       {k:'ultimoAcessoTino', l:'Último acesso no Tino', tipo:'usoTino'},
+      {k:'statusTino', l:'Situação', tipo:'statusTino'},
     ],
-    /* A tabela lista TODA a carteira: quem nunca usou é o alvo principal da CS,
-       então não pode sumir por não ter clique no período. */
+    /* A tabela lista TODA marca que tem o Tino: quem nunca entrou é o alvo
+       principal da CS, então não pode sumir por não ter evento no período. */
     linhas:()=>{
       const noPeriodo = {};
-      agregarPorCliente(DATA.tino.series,['cliques']).forEach(a=>noPeriodo[a.cliente]=a.cliques);
-      return DATA.tino.tabela.map(x=>Object.assign({}, x, {cliques: noPeriodo[x.cliente]||0}));
+      agregarPorCliente(DATA.tino.series,['eventos','sessoes']).forEach(a=>noPeriodo[a.cliente]=a);
+      return DATA.tino.tabela.map(x=>Object.assign({}, x, {
+        eventos:(noPeriodo[x.cliente]||{}).eventos||0,
+        sessoes:(noPeriodo[x.cliente]||{}).sessoes||0,
+      }));
     },
+    seriePropria:true,
     series:()=>DATA.tino.series,
     graficos:[
-      {t:'Cliques × GMV por semana', s:[
-        {k:'cliques', l:'Cliques', tipo:'line', cor:'var(--acc)', f:fmt.int},
+      {t:'Eventos × GMV por semana', s:[
+        {k:'eventos', l:'Eventos', tipo:'line', cor:'var(--acc)', f:fmt.int},
         {k:'receita', l:'GMV da marca', tipo:'line', cor:'var(--acc-2)', eixo:'dir', f:fmt.money},
       ]},
     ],
     kpis:(rows,serie)=>[
-      {l:'Cliques', v:fmt.compact(soma(serie,'cliques')), s:'no período'},
-      {l:'GMV das marcas', v:fmt.moneyCompact(soma(serie,'receita')), s:'faturamento total, não atribuído'},
-      {l:'Usando no período', v:fmt.int(rows.filter(r=>r.cliques>0).length), s:`de ${rows.length} marcas na visão`},
-      {l:'Nunca usaram', v:fmt.int(rows.filter(r=>r.nuncaUsou).length), s:'nenhum clique registrado'},
+      {l:'Eventos', v:fmt.compact(soma(serie,'eventos')), s:'no período'},
+      {l:'Marcas com Tino', v:fmt.int(rows.length), s:tinoKpiTexto()},
+      {l:'Usando no período', v:fmt.int(rows.filter(r=>r.eventos>0).length), s:`de ${rows.length} marcas na visão`},
+      {l:'Nunca acessaram', v:fmt.int(rows.filter(r=>r.nuncaUsou).length), s:'têm o produto e nunca entraram'},
     ]
   },
   {
     id:'vestiPago', grupo:'Produtos', nav:'Vesti Pago', cor:'#2E7D46', cor2:'#1E74C8',
     titulo:'Vesti Pago',
-    desc:'Volume transacionado, receita de fee e de antecipação, e quantos links de cobrança cada cliente emitiu — e quantos foram pagos. <b>A receita cobre só cartão</b>: em PIX o fee da Vesti não é registrado na fonte, embora o valor transacionado inclua os dois.',
+    desc:'Volume transacionado, receita de fee e de antecipação, e quantos links de cobrança cada cliente emitiu — e quantos foram pagos. A <b>receita de fee já é líquida</b>: o que o lojista paga menos o MDR do banco (Iugu, Starkbank, Pagarme), mais o antifraude — a mesma régua do Interchange da tabela geral. <b>A receita cobre só cartão</b>: em PIX o fee da Vesti não é registrado na fonte, embora o valor transacionado inclua os dois.',
     filtros:['cliente','cs','canal','periodo'],
     tabela:'Clientes', chaveCliente:'cliente',
     colunas:[
@@ -1032,7 +1053,7 @@ const TABS = [
       {k:'valorTransacionado', l:'Valor transacionado', tipo:'money', r:true, forte:true},
       {k:'valorCartao', l:'Cartão', tipo:'money', r:true},
       {k:'valorPix', l:'PIX', tipo:'money', r:true},
-      {k:'receitaFee', l:'Receita (fee)', tipo:'money', r:true},
+      {k:'receitaFee', l:'Receita (fee) líquida', tipo:'money', r:true},
       {k:'receitaAntecipacao', l:'Receita antecipação', tipo:'money', r:true},
       {k:'linksGerados', l:'Links gerados', tipo:'int', r:true},
       {k:'linksPagos', l:'Links pagos', tipo:'linksPagos', r:true},
@@ -1051,7 +1072,7 @@ const TABS = [
     ],
     kpis:(rows,serie)=>[
       {l:'Valor transacionado', v:fmt.moneyCompact(soma(serie,'valor')), s:'no período'},
-      {l:'Receita (fee)', v:fmt.moneyCompact(soma(rows,'receitaFee')), s:'soma da coluna'},
+      {l:'Receita (fee) líquida', v:fmt.moneyCompact(soma(rows,'receitaFee')), s:'já sem a taxa do banco'},
       {l:'Receita antecipação', v:fmt.moneyCompact(soma(rows,'receitaAntecipacao')), s:'soma da coluna'},
       {l:'Links pagos', v:fmt.compact(soma(serie,'linksPagos')), s:pctTexto(soma(serie,'linksPagos'),soma(serie,'linksGerados'))+' dos gerados'},
     ]
@@ -1096,25 +1117,43 @@ const TABS = [
     ]
   },
   {
-    id:'tarefas', grupo:'Operação', nav:'Tarefas', cor:'#B54A72', cor2:'#1E74C8',
-    titulo:'Tarefas',
-    desc:'Agenda do time de CS: o que já foi concluído, o que está a fazer e o que está atrasado. A situação vem do HubSpot, não da data.',
-    filtros:['cs','periodo','statusTarefa'],
-    tabela:'Tarefas', chaveCliente:'tarefa',
+    id:'reunioes', grupo:'Operação', nav:'Reuniões', cor:'#B54A72', cor2:'#1E74C8',
+    titulo:'Reuniões',
+    desc:'Reuniões realizadas pelo time de CS e o negócio fechado depois delas — a mesma leitura do painel <b>Reuniões × Negócios</b>. O negócio ganho é creditado à <b>última reunião daquela empresa antes do fechamento</b>, para uma empresa com cinco reuniões e um negócio não virar cinco negócios.',
+    filtros:['cliente','cs','periodo','resultadoReuniao'],
+    tabela:'Reuniões', chaveCliente:'cliente',
     colunas:[
-      {k:'tarefa', l:'Tarefa', tipo:'texto'},
+      {k:'cliente', l:'Cliente', tipo:'cliente'},
+      {k:'reuniao', l:'Reunião', tipo:'texto'},
       {k:'data', l:'Data', tipo:'dataRel'},
-      {k:'situacao', l:'Situação', tipo:'situacaoTarefa'},
+      {k:'resultado', l:'Resultado', tipo:'resultadoReuniao'},
+      {k:'valor', l:'Valor do negócio', tipo:'money', r:true},
       {k:'cs', l:'Responsável', tipo:'cs'},
     ],
-    linhas:()=>DATA.tarefas,
+    linhas:()=>DATA.reunioes,
+    /* A série carrega o CS da própria linha (seriePropria): o cliente de uma
+       reunião é a empresa do HubSpot, que nem sempre existe com o mesmo nome na
+       carteira — filtrar o gráfico pela lista de marcas jogaria fora metade das
+       reuniões. */
+    seriePropria:true,
+    series:()=>DATA.reunioes.map(r=>({
+      semana: semanaDoAno(r.data), cliente: r.cliente, cs: r.cs,
+      reunioes: 1, fechados: r.resultado==='Fechou negócio' ? 1 : 0,
+    })).filter(x=>x.semana),
+    graficos:[
+      {t:'Reuniões × negócios fechados por semana', s:[
+        {k:'reunioes', l:'Reuniões', tipo:'bar', cor:'var(--acc)', f:fmt.int},
+        {k:'fechados', l:'Negócios fechados', tipo:'line', cor:'var(--acc-2)', f:fmt.int},
+      ]},
+    ],
     kpis:(rows)=>{
-      const feitas = rows.filter(feita), aFazer = rows.filter(r=>!feita(r));
+      const fechou = rows.filter(r=>r.resultado==='Fechou negócio');
+      const realizadas = rows.filter(r=>r.resultado!=='Agendada');
       return [
-        {l:'Tarefas na visão', v:fmt.int(rows.length), s:'no período filtrado'},
-        {l:'Concluídas', v:fmt.int(feitas.length), s:pctTexto(feitas.length,rows.length)+' do total'},
-        {l:'A fazer', v:fmt.int(aFazer.length), s:fmt.int(aFazer.filter(r=>diasDe(r.data)<0).length)+' ainda por vencer'},
-        {l:'Atrasadas', v:fmt.int(aFazer.filter(r=>diasDe(r.data)>0).length), s:'venceram sem conclusão'},
+        {l:'Reuniões na visão', v:fmt.int(rows.length), s:fmt.int(rows.length-realizadas.length)+' ainda agendadas'},
+        {l:'Fecharam negócio', v:fmt.int(fechou.length), s:pctTexto(fechou.length,realizadas.length)+' das realizadas'},
+        {l:'Valor fechado', v:fmt.moneyCompact(soma(rows,'valor')), s:'negócios creditados às reuniões'},
+        {l:'Clientes atendidos', v:fmt.int(new Set(rows.map(r=>r.cliente)).size), s:'empresas distintas'},
       ];
     }
   },
@@ -1155,13 +1194,19 @@ const TABS = [
   },
 ];
 
+/* Legenda do KPI "Marcas com Tino": o total que a própria API do Tino informa,
+   que é a régua oficial do produto — a tabela mostra menos quando há filtro
+   ligado. Não repete "nunca acessaram" aqui de propósito: o KPI ao lado conta
+   isso pela linha (marca sem last_login), e a API usa outro critério — dois
+   números diferentes lado a lado só confundiriam. */
+function tinoKpiTexto(){
+  const k = DATA.tino.kpis || {};
+  return k.total_brands ? fmt.int(k.total_brands) + ' na base do Tino' : 'na base do Tino';
+}
+
 const soma=(a,k)=>a.reduce((s,x)=>s+(Number(x[k])||0),0);
 const media=(a,k)=>a.length?soma(a,k)/a.length:0;
 const pctTexto=(p,t)=>t?Math.round(p/t*100)+'%':'—';
-/* Situação da tarefa é o hs_task_status do HubSpot — nada a ver com a data.
-   Tudo que não é "Concluída" (a fazer, em andamento, aguardando, adiada) conta
-   como pendente; atrasada é pendente com data já vencida. */
-const feita=r=>r.situacao==='Concluída';
 function maisFrequente(a,k){const m={};a.forEach(x=>m[x[k]]=(m[x[k]]||0)+1);const e=Object.entries(m).sort((x,y)=>y[1]-x[1])[0];return e?e[0]:'—'}
 function piorSemana(s){const m={};s.forEach(x=>m[x.semana]=(m[x.semana]||0)+x.churns);const e=Object.entries(m).sort((a,b)=>b[1]-a[1])[0];return e&&e[1]?fmt.wk(e[0]):'—'}
 /* Fechado = SOMENTE 'Ganho'. 'Em aberto' não conta nem como ganho nem como perdido. */
@@ -1182,7 +1227,7 @@ function kpisDeal(rows){
    5. ESTADO
    ========================================================================== */
 const FILTROS_PADRAO_BASE = { cliente:'', statusDeal:'todos', situacao:'Cancelado',
-  statusCliente:'todos', statusTarefa:'todos', statusTicket:'todos', pipeline:'todos' };
+  statusCliente:'todos', resultadoReuniao:'todos', statusTicket:'todos', pipeline:'todos' };
 /* `canais` e `cs` vazios querem dizer "todos" — assim o filtro nasce sem nada
    marcado e marcar um item já é o recorte, sem precisar desmarcar os outros. */
 const filtrosPadrao = ()=>Object.assign({}, FILTROS_PADRAO_BASE,
@@ -1271,21 +1316,21 @@ function filtrarLinhas(t){
   if(t.filtros.includes('statusDeal') && f.statusDeal!=='todos'){
     rows = rows.filter(r=>r.status===f.statusDeal);
   }
-  if(t.filtros.includes('statusTarefa') && f.statusTarefa!=='todos'){
-    rows = f.statusTarefa==='feitas'    ? rows.filter(feita)
-         : f.statusTarefa==='aFazer'    ? rows.filter(r=>!feita(r))
-         : f.statusTarefa==='atrasadas' ? rows.filter(r=>!feita(r) && diasDe(r.data)>0)
+  if(t.filtros.includes('resultadoReuniao') && f.resultadoReuniao!=='todos'){
+    rows = f.resultadoReuniao==='fechou'   ? rows.filter(r=>r.resultado==='Fechou negócio')
+         : f.resultadoReuniao==='semNeg'   ? rows.filter(r=>r.resultado==='Sem negócio')
+         : f.resultadoReuniao==='agendada' ? rows.filter(r=>r.resultado==='Agendada')
          : rows;
   }
   // período: só recorta linhas que carregam data própria. Onde a linha é um
   // agregado (tabela geral, produtos), o período já entrou na agregação.
   if(t.filtros.includes('periodo')){
     const temData = rows.some(r=>r.data);
-    /* O seletor de semanas só vai até a semana atual, então tarefa com data
-       futura ficaria invisível — e ela é justamente a agenda do que vem. Quando
-       a semana atual está na seleção ("estou olhando o agora"), o que está por
-       vir entra junto. */
-    const futuroVale = t.id==='tarefas' && estado.filtros.semanas.has(DATA.meta.semanaAtual);
+    /* O seletor de semanas só vai até a semana atual, então reunião já marcada
+       para a frente ficaria invisível — e ela é justamente a agenda do que vem.
+       Quando a semana atual está na seleção ("estou olhando o agora"), o que
+       está por vir entra junto. */
+    const futuroVale = t.id==='reunioes' && estado.filtros.semanas.has(DATA.meta.semanaAtual);
     if(temData) rows = rows.filter(r=>!r.data || dentroDaJanela(semanaDoAno(r.data))
       || (futuroVale && semanaDoAno(r.data) > DATA.meta.semanaAtual));
   }
@@ -1329,9 +1374,17 @@ function agregarSerie(t){
   const nomes = escopoClientes(t);
   const mapa = new Map();
   semanasOrdenadas().forEach(s=>mapa.set(s,{semana:s}));
+  const f = estado.filtros;
   t.series().forEach(x=>{
     if(!sem.has(x.semana)) return;
-    if(x.cliente && !nomes.has(x.cliente)) return;
+    /* seriePropria: a linha traz o próprio responsável e pode ser de uma marca
+       que não está na carteira (empresa do HubSpot, marca só do Tino). Aí o
+       recorte é feito na própria linha, senão ela sumiria do gráfico. */
+    if(t.seriePropria){
+      if(t.filtros.includes('cliente') && f.cliente
+         && !String(x.cliente||'').toLowerCase().includes(f.cliente.toLowerCase())) return;
+      if(t.filtros.includes('cs') && f.cs.size && !f.cs.has(normalizarCs(x.cs)||'Sem CS')) return;
+    } else if(x.cliente && !nomes.has(x.cliente)) return;
     const alvo = mapa.get(x.semana); if(!alvo) return;
     for(const k in x){ if(k!=='semana'&&k!=='cliente') alvo[k]=(alvo[k]||0)+x[k] }
   });
@@ -1423,10 +1476,10 @@ function renderFiltros(t){
       ['Perdido','Somente perdidos'],['Em aberto','Somente em aberto']],
       estado.filtros.statusDeal, v=>estado.filtros.statusDeal=v));
   }
-  if(t.filtros.includes('statusTarefa')){
-    add('Situação', sel([['todos','Concluídas e a fazer'],['feitas','Só concluídas'],
-      ['aFazer','Só a fazer'],['atrasadas','Só atrasadas']],
-      estado.filtros.statusTarefa, v=>estado.filtros.statusTarefa=v));
+  if(t.filtros.includes('resultadoReuniao')){
+    add('Resultado', sel([['todos','Todos os resultados'],['fechou','Só as que fecharam negócio'],
+      ['semNeg','Só sem negócio'],['agendada','Só as agendadas']],
+      estado.filtros.resultadoReuniao, v=>estado.filtros.resultadoReuniao=v));
   }
   if(t.filtros.includes('situacao')){
     add('Situação', sel([['Cancelado','Cancelados'],['Em risco','Em risco (ativos)'],['todos','Todos']],
@@ -1833,11 +1886,24 @@ function celula(r,c){
     case 'dataRel': { const d = diasDe(v);
       const prazo = d<0 ? 'em '+Math.abs(d)+' d' : d===0 ? 'vence hoje' : 'venceu há '+d+' d';
       td.innerHTML = `<span class="cell-main">${fmt.date(v)}</span><span class="cell-sub">${prazo}</span>`; break }
-    case 'situacaoTarefa': {
-      if(feita(r)){ td.innerHTML = '<span class="pill ok"><i></i>Concluída</span>'; break }
-      const atrasada = diasDe(r.data)>0;
-      td.innerHTML = `<span class="pill ${atrasada?'bad':'open'}"><i></i>${v||'A fazer'}</span>`
-        + (atrasada?'<span class="cell-sub">atrasada</span>':''); break }
+    /* Tem o produto ou não: verde quando tem, vermelho quando não tem. É uma
+       coluna de conferência rápida na tabela geral — sem meio-termo de propósito. */
+    case 'temProduto': td.innerHTML = v
+        ? '<span class="pill ok"><i></i>Sim</span>'
+        : '<span class="pill bad"><i></i>Não</span>'; break;
+    case 'statusTino': {
+      const semCad = r.semCadastro ? '<span class="cell-sub">sem marca no cadastro</span>' : '';
+      td.innerHTML = (v==='Inativa'
+        ? '<span class="pill bad"><i></i>Inativa</span>'
+        : '<span class="pill ok"><i></i>Ativa</span>') + semCad; break }
+    /* Reunião: o desfecho é o negócio fechado depois dela (creditado à última
+       reunião antes do fechamento), igual ao painel das planilhas. */
+    case 'resultadoReuniao': {
+      if(v==='Fechou negócio'){
+        td.innerHTML = '<span class="pill ok"><i></i>Fechou negócio</span>'
+          + (r.negocio?`<span class="cell-sub">${r.negocio}</span>`:''); break }
+      if(v==='Agendada'){ td.innerHTML = '<span class="pill open"><i></i>Agendada</span>'; break }
+      td.innerHTML = '<span class="pill off"><i></i>Sem negócio</span>'; break }
     /* Assunto do ticket com a categoria embaixo: a categoria é o que agrupa
        ("Configuração de frete", "Ativação VestiPago (PIX)") e o assunto é o
        caso individual. */
@@ -1921,7 +1987,7 @@ $('#wkRange').textContent = intervaloSemana(DATA.meta.semanaAtual, DATA.meta.ano
   if(!DADOS_REAIS){ chip.innerHTML = '<i></i> Dados de exemplo'; return }
   const g = DATA.meta.geradoEm ? new Date(DATA.meta.geradoEm) : null;
   const quando = g ? g.toLocaleDateString('pt-BR') + ' ' + g.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '';
-  chip.innerHTML = '<i style="background:var(--pos)"></i> BigQuery + HubSpot · ' + quando;
+  chip.innerHTML = '<i style="background:var(--pos)"></i> BigQuery + HubSpot + Tino · ' + quando;
   chip.title = 'Dados reais. Clique para ver as ressalvas de fonte.';
   chip.style.cursor = 'pointer';
   const av = (DATA.meta.avisos)||{};

@@ -5,7 +5,10 @@
 # (BigQuery + HubSpot) e commita. Todas as abas, tabelas e gráficos do painel
 # saem desse único arquivo, então uma carga atualiza o painel inteiro.
 #
-# Secrets usados (já existem no repo): GCP_SA_KEY, HUBSPOT_TOKEN
+# Secrets usados (todos já existem no repo): GCP_SA_KEY, HUBSPOT_TOKEN e
+# RELCS2_TINO_USER / RELCS2_TINO_PASS — a credencial do painel do Tino, a mesma
+# que o relatoriocs2 usa. Sem ela a carga roda igual, só que a aba do Tino e a
+# coluna "Tino" da tabela geral ficam vazias.
 
 name: Painel de Clientes CS
 
@@ -37,10 +40,12 @@ jobs:
           printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
 
-      - name: Rodar carga (BigQuery + HubSpot)
+      - name: Rodar carga (BigQuery + HubSpot + Tino)
         working-directory: CS
         env:
           HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
+          TINO_USER: ${{ secrets.RELCS2_TINO_USER }}
+          TINO_PASS: ${{ secrets.RELCS2_TINO_PASS }}
         run: node fetch_dados.js
 
       # trava de sanidade: dados.js tem ~6 MB. Se vier um arquivo minúsculo,
