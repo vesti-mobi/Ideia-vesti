@@ -1,6 +1,6 @@
 window.DADOS = {
-  "gerado_em": "2026-08-18T21:15:01.159Z",
-  "hoje": "2026-08-18",
+  "gerado_em": "2026-08-19T12:25:27.999Z",
+  "hoje": "2026-08-19",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
   "auto_publica_desde": "2026-08-10",
@@ -19,7 +19,7 @@ window.DADOS = {
     "com_conta": 10,
     "contas": 9,
     "produtos_total": 254,
-    "produtos_7d": 47,
+    "produtos_7d": 10,
     "descricoes_total": 251,
     "total_estimado": true
   },
@@ -32,7 +32,7 @@ window.DADOS = {
       "email": "nicoboco.shop@nicoboco.com.br",
       "produtos": 104,
       "estimado": false,
-      "produtos_7d": 43,
+      "produtos_7d": 6,
       "ativa": true,
       "acessos": 58,
       "buscas": 305,
@@ -437,7 +437,7 @@ window.DADOS = {
         "com_conta": 10,
         "contas": 9,
         "produtos_total": 105,
-        "produtos_7d": 46,
+        "produtos_7d": 9,
         "descricoes_total": 157,
         "total_estimado": false,
         "produtos_atribuidos": 0
@@ -451,7 +451,7 @@ window.DADOS = {
           "email": "nicoboco.shop@nicoboco.com.br",
           "produtos": 102,
           "estimado": false,
-          "produtos_7d": 43,
+          "produtos_7d": 6,
           "ativa": true,
           "acessos": 49,
           "buscas": 265,
@@ -994,7 +994,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-12T12:05:03.861Z",
           "ultimo": "2026-08-12T12:05:03.861Z",
-          "dias": 6,
+          "dias": 7,
           "produtos_medidos": 0,
           "atribuido": 36
         },
