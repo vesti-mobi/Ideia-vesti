@@ -410,38 +410,56 @@ tr.parc.last td{border-bottom:2px solid #E8E4FF}
 <div id="toastConta"></div>
 
 <script>
-// carrega dados.js com cache-bust agressivo — evita browser servir versao velha
+// Carregamento dos arquivos de dados. dados.js tem ~63MB e invoices.js ~71MB,
+// e duas coisas deixavam a abertura lenta e com cara de erro:
+//   1) o cache-bust era '?v='+Date.now(), entao TODA abertura rebaixava e
+//      reinterpretava os ~130MB — o navegador nunca podia reaproveitar nada.
+//      Agora a versao sai do ETag do proprio arquivo (um HEAD sem corpo): se o
+//      arquivo nao mudou a URL e a mesma e vem do cache; quando o robo publica
+//      de novo, o ETag muda e a URL muda junto. Continua sem servir dado velho.
+//   2) invoices.js baixava junto com dados.js e competia com ele, mesmo a aba
+//      inicial (CP) nao precisando dele. Agora so e buscado quando alguma aba
+//      pede (CR, Auditoria, Cancelados) — ou em segundo plano, depois que o CP
+//      ja esta na tela.
 window._dadosError=null;
-(function(){
-    var v=Date.now()+'_'+Math.random().toString(36).substring(2,8);
-    var s=document.createElement('script');
-    s.src='dados.js?v='+v;
-    s.onload=function(){window._dadosLoaded=true};
-    s.onerror=function(){window._dadosError='falha ao carregar dados.js'};
-    document.head.appendChild(s);
-    var s2=document.createElement('script');
-    s2.src='invoices.js?v='+v;
-    s2.onload=function(){window._invoicesLoaded=true};
-    s2.onerror=function(){window._invoicesLoaded=true}; // invoices opcional
-    document.head.appendChild(s2);
-    var s3=document.createElement('script');
-    s3.src='pix_marcas.js?v='+v;
-    document.head.appendChild(s3);
-    var s4=document.createElement('script');
-    s4.src='cnpj_marcas.js?v='+v;
-    document.head.appendChild(s4);
-    var s5=document.createElement('script');
-    s5.src='razao_marcas.js?v='+v;
-    document.head.appendChild(s5);
-    var s6=document.createElement('script');
-    s6.src='saldos.js?v='+v;
-    s6.onerror=function(){};
-    document.head.appendChild(s6);
-    var s7=document.createElement('script');
-    s7.src='cancelados_valores.js?v='+v;
-    s7.onerror=function(){};
-    document.head.appendChild(s7);
+var Carregador=(function(){
+    var estado={}, espera={};
+    function avisar(arq,ok){var fs=espera[arq]||[];espera[arq]=[];fs.forEach(function(f){try{f&&f(ok)}catch(e){}})}
+    function carregar(arq,cb){
+        if(estado[arq]==='ok'){cb&&cb(true);return}
+        if(estado[arq]==='erro'){cb&&cb(false);return}
+        (espera[arq]=espera[arq]||[]).push(cb);
+        if(estado[arq]==='carregando')return;
+        estado[arq]='carregando';
+        var h=new XMLHttpRequest();
+        // HEAD com cache-bust: resposta sem corpo, custa quase nada, e garante o
+        // ETag mais novo mesmo dentro do max-age=600 do GitHub Pages.
+        h.open('HEAD',arq+'?t='+Date.now(),true);
+        h.onload=h.onerror=function(){
+            var v='';
+            try{v=h.getResponseHeader('ETag')||h.getResponseHeader('Last-Modified')||''}catch(e){}
+            v=String(v).replace(/[^A-Za-z0-9]/g,'')||String(Date.now());
+            var s=document.createElement('script');
+            s.src=arq+'?v='+v;
+            s.onload=function(){estado[arq]='ok';avisar(arq,true)};
+            s.onerror=function(){estado[arq]='erro';avisar(arq,false)};
+            document.head.appendChild(s);
+        };
+        h.send();
+    }
+    return {carregar:carregar,estado:function(a){return estado[a]||''}};
 })();
+Carregador.carregar('dados.js',function(ok){
+    if(ok){window._dadosLoaded=true}else{window._dadosError='falha ao carregar dados.js'}
+});
+['pix_marcas.js','cnpj_marcas.js','razao_marcas.js','saldos.js','cancelados_valores.js']
+    .forEach(function(a){Carregador.carregar(a)});
+// invoices.js sob demanda; cb roda quando o arquivo estiver disponivel.
+function garantirInvoices(cb){
+    if(window.INVOICES&&window.INVOICES.faturas){cb&&cb(true);return}
+    Carregador.carregar('invoices.js',function(ok){window._invoicesLoaded=true;cb&&cb(ok)});
+}
+function invoicesCarregando(){return Carregador.estado('invoices.js')==='carregando'}
 // auto-reload: mantem o relatorio sempre na versao mais nova sem refresh manual.
 // O cache-bust acima ja garante dados frescos numa recarga; o problema e a aba ficar
 // aberta sem nunca recarregar. Aqui recarregamos quando a pagina ficou velha (>15min de
@@ -507,12 +525,19 @@ function showApp(){
                 var el=document.getElementById('tbody');
                 if(el)el.innerHTML='<tr><td colspan="8" class="empty" style="color:#E17055">ERRO init: '+(e&&e.message)+'</td></tr>';
             }
-        } else if(tries>80){
-            var el=document.getElementById('tbody');
-            if(el)el.innerHTML='<tr><td colspan="8" class="empty" style="color:#E17055">Timeout: dados.js não carregou em 5s. Verifique o console (F12)</td></tr>';
-        } else {
-            setTimeout(wait,60);
+            // Com o CP ja na tela, busca o invoices em segundo plano pras outras abas.
+            setTimeout(function(){garantirInvoices()},800);
+            return;
         }
+        // dados.js e grande: em conexao lenta passa facil dos 5s. Antes o loop
+        // desistia aqui e pintava "Timeout" em vermelho — parecia erro quando era
+        // so o download em andamento, e nada mais redesenhava a tabela depois.
+        // Agora avisa que esta carregando e continua esperando.
+        if(tries===25){
+            var elc=document.getElementById('tbody');
+            if(elc)elc.innerHTML='<tr><td colspan="8" class="empty">Carregando os dados… o arquivo e grande, pode levar alguns segundos na primeira vez.</td></tr>';
+        }
+        setTimeout(wait,60);
     })();
 }
 if(sessionStorage.getItem('stark_auth')==='1')showApp();
@@ -1092,7 +1117,10 @@ function renderAud(){
     var tb=document.getElementById('tbodyAud');
     var needsApi=(AUD_SUB==='api'||AUD_SUB==='vesti');
     if(needsApi && (!window.INVOICES||!window.INVOICES.faturas)){
-        tb.innerHTML='<tr><td colspan="4" class="empty" style="color:#E17055">invoices.js nao carregou</td></tr>';
+        garantirInvoices(function(ok){if(ok&&TAB==='aud')render()});
+        tb.innerHTML=invoicesCarregando()
+            ? '<tr><td colspan="4" class="empty">Carregando as faturas… (arquivo grande, so baixa na primeira vez)</td></tr>'
+            : '<tr><td colspan="4" class="empty" style="color:#E17055">invoices.js nao carregou</td></tr>';
         ['kAudEnt','kAudSai','kAudSld'].forEach(function(id){document.getElementById(id).textContent='--'});
         return;
     }
@@ -1467,7 +1495,10 @@ function renderCr(){
     // 'created') = a receber. Valores da API sao em centavos.
     var tb=document.getElementById('tbodyCr');
     if(!window.INVOICES||!window.INVOICES.faturas){
-        tb.innerHTML='<tr><td colspan="12" class="empty" style="color:#E17055">invoices.js nao carregou — rode fetch_invoices.py</td></tr>';
+        garantirInvoices(function(ok){if(ok&&TAB==='cr')render()});
+        tb.innerHTML=invoicesCarregando()
+            ? '<tr><td colspan="12" class="empty">Carregando as faturas… (arquivo grande, so baixa na primeira vez)</td></tr>'
+            : '<tr><td colspan="12" class="empty" style="color:#E17055">invoices.js nao carregou — rode fetch_invoices.py</td></tr>';
         ['crEmp','crPedQty','crPed','crPedPg','crGross','crFee','crLiq','crEntradas','crSaidas','crSaldo'].forEach(function(id){document.getElementById(id).textContent='--'});
         return;
     }
@@ -1781,6 +1812,15 @@ function renderCr(){
 // ===== Aba CANCELADOS =====
 var CANC_ROWS=null, CANC_SORT={k:'cancelAt',desc:true};
 function buildCancelados(){
+    // Cancelados sai do cruzamento invoices.js x cancelados_valores.js; se o
+    // invoices ainda nao chegou, pede e redesenha quando chegar — em vez de
+    // montar uma tabela vazia, que parece "nao tem cancelado nenhum".
+    if(!window.INVOICES||!window.INVOICES.faturas){
+        var tbc=document.getElementById('tbodyCanc');
+        garantirInvoices(function(ok){if(ok&&TAB==='canc'){CANC_ROWS=null;buildCancelados()}});
+        if(tbc)tbc.innerHTML='<tr><td colspan="12" class="empty">Carregando as faturas… (arquivo grande, so baixa na primeira vez)</td></tr>';
+        return;
+    }
     if(CANC_ROWS===null){
         var faturas=(window.INVOICES&&window.INVOICES.faturas)||[];
         var vals=(window.CANCELADOS_VALORES&&window.CANCELADOS_VALORES.valores)||{};
