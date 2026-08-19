@@ -37,7 +37,14 @@ jobs:
           sudo ACCEPT_EULA=Y apt-get install -y -qq msodbcsql18 unixodbc-dev
 
       - name: Instalar dependencias Python
-        run: pip install pyodbc
+        run: pip install pyodbc google-cloud-bigquery google-auth
+
+      - name: Gravar credencial BigQuery (SA key)
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
 
       - name: Rodar fetcher StarkBank (CP - API Vesti)
         # CP agora vem da API Vesti (orders-paylinks, payment.receivables
@@ -83,14 +90,15 @@ jobs:
       # (antecipationValue > 0 = antecipado). enrich_antecipacao_real.py fica no
       # repo como referencia, mas nao roda mais no workflow.
 
-      - name: Rodar fetcher Cancelados (Fabric)
-        # Tambem Fabric: nao deve abortar o job nem o commit (ver fetcher acima).
+      - name: Rodar fetcher Cancelados (BigQuery)
+        # Fonte migrada do Fabric pro BQ em 19/08/2026: a capacidade Fabric esta
+        # pausada desde ~15/07 e esta etapa gastava ~13min por run em 6
+        # tentativas so pra falhar (continue-on-error deixava o run verde e
+        # ninguem percebia que o cancelados_valores.js estava congelado).
+        # No BQ a mesma consulta responde em ~1,3s. continue-on-error segue
+        # valendo: cancelados nao deve abortar o commit do dados.js.
         continue-on-error: true
         working-directory: relatoriostarkbank
-        env:
-          FABRIC_REFRESH_TOKEN: ${{ secrets.FABRIC_REFRESH_TOKEN }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
         run: python fetch_cancelados.py
 
       - name: Commit e push se houver mudancas
