@@ -1,0 +1,87 @@
+name: _debug cancelados BQ
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dbg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -q google-cloud-bigquery google-auth
+      - name: cred
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
+      - name: query
+        working-directory: relatoriostarkbank
+        run: |
+          cat > /tmp/dbg.py <<'PY'
+          import json, re, time
+          from pathlib import Path
+          from google.cloud import bigquery
+          c = bigquery.Client(project='vesti-data-499015')
+          DS = '`vesti-data-499015.vestilake_BI`'
+
+          cols = [r['column_name'] for r in c.query("""
+            SELECT column_name FROM `vesti-data-499015.vestilake_BI`.INFORMATION_SCHEMA.COLUMNS
+            WHERE table_name='MongoDB_Pedidos_Geral'
+          """).result()]
+          need = ['_id','orderNumber','summary_total','payment_transaction_installments',
+                  'customer_name','customer_doc','settings_createdAt']
+          print('[colunas] total', len(cols))
+          for n in need:
+              print('  ', n, 'OK' if n in cols else '*** FALTA ***')
+          print('[parecidos]', [x for x in cols if 'customer' in x.lower() or 'orderNumber' in x][:15])
+
+          r = list(c.query(f"""
+            SELECT MAX(CAST(settings_createdAt AS TIMESTAMP)) mx, COUNT(*) n
+            FROM {DS}.MongoDB_Pedidos_Geral
+          """).result())[0]
+          print('[frescor] pedido mais novo:', r['mx'], '| linhas:', r['n'])
+
+          txt = Path('invoices.js').read_text(encoding='utf-8')
+          inv = json.loads(re.search(r'window\.INVOICES\s*=\s*(\{.*\})\s*;?\s*$', txt, re.S).group(1))
+          voided = [f for f in inv['faturas'] if (f.get('purchase') or {}).get('status')=='voided']
+          oids = sorted({f['orderId'] for f in voided if f.get('orderId')})
+          print('[invoices]', len(voided), 'cancelados,', len(oids), 'orderIds unicos')
+
+          t0 = time.time()
+          rows = list(c.query(f"""
+            SELECT _id,
+              MAX(orderNumber) order_number,
+              MAX(SAFE_CAST(summary_total AS FLOAT64)) summary_total,
+              MAX(payment_transaction_installments) installments,
+              MAX(customer_name) customer_name,
+              MAX(customer_doc) customer_doc,
+              MAX(DATE(CAST(settings_createdAt AS TIMESTAMP), 'America/Sao_Paulo')) order_date
+            FROM {DS}.MongoDB_Pedidos_Geral
+            WHERE _id IN UNNEST(@ids)
+            GROUP BY _id
+          """, job_config=bigquery.QueryJobConfig(query_parameters=[
+              bigquery.ArrayQueryParameter('ids','STRING',oids)])).result())
+          print(f'[bq] {len(rows)}/{len(oids)} pedidos encontrados em {time.time()-t0:.1f}s')
+
+          old = json.loads(re.search(r'window\.CANCELADOS_VALORES\s*=\s*(\{.*\})\s*;?\s*$',
+                 Path('cancelados_valores.js').read_text(encoding='utf-8'), re.S).group(1))['valores']
+          novo = {r['_id']: r for r in rows}
+          comuns = set(old) & set(novo)
+          print('[comparacao] fabric antigo:', len(old), '| bq:', len(novo), '| em comum:', len(comuns))
+          dif = 0
+          for k in list(comuns):
+              a, b = old[k], novo[k]
+              if abs((a.get('summary_total') or 0) - (b['summary_total'] or 0)) > 0.01:
+                  dif += 1
+                  if dif <= 5: print('   valor difere', k, a.get('summary_total'), '->', b['summary_total'])
+              elif str(a.get('order_number')) != str(b['order_number']):
+                  if dif <= 5: print('   orderNumber difere', k, a.get('order_number'), '->', b['order_number'])
+          print('[comparacao] valores divergentes:', dif)
+          print('[so no bq]', len(set(novo)-set(old)), '| [so no fabric]', len(set(old)-set(novo)))
+          for k in list(novo)[:3]: print('  amostra:', json.dumps(novo[k], default=str, ensure_ascii=False)[:220])
+          PY
+          python /tmp/dbg.py
