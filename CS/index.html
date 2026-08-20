@@ -821,6 +821,9 @@ const CS_POR_CLIENTE = (()=>{ const m={}; DATA.clientes.forEach(c=>m[c.nome]=c.c
 /* Canal de cada cliente, para as abas que agregam por nome (produtos, churn)
    responderem ao filtro de canal sem carregar a coluna. */
 const CANAL_POR_CLIENTE = (()=>{ const m={}; DATA.clientes.forEach(c=>m[c.nome]=c.canal); return m })();
+/* Domínio de cada cliente. As abas que agregam por nome montam linhas novas e
+   perdem os campos que não somam, então o id é recuperado por aqui. */
+const DOM_POR_CLIENTE = (()=>{ const m={}; DATA.clientes.forEach(c=>{ if(c.dominio) m[c.nome]=c.dominio }); return m })();
 
 /* Responsável de uma linha, para o filtro de CS valer em qualquer aba: em
    Reuniões e Tickets é o dono do registro no HubSpot; nas demais é o CS da
@@ -855,7 +858,9 @@ function agregarPorCliente(series, campos, derivar){
   const acc = {};
   series.forEach(x=>{
     if(!sem.has(x.semana)) return;
-    const a = acc[x.cliente] || (acc[x.cliente] = {cliente:x.cliente, cs:CS_POR_CLIENTE[x.cliente]||'Sem CS'});
+    const a = acc[x.cliente] || (acc[x.cliente] = {cliente:x.cliente, cs:CS_POR_CLIENTE[x.cliente]||'Sem CS',
+      dominio:x.dominio||DOM_POR_CLIENTE[x.cliente]||null});
+    if(!a.dominio && x.dominio) a.dominio = x.dominio;
     campos.forEach(k=>a[k]=(a[k]||0)+(Number(x[k])||0));
   });
   const out = Object.values(acc);
@@ -869,10 +874,10 @@ function linhasChurn(){
   const out = [];
   DATA.clientes.forEach(c=>{
     if(c.dataChurn){
-      out.push({cliente:c.nome, cs:c.cs, plano:c.plano, data:c.dataChurn,
+      out.push({cliente:c.nome, dominio:c.dominio, cs:c.cs, plano:c.plano, data:c.dataChurn,
                 riscoChurn:c.riscoChurn, situacao:'Cancelado'});
     } else {
-      out.push({cliente:c.nome, cs:c.cs, plano:c.plano, data:null,
+      out.push({cliente:c.nome, dominio:c.dominio, cs:c.cs, plano:c.plano, data:null,
                 riscoChurn:c.riscoChurn, situacao:'Em risco'});
     }
   });
