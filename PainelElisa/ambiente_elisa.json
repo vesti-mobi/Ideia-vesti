@@ -134,8 +134,8 @@
   },
   "619088": {
     "ligado": true,
-    "update": "2026-07-22",
-    "religamentoReal": false,
+    "update": "2026-08-20",
+    "religamentoReal": true,
     "nomePlanilha": "Valentina Sirrah",
     "canalPlanilha": "Vesti"
   },
@@ -427,14 +427,14 @@
     "canalPlanilha": "Vesti"
   },
   "1584172": {
-    "ligado": false,
+    "ligado": true,
     "update": "2026-08-19",
     "religamentoReal": false,
     "nomePlanilha": "TRICOTEZ",
     "canalPlanilha": "Vesti"
   },
   "1613705": {
-    "ligado": false,
+    "ligado": true,
     "update": "2026-08-19",
     "religamentoReal": false,
     "nomePlanilha": "Tricotez Mega",
@@ -470,7 +470,7 @@
   },
   "1700627": {
     "ligado": true,
-    "update": "2026-07-28",
+    "update": "2026-08-19",
     "religamentoReal": false,
     "nomePlanilha": "HELLEN MODA FEMININA",
     "canalPlanilha": "Uemtel"
@@ -568,7 +568,7 @@
   },
   "1422450": {
     "ligado": true,
-    "update": "2026-07-23",
+    "update": "2026-08-19",
     "religamentoReal": true,
     "nomePlanilha": "Espaço Hada",
     "canalPlanilha": "Starter"
@@ -1066,7 +1066,7 @@
   "93281": {
     "ligado": true,
     "update": "2026-08-19",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "As Marias",
     "canalPlanilha": "Attasoft"
   },
@@ -1505,8 +1505,8 @@
     "canalPlanilha": "Vesti"
   },
   "1069425": {
-    "ligado": true,
-    "update": "2026-07-20",
+    "ligado": false,
+    "update": "2026-08-20",
     "religamentoReal": false,
     "nomePlanilha": "MALUE",
     "canalPlanilha": "Vesti"
@@ -2276,7 +2276,7 @@
   },
   "451968": {
     "ligado": true,
-    "update": "2026-08-17",
+    "update": "2026-08-19",
     "religamentoReal": false,
     "nomePlanilha": "Vila Sol",
     "canalPlanilha": "Vesti"
@@ -2543,7 +2543,7 @@
   "1213886": {
     "ligado": true,
     "update": "2026-08-19",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Aero Summer",
     "canalPlanilha": "Vesti"
   },
@@ -2605,7 +2605,7 @@
   },
   "157680": {
     "ligado": true,
-    "update": "2026-08-11",
+    "update": "2026-08-19",
     "religamentoReal": false,
     "nomePlanilha": "Le Ricard",
     "canalPlanilha": "Vesti"
@@ -2633,7 +2633,7 @@
   },
   "347376": {
     "ligado": true,
-    "update": "2026-07-21",
+    "update": "2026-08-19",
     "religamentoReal": false,
     "nomePlanilha": "Apoá",
     "canalPlanilha": "Vesti"
@@ -2647,7 +2647,7 @@
   },
   "166026": {
     "ligado": true,
-    "update": "2026-07-21",
+    "update": "2026-08-19",
     "religamentoReal": false,
     "nomePlanilha": "Barraca do Willinha",
     "canalPlanilha": "Vesti"
@@ -2683,7 +2683,7 @@
   "1790137": {
     "ligado": true,
     "update": "2026-08-19",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "CAMBORIU",
     "canalPlanilha": "Vesti"
   },
@@ -2752,7 +2752,7 @@
   },
   "549482": {
     "ligado": true,
-    "update": "2026-07-21",
+    "update": "2026-08-19",
     "religamentoReal": false,
     "nomePlanilha": "Valentins Fashion",
     "canalPlanilha": "Vesti"
@@ -2787,7 +2787,7 @@
   },
   "128065": {
     "ligado": true,
-    "update": "2026-08-17",
+    "update": "2026-08-19",
     "religamentoReal": false,
     "nomePlanilha": "Alpelo",
     "canalPlanilha": "Vesti"
@@ -2850,8 +2850,8 @@
   },
   "632540": {
     "ligado": true,
-    "update": "2026-07-22",
-    "religamentoReal": false,
+    "update": "2026-08-20",
+    "religamentoReal": true,
     "nomePlanilha": "Trama Jeans",
     "canalPlanilha": "Attasoft"
   },
@@ -2893,7 +2893,7 @@
   "968033": {
     "ligado": true,
     "update": "2026-08-19",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Ankor Design",
     "canalPlanilha": "Vesti"
   },
@@ -2920,7 +2920,7 @@
   },
   "1250065": {
     "ligado": true,
-    "update": "2026-07-20",
+    "update": "2026-08-19",
     "religamentoReal": false,
     "nomePlanilha": "Peran Jeans",
     "canalPlanilha": "Vesti"
@@ -2956,7 +2956,7 @@
   "612832": {
     "ligado": true,
     "update": "2026-08-19",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Yoo Moda Grande",
     "canalPlanilha": "Starter"
   },
@@ -3004,8 +3004,8 @@
   },
   "42652": {
     "ligado": true,
-    "update": "2026-07-21",
-    "religamentoReal": false,
+    "update": "2026-08-20",
+    "religamentoReal": true,
     "nomePlanilha": "PIANETA",
     "canalPlanilha": "Vesti"
   },
@@ -3144,7 +3144,7 @@
   },
   "135576": {
     "ligado": true,
-    "update": "2026-07-17",
+    "update": "2026-08-19",
     "religamentoReal": false,
     "nomePlanilha": "BYZ Premium",
     "canalPlanilha": "Vesti"
@@ -3207,8 +3207,8 @@
   },
   "383850": {
     "ligado": true,
-    "update": "2026-07-21",
-    "religamentoReal": false,
+    "update": "2026-08-20",
+    "religamentoReal": true,
     "nomePlanilha": "Mais Moda",
     "canalPlanilha": "Starter"
   },
@@ -3473,7 +3473,7 @@
   },
   "1637938": {
     "ligado": true,
-    "update": "2026-07-10",
+    "update": "2026-08-19",
     "religamentoReal": false,
     "nomePlanilha": "SN Acessórios",
     "canalPlanilha": "Vesti"
@@ -4537,9 +4537,9 @@
   },
   "16653": {
     "ligado": true,
-    "update": "2026-07-15",
+    "update": "2026-08-19",
     "religamentoReal": false,
-    "nomePlanilha": "Kaylane Naybe",
+    "nomePlanilha": "Black Jeans",
     "canalPlanilha": "Vesti"
   },
   "107077": {
@@ -5028,7 +5028,7 @@
   "1024327": {
     "ligado": true,
     "update": "2026-08-19",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Luciana Pais",
     "canalPlanilha": "Vesti"
   },
@@ -5098,7 +5098,7 @@
   "17894": {
     "ligado": true,
     "update": "2026-08-19",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Idrissi Dress",
     "canalPlanilha": "Attasoft"
   },
@@ -5118,14 +5118,14 @@
   },
   "774506": {
     "ligado": true,
-    "update": "2026-07-15",
-    "religamentoReal": false,
+    "update": "2026-08-20",
+    "religamentoReal": true,
     "nomePlanilha": "Fit Clothing Line",
     "canalPlanilha": "Vesti"
   },
   "448792": {
     "ligado": true,
-    "update": "2026-07-18",
+    "update": "2026-08-19",
     "religamentoReal": false,
     "nomePlanilha": "Karmani",
     "canalPlanilha": "Attasoft"
@@ -6168,7 +6168,7 @@
   },
   "1870959": {
     "ligado": true,
-    "update": "2026-07-17",
+    "update": "2026-08-20",
     "religamentoReal": false,
     "nomePlanilha": "Bilcon Modas",
     "canalPlanilha": "Uemtel"
