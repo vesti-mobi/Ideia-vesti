@@ -318,6 +318,7 @@ td.strong{font-weight:600}
 .health i{width:6px;height:6px;border-radius:50%;flex:none}
 .h-ok i{background:var(--pos)}.h-warn i{background:var(--gold)}.h-bad i{background:var(--neg)}
 .cs-chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2)}
+.dom-id{font-variant-numeric:tabular-nums;font-size:12px;color:var(--txt-2,#6b7280);letter-spacing:.01em}
 .cs-chip b{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;flex:none;
   font-family:var(--f-mono);font-size:9.5px;font-weight:600;background:var(--sunken);border:1px solid var(--line);color:var(--ink-2)}
 
@@ -908,6 +909,7 @@ const TABS = [
     tabela:'Clientes', chaveCliente:'nome',
     colunas:[
       {k:'nome', l:'Cliente', tipo:'cliente'},
+      {k:'dominio', l:'Domínio', tipo:'dominio'},
       COL_CS,
       {k:'status', l:'Status', tipo:'status'},
       {k:'canal', l:'Canal', tipo:'tag'},
@@ -945,6 +947,7 @@ const TABS = [
     tabela:'Negócios', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente / Negócio', tipo:'clienteNegocio'},
+      {k:'dominio', l:'Domínio', tipo:'dominio'},
       COL_CS,
       {k:'valor', l:'Valor', tipo:'money', r:true, forte:true},
       {k:'status', l:'Status', tipo:'ganho'},
@@ -960,6 +963,7 @@ const TABS = [
     tabela:'Negócios', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente / Negócio', tipo:'clienteNegocio'},
+      {k:'dominio', l:'Domínio', tipo:'dominio'},
       COL_CS,
       {k:'valor', l:'Valor', tipo:'money', r:true, forte:true},
       {k:'status', l:'Status', tipo:'ganho'},
@@ -975,6 +979,7 @@ const TABS = [
     tabela:'Clientes', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente', tipo:'cliente'},
+      {k:'dominio', l:'Domínio', tipo:'dominio'},
       COL_CS,
       {k:'pctIA', l:'Finalizados pela IA', tipo:'barPct', r:true},
       {k:'atendimentos', l:'Atendimentos', tipo:'int', r:true},
@@ -1009,6 +1014,7 @@ const TABS = [
     tabela:'Clientes', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente', tipo:'cliente'},
+      {k:'dominio', l:'Domínio', tipo:'dominio'},
       COL_CS,
       {k:'eventos', l:'Eventos no período', tipo:'int', r:true, forte:true},
       {k:'eventosAno', l:'Eventos no ano', tipo:'int', r:true},
@@ -1049,6 +1055,7 @@ const TABS = [
     tabela:'Clientes', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente', tipo:'cliente'},
+      {k:'dominio', l:'Domínio', tipo:'dominio'},
       COL_CS,
       {k:'valorTransacionado', l:'Valor transacionado', tipo:'money', r:true, forte:true},
       {k:'valorCartao', l:'Cartão', tipo:'money', r:true},
@@ -1085,6 +1092,7 @@ const TABS = [
     tabela:'Clientes', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente', tipo:'cliente'},
+      {k:'dominio', l:'Domínio', tipo:'dominio'},
       COL_CS,
       {k:'plano', l:'Plano', tipo:'tag'},
       {k:'data', l:'Data do churn', tipo:'date'},
@@ -1124,6 +1132,7 @@ const TABS = [
     tabela:'Reuniões', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente', tipo:'cliente'},
+      {k:'dominio', l:'Domínio', tipo:'dominio'},
       {k:'reuniao', l:'Reunião', tipo:'texto'},
       {k:'data', l:'Data', tipo:'dataRel'},
       {k:'resultado', l:'Resultado', tipo:'resultadoReuniao'},
@@ -1166,6 +1175,7 @@ const TABS = [
     colunas:[
       {k:'ticket', l:'Ticket', tipo:'ticket'},
       {k:'cliente', l:'Cliente', tipo:'clienteCanal'},
+      {k:'dominio', l:'Domínio', tipo:'dominio'},
       {k:'pipeline', l:'Pipeline', tipo:'tag'},
       {k:'estagio', l:'Estágio', tipo:'tag'},
       {k:'situacao', l:'Situação', tipo:'situacaoTicket'},
@@ -1858,6 +1868,10 @@ function celula(r,c){
   const v = r[c.k];
   const td = el('td', {class:[c.r?'r':'', ['int','money','moneyC','date','semana','barPct','linksPagos'].includes(c.tipo)?'num':'', c.forte?'strong':''].filter(Boolean).join(' ')});
   switch(c.tipo){
+    /* Domínio = odbc_domains.ID, o número que identifica a marca na Vesti.
+       É chave de busca, então vai em tabular para alinhar na coluna. */
+    case 'dominio': td.innerHTML = v==null||v==='' ? '—'
+      : `<span class="dom-id">${v}</span>`; break;
     case 'cliente': td.innerHTML = `<span class="cell-main" style="font-weight:600">${v}</span>`; break;
     case 'clienteNegocio': td.innerHTML = `<span class="cell-main" style="font-weight:600">${v}</span><span class="cell-sub">${r.negocio||''}</span>`; break;
     case 'cs': td.innerHTML = v?`<span class="cs-chip"><b>${iniciais(v)}</b>${v}</span>`:'—'; break;

@@ -55,6 +55,7 @@ de layout continua indo por `node publicar.js`.
 
 | Aba | Campo | Fonte |
 |---|---|---|
+| Todas | Domínio | `odbc_domains.ID` — o id da marca na Vesti, chave de busca no admin |
 | Todas | CS responsável | `odbc_domains.angel_id` → `odbc_angels.name` |
 | Tabela geral | Integração | `odbc_domains.integration_id` → `odbc_integrations.name` |
 | Tabela geral | Data de cadastro | `odbc_domains.created_at` — entrada da marca na Vesti |
@@ -81,6 +82,20 @@ de layout continua indo por `node publicar.js`.
 | Tickets | ticket / pipeline / estágio | HubSpot `tickets`, todos os pipelines |
 | Tickets | Situação | estágio marcado como fechado (`metadata.ticketState`) ou `closed_date` preenchida |
 | Tickets | Cliente e Canal | empresa associada ao ticket → marca do cadastro (nome, nome sem ruído ou CNPJ) |
+
+### Domínio nas abas
+
+A coluna **Domínio** (`odbc_domains.ID`) aparece nas nove abas, ao lado do cliente.
+Onde a linha nasce de um domínio — tabela geral, Oráculo, Tino, Vesti Pago, Churn —
+o id vem direto e a cobertura é de 97% a 100%. Nas abas que vêm do HubSpot
+(Cross-sell, Upsell, Reuniões, Tickets) a linha nasce com o **nome da empresa no
+HubSpot**, então o id é resolvido pelo mesmo casamento em três tentativas usado
+para o canal do ticket; sem casar fica `—`. Tickets fica em ~34% porque boa parte
+deles é de empresa que não é marca da carteira — é a mesma limitação já
+documentada na linha "Cliente e Canal" da tabela acima, não um defeito da coluna.
+
+Inventar um id quando o nome não casa seria pior do que deixar em branco: a coluna
+existe justamente para ser colada na busca do admin.
 
 ## Ressalvas que mudam a leitura do número
 

@@ -1090,7 +1090,7 @@ function montar(bqd, hsd, tinoDados) {
     }
     const av = dataChurn ? { risco: null, motivos: [] } : avaliarRisco(m, ultimoPed, fat);
     clientes.push({
-      nome: m.nome, cs: m.cs,
+      nome: m.nome, dominio: m.dom, cs: m.cs,
       status: dataChurn ? 'inativo' : (ultimoPed && ultimoPed >= limiteChurn ? 'ativo' : 'inativo'),
       integracao: m.integracao,
       canal: m.canal,
@@ -1129,14 +1129,14 @@ function montar(bqd, hsd, tinoDados) {
   oraSerie.forEach((v, k) => {
     const [dom, sem] = k.split('|');
     oraculoSeries.push({
-      semana: Number(sem), cliente: nomeDe(dom),
+      semana: Number(sem), cliente: nomeDe(dom), dominio: dom,
       atendimentos: v.atendimentos || 0, atendimentosIA: v.atendimentosIA || 0,
       gmvIniciado: v.gmvIniciado || 0, gmvFinalizado: v.gmvFinalizado || 0,
     });
     somaEm(oraAcc, dom, { at: v.atendimentos || 0, ia: v.atendimentosIA || 0, gi: v.gmvIniciado || 0, gf: v.gmvFinalizado || 0 });
   });
   const oraculoTab = [...oraAcc.entries()].map(([dom, v]) => ({
-    cliente: nomeDe(dom), cs: csDe(dom),
+    cliente: nomeDe(dom), dominio: dom, cs: csDe(dom),
     pctIA: v.at ? Math.round(v.ia / v.at * 100) : null,
     atendimentos: v.at, gmvIniciado: r2(v.gi), gmvFinalizado: r2(v.gf),
   })).filter(x => x.atendimentos || x.gmvIniciado);
@@ -1182,7 +1182,7 @@ function montar(bqd, hsd, tinoDados) {
       const dom = domDaCompany.get(r.company);
       const cliente = nomeDaCompany.get(r.company) || nomeBonito(r.company);
       tinoSeries.push({
-        semana: r.sem, cliente,
+        semana: r.sem, cliente, dominio: dom || null,
         cs: dom ? csDe(dom) : ((foraDaCarteira.get(r.company) || {}).cs || 'Sem CS'),
         eventos: r.eventos,
         receita: dom ? (gmvSemana.get(dom + '|' + r.sem) || 0) : 0,
@@ -1198,6 +1198,7 @@ function montar(bqd, hsd, tinoDados) {
       const f = foraDaCarteira.get(m.company);
       tinoTab.push({
         cliente: nomeDaCompany.get(m.company),
+        dominio: dom || null,
         cs: dom ? csDe(dom) : (f ? f.cs : 'Sem CS'),
         eventos: a.eventos || 0,
         eventosAno: num(t.eventos),
@@ -1238,7 +1239,7 @@ function montar(bqd, hsd, tinoDados) {
     const fee = feeLiquido.get(r.dom + '|' + r.sem) || 0;
     const antec = num(r.antec) * FATOR_ANTECIPACAO_VESTI;
     vpSeries.push({
-      semana: r.sem, cliente: nomeDe(r.dom),
+      semana: r.sem, cliente: nomeDe(r.dom), dominio: r.dom,
       linksGerados: num(r.gerados), linksPagos: num(r.pagos), valor: num(r.valor),
       valorCartao: num(r.valor_cartao), valorPix: num(r.valor_pix),
       receitaFee: r2(fee), receitaAntecipacao: r2(antec),
@@ -1250,7 +1251,7 @@ function montar(bqd, hsd, tinoDados) {
     });
   });
   const vpTab = [...vpAcc.entries()].map(([dom, v]) => ({
-    cliente: nomeDe(dom), cs: csDe(dom),
+    cliente: nomeDe(dom), dominio: dom, cs: csDe(dom),
     valorTransacionado: v.valorTransacionado,
     valorCartao: v.valorCartao, valorPix: v.valorPix,
     receitaFee: r2(v.receitaFee), receitaAntecipacao: r2(v.receitaAntecipacao),
@@ -1263,11 +1264,11 @@ function montar(bqd, hsd, tinoDados) {
     if (!c.dataChurn) return;
     const s = isoWeek(new Date(c.dataChurn));
     if (!semanaOk(s) || Number(c.dataChurn.slice(0, 4)) !== ANO) return;
-    churnPorSemana.set(c.nome + '|' + s, 1);
+    churnPorSemana.set(c.nome + '|' + s, c._dom || null);
   });
-  const churnSeries = [...churnPorSemana.keys()].map(k => {
+  const churnSeries = [...churnPorSemana.entries()].map(([k, dom]) => {
     const i = k.lastIndexOf('|');
-    return { semana: Number(k.slice(i + 1)), cliente: k.slice(0, i), churns: 1 };
+    return { semana: Number(k.slice(i + 1)), cliente: k.slice(0, i), dominio: dom, churns: 1 };
   });
 
   // ---- só quem teve alguma atividade no ano entra no painel
@@ -1318,6 +1319,7 @@ function montar(bqd, hsd, tinoDados) {
     if (m) ticketsCasados++;
     const o = Object.assign({}, t, {
       cliente: m ? m.nome : (t.empresa || '(sem marca)'),
+      dominio: m ? m.dom : null,
       canal: m ? m.canal : 'Sem canal',
     });
     delete o.empresa; delete o.empresaCnpj;
@@ -1326,6 +1328,27 @@ function montar(bqd, hsd, tinoDados) {
   if (tickets.length) {
     console.log('  tickets ligados a marca do painel'.padEnd(44)
       + (ticketsCasados + '/' + tickets.length).padStart(8));
+  }
+
+  /* ---- Domínio nas abas que vêm do HubSpot (Cross-sell, Upsell, Reuniões)
+     Ali a linha nasce com o nome da empresa no HubSpot, não com o domínio, então
+     o id é resolvido pelo mesmo casamento em três tentativas usado nos tickets.
+     Sem casar fica null e a coluna mostra "—": inventar um id seria pior, porque
+     a coluna existe justamente para ser chave de busca no admin. */
+  const domDoNome = nome => {
+    if (!nome) return null;
+    const m = marcaPorNome.get(semAcento(nome)) || marcaPorChave.get(chaveMarca(nome));
+    return m ? m.dom : null;
+  };
+  let hsCasados = 0, hsTotal = 0;
+  [hsd.negocios, hsd.reunioes].forEach(lista => (lista || []).forEach(r => {
+    hsTotal++;
+    r.dominio = domDoNome(r.cliente);
+    if (r.dominio) hsCasados++;
+  }));
+  if (hsTotal) {
+    console.log('  negócios/reuniões com domínio'.padEnd(44)
+      + (hsCasados + '/' + hsTotal).padStart(8));
   }
 
   return {
