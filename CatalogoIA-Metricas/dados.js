@@ -1,6 +1,6 @@
 window.DADOS = {
-  "gerado_em": "2026-08-20T21:18:54.265Z",
-  "hoje": "2026-08-20",
+  "gerado_em": "2026-08-21T21:15:19.859Z",
+  "hoje": "2026-08-21",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
   "auto_publica_desde": "2026-08-10",
@@ -12,15 +12,15 @@ window.DADOS = {
   },
   "kpis": {
     "liberadas": 16,
-    "ativas": 3,
+    "ativas": 4,
     "usando": 9,
     "nunca_usaram": 7,
-    "paradas": 4,
+    "paradas": 3,
     "com_conta": 10,
     "contas": 9,
-    "produtos_total": 274,
-    "produtos_7d": 46,
-    "descricoes_total": 339,
+    "produtos_total": 292,
+    "produtos_7d": 64,
+    "descricoes_total": 361,
     "total_estimado": true
   },
   "marcas": [
@@ -30,16 +30,16 @@ window.DADOS = {
       "arquetipo": "explorador",
       "tem_conta": true,
       "email": "nicoboco.shop@nicoboco.com.br",
-      "produtos": 113,
+      "produtos": 127,
       "estimado": false,
-      "produtos_7d": 11,
+      "produtos_7d": 25,
       "ativa": true,
-      "acessos": 60,
-      "buscas": 320,
-      "descricoes": 162,
-      "envios": 188,
+      "acessos": 61,
+      "buscas": 321,
+      "descricoes": 176,
+      "envios": 202,
       "primeiro": "2026-08-10T19:02:35.392Z",
-      "ultimo": "2026-08-20T21:14:18.430Z",
+      "ultimo": "2026-08-21T19:17:26.782Z",
       "dias": 0
     },
     {
@@ -54,11 +54,11 @@ window.DADOS = {
       "ativa": true,
       "acessos": 6,
       "buscas": 37,
-      "descricoes": 49,
-      "envios": 42,
+      "descricoes": 53,
+      "envios": 46,
       "primeiro": "2026-07-28T18:41:18.639Z",
-      "ultimo": "2026-08-19T14:48:55.101Z",
-      "dias": 1
+      "ultimo": "2026-08-21T01:32:24.963Z",
+      "dias": 0
     },
     {
       "slug": "petit",
@@ -76,7 +76,7 @@ window.DADOS = {
       "envios": 0,
       "primeiro": "",
       "ultimo": "2026-07-22T20:22:50.872Z",
-      "dias": 29
+      "dias": 30
     },
     {
       "slug": "opera-kids",
@@ -94,7 +94,7 @@ window.DADOS = {
       "envios": 61,
       "primeiro": "2026-07-28T11:47:18.529Z",
       "ultimo": "2026-08-20T19:25:53.314Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "andressa-vesti",
@@ -112,6 +112,24 @@ window.DADOS = {
       "envios": 12,
       "primeiro": "2026-08-10T16:01:03.796Z",
       "ultimo": "2026-08-20T11:06:21.271Z",
+      "dias": 1
+    },
+    {
+      "slug": "monnika-marikinha",
+      "nome": "Monnika Marikinha",
+      "arquetipo": "amante",
+      "tem_conta": true,
+      "email": "monnikamarikinhaloja@gmail.com",
+      "produtos": 5,
+      "estimado": false,
+      "produtos_7d": 4,
+      "ativa": true,
+      "acessos": 2,
+      "buscas": 1,
+      "descricoes": 5,
+      "envios": 5,
+      "primeiro": "2026-08-06T14:16:43.085Z",
+      "ultimo": "2026-08-21T01:34:35.135Z",
       "dias": 0
     },
     {
@@ -130,7 +148,7 @@ window.DADOS = {
       "envios": 5,
       "primeiro": "2026-08-07T13:23:05.929Z",
       "ultimo": "2026-08-07T14:55:31.596Z",
-      "dias": 13
+      "dias": 14
     },
     {
       "slug": "optimist-feirinha",
@@ -148,24 +166,6 @@ window.DADOS = {
       "envios": 2,
       "primeiro": "2026-08-07T13:33:14.591Z",
       "ultimo": "2026-08-07T14:33:01.598Z",
-      "dias": 13
-    },
-    {
-      "slug": "monnika-marikinha",
-      "nome": "Monnika Marikinha",
-      "arquetipo": "amante",
-      "tem_conta": true,
-      "email": "monnikamarikinhaloja@gmail.com",
-      "produtos": 1,
-      "estimado": false,
-      "produtos_7d": 0,
-      "ativa": false,
-      "acessos": 2,
-      "buscas": 1,
-      "descricoes": 1,
-      "envios": 1,
-      "primeiro": "2026-08-06T14:16:43.085Z",
-      "ultimo": "2026-08-06T14:20:20.569Z",
       "dias": 14
     },
     {
@@ -292,7 +292,7 @@ window.DADOS = {
       "envios": 0,
       "primeiro": "2026-08-04T14:28:52.117Z",
       "ultimo": "2026-08-20T19:29:40.224Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "ttng",
@@ -416,9 +416,9 @@ window.DADOS = {
     {
       "inicio": "2026-08-17",
       "fim": "2026-08-23",
-      "produtos": 46,
-      "ativas": 3,
-      "usaram": 5,
+      "produtos": 64,
+      "ativas": 4,
+      "usaram": 6,
       "cadastros": 9,
       "novos": 0
     }
@@ -430,15 +430,15 @@ window.DADOS = {
       "prefixo": "app:auto:",
       "kpis": {
         "liberadas": 16,
-        "ativas": 2,
-        "usando": 3,
-        "nunca_usaram": 13,
+        "ativas": 4,
+        "usando": 5,
+        "nunca_usaram": 11,
         "paradas": 0,
         "com_conta": 10,
         "contas": 9,
-        "produtos_total": 152,
-        "produtos_7d": 34,
-        "descricoes_total": 216,
+        "produtos_total": 174,
+        "produtos_7d": 56,
+        "descricoes_total": 238,
         "total_estimado": true,
         "produtos_atribuidos": 15
       },
@@ -449,18 +449,18 @@ window.DADOS = {
           "arquetipo": "explorador",
           "tem_conta": true,
           "email": "nicoboco.shop@nicoboco.com.br",
-          "produtos": 111,
+          "produtos": 125,
           "estimado": false,
-          "produtos_7d": 11,
+          "produtos_7d": 25,
           "ativa": true,
-          "acessos": 51,
-          "buscas": 280,
-          "descricoes": 159,
-          "envios": 163,
+          "acessos": 52,
+          "buscas": 281,
+          "descricoes": 173,
+          "envios": 177,
           "primeiro": "2026-08-11T18:28:02.542Z",
-          "ultimo": "2026-08-20T21:14:18.430Z",
+          "ultimo": "2026-08-21T19:17:26.782Z",
           "dias": 0,
-          "produtos_medidos": 111,
+          "produtos_medidos": 125,
           "atribuido": 0
         },
         {
@@ -479,9 +479,49 @@ window.DADOS = {
           "envios": 46,
           "primeiro": "2026-08-18T13:22:59.954Z",
           "ultimo": "2026-08-20T19:25:53.314Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 23,
           "atribuido": 15
+        },
+        {
+          "slug": "amiska",
+          "nome": "Amiska",
+          "arquetipo": "sabio",
+          "tem_conta": true,
+          "email": "missmilliebr@gmail.com",
+          "produtos": 4,
+          "estimado": false,
+          "produtos_7d": 4,
+          "ativa": true,
+          "acessos": 0,
+          "buscas": 0,
+          "descricoes": 4,
+          "envios": 4,
+          "primeiro": "2026-08-21T01:32:04.730Z",
+          "ultimo": "2026-08-21T01:32:24.963Z",
+          "dias": 0,
+          "produtos_medidos": 4,
+          "atribuido": 0
+        },
+        {
+          "slug": "monnika-marikinha",
+          "nome": "Monnika Marikinha",
+          "arquetipo": "amante",
+          "tem_conta": true,
+          "email": "monnikamarikinhaloja@gmail.com",
+          "produtos": 4,
+          "estimado": false,
+          "produtos_7d": 4,
+          "ativa": true,
+          "acessos": 0,
+          "buscas": 0,
+          "descricoes": 4,
+          "envios": 4,
+          "primeiro": "2026-08-21T01:34:17.651Z",
+          "ultimo": "2026-08-21T01:34:35.135Z",
+          "dias": 0,
+          "produtos_medidos": 4,
+          "atribuido": 0
         },
         {
           "slug": "andressa-vesti",
@@ -499,28 +539,8 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-13T17:14:37.157Z",
           "ultimo": "2026-08-20T11:06:21.271Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 3,
-          "atribuido": 0
-        },
-        {
-          "slug": "amiska",
-          "nome": "Amiska",
-          "arquetipo": "sabio",
-          "tem_conta": true,
-          "email": "missmilliebr@gmail.com",
-          "produtos": 0,
-          "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
-          "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null,
-          "produtos_medidos": 0,
           "atribuido": 0
         },
         {
@@ -569,26 +589,6 @@ window.DADOS = {
           "arquetipo": "",
           "tem_conta": false,
           "email": "",
-          "produtos": 0,
-          "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
-          "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null,
-          "produtos_medidos": 0,
-          "atribuido": 0
-        },
-        {
-          "slug": "monnika-marikinha",
-          "nome": "Monnika Marikinha",
-          "arquetipo": "amante",
-          "tem_conta": true,
-          "email": "monnikamarikinhaloja@gmail.com",
           "produtos": 0,
           "estimado": false,
           "produtos_7d": 0,
@@ -889,12 +889,12 @@ window.DADOS = {
         {
           "inicio": "2026-08-17",
           "fim": "2026-08-23",
-          "produtos": 36,
-          "ativas": 2,
-          "usaram": 3,
+          "produtos": 58,
+          "ativas": 4,
+          "usaram": 5,
           "cadastros": 9,
           "novos": 0,
-          "produtos_medidos": 34,
+          "produtos_medidos": 56,
           "atribuido": 2
         }
       ]
@@ -911,11 +911,11 @@ window.DADOS = {
         "paradas": 0,
         "com_conta": 10,
         "contas": 9,
-        "produtos_total": 206,
+        "produtos_total": 204,
         "produtos_7d": 12,
         "descricoes_total": 33,
         "total_estimado": true,
-        "produtos_atribuidos": 194
+        "produtos_atribuidos": 192
       },
       "marcas": [
         {
@@ -944,7 +944,7 @@ window.DADOS = {
           "arquetipo": "sabio",
           "tem_conta": true,
           "email": "missmilliebr@gmail.com",
-          "produtos": 65,
+          "produtos": 62,
           "estimado": true,
           "produtos_7d": 10,
           "ativa": true,
@@ -954,9 +954,9 @@ window.DADOS = {
           "envios": 11,
           "primeiro": "2026-08-17T12:54:41.838Z",
           "ultimo": "2026-08-19T14:48:53.887Z",
-          "dias": 1,
+          "dias": 2,
           "produtos_medidos": 10,
-          "atribuido": 55
+          "atribuido": 52
         },
         {
           "slug": "petit",
@@ -994,7 +994,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T12:06:46.387Z",
           "ultimo": "2026-08-20T02:30:36.116Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 0,
           "atribuido": 8
         },
@@ -1019,6 +1019,26 @@ window.DADOS = {
           "atribuido": 3
         },
         {
+          "slug": "monnika-marikinha",
+          "nome": "Monnika Marikinha",
+          "arquetipo": "amante",
+          "tem_conta": true,
+          "email": "monnikamarikinhaloja@gmail.com",
+          "produtos": 2,
+          "estimado": true,
+          "produtos_7d": 0,
+          "ativa": false,
+          "acessos": 0,
+          "buscas": 0,
+          "descricoes": 0,
+          "envios": 0,
+          "primeiro": "",
+          "ultimo": "",
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 2
+        },
+        {
           "slug": "opera-kids",
           "nome": "Ópera Kids",
           "arquetipo": "inocente",
@@ -1034,7 +1054,7 @@ window.DADOS = {
           "envios": 3,
           "primeiro": "2026-08-12T12:05:03.861Z",
           "ultimo": "2026-08-20T13:45:53.884Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 2,
           "atribuido": 0
         },
@@ -1057,26 +1077,6 @@ window.DADOS = {
           "dias": null,
           "produtos_medidos": 0,
           "atribuido": 2
-        },
-        {
-          "slug": "monnika-marikinha",
-          "nome": "Monnika Marikinha",
-          "arquetipo": "amante",
-          "tem_conta": true,
-          "email": "monnikamarikinhaloja@gmail.com",
-          "produtos": 1,
-          "estimado": true,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
-          "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null,
-          "produtos_medidos": 0,
-          "atribuido": 1
         },
         {
           "slug": "anne-blanc",
@@ -1214,7 +1214,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T11:49:43.332Z",
           "ultimo": "2026-08-20T19:29:40.224Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 0,
           "atribuido": 0
         },
@@ -1364,13 +1364,13 @@ window.DADOS = {
         {
           "inicio": "2026-08-17",
           "fim": "2026-08-23",
-          "produtos": 15,
+          "produtos": 16,
           "ativas": 2,
           "usaram": 4,
           "cadastros": 9,
           "novos": 0,
           "produtos_medidos": 12,
-          "atribuido": 3
+          "atribuido": 4
         }
       ]
     }
