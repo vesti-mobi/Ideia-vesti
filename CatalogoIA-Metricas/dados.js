@@ -1,6 +1,6 @@
 window.DADOS = {
-  "gerado_em": "2026-08-21T21:15:19.859Z",
-  "hoje": "2026-08-21",
+  "gerado_em": "2026-08-22T12:21:36.336Z",
+  "hoje": "2026-08-22",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
   "auto_publica_desde": "2026-08-10",
@@ -58,7 +58,7 @@ window.DADOS = {
       "envios": 46,
       "primeiro": "2026-07-28T18:41:18.639Z",
       "ultimo": "2026-08-21T01:32:24.963Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "petit",
@@ -112,7 +112,7 @@ window.DADOS = {
       "envios": 12,
       "primeiro": "2026-08-10T16:01:03.796Z",
       "ultimo": "2026-08-20T11:06:21.271Z",
-      "dias": 1
+      "dias": 2
     },
     {
       "slug": "monnika-marikinha",
@@ -130,7 +130,7 @@ window.DADOS = {
       "envios": 5,
       "primeiro": "2026-08-06T14:16:43.085Z",
       "ultimo": "2026-08-21T01:34:35.135Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "optimist-jeans",
@@ -499,7 +499,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-21T01:32:04.730Z",
           "ultimo": "2026-08-21T01:32:24.963Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -519,7 +519,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-21T01:34:17.651Z",
           "ultimo": "2026-08-21T01:34:35.135Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -539,7 +539,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-13T17:14:37.157Z",
           "ultimo": "2026-08-20T11:06:21.271Z",
-          "dias": 1,
+          "dias": 2,
           "produtos_medidos": 3,
           "atribuido": 0
         },
@@ -994,7 +994,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T12:06:46.387Z",
           "ultimo": "2026-08-20T02:30:36.116Z",
-          "dias": 1,
+          "dias": 2,
           "produtos_medidos": 0,
           "atribuido": 8
         },
