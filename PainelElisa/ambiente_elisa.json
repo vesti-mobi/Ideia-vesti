@@ -372,7 +372,7 @@
   },
   "627469": {
     "ligado": true,
-    "update": "2026-07-22",
+    "update": "2026-08-22",
     "religamentoReal": true,
     "nomePlanilha": "Emile Fontes",
     "canalPlanilha": "Trial"
@@ -827,7 +827,7 @@
   },
   "1794530": {
     "ligado": true,
-    "update": "2026-07-22",
+    "update": "2026-08-22",
     "religamentoReal": false,
     "nomePlanilha": "Mocinha Charmosa",
     "canalPlanilha": "Starter"
@@ -1136,7 +1136,7 @@
   "198148": {
     "ligado": true,
     "update": "2026-08-22",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "BM Bolsas",
     "canalPlanilha": "Starter"
   },
@@ -1695,7 +1695,7 @@
   },
   "1797546": {
     "ligado": true,
-    "update": "2026-07-22",
+    "update": "2026-08-22",
     "religamentoReal": false,
     "nomePlanilha": "Edge clothing",
     "canalPlanilha": "Starter"
@@ -2045,7 +2045,7 @@
   },
   "1688322": {
     "ligado": true,
-    "update": "2026-07-22",
+    "update": "2026-08-22",
     "religamentoReal": false,
     "nomePlanilha": "AMIK MODAS",
     "canalPlanilha": "Uemtel"
@@ -3130,14 +3130,14 @@
   },
   "182668": {
     "ligado": true,
-    "update": "2026-07-22",
+    "update": "2026-08-22",
     "religamentoReal": false,
     "nomePlanilha": "Blue Beni",
     "canalPlanilha": "Attasoft"
   },
   "1549609": {
     "ligado": true,
-    "update": "2026-07-22",
+    "update": "2026-08-22",
     "religamentoReal": false,
     "nomePlanilha": "Mattos Wear",
     "canalPlanilha": "Starter"
@@ -3255,8 +3255,8 @@
     "canalPlanilha": "Uemtel"
   },
   "940943": {
-    "ligado": true,
-    "update": "2026-07-21",
+    "ligado": false,
+    "update": "2026-08-23",
     "religamentoReal": false,
     "nomePlanilha": "SunWeek",
     "canalPlanilha": "Vesti"
@@ -3320,7 +3320,7 @@
   "683519": {
     "ligado": true,
     "update": "2026-08-22",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Boladinhos Kids",
     "canalPlanilha": "Vesti"
   },
@@ -3355,7 +3355,7 @@
   "407318": {
     "ligado": true,
     "update": "2026-08-22",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Patmos",
     "canalPlanilha": "Vesti"
   },
@@ -3460,7 +3460,7 @@
   "376753": {
     "ligado": true,
     "update": "2026-08-22",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Issexy Treinamento",
     "canalPlanilha": "Vesti"
   },
@@ -3521,8 +3521,8 @@
     "canalPlanilha": "Vesti"
   },
   "1982744": {
-    "ligado": true,
-    "update": "2026-07-27",
+    "ligado": false,
+    "update": "2026-08-23",
     "religamentoReal": false,
     "nomePlanilha": "Max Acessórios Brás",
     "canalPlanilha": "Starter"
@@ -5203,7 +5203,7 @@
   "1712269": {
     "ligado": true,
     "update": "2026-08-22",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Agarre & Use Varejo",
     "canalPlanilha": "Vesti"
   },
@@ -6414,7 +6414,7 @@
   "2061322": {
     "ligado": true,
     "update": "2026-08-22",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "MMK Confecções",
     "canalPlanilha": "Uemtel"
   },
@@ -6524,7 +6524,7 @@
     "canalPlanilha": "Vesti"
   },
   "844604": {
-    "ligado": false,
+    "ligado": true,
     "update": "2026-08-22",
     "religamentoReal": false,
     "nomePlanilha": "Ajo Brand",
@@ -6539,7 +6539,7 @@
   },
   "187178": {
     "ligado": true,
-    "update": "2026-07-22",
+    "update": "2026-08-22",
     "religamentoReal": false,
     "nomePlanilha": "Cappuccino",
     "canalPlanilha": "Attasoft"
@@ -6553,7 +6553,7 @@
   },
   "1467676": {
     "ligado": true,
-    "update": "2026-07-22",
+    "update": "2026-08-22",
     "religamentoReal": false,
     "nomePlanilha": "KVG Oficial",
     "canalPlanilha": "Tizeefy"
@@ -6567,7 +6567,7 @@
   },
   "1133874": {
     "ligado": true,
-    "update": "2026-07-22",
+    "update": "2026-08-22",
     "religamentoReal": false,
     "nomePlanilha": "Aldemira Da Silva",
     "canalPlanilha": "Varejo Vesti"
@@ -6581,7 +6581,7 @@
   },
   "1347965": {
     "ligado": true,
-    "update": "2026-07-22",
+    "update": "2026-08-22",
     "religamentoReal": false,
     "nomePlanilha": "Wish Brand",
     "canalPlanilha": "Vesti"
@@ -7113,7 +7113,7 @@
   },
   "2025163": {
     "ligado": true,
-    "update": "2026-08-03",
+    "update": "2026-08-22",
     "religamentoReal": false,
     "nomePlanilha": "Artesanal",
     "canalPlanilha": "Starter"
@@ -7329,11 +7329,11 @@
     "canalPlanilha": "Attasoft"
   },
   "2090422": {
-    "ligado": true,
-    "update": "2026-08-06",
+    "ligado": false,
+    "update": "2026-08-23",
     "religamentoReal": false,
-    "nomePlanilha": "",
-    "canalPlanilha": ""
+    "nomePlanilha": "Lumi",
+    "canalPlanilha": "Starter"
   },
   "1140146": {
     "ligado": true,
@@ -7537,5 +7537,12 @@
     "religamentoReal": false,
     "nomePlanilha": "Emilie Plus Size",
     "canalPlanilha": "Uemtel"
+  },
+  "2132423": {
+    "ligado": true,
+    "update": "2026-08-22",
+    "religamentoReal": false,
+    "nomePlanilha": "Cappuccino",
+    "canalPlanilha": "Attasoft"
   }
 }
