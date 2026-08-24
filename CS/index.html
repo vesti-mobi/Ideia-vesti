@@ -292,6 +292,18 @@ td.strong{font-weight:600}
 .cell-main{display:block;line-height:1.25}
 .cell-sub{display:block;font-size:11.5px;color:var(--ink-3);margin-top:2px}
 
+/* Racional do risco de churn: um critério por linha, com um tracinho na frente.
+   Coluna larga o suficiente para a frase não quebrar no meio do número de dias. */
+.motivos{display:flex;flex-direction:column;gap:2px;min-width:20ch;max-width:34ch}
+.motivos span{
+  font-size:11.5px;line-height:1.35;color:var(--ink-2);
+  padding-left:9px;position:relative;
+}
+.motivos span::before{
+  content:'';position:absolute;left:0;top:.62em;
+  width:4px;height:1px;background:var(--ink-3);
+}
+
 .pill{display:inline-flex;align-items:center;gap:6px;border-radius:100px;padding:3px 9px;font-size:11.5px;font-weight:500;border:1px solid transparent}
 .pill i{width:5px;height:5px;border-radius:50%;display:block}
 .pill.ok{background:var(--brand-soft);color:#0F4340;border-color:#D2E3DE}
@@ -551,12 +563,17 @@ const MOCK = (function buildMock(){
   const clientes = nomes.map(([nome,integracao,plano],i)=>{
     const inativo = i===8 || i===10;
     const semAcesso = inativo?int(34,80):int(0,12);
+    /* guardado como número porque o racional do risco precisa dos DIAS, e
+       `diasDe` ainda não pode ser chamado aqui: ela usa o `hoje`, que só é
+       declarado mais abaixo no arquivo. */
+    const semPedido = inativo?int(30,70):int(0,6);
     return {
       nome, cs: CS_TIME[i%CS_TIME.length],
       status: inativo?'inativo':'ativo', integracao, plano,
       dataCadastro: dia(int(120, 3200)),   // de ~4 meses a ~9 anos de casa
       ultimoAcesso: dia(semAcesso),
-      ultimoPedido: dia(inativo?int(30,70):int(0,6)),
+      ultimoPedido: dia(semPedido),
+      _semPedido: semPedido,
       vencimento: '2026-09-'+String(int(1,28)).padStart(2,'0'),
       riscoChurn: 'Baixo',   // recalculado abaixo, depois de definir quem cancelou
       dataChurn: null,
@@ -634,9 +651,24 @@ const MOCK = (function buildMock(){
 
   /* risco só faz sentido para quem ainda está na base */
   clientes.forEach(c=>{
-    if(c.dataChurn){ c.riscoChurn = null; return }
+    /* Inadimplência é fato, então vale inclusive para quem cancelou — igual ao
+       dado real. Só o risco é que fica null para quem já saiu. */
+    const venc = r()<0.13 ? int(1,3) : 0;
+    c.faturasVencidas = venc;
+    c.diasAtraso = venc ? int(1,90) : null;
+    c.valorEmAberto = venc ? int(300,4500) : 0;
+    c.vencMaisAntigo = venc ? dia(c.diasAtraso) : null;
+    c.inadimplente = venc>0 && c.diasAtraso>=10;
+    c.diasSemPedido = c._semPedido;
+
+    if(c.dataChurn){ c.riscoChurn = null; c.motivosRisco = []; return }
     const d = c._semAcesso;
-    c.riscoChurn = d>30 ? 'Alto' : d>12 ? 'Médio' : (r()<0.25?'Alto':r()<0.55?'Médio':'Baixo');
+    c.riscoChurn = (c.inadimplente || d>30) ? 'Alto' : d>12 ? 'Médio' : (r()<0.25?'Alto':r()<0.55?'Médio':'Baixo');
+    c.motivosRisco = [
+      c.diasSemPedido>15 ? 'sem pedido há '+c.diasSemPedido+' dias' : null,
+      venc ? venc+(venc>1?' faturas vencidas':' fatura vencida')+' há '+c.diasAtraso+' dias' : null,
+      d>30 ? 'sem acesso há '+d+' dias' : null,
+    ].filter(Boolean);
   });
 
   const porCliente=(arr,k)=>{const m={};arr.forEach(x=>{m[x.cliente]=(m[x.cliente]||0)+x[k]});return m};
@@ -677,10 +709,10 @@ const MOCK = (function buildMock(){
              valor: resultado==='Fechou negócio' ? int(400,4000) : 0 };
   }).sort((a,b)=>b.data.localeCompare(a.data));
 
-  clientes.forEach(c=>{ delete c._plano; delete c._inativo; delete c._semAcesso });
+  clientes.forEach(c=>{ delete c._plano; delete c._inativo; delete c._semAcesso; delete c._semPedido });
 
   return {
-    meta:{ ano:ANO, semanaAtual:SEMANA_ATUAL, cs:CS_TIME },
+    meta:{ ano:ANO, semanaAtual:SEMANA_ATUAL, cs:CS_TIME, diasChurn:45, diasInadimplencia:10 },
     clientes, clientesSeries, negocios,
     oraculo:{ tabela:oraculoTab, series:oraculoSeries },
     tino:{ tabela:tinoTab, series:tinoSeries },
@@ -868,27 +900,45 @@ function agregarPorCliente(series, campos, derivar){
   return out;
 }
 
-/* Churn: cancelados no período + (opcional) clientes ativos em risco. */
+/* Churn: cancelados + inadimplentes + clientes ativos em risco.
+   Uma marca só aparece uma vez, na situação mais grave que couber nela:
+   Cancelado > Inadimplente > Em risco. Sem essa prioridade a mesma marca sairia
+   duas vezes em "Todos" (quem está inadimplente costuma estar em risco também)
+   e a contagem do topo deixaria de bater com a tabela. */
+function situacaoDe(c){
+  if(c.dataChurn) return 'Cancelado';
+  if(c.inadimplente) return 'Inadimplente';
+  return 'Em risco';
+}
+
 function linhasChurn(){
   const sit = estado.filtros.situacao;
-  const out = [];
-  DATA.clientes.forEach(c=>{
-    if(c.dataChurn){
-      out.push({cliente:c.nome, dominio:c.dominio, cs:c.cs, plano:c.plano, data:c.dataChurn,
-                riscoChurn:c.riscoChurn, situacao:'Cancelado'});
-    } else {
-      out.push({cliente:c.nome, dominio:c.dominio, cs:c.cs, plano:c.plano, data:null,
-                riscoChurn:c.riscoChurn, situacao:'Em risco'});
-    }
-  });
-  const filtrado = sit==='Cancelado' ? out.filter(x=>x.situacao==='Cancelado')
-                 : sit==='Em risco'  ? out.filter(x=>x.situacao==='Em risco' && x.riscoChurn!=='Baixo')
+  const out = DATA.clientes.map(c=>({
+    cliente:c.nome, dominio:c.dominio, cs:c.cs, plano:c.plano,
+    data:c.dataChurn||null, riscoChurn:c.riscoChurn, situacao:situacaoDe(c),
+    /* o racional, em coluna — é o que responde "risco baseado em quê?" */
+    motivosRisco:c.motivosRisco||[], diasSemPedido:c.diasSemPedido??null,
+    ultimoPedido:c.ultimoPedido||null,
+    faturasVencidas:c.faturasVencidas||0, valorEmAberto:c.valorEmAberto||0,
+    diasAtraso:c.diasAtraso??null, vencMaisAntigo:c.vencMaisAntigo||null,
+  }));
+  const filtrado = sit==='Cancelado'    ? out.filter(x=>x.situacao==='Cancelado')
+                 : sit==='Inadimplente' ? out.filter(x=>x.situacao==='Inadimplente')
+                 /* "Em risco" esconde quem está Baixo: a lista existe para
+                    virar trabalho da CS, e risco baixo não vira ligação. */
+                 : sit==='Em risco'     ? out.filter(x=>x.situacao==='Em risco' && x.riscoChurn!=='Baixo')
                  : out;
   const ordemRisco = {Alto:0, 'Médio':1, Baixo:2};
   return filtrado.sort((a,b)=>{
+    /* cancelado primeiro (mais recente no topo), depois inadimplente pelo
+       maior atraso, depois o resto pelo risco. */
     if(a.data && b.data) return b.data.localeCompare(a.data);
     if(a.data) return -1;
     if(b.data) return 1;
+    const ia = a.situacao==='Inadimplente', ib = b.situacao==='Inadimplente';
+    if(ia && ib) return (b.diasAtraso||0)-(a.diasAtraso||0);
+    if(ia) return -1;
+    if(ib) return 1;
     return (ordemRisco[a.riscoChurn]??9)-(ordemRisco[b.riscoChurn]??9);
   });
 }
@@ -1092,7 +1142,16 @@ const TABS = [
   {
     id:'churn', grupo:'Carteira', nav:'Churn', cor:'#C0453B', cor2:'#7B8595',
     titulo:'Churn',
-    desc:'Cancelamentos e o risco de quem ainda está na base. Churn é derivado do Iugu: sem fatura paga há mais de 45 dias e sem fatura futura em aberto.',
+    desc:'Três situações na mesma tabela, pelo filtro <b>Situação</b>. '
+      + '<b>Cancelado</b> vem do Iugu — sem fatura paga há mais de 45 dias <i>e</i> sem fatura futura em aberto; '
+      + 'não existe cancelamento formalizado no HubSpot chegando ao painel. '
+      + '<b>Inadimplente</b> = fatura do Iugu vencida há mais de 10 dias e não paga (fatura cancelada e estornada '
+      + 'ficam de fora — essas não são dívida do lojista); os dias contam do vencimento <i>mais antigo</i> em aberto. '
+      + '<b>Risco de churn</b> é regra fixa, não modelo: <b>Alto</b> se nunca vendeu, ou está sem pedido há +45 dias, '
+      + 'ou sem fatura paga há +45 dias, ou inadimplente; <b>Médio</b> se está sem pedido há +15 dias, ou sem nenhuma '
+      + 'fatura futura em aberto, ou com fatura vencida ainda dentro da régua dos 10 dias; <b>Baixo</b> se nada disso '
+      + 'bate. A coluna <b>Por que</b> mostra o que disparou em cada marca, e as colunas ao lado trazem os números '
+      + 'crus. Quem já cancelou fica sem risco: medir risco de quem já saiu não diz nada.',
     filtros:['cliente','cs','canal','periodo','situacao'],
     tabela:'Clientes', chaveCliente:'cliente',
     colunas:[
@@ -1100,8 +1159,15 @@ const TABS = [
       {k:'dominio', l:'Domínio', tipo:'dominio'},
       COL_CS,
       {k:'plano', l:'Plano', tipo:'tag'},
+      {k:'situacao', l:'Situação', tipo:'situacaoChurn'},
       {k:'data', l:'Data do churn', tipo:'date'},
       {k:'riscoChurn', l:'Risco de churn', tipo:'risco'},
+      /* O racional pedido pela Laura: a etiqueta Alto/Médio/Baixo sozinha não
+         diz em cima de quê, então cada critério que disparou vira uma frase. */
+      {k:'motivosRisco', l:'Por que', tipo:'motivos'},
+      {k:'diasSemPedido', l:'Sem pedido há', tipo:'diasPedido', r:true},
+      {k:'faturasVencidas', l:'Faturas vencidas', tipo:'vencidas', r:true},
+      {k:'valorEmAberto', l:'Valor em aberto', tipo:'money', r:true, forte:true},
       {k:'_sem', l:'Semana', tipo:'semana', r:true},
     ],
     linhas:()=>linhasChurn(),
@@ -1122,12 +1188,19 @@ const TABS = [
         ];
       }},
     ],
-    kpis:(rows,serie)=>[
-      {l:'Cancelamentos', v:fmt.int(soma(serie,'churns')), s:'no período'},
-      {l:'Em risco alto', v:fmt.int(DATA.clientes.filter(c=>!c.dataChurn&&c.riscoChurn==='Alto').length), s:'clientes ativos hoje'},
-      {l:'Semanas sem churn', v:fmt.int(serie.filter(x=>!x.churns).length), s:`de ${serie.length} semanas`},
-      {l:'Pior semana', v:piorSemana(serie), s:'maior número de saídas'},
-    ]
+    /* Os KPIs de inadimplência olham a BASE inteira, não as linhas filtradas:
+       são uma foto de hoje, como o risco. Se seguissem o filtro de Situação,
+       o número de inadimplentes zeraria justamente na visão de cancelados. */
+    kpis:(rows,serie)=>{
+      const inad = DATA.clientes.filter(c=>!c.dataChurn && c.inadimplente);
+      const emAberto = inad.reduce((s,c)=>s+(c.valorEmAberto||0),0);
+      return [
+        {l:'Cancelamentos', v:fmt.int(soma(serie,'churns')), s:'no período'},
+        {l:'Inadimplentes', v:fmt.int(inad.length), s:`vencido há +${DATA.meta.diasInadimplencia||10} dias`},
+        {l:'Valor em aberto', v:fmt.moneyCompact(emAberto), s:'faturas vencidas não pagas'},
+        {l:'Em risco alto', v:fmt.int(DATA.clientes.filter(c=>!c.dataChurn&&c.riscoChurn==='Alto').length), s:'clientes ativos hoje'},
+      ];
+    }
   },
   {
     id:'reunioes', grupo:'Operação', nav:'Reuniões', cor:'#B54A72', cor2:'#1E74C8',
@@ -1412,7 +1485,13 @@ function renderPagina(){
   const page = $('#page'); page.innerHTML='';
 
   const head = el('div',{class:'page-head'});
-  head.innerHTML = `<div><span class="eyebrow">${t.grupo}</span><h1>${t.titulo}</h1></div>`;
+  /* O `desc` de cada aba já existia no código desde o começo, documentando de
+     onde vem cada número — só nunca tinha sido desenhado (o CSS de .page-head p
+     estava lá, sem ninguém para usar). É o disclaimer da aba: fica embaixo do
+     título, antes dos filtros, para quem abre a tela ler a régua antes de
+     interpretar a tabela. */
+  head.innerHTML = `<div><span class="eyebrow">${t.grupo}</span><h1>${t.titulo}</h1>`
+    + (t.desc ? `<p>${t.desc}</p>` : '') + `</div>`;
   page.appendChild(head);
 
   page.appendChild(renderFiltros(t));
@@ -1497,7 +1576,8 @@ function renderFiltros(t){
       estado.filtros.resultadoReuniao, v=>estado.filtros.resultadoReuniao=v));
   }
   if(t.filtros.includes('situacao')){
-    add('Situação', sel([['Cancelado','Cancelados'],['Em risco','Em risco (ativos)'],['todos','Todos']],
+    add('Situação', sel([['Cancelado','Cancelados'],['Inadimplente','Inadimplentes'],
+      ['Em risco','Em risco (ativos)'],['todos','Todos']],
       estado.filtros.situacao, v=>estado.filtros.situacao=v));
   }
   if(t.filtros.includes('statusTicket')){
@@ -1721,10 +1801,17 @@ function desenharCategorias(host, cats){
              font-size="12.5" fill="var(--ink-2)">${c.l}</text>`;
       s += `<rect x="${P.l}" y="${y+4}" width="${iw}" height="20" rx="4" fill="var(--line-2)"/>`;
       s += `<rect x="${P.l}" y="${y+4}" width="${w}" height="20" rx="4" fill="${c.cor}"/>`;
-      s += `<text x="${P.l+w+8}" y="${y+19}" font-family="IBM Plex Mono, monospace" font-size="12"
-             fill="var(--ink)">${fmt.int(c.v)}</text>`;
-      s += `<text x="${P.l+w+8}" y="${y+33}" font-family="IBM Plex Mono, monospace" font-size="10"
-             fill="var(--ink-3)">${pct}%</text>`;
+      /* A barra da maior categoria ocupa a faixa inteira, e aí o rótulo à
+         direita dela caía fora do card — era sempre o número mais importante
+         que sumia. Quando não cabe do lado de fora, ele entra na barra,
+         encostado na ponta e em branco. */
+      const cabeFora = P.l + w + 8 + 46 <= W - P.r;
+      const tx = cabeFora ? P.l + w + 8 : P.l + w - 8;
+      const anc = cabeFora ? 'start' : 'end';
+      s += `<text x="${tx}" y="${y+19}" text-anchor="${anc}" font-family="IBM Plex Mono, monospace" font-size="12"
+             fill="${cabeFora?'var(--ink)':'#fff'}">${fmt.int(c.v)}</text>`;
+      s += `<text x="${tx}" y="${y+33}" text-anchor="${anc}" font-family="IBM Plex Mono, monospace" font-size="10"
+             fill="${cabeFora?'var(--ink-3)':'var(--ink-3)'}">${pct}%</text>`;
     });
     s += `<text x="${P.l}" y="${H-4}" font-family="IBM Plex Mono, monospace" font-size="10"
            fill="var(--ink-3)">${fmt.int(total)} marcas ativas na visão</text>`;
@@ -1887,7 +1974,36 @@ function celula(r,c){
         : '<span class="pill open"><i></i>Em aberto</span>'; break;
     case 'risco': {
       const cls = v==='Alto'?'bad':v==='Médio'?'warn':'ok';
-      td.innerHTML = v?`<span class="pill ${cls}"><i></i>${v}</span>`:'—'; break }
+      td.innerHTML = v?`<span class="pill ${cls}"><i></i>${v}</span>`
+        : '<span class="pill off"><i></i>—</span><span class="cell-sub">já cancelou</span>'; break }
+    case 'situacaoChurn': {
+      const cls = v==='Cancelado'?'bad':v==='Inadimplente'?'warn':'open';
+      td.innerHTML = `<span class="pill ${cls}"><i></i>${v}</span>`; break }
+    /* O racional do risco. Cada critério que disparou é uma linha própria —
+       empilhado lê melhor que uma frase corrida, e é o que a CS vai bater o
+       olho antes de ligar para a marca. */
+    case 'motivos': {
+      const lista = Array.isArray(v) ? v : (v?[v]:[]);
+      td.innerHTML = lista.length
+        ? `<span class="motivos">${lista.map(m=>`<span>${m}</span>`).join('')}</span>`
+        : '<span class="cell-sub">nenhum sinal de risco</span>';
+      break }
+    /* Dias sem pedido com a data embaixo: o número é o que ordena, a data é o
+       que a CS confere. "nunca vendeu" é caso à parte — não é dia nenhum. */
+    case 'diasPedido': {
+      if(v==null){ td.innerHTML = '<span class="pill bad"><i></i>nunca vendeu</span>'; break }
+      const cls = v>45?'bad':v>15?'warn':'ok';
+      td.innerHTML = `<span class="health ${cls}"><i></i>${fmt.int(v)} d</span>`
+        + (r.ultimoPedido?`<span class="cell-sub">${fmt.date(r.ultimoPedido)}</span>`:''); break }
+    /* Faturas vencidas com os dias de atraso embaixo — é o atraso que decide
+       se a marca é inadimplente, então ele precisa estar visível mesmo quando
+       está abaixo da régua (fatura de 8 dias aparece, sem virar inadimplente). */
+    case 'vencidas': {
+      if(!v){ td.innerHTML = '<span class="cell-sub">—</span>'; break }
+      const lim = DATA.meta.diasInadimplencia||10;
+      const cls = (r.diasAtraso||0)>=lim?'bad':'warn';
+      td.innerHTML = `<span class="health ${cls}"><i></i>${fmt.int(v)}</span>`
+        + `<span class="cell-sub">${r.diasAtraso==null?'':'atraso de '+r.diasAtraso+' d'}</span>`; break }
     case 'tag': {
       if(v==null || v===''){ td.textContent = '—'; break }   // origem e categoria podem faltar
       const cls = c.k==='plano' ? ' t-'+String(v).replace(/\s+/g,'') : '';
@@ -1982,6 +2098,10 @@ function exportarCSV(){
     let v = r[c.k];
     if(c.tipo==='semana'){ const s=semanaDoAno(r.data); v = s?fmt.wk(s):'' }
     if(c.tipo==='clienteNegocio') v = `${r.cliente} — ${r.negocio||''}`;
+    /* O racional é uma lista; sem isso o CSV sairia com os critérios colados
+       por vírgula e ninguém entenderia onde um termina e o outro começa. */
+    if(Array.isArray(v)) v = v.join(' · ');
+    if(c.tipo==='diasPedido') v = v==null ? 'nunca vendeu' : v;
     return String(v==null?'':v).replace(/;/g,',');
   }).join(';')));
   const blob = new Blob(['\ufeff'+linhas.join('\n')],{type:'text/csv;charset=utf-8'});
