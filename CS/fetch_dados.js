@@ -55,6 +55,20 @@ const DOMINIOS_EXTRA = [
 /* Churn: marca sem fatura paga há mais de N dias e sem fatura futura em aberto. */
 const DIAS_CHURN = 45;
 
+/* Inadimplência: marca com fatura do Iugu vencida há mais de N dias e ainda não
+   paga. A régua é 10 dias por decisão da Laura (24/08/2026): abaixo disso a
+   maioria é só a fatura sentada uns dias — no dia da medição, 62 das 124 marcas
+   com algo vencido estavam entre 1 e 5 dias, e chamar isso de inadimplente
+   encheria a aba de quem já ia pagar. Os dias de atraso vão numa coluna, então
+   quem quiser conferir o caso limítrofe consegue. */
+const DIAS_INADIMPLENCIA = 10;
+
+/* Status do Iugu que contam como fatura em aberto. 'pending' é o normal;
+   os outros três são fatura que também não entrou (venceu de vez, entrou
+   parcial, está em contestação). 'canceled' e 'refunded' ficam de fora
+   de propósito: essas a Vesti não vai receber e não são dívida do lojista. */
+const STATUS_EM_ABERTO = "'pending','expired','partially_paid','in_protest'";
+
 /* Anjos que não são mais CS da carteira. As marcas deles passam a "Sem CS" —
    assim a coluna e o filtro contam a mesma história. */
 const ANJOS_FORA = ['Shirley Silva', 'Priscila Argolo'];
@@ -362,6 +376,17 @@ async function puxarBQ() {
     SELECT REGEXP_REPLACE(cnpj,'[^0-9]','') cnpj, ANY_VALUE(payer) payer,
            MIN(IF(status='pending' AND due >= CAST(CURRENT_DATE() AS STRING), due, NULL)) proximo_venc,
            MAX(IF(status IN ('paid','externally_paid'), due, NULL)) ultima_paga,
+           /* Inadimplência. A consulta só olhava fatura PAGA e pendente com
+              vencimento FUTURO — a vencida era invisível, e era justamente ela
+              que faltava na aba Churn. O vencimento mais antigo é o que vira
+              "dias de atraso": é por ele que se mede há quanto tempo a marca
+              está devendo, não pela fatura mais recente. */
+           COUNTIF(status IN (${STATUS_EM_ABERTO})
+                   AND due < CAST(CURRENT_DATE() AS STRING)) faturas_vencidas,
+           ROUND(SUM(IF(status IN (${STATUS_EM_ABERTO})
+                        AND due < CAST(CURRENT_DATE() AS STRING), cents, 0))/100, 2) valor_vencido,
+           MIN(IF(status IN (${STATUS_EM_ABERTO})
+                  AND due < CAST(CURRENT_DATE() AS STRING), due, NULL)) venc_mais_antigo,
            ARRAY_AGG(IF(status IN ('paid','externally_paid') AND plano IS NOT NULL,
                         STRUCT(due, cents, plano), NULL)
                      IGNORE NULLS ORDER BY due DESC LIMIT 1)[SAFE_OFFSET(0)] ultima
@@ -1064,18 +1089,50 @@ function montar(bqd, hsd, tinoDados) {
   const hojeIso = HOJE.toISOString().slice(0, 10);
   const limiteChurn = new Date(HOJE.getTime() - DIAS_CHURN * 864e5).toISOString().slice(0, 10);
 
+  /* ---- inadimplência (Iugu)
+     Devolve os números crus para o painel: quantas faturas venceram sem pagar,
+     quanto está em aberto e há quantos dias vence a mais antiga. "Inadimplente"
+     é só o atraso passar de DIAS_INADIMPLENCIA — mas os dias vão junto, para a
+     coluna mostrar o caso de 8 dias sem precisar dizer que ele é inadimplente. */
+  function avaliarFatura(fat) {
+    const n = fat ? num(fat.faturas_vencidas) : 0;
+    if (!n) return { faturasVencidas: 0, valorEmAberto: 0, vencMaisAntigo: null, diasAtraso: null, inadimplente: false };
+    const venc = fat.venc_mais_antigo || null;
+    const diasAtraso = venc ? Math.round((HOJE - new Date(venc)) / 864e5) : null;
+    return {
+      faturasVencidas: n,
+      valorEmAberto: num(fat.valor_vencido),
+      vencMaisAntigo: venc,
+      diasAtraso,
+      inadimplente: diasAtraso != null && diasAtraso >= DIAS_INADIMPLENCIA,
+    };
+  }
+
   // ---- risco de churn (regra explícita, sem caixa-preta)
-  function avaliarRisco(m, ultimoPed, fat) {
+  /* Cada critério que dispara vira uma frase em `motivos`, e é ela que aparece
+     na coluna "Por que" da aba Churn. Regra: se algum critério GRAVE bate, o
+     risco é Alto; senão, qualquer critério MÉDIO deixa Médio; sem nenhum, Baixo. */
+  function avaliarRisco(m, ultimoPed, fat, inad) {
     const motivos = [];
     const diasPed = ultimoPed ? Math.round((HOJE - new Date(ultimoPed)) / 864e5) : null;
     if (diasPed == null) motivos.push('nunca vendeu');
-    else if (diasPed > 45) motivos.push('sem pedido há ' + diasPed + ' dias');
     else if (diasPed > 15) motivos.push('sem pedido há ' + diasPed + ' dias');
     if (fat && fat.ultima_paga && fat.ultima_paga < limiteChurn) motivos.push('sem fatura paga desde ' + fat.ultima_paga);
     if (fat && !fat.proximo_venc) motivos.push('sem fatura futura em aberto');
-    const grave = (diasPed == null || diasPed > 45) || (fat && fat.ultima_paga && fat.ultima_paga < limiteChurn);
-    const medio = (diasPed != null && diasPed > 15) || (fat && !fat.proximo_venc);
-    return { risco: grave ? 'Alto' : medio ? 'Médio' : 'Baixo', motivos };
+    /* Inadimplência entra como critério de risco, não só como coluna: marca
+       devendo há mais de DIAS_INADIMPLENCIA dias é candidata a churn mesmo
+       vendendo bem. Abaixo da régua ainda conta, mas só como sinal médio. */
+    if (inad.faturasVencidas) {
+      motivos.push(inad.faturasVencidas + (inad.faturasVencidas > 1 ? ' faturas vencidas' : ' fatura vencida')
+        + ' há ' + inad.diasAtraso + ' dias (' + fmtBR(inad.valorEmAberto) + ')');
+    }
+    const grave = (diasPed == null || diasPed > 45)
+      || (fat && fat.ultima_paga && fat.ultima_paga < limiteChurn)
+      || inad.inadimplente;
+    const medio = (diasPed != null && diasPed > 15)
+      || (fat && !fat.proximo_venc)
+      || inad.faturasVencidas > 0;
+    return { risco: grave ? 'Alto' : medio ? 'Médio' : 'Baixo', motivos, diasSemPedido: diasPed };
   }
 
   const clientes = [];
@@ -1088,7 +1145,13 @@ function montar(bqd, hsd, tinoDados) {
       const d = new Date(new Date(fat.ultima_paga).getTime() + DIAS_CHURN * 864e5).toISOString().slice(0, 10);
       dataChurn = d <= hojeIso ? d : null;
     }
-    const av = dataChurn ? { risco: null, motivos: [] } : avaliarRisco(m, ultimoPed, fat);
+    /* A inadimplência é medida para TODA marca, inclusive a que já cancelou:
+       fatura vencida é fato, não avaliação. O risco é que continua sem sentido
+       para quem já saiu — por isso ele fica null e os motivos, vazios. */
+    const inad = avaliarFatura(fat);
+    const av = dataChurn
+      ? { risco: null, motivos: [], diasSemPedido: ultimoPed ? Math.round((HOJE - new Date(ultimoPed)) / 864e5) : null }
+      : avaliarRisco(m, ultimoPed, fat, inad);
     clientes.push({
       nome: m.nome, dominio: m.dom, cs: m.cs,
       status: dataChurn ? 'inativo' : (ultimoPed && ultimoPed >= limiteChurn ? 'ativo' : 'inativo'),
@@ -1102,6 +1165,14 @@ function montar(bqd, hsd, tinoDados) {
       vencimento: fat ? fat.proximo_venc : null,
       riscoChurn: av.risco,
       motivosRisco: av.motivos,
+      /* Os números por trás do risco, cada um em campo próprio: a aba Churn
+         mostra o racional em coluna, não só a etiqueta Alto/Médio/Baixo. */
+      diasSemPedido: av.diasSemPedido,
+      faturasVencidas: inad.faturasVencidas,
+      valorEmAberto: inad.valorEmAberto,
+      vencMaisAntigo: inad.vencMaisAntigo,
+      diasAtraso: inad.diasAtraso,
+      inadimplente: inad.inadimplente,
       dataChurn,
       /* Produtos contratados. Oráculo vem do próprio produto (tem atendimento
          registrado); Tino é preenchido logo abaixo, depois que a lista de marcas
@@ -1357,6 +1428,7 @@ function montar(bqd, hsd, tinoDados) {
       geradoEm: new Date().toISOString(),
       fatorAntecipacaoVesti: FATOR_ANTECIPACAO_VESTI,
       diasChurn: DIAS_CHURN,
+      diasInadimplencia: DIAS_INADIMPLENCIA,
       tetoPedido: TETO_PEDIDO,
       avisos: {
         ultimoAcesso: 'Sem fonte: não existe coluna de login/sessão do lojista no vestilake_BI.',
@@ -1405,7 +1477,20 @@ function montar(bqd, hsd, tinoDados) {
                + 'empresa associada ao ticket; quando essa empresa não casa com nenhuma marca do '
                + 'cadastro, o ticket fica sem canal (mas continua na lista). O período filtra pela '
                + 'data de abertura.',
-        churn: 'Derivado do Iugu: sem fatura paga há mais de ' + DIAS_CHURN + ' dias e sem fatura futura em aberto.',
+        churn: 'Derivado do Iugu: sem fatura paga há mais de ' + DIAS_CHURN + ' dias e sem fatura futura em aberto. '
+             + 'NÃO vem de cancelamento formalizado no HubSpot — não existe pipeline de cancelamento chegando ao painel.',
+        inadimplencia: 'Inadimplente = marca com fatura do Iugu vencida há mais de ' + DIAS_INADIMPLENCIA
+             + ' dias e ainda não paga (status ' + STATUS_EM_ABERTO.replace(/'/g, '') + '). Fatura cancelada e '
+             + 'estornada ficam de fora: essas a Vesti não vai receber e não são dívida do lojista. Os dias de '
+             + 'atraso contam do vencimento MAIS ANTIGO em aberto, não do mais recente. A régua de '
+             + DIAS_INADIMPLENCIA + ' dias foi decidida em 24/08/2026 para não encher a lista de fatura que '
+             + 'venceu ontem — a coluna mostra os dias, então o caso limítrofe continua visível.',
+        risco: 'Risco de churn é regra fixa, não modelo. ALTO quando bate qualquer um: nunca vendeu, sem pedido '
+             + 'há mais de 45 dias, sem fatura paga há mais de ' + DIAS_CHURN + ' dias, ou inadimplente (fatura '
+             + 'vencida há mais de ' + DIAS_INADIMPLENCIA + ' dias). MÉDIO quando bate qualquer um: sem pedido há '
+             + 'mais de 15 dias, sem nenhuma fatura futura em aberto, ou com fatura vencida ainda dentro da régua. '
+             + 'BAIXO quando não bate nenhum. Quem já cancelou fica sem risco — medir risco de quem já saiu não '
+             + 'diz nada. O que disparou em cada marca vai na coluna "Por que".',
         negocios: 'Pipeline "Expand (Upgrades)" do HubSpot. Cross-sell x upsell classificado pelo nome do negócio '
                 + '(sem escopo de line items na API). Fechado = somente estágio "Ganho (Expand)".',
       },
