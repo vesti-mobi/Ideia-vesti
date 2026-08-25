@@ -1,6 +1,6 @@
 window.DADOS = {
-  "gerado_em": "2026-08-24T21:20:10.970Z",
-  "hoje": "2026-08-24",
+  "gerado_em": "2026-08-25T12:28:22.018Z",
+  "hoje": "2026-08-25",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
   "auto_publica_desde": "2026-08-10",
@@ -20,7 +20,7 @@ window.DADOS = {
     "contas": 9,
     "produtos_total": 293,
     "produtos_7d": 63,
-    "descricoes_total": 373,
+    "descricoes_total": 382,
     "total_estimado": true
   },
   "marcas": [
@@ -58,7 +58,7 @@ window.DADOS = {
       "envios": 46,
       "primeiro": "2026-07-28T18:41:18.639Z",
       "ultimo": "2026-08-21T01:32:24.963Z",
-      "dias": 3
+      "dias": 4
     },
     {
       "slug": "petit",
@@ -112,7 +112,7 @@ window.DADOS = {
       "envios": 12,
       "primeiro": "2026-08-10T16:01:03.796Z",
       "ultimo": "2026-08-20T11:06:21.271Z",
-      "dias": 4
+      "dias": 5
     },
     {
       "slug": "monnika-marikinha",
@@ -130,7 +130,7 @@ window.DADOS = {
       "envios": 5,
       "primeiro": "2026-08-06T14:16:43.085Z",
       "ultimo": "2026-08-21T01:34:35.135Z",
-      "dias": 3
+      "dias": 4
     },
     {
       "slug": "optimist-jeans",
@@ -286,12 +286,12 @@ window.DADOS = {
       "estimado": false,
       "produtos_7d": 0,
       "ativa": false,
-      "acessos": 12,
-      "buscas": 42,
-      "descricoes": 40,
+      "acessos": 13,
+      "buscas": 51,
+      "descricoes": 49,
       "envios": 0,
       "primeiro": "2026-08-04T14:28:52.117Z",
-      "ultimo": "2026-08-24T16:45:07.450Z",
+      "ultimo": "2026-08-25T12:13:56.679Z",
       "dias": 0
     },
     {
@@ -499,7 +499,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-21T01:32:04.730Z",
           "ultimo": "2026-08-21T01:32:24.963Z",
-          "dias": 3,
+          "dias": 4,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -519,7 +519,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-21T01:34:17.651Z",
           "ultimo": "2026-08-21T01:34:35.135Z",
-          "dias": 3,
+          "dias": 4,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -539,7 +539,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-13T17:14:37.157Z",
           "ultimo": "2026-08-20T11:06:21.271Z",
-          "dias": 4,
+          "dias": 5,
           "produtos_medidos": 3,
           "atribuido": 0
         },
@@ -913,7 +913,7 @@ window.DADOS = {
         "contas": 9,
         "produtos_total": 203,
         "produtos_7d": 11,
-        "descricoes_total": 44,
+        "descricoes_total": 53,
         "total_estimado": true,
         "produtos_atribuidos": 191
       },
@@ -994,7 +994,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T12:06:46.387Z",
           "ultimo": "2026-08-20T02:30:36.116Z",
-          "dias": 4,
+          "dias": 5,
           "produtos_medidos": 0,
           "atribuido": 8
         },
@@ -1208,12 +1208,12 @@ window.DADOS = {
           "estimado": false,
           "produtos_7d": 0,
           "ativa": false,
-          "acessos": 4,
-          "buscas": 15,
-          "descricoes": 14,
+          "acessos": 5,
+          "buscas": 24,
+          "descricoes": 23,
           "envios": 0,
           "primeiro": "2026-08-14T11:49:43.332Z",
-          "ultimo": "2026-08-24T16:45:07.450Z",
+          "ultimo": "2026-08-25T12:13:56.679Z",
           "dias": 0,
           "produtos_medidos": 0,
           "atribuido": 0
