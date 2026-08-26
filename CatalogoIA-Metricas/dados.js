@@ -1,6 +1,6 @@
 window.DADOS = {
-  "gerado_em": "2026-08-25T21:18:57.609Z",
-  "hoje": "2026-08-25",
+  "gerado_em": "2026-08-26T12:30:52.226Z",
+  "hoje": "2026-08-26",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
   "auto_publica_desde": "2026-08-10",
@@ -19,7 +19,7 @@ window.DADOS = {
     "com_conta": 10,
     "contas": 9,
     "produtos_total": 294,
-    "produtos_7d": 64,
+    "produtos_7d": 57,
     "descricoes_total": 386,
     "total_estimado": true
   },
@@ -32,7 +32,7 @@ window.DADOS = {
       "email": "nicoboco.shop@nicoboco.com.br",
       "produtos": 129,
       "estimado": false,
-      "produtos_7d": 26,
+      "produtos_7d": 25,
       "ativa": true,
       "acessos": 61,
       "buscas": 321,
@@ -50,7 +50,7 @@ window.DADOS = {
       "email": "missmilliebr@gmail.com",
       "produtos": 65,
       "estimado": true,
-      "produtos_7d": 9,
+      "produtos_7d": 4,
       "ativa": true,
       "acessos": 6,
       "buscas": 37,
@@ -58,7 +58,7 @@ window.DADOS = {
       "envios": 46,
       "primeiro": "2026-07-28T18:41:18.639Z",
       "ultimo": "2026-08-21T01:32:24.963Z",
-      "dias": 4
+      "dias": 5
     },
     {
       "slug": "petit",
@@ -86,7 +86,7 @@ window.DADOS = {
       "email": "contato@operakids.com.br",
       "produtos": 38,
       "estimado": true,
-      "produtos_7d": 25,
+      "produtos_7d": 24,
       "ativa": true,
       "acessos": 64,
       "buscas": 81,
@@ -112,7 +112,7 @@ window.DADOS = {
       "envios": 12,
       "primeiro": "2026-08-10T16:01:03.796Z",
       "ultimo": "2026-08-20T11:06:21.271Z",
-      "dias": 5
+      "dias": 6
     },
     {
       "slug": "monnika-marikinha",
@@ -130,7 +130,7 @@ window.DADOS = {
       "envios": 5,
       "primeiro": "2026-08-06T14:16:43.085Z",
       "ultimo": "2026-08-21T01:34:35.135Z",
-      "dias": 4
+      "dias": 5
     },
     {
       "slug": "optimist-jeans",
@@ -437,7 +437,7 @@ window.DADOS = {
         "com_conta": 10,
         "contas": 9,
         "produtos_total": 176,
-        "produtos_7d": 57,
+        "produtos_7d": 56,
         "descricoes_total": 240,
         "total_estimado": true,
         "produtos_atribuidos": 15
@@ -451,7 +451,7 @@ window.DADOS = {
           "email": "nicoboco.shop@nicoboco.com.br",
           "produtos": 127,
           "estimado": false,
-          "produtos_7d": 26,
+          "produtos_7d": 25,
           "ativa": true,
           "acessos": 52,
           "buscas": 281,
@@ -499,7 +499,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-21T01:32:04.730Z",
           "ultimo": "2026-08-21T01:32:24.963Z",
-          "dias": 4,
+          "dias": 5,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -519,7 +519,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-21T01:34:17.651Z",
           "ultimo": "2026-08-21T01:34:35.135Z",
-          "dias": 4,
+          "dias": 5,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -539,7 +539,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-13T17:14:37.157Z",
           "ultimo": "2026-08-20T11:06:21.271Z",
-          "dias": 5,
+          "dias": 6,
           "produtos_medidos": 3,
           "atribuido": 0
         },
@@ -905,14 +905,14 @@ window.DADOS = {
       "prefixo": "app:manual:",
       "kpis": {
         "liberadas": 16,
-        "ativas": 2,
+        "ativas": 0,
         "usando": 9,
         "nunca_usaram": 7,
         "paradas": 0,
         "com_conta": 10,
         "contas": 9,
         "produtos_total": 204,
-        "produtos_7d": 11,
+        "produtos_7d": 1,
         "descricoes_total": 56,
         "total_estimado": true,
         "produtos_atribuidos": 192
@@ -946,8 +946,8 @@ window.DADOS = {
           "email": "missmilliebr@gmail.com",
           "produtos": 62,
           "estimado": true,
-          "produtos_7d": 9,
-          "ativa": true,
+          "produtos_7d": 0,
+          "ativa": false,
           "acessos": 2,
           "buscas": 10,
           "descricoes": 21,
@@ -994,7 +994,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T12:06:46.387Z",
           "ultimo": "2026-08-20T02:30:36.116Z",
-          "dias": 5,
+          "dias": 6,
           "produtos_medidos": 0,
           "atribuido": 8
         },
@@ -1046,8 +1046,8 @@ window.DADOS = {
           "email": "contato@operakids.com.br",
           "produtos": 2,
           "estimado": false,
-          "produtos_7d": 2,
-          "ativa": true,
+          "produtos_7d": 1,
+          "ativa": false,
           "acessos": 16,
           "buscas": 9,
           "descricoes": 9,
