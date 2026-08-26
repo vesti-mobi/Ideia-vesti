@@ -279,16 +279,30 @@ por medição pedido a pedido (ressalva 4).
      próprio ("Nicoboco Varejo") e que a régua de "2ª empresa do mesmo domínio" nunca
      enxerga como filial.
 
-     A marcação é salva em dois lugares, de propósito:
-     - **no navegador** (`localStorage`, chave `painelcs:varejo-manual`), no instante
-       do clique. É o que faz ela sobreviver à carga das 04:00, que reescreve o
-       `dados.js` inteiro. Enquanto está só aí, aparece com um **ponto dourado**;
-     - **em `varejo_manual.json`**, que o fetcher lê na carga seguinte e aplica por
-       cima do `confeccao_tipo_empresa`. É o que faz a marcação valer para todo mundo.
-       Uma página estática não commita nada sozinha, então quem gera o arquivo é o
-       botão **"Baixar varejo_manual.json"** do próprio editor: ele já vem com o que
-       está publicado + o que foi marcado no navegador. Salvar por cima de
-       `CS/varejo_manual.json` e rodar `node publicar.js --sem-dados`.
+     **Um clique em "Salvar para todo mundo" e acabou.** A marcação vai para
+     `CS/varejo_manual.json` no repositório e passa a valer para quem abrir o painel,
+     sem esperar a carga da madrugada.
+
+     Como uma página estática não commita nada sozinha, quem grava é a **API do
+     stark-admin** (`https://vesti-contas.vercel.app/api/varejo`), que guarda o
+     `GH_TOKEN` no servidor — mesma ideia do `overlays.js` do relatoriocs2:
+     - `GET /api/varejo` é **público**: o painel lê no boot e aplica por cima do
+       `dados.js`, então a marcação de uma CS aparece para as outras no mesmo dia;
+     - `POST /api/varejo` pede `Authorization: Bearer <senha do painel>` (env
+       **`CS_SENHA`** na Vercel, hoje igual à senha da tela). Manda só o que mudou;
+       o servidor aplica em cima do arquivo mais novo com retry, então duas CS
+       marcando ao mesmo tempo não se apagam. Cada salvamento é **1 commit**.
+     - ⚠️ a senha de escrita é a mesma que está no código da página. Quem abre o
+       painel pode marcar varejo — é o mesmo nível de acesso do painel em si. Para
+       separar, basta trocar `CS_SENHA` na Vercel e pedir a senha na tela.
+
+     Enquanto não foi salvo, fica **só no navegador** (`localStorage`, chave
+     `painelcs:varejo-manual`) e aparece com um **ponto dourado** — inclusive se a
+     API estiver fora. O botão **"Baixar arquivo"** é o plano B: gera o
+     `varejo_manual.json` para publicar à mão (`node publicar.js --sem-dados`).
+
+     O `fetch_dados.js` lê esse mesmo arquivo em cada carga, então os números
+     agregados do `dados.js` também nascem já com a marcação.
 
      Precedência: **marcação no navegador > `varejo_manual.json` > cadastro**. O
      `publicar.js` se recusa a subir um `varejo_manual.json` local que tenha MENOS

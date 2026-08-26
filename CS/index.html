@@ -238,6 +238,10 @@ button,input,select{font:inherit;color:inherit}
   align-items:center;gap:8px;flex-wrap:wrap}
 .ed-nota{flex:1;min-width:240px;font-size:11.5px;color:var(--ink-3);line-height:1.45}
 .ed-nota code{font-family:var(--f-mono);font-size:11px}
+.ed-salvar{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+.ed-salvar:hover{background:var(--acc);border-color:var(--acc);filter:brightness(1.08)}
+.ed-salvar[disabled]{opacity:.6;cursor:default;filter:none}
+.ed-erro{flex-basis:100%;font-size:12px;color:var(--neg);line-height:1.45}
 /* --- seletor de período: dois campos de data + grade de meses --- */
 .per-datas{display:flex;gap:8px;margin-bottom:12px}
 .per-campo{flex:1;display:flex;flex-direction:column;gap:4px}
@@ -1506,7 +1510,8 @@ const TABS = [
       + '<b>Varejo</b> conta só filial nova classificada como varejo. A classificação automática vem do '
       + 'Relatório Confecções e tem data de corte, então filial mais nova que isso aparece como '
       + '"sem classificação" ao lado do número, e não some da tela — <b>clique no número de varejos para '
-      + 'marcar na mão</b> quais filiais são de varejo. A marcação fica salva e vale por cima do cadastro. '
+      + 'marcar na mão</b> quais filiais são de varejo e clique em <b>salvar</b>: vale por cima do cadastro '
+      + 'e passa a valer para todo mundo. '
       + '<b>Atenção na comparação com o ano passado:</b> a marca é creditada ao CS que a atende <i>hoje</i>, '
       + 'porque o cadastro não guarda o histórico de quem atendia antes. Quem assumiu carteira no meio do '
       + 'caminho aparece com base baixa em 2025 e um crescimento que é troca de responsável, não venda.',
@@ -2684,6 +2689,95 @@ function varejoJson(){
   };
 }
 
+/* --- A marcação compartilhada: ler de todo mundo, salvar para todo mundo -----
+   O painel é estático no GitHub Pages: não consegue commitar nada sozinho, e um
+   token do GitHub dentro desta página seria público. Quem grava é a mesma API
+   que já cuida das edições compartilhadas do relatoriocs2 (stark-admin, na
+   Vercel): ela guarda o GH_TOKEN e commita CS/varejo_manual.json.
+
+   Dois caminhos, e os dois importam:
+   - no BOOT o painel lê /api/varejo e aplica por cima do dados.js. É isso que faz
+     a marcação de uma CS aparecer para as outras no mesmo dia, sem esperar a
+     carga das 04:00 (que também lê o arquivo, para os números agregados);
+   - o botão "Salvar para todo mundo" manda só o que mudou neste navegador e o
+     servidor aplica em cima do arquivo mais novo, com retry — duas pessoas
+     marcando ao mesmo tempo não se apagam.
+
+   A senha é a mesma do painel (env CS_SENHA na Vercel). Se um dia a senha da
+   tela mudar, a variável na Vercel tem de mudar junto. */
+const API_VAREJO = 'https://vesti-contas.vercel.app/api/varejo';
+const SENHA_PAINEL = 'Mudar123';
+
+/* Aplica no dados.js da memória o que veio do servidor: o tipo de cada filial e
+   as marcas apontadas à mão. Devolve false quando o dados.js é antigo. */
+function aplicarMarcacaoPublicada(doc){
+  const b = DATA.bonificacao;
+  if(!b || !b.filiais) return false;
+  b.marcacaoManual = { filiais: doc.filiais||{}, extras: doc.extras||[] };
+  b.filiais = b.filiais.filter(f=>!f.extra);
+  b.filiais.forEach(f=>{
+    const m = b.marcacaoManual.filiais[f.id];
+    f.tipo = m ? m.tipo : (f.auto||null);
+    f.manual = !!m;
+  });
+  b.marcacaoManual.extras.forEach(x=>{
+    b.filiais.push({ mes:String(x.mes), cs:x.cs||'Sem CS', dom:String(x.dom),
+      id:chaveExtra(x), nome:x.nome||x.dom, criado:x.em||null,
+      tipo:'Varejo', auto:null, manual:true, extra:true });
+  });
+  limparLocalJaPublicado();
+  return true;
+}
+
+/* O que este navegador marcou e o servidor já confirmou deixa de ser pendência —
+   senão o ponto dourado ficaria aceso para sempre depois de salvar. */
+function limparLocalJaPublicado(){
+  const pub = varejoPublicado(), loc = varejoLocal();
+  const chavesPub = new Set(pub.extras.map(chaveExtra));
+  let mudou = false;
+  Object.keys(loc.filiais).forEach(id=>{
+    const meu = loc.filiais[id], dele = pub.filiais[id];
+    const aindaLa = !!dele || chavesPub.has(id);
+    const igual = meu.tipo==='auto' ? !aindaLa : (dele && dele.tipo===meu.tipo);
+    if(igual){ delete loc.filiais[id]; mudou = true }
+  });
+  const antes = loc.extras.length;
+  loc.extras = loc.extras.filter(x=>!chavesPub.has(chaveExtra(x)));
+  if(loc.extras.length !== antes) mudou = true;
+  if(mudou) varejoLocalSalvar(loc);
+}
+
+/* Boot: busca a marcação de todo mundo. Se a API estiver fora, o painel segue
+   com o que veio da carga — a marcação local continua valendo na tela. */
+function carregarMarcacaoVarejo(){
+  if(!(DATA.bonificacao||{}).filiais) return;
+  fetch(API_VAREJO, {cache:'no-store'})
+    .then(r=>r.ok ? r.json() : Promise.reject(new Error('HTTP '+r.status)))
+    .then(j=>{ if(j && j.ok && aplicarMarcacaoPublicada(j)) renderPagina() })
+    .catch(e=>console.warn('marcação de varejo: não consegui ler do servidor —', e.message));
+}
+
+/* Manda só o DELTA deste navegador. O servidor aplica em cima do arquivo mais
+   novo e devolve o resultado inteiro, que a gente adota na hora. */
+function salvarMarcacaoVarejo(){
+  const loc = varejoLocal();
+  if(!Object.keys(loc.filiais).length && !loc.extras.length){
+    return Promise.resolve({ok:true, semMudanca:true});
+  }
+  return fetch(API_VAREJO, {
+    method:'POST',
+    headers:{'Content-Type':'application/json', Authorization:'Bearer '+SENHA_PAINEL},
+    body: JSON.stringify({ filiais: loc.filiais, extras: loc.extras }),
+  }).then(r=>r.json().catch(()=>({ok:false,erro:'o servidor respondeu algo que não é JSON'}))
+      .then(j=>{ if(!r.ok || !j.ok) throw new Error(j.erro || ('erro '+r.status)); return j }))
+    .then(j=>{
+      varejoLocalSalvar({filiais:{}, extras:[]});
+      aplicarMarcacaoPublicada(j);
+      renderPagina();
+      return j;
+    });
+}
+
 /* --- o editor: uma linha por filial, três botões por linha --- */
 function abrirEditorVarejo(cs){
   const mes = mesBonificacao();
@@ -2778,27 +2872,42 @@ function abrirEditorVarejo(cs){
     foot.innerHTML = '';
     foot.appendChild(el('div',{class:'ed-nota'},
       '<b>'+varejos+'</b> '+(varejos===1?'varejo novo':'varejos novos')+' em '+rotuloMes(mes)+' para '+cs+'. '
-      + (pendentes ? '<b>'+pendentes+'</b> '+(pendentes===1?'marcação salva':'marcações salvas')
-          + ' só neste navegador — baixe o arquivo, salve por cima de <code>CS/varejo_manual.json</code> e rode '
-          + '<code>node publicar.js --sem-dados</code> para valer para todo mundo.'
-        : 'Nada pendente de publicação.')));
-    const baixar = el('button',{class:'btn',type:'button'},'Baixar varejo_manual.json');
+      + (pendentes ? '<b>'+pendentes+'</b> '+(pendentes===1?'marcação ainda não salva':'marcações ainda não salvas')
+          + ' para o time — clique em salvar.'
+        : 'Tudo salvo para todo mundo.')));
+    const erro = el('div',{class:'ed-erro',style:'display:none'});
+
+    /* O botão que a Laura pediu: salva e vale para todo mundo, sem baixar
+       arquivo nem publicar nada à mão. */
+    const salvar = el('button',{class:'btn ed-salvar',type:'button'},'Salvar para todo mundo');
+    if(!pendentes) salvar.setAttribute('disabled','');
+    salvar.onclick = ()=>{
+      salvar.setAttribute('disabled',''); salvar.textContent='Salvando…';
+      erro.style.display='none';
+      salvarMarcacaoVarejo()
+        .then(()=>{ pintar();
+          const b = foot.querySelector('.ed-salvar');
+          if(b){ b.textContent='Salvo ✓'; setTimeout(()=>{ if(foot.contains(b)) pintar() },1800) } })
+        .catch(e=>{
+          salvar.removeAttribute('disabled'); salvar.textContent='Salvar para todo mundo';
+          erro.textContent = 'Não deu para salvar: ' + e.message
+            + ' A marcação continua guardada neste navegador — dá para tentar de novo ou baixar o arquivo.';
+          erro.style.display='';
+        });
+    };
+    /* Plano B para quando a API estiver fora: o arquivo continua podendo ser
+       publicado à mão (node publicar.js --sem-dados). */
+    const baixar = el('button',{class:'btn btn-ghost',type:'button'},'Baixar arquivo');
+    baixar.title = 'Plano B: gera o varejo_manual.json para publicar à mão';
     baixar.onclick = ()=>{
       const blob = new Blob([JSON.stringify(varejoJson(),null,2)+'\n'],{type:'application/json'});
       const a = el('a'); a.href = URL.createObjectURL(blob); a.download='varejo_manual.json'; a.click();
       URL.revokeObjectURL(a.href);
     };
-    const copiar = el('button',{class:'btn',type:'button'},'Copiar JSON');
-    copiar.onclick = ()=>{
-      const txt = JSON.stringify(varejoJson(),null,2);
-      const ok = ()=>{ copiar.textContent='Copiado'; setTimeout(()=>copiar.textContent='Copiar JSON',1600) };
-      if(navigator.clipboard) navigator.clipboard.writeText(txt).then(ok)
-        .catch(()=>window.prompt('Copie o conteúdo do varejo_manual.json:', txt));
-      else window.prompt('Copie o conteúdo do varejo_manual.json:', txt);
-    };
     const sair = el('button',{class:'btn',type:'button'},'Fechar');
     sair.onclick = fechar;
-    foot.appendChild(baixar); foot.appendChild(copiar); foot.appendChild(sair);
+    foot.appendChild(salvar); foot.appendChild(baixar); foot.appendChild(sair);
+    foot.appendChild(erro);
   };
   pintar();
   document.body.appendChild(back);
@@ -2882,6 +2991,9 @@ window.__cs_boot = function(){
   __jaDesenhou = true;
   renderNav();
   renderPagina();
+  /* Depois de desenhar, e não antes: a marcação de varejo vem de outra origem e
+     não pode segurar o painel se a API estiver lenta ou fora. */
+  carregarMarcacaoVarejo();
 };
 if(document.getElementById('app').style.display !== 'none') window.__cs_boot();
 
