@@ -177,7 +177,7 @@ button,input,select{font:inherit;color:inherit}
 .field input:focus,.field select:focus{background:var(--surface);border-color:var(--brand-2);outline:none}
 .filters-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
 
-/* seletor de semanas */
+/* seletor de período (e o de CS/canal, que herda os mesmos botões) */
 .wk-pick{position:relative}
 .wk-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:210px;
   border:1px solid var(--line);background:var(--sunken);border-radius:var(--r-sm);
@@ -206,6 +206,24 @@ button,input,select{font:inherit;color:inherit}
 .wk-s:hover{border-color:var(--acc-line)}
 .wk-s.on{background:var(--acc);border-color:var(--acc);color:#fff}
 .wk-s.hoje{box-shadow:0 0 0 2px var(--acc-soft)}
+/* --- seletor de período: dois campos de data + grade de meses --- */
+.per-datas{display:flex;gap:8px;margin-bottom:12px}
+.per-campo{flex:1;display:flex;flex-direction:column;gap:4px}
+.per-campo span{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-3)}
+.per-campo input{border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);
+  padding:6px 8px;font-family:var(--f-body);font-size:12.5px;color:var(--ink);width:100%}
+.per-campo input:focus{outline:none;border-color:var(--acc)}
+.per-titulo{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:7px}
+.per-meses{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.per-mes{border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);
+  padding:6px 2px;font-size:11.5px;cursor:pointer;color:var(--ink-2)}
+.per-mes:hover{border-color:var(--acc-line);background:var(--acc-soft);color:var(--acc)}
+.per-mes.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.per-mes.off{opacity:.32;cursor:default}
+.per-mes.off:hover{background:var(--surface);border-color:var(--line);color:var(--ink-2)}
+.wk-chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
 /* chip de canal: mesmo botão das semanas, mas com texto em vez de número */
 .wk-s.canal{font-family:var(--f-body);font-size:11.5px;padding:5px 9px;color:var(--ink-2)}
 .btn{
@@ -229,7 +247,7 @@ button,input,select{font:inherit;color:inherit}
 .kpi-sub{margin-top:6px;font-size:11.5px;color:var(--ink-3)}
 .kpi-sub b{color:var(--ink-2);font-weight:600}
 
-/* --- régua de semanas (elemento-assinatura) --- */
+/* --- régua do período (elemento-assinatura) --- */
 .ruler{
   background:var(--acc-soft);border:1px solid var(--acc-line);border-radius:var(--r-lg);
   padding:13px 16px 8px;margin-bottom:16px;
@@ -291,6 +309,11 @@ td.num{font-family:var(--f-mono);font-size:12.5px}
 td.strong{font-weight:600}
 .cell-main{display:block;line-height:1.25}
 .cell-sub{display:block;font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.cell-sub.novo{color:var(--acc);font-weight:600}
+.cell-sub.var-up{color:var(--pos);font-weight:600}
+.cell-sub.var-down{color:var(--neg);font-weight:600}
+.cell-sub.var-flat{color:var(--ink-3)}
+.cell-sub em{font-style:normal;font-weight:400;color:var(--ink-3);opacity:.85}
 
 /* Racional do risco de churn: um critério por linha, com um tracinho na frente.
    Coluna larga o suficiente para a frase não quebrar no meio do número de dias. */
@@ -411,7 +434,7 @@ td.strong{font-weight:600}
     </div>
     <nav id="nav" aria-label="Seções do painel"></nav>
     <div class="rail-foot">
-      <p>Todos os gráficos são agrupados por semana do ano.</p>
+      <p>Os gráficos agrupam por dia, semana ou mês conforme o tamanho do período.</p>
     </div>
   </aside>
 
@@ -419,8 +442,8 @@ td.strong{font-weight:600}
   <div class="main">
     <header class="topbar">
       <div class="week-now">
-        <b id="wkNow">Semana 33</b>
-        <span id="wkRange">10–16 de agosto de 2026</span>
+        <b id="wkNow">Período</b>
+        <span id="wkRange">carregando…</span>
       </div>
       <div class="topbar-right">
         <span class="chip-demo"><i></i> Dados de exemplo</span>
@@ -473,7 +496,10 @@ if(_ss('get')==='1'){
    JSON com o mesmo formato — nenhuma outra parte do arquivo precisa mudar.
 
    DATA = {
-     meta: { ano, semanaAtual },
+     meta: { ano, semanaAtual,
+             inicio:'AAAA-MM-DD',   // primeiro dia com dado no arquivo
+             hoje:'AAAA-MM-DD',     // último; é o teto do seletor de datas
+             grao:'dia' },
 
      // --- cadastro: atributos que NÃO dependem do período ---
      clientes: [{
@@ -487,8 +513,11 @@ if(_ss('get')==='1'){
        dataChurn:'AAAA-MM-DD'|null  // preenchido só para quem cancelou
      }],
 
-     // --- séries semanais: é daqui que a tabela geral é agregada ---
-     clientesSeries: [{ semana, cliente, pedidos, valorPedidos,
+     // --- séries DIÁRIAS: é daqui que a tabela geral é agregada ---
+     // `data` é 'AAAA-MM-DD'. O painel filtra por janela de datas e agrupa em
+     // dia/semana/mês só na hora de desenhar. `dominio` é a chave da agregação
+     // (28 marcas da carteira têm nome repetido).
+     clientesSeries: [{ data, cliente, dominio, pedidos, valorPedidos,
                         receitaInterchange, receitaMensalidade, receitaAntecipacao }],
 
      // --- HubSpot: cross-sell e upsell vivem juntos em "negócios" ---
@@ -497,24 +526,36 @@ if(_ss('get')==='1'){
      negocios: [{ cliente, produto, negocio, categoria:'cross'|'up',
                   valor, status:'Ganho'|'Perdido'|'Em aberto', data }],
 
-     oraculo:   { tabela:[{ cliente, cs, pctIA, atendimentos, gmvIniciado, gmvFinalizado }],
-                  series:[{ semana, cliente, atendimentos, gmvIniciado, gmvFinalizado }] },
-     tino:      { tabela:[{ cliente, cs, eventos, eventosAno, sessoesAno, diasAcesso,
+     oraculo:   { tabela:[{ cliente, cs, implantado, implantadoOrigem, pctIA,
+                            atendimentos, gmvIniciado, gmvFinalizado }],
+                  series:[{ data, cliente, atendimentos, gmvIniciado, gmvFinalizado }] },
+     tino:      { tabela:[{ cliente, cs, implantado, eventos, eventosAno, sessoesAno, diasAcesso,
                             ultimoAcessoTino, statusTino, nuncaUsou, nuncaLogou,
                             semCadastro, foraDaCarteira }],
-                  series:[{ semana, cliente, cs, eventos, receita }],
+                  series:[{ data, cliente, cs, eventos, receita }],
                   kpis:{ total_brands, active_brands, never_accessed },
                   tiposDeEvento:[{ event_type, cnt }] },
-     vestiPago: { tabela:[{ cliente, cs, valorTransacionado, receitaFee,
+     vestiPago: { tabela:[{ cliente, cs, implantado, valorTransacionado, receitaFee,
                             receitaAntecipacao, linksGerados, linksPagos }],
-                  series:[{ semana, cliente, linksGerados, linksPagos, valor }] },
-     churn:     { series:[{ semana, cliente, churns }] },   // tabela vem de `clientes`
+                  series:[{ data, cliente, linksGerados, linksPagos, valor }] },
+     churn:     { series:[{ data, cliente, churns }] },   // tabela vem de `clientes`
+
+     // --- bonificação: já agregada por CS e por mês, direto do fetcher ---
+     // `base` é o valor do comparativo que a regra pede (mês anterior ou mesmo
+     // mês do ano passado); null quando a regra não compara.
+     bonificacao: { meses:['AAAA-MM'],
+                    metricas:[{ k, titulo, unidade, comparacao, regra }],
+                    linhas:[{ mes, cs, k, valor, base }],
+                    detalhe:[{ mes, cs, k, cliente, valor }] },
      reunioes:  [{ reuniao, data, cliente, cs, valor,
                    resultado:'Fechou negócio'|'Sem negócio'|'Agendada', negocio }],
      tickets:   [{ ticket, cliente, canal, pipeline, estagio,
                    situacao:'Aberto'|'Encerrado', categoria, prioridade, origem,
                    cs, data, fechadoEm, diasParaFechar }]
    }
+
+   Obs.: as séries chegam EMPACOTADAS (formato colunar), e `desempacotar()` as
+   devolve a este formato no boot. Ver `empacotar` no fetch_dados.js.
 
    Obs.: o campo `cliente` dentro de `series` é o que permite os gráficos
    responderem aos filtros de cliente e de CS. Se a série vier agregada
@@ -557,7 +598,6 @@ const MOCK = (function buildMock(){
   const pick=(a)=>a[Math.floor(r()*a.length)];
   const int=(a,b)=>Math.floor(a+r()*(b-a+1));
   const dia=(d)=>{const x=new Date(2026,7,13);x.setDate(x.getDate()-d);return x.toISOString().slice(0,10)};
-  const diaDaSemana=(s)=>new Date(Date.UTC(ANO,0,1+(s-1)*7+3)).toISOString().slice(0,10);
 
   /* --- cadastro --- */
   const clientes = nomes.map(([nome,integracao,plano],i)=>{
@@ -582,9 +622,26 @@ const MOCK = (function buildMock(){
     };
   });
 
-  const semanas = Array.from({length:SEMANA_ATUAL},(_,i)=>i+1);
-  const serie = (fn)=>{const out=[];clientes.forEach((c,ci)=>{semanas.forEach(s=>{
-    out.push(Object.assign({semana:s,cliente:c.nome},fn(c,s,ci)))})});return out};
+  /* O mock passou a gerar DIA a dia, como o dado real. As funções de forma
+     continuam pensando em semana (é a escala em que foram escritas): recebem o
+     número da semana e têm o resultado dividido pelos sete dias, com uma
+     variação para o gráfico não sair reto. */
+  const diasDoAno = (()=>{
+    const out = [], fim = new Date(Date.UTC(ANO,0,1+(SEMANA_ATUAL*7)-1));
+    for(let d = new Date(Date.UTC(ANO,0,1)); d <= fim; d.setUTCDate(d.getUTCDate()+1))
+      out.push(d.toISOString().slice(0,10));
+    return out;
+  })();
+  const semanaDoDia = iso => Math.max(1, Math.ceil((Math.round(
+    (Date.parse(iso+'T00:00:00Z') - Date.UTC(ANO,0,1))/864e5) + 1)/7));
+  const serie = (fn)=>{const out=[];clientes.forEach((c,ci)=>{diasDoAno.forEach(dt=>{
+    const base = fn(c, semanaDoDia(dt), ci), linha = {data:dt, cliente:c.nome};
+    for(const k in base){
+      const v = base[k];
+      linha[k] = typeof v==='number' ? Math.round(v/7*(0.5+r())) : v;
+    }
+    out.push(linha);
+  })});return out};
 
   /* --- séries semanais da carteira (base da tabela geral) --- */
   const clientesSeries = serie((c)=>{
@@ -636,7 +693,7 @@ const MOCK = (function buildMock(){
   });
   // probabilidade cresce um pouco ao longo do ano para que sempre caiam
   // cancelamentos dentro das últimas semanas — senão a aba abre vazia.
-  const churnSeries = serie((c,s)=>({ churns: r() < 0.004 + s*0.0005 ? 1 : 0 }));
+  const churnSeries = serie((c,s)=>({ churns: r() < (0.004 + s*0.0005)/7 ? 7 : 0 }));
 
   /* marca quem efetivamente cancelou (a 1ª ocorrência de cada cliente) e
      mantém o cadastro coerente: quem cancelou fica inativo. */
@@ -646,7 +703,7 @@ const MOCK = (function buildMock(){
     if(jaChurnou.has(x.cliente)){ x.churns = 0; return }
     jaChurnou.add(x.cliente);
     const c = clientes.find(k=>k.nome===x.cliente);
-    if(c){ c.dataChurn = diaDaSemana(x.semana); c.status = 'inativo' }
+    if(c){ c.dataChurn = x.data; c.status = 'inativo' }
   });
 
   /* risco só faz sentido para quem ainda está na base */
@@ -712,7 +769,8 @@ const MOCK = (function buildMock(){
   clientes.forEach(c=>{ delete c._plano; delete c._inativo; delete c._semAcesso; delete c._semPedido });
 
   return {
-    meta:{ ano:ANO, semanaAtual:SEMANA_ATUAL, cs:CS_TIME, diasChurn:45, diasInadimplencia:10 },
+    meta:{ ano:ANO, semanaAtual:SEMANA_ATUAL, cs:CS_TIME, diasChurn:45, diasInadimplencia:10,
+           inicio:ANO+'-01-01', hoje:diasDoAno[diasDoAno.length-1], grao:'dia' },
     clientes, clientesSeries, negocios,
     oraculo:{ tabela:oraculoTab, series:oraculoSeries },
     tino:{ tabela:tinoTab, series:tinoSeries },
@@ -722,7 +780,59 @@ const MOCK = (function buildMock(){
   };
 })();
 
-const DATA = DADOS_REAIS ? window.PAINEL_DATA : MOCK;
+/* As séries diárias chegam em formato colunar (ver `empacotar` no fetch_dados.js):
+   uma lista de colunas, um dicionário por coluna de texto e uma matriz de valores.
+   Sem isso o dados.js passaria de 35 MB, porque o nome do cliente e o do campo se
+   repetem em cada uma das ~78 mil linhas. Aqui ele volta a ser lista de objetos —
+   nenhuma outra parte do painel precisa saber que houve empacotamento. */
+function desempacotar(o){
+  if(Array.isArray(o)) return o;
+  if(!o || typeof o!=='object') return o;
+  if(o._p===1 && Array.isArray(o.c) && Array.isArray(o.r)){
+    const cols = o.c, dic = o.dic || {};
+    return o.r.map(linha=>{
+      const obj = {};
+      for(let i=0;i<cols.length;i++){
+        const k = cols[i]; let v = linha[i];
+        const d = dic[k];
+        if(d && typeof v==='number') v = d[v];
+        obj[k] = v;
+      }
+      return obj;
+    });
+  }
+  for(const k in o) o[k] = desempacotar(o[k]);
+  return o;
+}
+
+/* Rede de segurança para a virada de formato (26/08/2026): o layout novo é
+   publicado por `publicar.js` e o dados.js por um workflow que roda de
+   madrugada, então existe uma janela em que o painel novo abre com o arquivo
+   velho, ainda no grão de semana. Em vez de mostrar tudo zerado, cada linha
+   antiga vira a segunda-feira da semana dela — o número do mês fica aproximado
+   (a semana da virada cai inteira num mês só) e a próxima carga arruma. */
+function converterSemanaEmData(o){
+  const ano = (o.meta && o.meta.ano) || new Date().getFullYear();
+  const daSemana = s => {
+    const base = new Date(Date.UTC(ano,0,4));
+    const seg = new Date(base);
+    seg.setUTCDate(base.getUTCDate() - ((base.getUTCDay()+6)%7) + (Number(s)-1)*7);
+    return seg.toISOString().slice(0,10);
+  };
+  let convertidas = 0;
+  const arruma = arr => {
+    if(!Array.isArray(arr)) return arr;
+    arr.forEach(x=>{ if(x && x.data==null && x.semana!=null){ x.data = daSemana(x.semana); convertidas++ } });
+    return arr;
+  };
+  arruma(o.clientesSeries);
+  ['oraculo','tino','vestiPago','churn'].forEach(k=>{ if(o[k]) arruma(o[k].series) });
+  if(convertidas) console.warn('Painel: dados.js ainda está no formato de semana ('
+    + convertidas + ' linhas convertidas). Os números ficam aproximados até a próxima carga.');
+  return o;
+}
+
+const DATA = converterSemanaEmData(desempacotar(DADOS_REAIS ? window.PAINEL_DATA : MOCK));
 
 /* Campos novos (canal, tickets, reuniões, Tino por API) podem faltar no mock e
    num dados.js antigo: o painel abre do mesmo jeito, só com a aba e o filtro
@@ -751,7 +861,11 @@ const fmt = {
   date:v=>v?v.split('-').reverse().join('/'):'—',
   compact:v=>{const a=Math.abs(v);if(a>=1e6)return (v/1e6).toFixed(a>=1e7?0:1).replace('.',',')+'M';if(a>=1e3)return (v/1e3).toFixed(a>=1e4?0:1).replace('.',',')+'k';return nfInt.format(v)},
   moneyCompact:v=>'R$ '+fmt.compact(v),
-  wk:s=>'S'+String(s).padStart(2,'0')
+  wk:s=>'S'+String(s).padStart(2,'0'),
+  /* '05/ago' — rótulo curto de dia, para o eixo dos gráficos e a régua. */
+  dia:iso=>{ if(!iso) return '—'; const [,m,d]=iso.split('-'); return d+'/'+MESES[Number(m)-1] },
+  /* 'ago/26' — rótulo de mês, para quando o período é longo demais para dias. */
+  mes:iso=>{ if(!iso) return '—'; const [y,m]=iso.split('-'); return MESES[Number(m)-1]+'/'+String(y).slice(2) },
 };
 /* Hoje de verdade. Era uma data fixa (13/08/2026) de quando o painel foi
    escrito; com a carga rodando todo dia às 04:00 BRT, "há X dias", "atrasada"
@@ -773,64 +887,95 @@ function tempoDeCasa(iso){
   const anos = Math.floor(meses/12), resto = meses%12;
   return anos+'a'+(resto?' '+resto+'m':'');
 }
-function semanaDoAno(iso){ if(!iso) return null;
-  const [y,m,d]=iso.split('-').map(Number); const dt=new Date(Date.UTC(y,m-1,d));
-  const dn=(dt.getUTCDay()+6)%7; dt.setUTCDate(dt.getUTCDate()-dn+3);
-  const t=new Date(Date.UTC(dt.getUTCFullYear(),0,4));
-  return 1+Math.round(((dt-t)/864e5-3+((t.getUTCDay()+6)%7))/7); }
-function intervaloSemana(s,ano){
-  const t=new Date(Date.UTC(ano,0,4)); const seg=new Date(t); seg.setUTCDate(t.getUTCDate()-((t.getUTCDay()+6)%7)+(s-1)*7);
-  const dom=new Date(seg); dom.setUTCDate(seg.getUTCDate()+6);
-  const M=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-  return seg.getUTCDate()+'–'+dom.getUTCDate()+' de '+M[dom.getUTCMonth()]+' de '+ano;
-}
-
 /* ============================================================================
    3. AGREGAÇÕES DEPENDENTES DE PERÍODO
    ========================================================================== */
-/* As semanas são escolhidas uma a uma (podem ser soltas, de meses diferentes),
-   então tudo que agrega pergunta a este conjunto — não existe mais "janela
-   contígua" de início e fim. */
-function semanasAtivas(){ return estado.filtros.semanas }
-function dentroDaJanela(s){ return s!=null && estado.filtros.semanas.has(s) }
-function semanasOrdenadas(){ return [...estado.filtros.semanas].sort((a,b)=>a-b) }
+/* O período é uma JANELA DE DATAS: início e fim, inclusive nos dois extremos.
+   Era uma seleção de semanas ISO até 26/08/2026, e mudou por um motivo prático
+   levantado pela Laura: semana ISO atravessa a virada do mês — a semana 31 de
+   2026 começa em 27/julho e termina em 2/agosto — então nenhum recorte semanal
+   fechava um mês. Agora quem pergunta "e agosto?" escolhe 01/08 a 31/08 e
+   recebe agosto, sem sobra do mês vizinho. */
+function periodo(){ return estado.filtros.periodo }
+function dentroDaJanela(d){
+  if(!d) return false;
+  const p = estado.filtros.periodo;
+  const iso = String(d).slice(0,10);
+  return iso >= p.ini && iso <= p.fim;
+}
+/* Primeiro e último dia com dado no arquivo. O seletor não deixa sair daqui:
+   escolher janeiro do ano passado devolveria uma tela vazia sem explicação. */
+const LIMITE_DADOS = (()=>{
+  const meta = DATA.meta || {};
+  const ano = meta.ano || new Date().getFullYear();
+  return { ini: ano+'-01-01', fim: meta.hoje || hojeIso() };
+})();
+function hojeIso(){ const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10) }
+const diasEntre = (a,b)=>Math.round((Date.parse(b+'T00:00:00Z')-Date.parse(a+'T00:00:00Z'))/864e5);
+function somarDias(iso,n){ const d=new Date(iso+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10) }
+function primeiroDiaDoMes(iso){ return iso.slice(0,7)+'-01' }
+function ultimoDiaDoMes(iso){
+  const [y,m]=iso.split('-').map(Number);
+  return new Date(Date.UTC(y, m, 0)).toISOString().slice(0,10);
+}
+/* Janela travada no que existe no arquivo — o seletor pode pedir "últimos 90
+   dias" em fevereiro e cair antes do começo da série. */
+function janela(ini, fim){
+  return { ini: ini < LIMITE_DADOS.ini ? LIMITE_DADOS.ini : ini,
+           fim: fim > LIMITE_DADOS.fim ? LIMITE_DADOS.fim : fim };
+}
+/* Atalhos do seletor. "Mês passado" é o que motivou a mudança toda. */
+function periodosProntos(){
+  const h = LIMITE_DADOS.fim;
+  const mesPassado = somarDias(primeiroDiaDoMes(h), -1);
+  return [
+    ['Este mês',      janela(primeiroDiaDoMes(h), h)],
+    ['Mês passado',   janela(primeiroDiaDoMes(mesPassado), ultimoDiaDoMes(mesPassado))],
+    ['Últimos 30 dias', janela(somarDias(h,-29), h)],
+    ['Últimos 90 dias', janela(somarDias(h,-89), h)],
+    ['Ano todo',      janela(LIMITE_DADOS.ini, h)],
+  ];
+}
 
-/* Semana do ano -> mês a que ela pertence (pela quinta-feira, regra ISO). */
 const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-function mesDaSemana(s, ano){
-  const base = new Date(Date.UTC(ano,0,4));
-  const d = new Date(base);
-  d.setUTCDate(base.getUTCDate() - ((base.getUTCDay()+6)%7) + (s-1)*7 + 3);
-  return d.getUTCMonth();
+
+/* Período de abertura do painel: os últimos 90 dias. Antes eram 12 semanas —
+   é a mesma ordem de grandeza, agora contada em dias corridos. */
+function periodoPadrao(){ return janela(somarDias(LIMITE_DADOS.fim,-89), LIMITE_DADOS.fim) }
+
+/* Rótulo curto do período, usado no botão do filtro, na régua e no topo.
+   Quando a janela é exatamente um mês-calendário, o nome do mês diz mais que
+   duas datas ("agosto de 2026" em vez de "01/08 – 31/08"). */
+function rotuloPeriodo(p){
+  const p2 = p || periodo();
+  if(p2.ini === primeiroDiaDoMes(p2.ini) && p2.fim === ultimoDiaDoMes(p2.ini)
+     && p2.ini.slice(0,7) === p2.fim.slice(0,7)){
+    return MESES_LONGOS[Number(p2.ini.slice(5,7))-1] + ' de ' + p2.ini.slice(0,4);
+  }
+  return fmt.date(p2.ini) + ' – ' + fmt.date(p2.fim);
 }
-function rotuloSemana(s, ano){
-  const base = new Date(Date.UTC(ano,0,4));
-  const seg = new Date(base);
-  seg.setUTCDate(base.getUTCDate() - ((base.getUTCDay()+6)%7) + (s-1)*7);
-  const dom = new Date(seg); dom.setUTCDate(seg.getUTCDate()+6);
-  const dd = x => String(x.getUTCDate()).padStart(2,'0');
-  return dd(seg)+'/'+MESES[seg.getUTCMonth()]+' – '+dd(dom)+'/'+MESES[dom.getUTCMonth()];
-}
-/* Semana do mês (1ª, 2ª...) — é assim que o time fala das semanas. */
-function semanaDoMes(s, ano){
-  const m = mesDaSemana(s, ano);
-  let n = 0;
-  for(let i=1;i<=s;i++) if(mesDaSemana(i,ano)===m) n++;
-  return n;
-}
-function ultimasSemanas(n){
-  const set = new Set();
-  for(let s=Math.max(1,DATA.meta.semanaAtual-n+1); s<=DATA.meta.semanaAtual; s++) set.add(s);
-  return set;
+const MESES_LONGOS = ['janeiro','fevereiro','março','abril','maio','junho','julho',
+                      'agosto','setembro','outubro','novembro','dezembro'];
+/* '2026-08' -> 'agosto de 2026' */
+function rotuloMes(m){
+  if(!m) return '—';
+  return MESES_LONGOS[Number(m.slice(5,7))-1] + ' de ' + m.slice(0,4);
 }
 
 /* Tabela geral: agrega as séries semanais dentro do período e junta ao cadastro. */
 function clientesAgregados(){
-  const sem = semanasAtivas();
   const acc = {};
+  /* Chave por DOMÍNIO, não por nome. 28 marcas da carteira dividem o nome com
+     outra (mesmo apelido, domínios diferentes: "Anisa", "Morina", "Di Luise"…),
+     e somando por nome as duas linhas recebiam o total das duas — R$ 684 mil a
+     mais só em julho de 2026. O domínio passou a viajar na série quando o grão
+     virou dia, e é ele que resolve. Nome continua valendo de reserva, para
+     linha antiga que não tenha domínio. */
+  const chave = x => x.dominio || x.cliente;
   DATA.clientesSeries.forEach(x=>{
-    if(!sem.has(x.semana)) return;
-    const a = acc[x.cliente] || (acc[x.cliente] = {pedidos:0,valorPedidos:0,receitaInterchange:0,receitaMensalidade:0,receitaOutrosIugu:0,receitaAntecipacao:0});
+    if(!dentroDaJanela(x.data)) return;
+    const k = chave(x);
+    const a = acc[k] || (acc[k] = {pedidos:0,valorPedidos:0,receitaInterchange:0,receitaMensalidade:0,receitaOutrosIugu:0,receitaAntecipacao:0});
     a.pedidos+=x.pedidos; a.valorPedidos+=x.valorPedidos;
     a.receitaInterchange+=x.receitaInterchange;
     a.receitaMensalidade+=x.receitaMensalidade;
@@ -838,7 +983,8 @@ function clientesAgregados(){
     a.receitaAntecipacao+=x.receitaAntecipacao;
   });
   return DATA.clientes.map(c=>{
-    const a = acc[c.nome] || {pedidos:0,valorPedidos:0,receitaInterchange:0,receitaMensalidade:0,receitaOutrosIugu:0,receitaAntecipacao:0};
+    const a = acc[c.dominio] || acc[c.nome]
+      || {pedidos:0,valorPedidos:0,receitaInterchange:0,receitaMensalidade:0,receitaOutrosIugu:0,receitaAntecipacao:0};
     return Object.assign({}, c, a, {
       ticketMedio: a.pedidos ? Math.round(a.valorPedidos/a.pedidos*100)/100 : 0,
       // total = tudo que a marca gerou de receita para a Vesti no período
@@ -853,6 +999,9 @@ const CS_POR_CLIENTE = (()=>{ const m={}; DATA.clientes.forEach(c=>m[c.nome]=c.c
 /* Canal de cada cliente, para as abas que agregam por nome (produtos, churn)
    responderem ao filtro de canal sem carregar a coluna. */
 const CANAL_POR_CLIENTE = (()=>{ const m={}; DATA.clientes.forEach(c=>m[c.nome]=c.canal); return m })();
+/* CS por domínio: onde a linha tem id, ele é chave melhor que o nome — 28
+   marcas da carteira são homônimas de outra. */
+const CS_POR_DOM = (()=>{ const m={}; DATA.clientes.forEach(c=>{ if(c.dominio) m[c.dominio]=c.cs }); return m })();
 /* Domínio de cada cliente. As abas que agregam por nome montam linhas novas e
    perdem os campos que não somam, então o id é recuperado por aqui. */
 const DOM_POR_CLIENTE = (()=>{ const m={}; DATA.clientes.forEach(c=>{ if(c.dominio) m[c.nome]=c.dominio }); return m })();
@@ -882,15 +1031,32 @@ function csDaAba(t){
     /^\(?Sem/i.test(a) ? 1 : /^\(?Sem/i.test(b) ? -1 : a.localeCompare(b,'pt-BR'));
 }
 
+/* Devolve à linha agregada os campos que não somam (data de implantação, e o
+   que mais o cadastro da aba trouxer), casando pelo domínio e, na falta dele,
+   pelo nome do cliente. */
+function juntarCadastro(linhas, cadastro, campos){
+  const porDom = new Map(), porNome = new Map();
+  (cadastro||[]).forEach(c=>{ if(c.dominio) porDom.set(c.dominio,c); if(c.cliente) porNome.set(c.cliente,c) });
+  return linhas.map(l=>{
+    const c = (l.dominio && porDom.get(l.dominio)) || porNome.get(l.cliente);
+    if(!c) return l;
+    campos.forEach(k=>{ if(l[k]==null) l[k]=c[k] });
+    return l;
+  });
+}
+
 /* As abas de produto também respeitam o Período: a tabela é somada a partir
-   da série semanal, e não de um total anual pré-calculado. Sem isso o filtro
+   da série diária, e não de um total anual pré-calculado. Sem isso o filtro
    de período mexeria só nos gráficos e a tabela mentiria. */
 function agregarPorCliente(series, campos, derivar){
-  const sem = semanasAtivas();
   const acc = {};
+  /* Mesma régua da tabela geral: agrega por domínio, com o nome de reserva —
+     senão duas marcas homônimas viram uma linha com o dobro. */
   series.forEach(x=>{
-    if(!sem.has(x.semana)) return;
-    const a = acc[x.cliente] || (acc[x.cliente] = {cliente:x.cliente, cs:CS_POR_CLIENTE[x.cliente]||'Sem CS',
+    if(!dentroDaJanela(x.data)) return;
+    const k = x.dominio || x.cliente;
+    const a = acc[k] || (acc[k] = {cliente:x.cliente,
+      cs:x.cs || CS_POR_DOM[x.dominio] || CS_POR_CLIENTE[x.cliente] || 'Sem CS',
       dominio:x.dominio||DOM_POR_CLIENTE[x.cliente]||null});
     if(!a.dominio && x.dominio) a.dominio = x.dominio;
     campos.forEach(k=>a[k]=(a[k]||0)+(Number(x[k])||0));
@@ -959,7 +1125,7 @@ const TABS = [
   {
     id:'clientes', grupo:'Carteira', nav:'Tabela geral', cor:'#0E7A73', cor2:'#B7791F',
     titulo:'Tabela geral dos clientes',
-    desc:'Uma linha por cliente com contrato, uso e composição de receita. Pedidos e receita são somados dentro do período selecionado. <b>Data de cadastro</b> é a entrada da marca na Vesti (criação do domínio), com o tempo de casa embaixo. <b>Canal</b> é o parceiro dono da conta (Vesti, Attasoft, Uemtel…). <b>Tino</b> e <b>Oráculo</b> dizem se a marca tem o produto — o Tino vem da base do próprio produto, o Oráculo de ter atendimento registrado. <b>Interchange</b> já é líquido: o fee do cartão menos a taxa do banco. <b>Último acesso</b> ainda não tem fonte: o BigQuery não guarda login de lojista.',
+    desc:'Uma linha por cliente com contrato, uso e composição de receita. Pedidos e receita são somados dentro do período selecionado — que agora é uma <b>janela de datas</b>, então "agosto" é agosto inteiro e só ele. <b>Data de cadastro</b> é a entrada da marca na Vesti (criação do domínio), com o tempo de casa embaixo. <b>Canal</b> é o parceiro dono da conta (Vesti, Attasoft, Uemtel…). <b>Tino</b> e <b>Oráculo</b> dizem se a marca tem o produto — o Tino vem da base do próprio produto, o Oráculo de ter atendimento registrado. <b>Interchange</b> já é líquido: o fee do cartão menos a taxa do banco. <b>Último acesso</b> ainda não tem fonte: o BigQuery não guarda login de lojista.',
     filtros:['cliente','cs','canal','statusCliente','periodo'],
     tabela:'Clientes', chaveCliente:'nome',
     colunas:[
@@ -1037,18 +1203,22 @@ const TABS = [
       {k:'dominio', l:'Domínio', tipo:'dominio'},
       COL_CS,
       {k:'pctIA', l:'Finalizados pela IA', tipo:'barPct', r:true},
+      {k:'implantado', l:'Implantado em', tipo:'implantado'},
       {k:'atendimentos', l:'Atendimentos', tipo:'int', r:true},
       {k:'gmvIniciado', l:'GMV iniciado no Oráculo', tipo:'money', r:true},
       {k:'gmvFinalizado', l:'GMV iniciado e finalizado', tipo:'money', r:true, forte:true},
     ],
-    linhas:()=>agregarPorCliente(DATA.oraculo.series,
+    /* A linha nasce da soma da série, que só carrega número — a data de
+       implantação vem do cadastro da aba, por domínio. */
+    linhas:()=>juntarCadastro(agregarPorCliente(DATA.oraculo.series,
       ['atendimentos','atendimentosIA','gmvIniciado','gmvFinalizado'],
       a=>{ a.pctIA = a.atendimentos ? Math.round(a.atendimentosIA/a.atendimentos*100) : null })
-      .filter(a=>a.atendimentos>0||a.gmvIniciado>0),
+      .filter(a=>a.atendimentos>0||a.gmvIniciado>0), DATA.oraculo.tabela,
+      ['implantado','implantadoOrigem']),
     series:()=>DATA.oraculo.series,
     graficos:[
-      {t:'Atendimentos por semana', s:[{k:'atendimentos', l:'Atendimentos', tipo:'bar', cor:'var(--acc)', f:fmt.int}]},
-      {t:'GMV por semana', s:[
+      {t:'Atendimentos no período', s:[{k:'atendimentos', l:'Atendimentos', tipo:'bar', cor:'var(--acc)', f:fmt.int}]},
+      {t:'GMV no período', s:[
         {k:'gmvIniciado', l:'Iniciado no Oráculo', tipo:'line', cor:'var(--acc)', area:true, f:fmt.money},
         {k:'gmvFinalizado', l:'Iniciado e finalizado', tipo:'line', cor:'var(--acc-2)', f:fmt.money},
       ]},
@@ -1064,13 +1234,14 @@ const TABS = [
   {
     id:'tino', grupo:'Produtos', nav:'Uso do Tino', cor:'#B7791F', cor2:'#0E7A73',
     titulo:'Uso do Tino',
-    desc:'Engajamento medido em <b>eventos</b> registrados pelo próprio Tino — login, troca de aba, filtro, abertura de produto, busca, export. A lista de marcas é a da base do Tino: quem está aqui tem o produto, inclusive quem nunca entrou. A segunda linha do gráfico é o <b>GMV total da marca</b> na semana, para comparar tendências — não é receita atribuída ao Tino.',
+    desc:'Engajamento medido em <b>eventos</b> registrados pelo próprio Tino — login, troca de aba, filtro, abertura de produto, busca, export. A lista de marcas é a da base do Tino: quem está aqui tem o produto, inclusive quem nunca entrou. A segunda linha do gráfico é o <b>GMV total da marca</b> no mesmo intervalo, para comparar tendências — não é receita atribuída ao Tino.',
     filtros:['cliente','cs','canal','periodo'],
     tabela:'Clientes', chaveCliente:'cliente',
     colunas:[
       {k:'cliente', l:'Cliente', tipo:'cliente'},
       {k:'dominio', l:'Domínio', tipo:'dominio'},
       COL_CS,
+      {k:'implantado', l:'Implantado em', tipo:'implantado'},
       {k:'eventos', l:'Eventos no período', tipo:'int', r:true, forte:true},
       {k:'eventosAno', l:'Eventos no ano', tipo:'int', r:true},
       {k:'sessoesAno', l:'Sessões no ano', tipo:'int', r:true},
@@ -1090,7 +1261,7 @@ const TABS = [
     seriePropria:true,
     series:()=>DATA.tino.series,
     graficos:[
-      {t:'Eventos × GMV por semana', s:[
+      {t:'Eventos × GMV no período', s:[
         {k:'eventos', l:'Eventos', tipo:'line', cor:'var(--acc)', f:fmt.int},
         {k:'receita', l:'GMV da marca', tipo:'line', cor:'var(--acc-2)', eixo:'dir', f:fmt.money},
       ]},
@@ -1112,6 +1283,7 @@ const TABS = [
       {k:'cliente', l:'Cliente', tipo:'cliente'},
       {k:'dominio', l:'Domínio', tipo:'dominio'},
       COL_CS,
+      {k:'implantado', l:'Implantado em', tipo:'implantado'},
       {k:'valorTransacionado', l:'Valor transacionado', tipo:'money', r:true, forte:true},
       {k:'valorCartao', l:'Cartão', tipo:'money', r:true},
       {k:'valorPix', l:'PIX', tipo:'money', r:true},
@@ -1120,13 +1292,14 @@ const TABS = [
       {k:'linksGerados', l:'Links gerados', tipo:'int', r:true},
       {k:'linksPagos', l:'Links pagos', tipo:'linksPagos', r:true},
     ],
-    linhas:()=>agregarPorCliente(DATA.vestiPago.series,
+    linhas:()=>juntarCadastro(agregarPorCliente(DATA.vestiPago.series,
       ['valor','valorCartao','valorPix','receitaFee','receitaAntecipacao','linksGerados','linksPagos'],
       a=>{ a.valorTransacionado = a.valor })
-      .filter(a=>a.linksGerados>0||a.valorTransacionado>0),
+      .filter(a=>a.linksGerados>0||a.valorTransacionado>0), DATA.vestiPago.tabela,
+      ['implantado']),
     series:()=>DATA.vestiPago.series,
     graficos:[
-      {t:'Quantidade × valor transacionado por semana', s:[
+      {t:'Quantidade × valor transacionado no período', s:[
         {k:'linksGerados', l:'Links gerados', tipo:'bar', cor:'var(--acc-line)', f:fmt.int},
         {k:'linksPagos', l:'Links pagos', tipo:'bar', cor:'var(--acc)', f:fmt.int},
         {k:'valor', l:'Valor transacionado', tipo:'line', cor:'var(--acc-2)', eixo:'dir', f:fmt.money},
@@ -1168,15 +1341,14 @@ const TABS = [
       {k:'diasSemPedido', l:'Sem pedido há', tipo:'diasPedido', r:true},
       {k:'faturasVencidas', l:'Faturas vencidas', tipo:'vencidas', r:true},
       {k:'valorEmAberto', l:'Valor em aberto', tipo:'money', r:true, forte:true},
-      {k:'_sem', l:'Semana', tipo:'semana', r:true},
     ],
     linhas:()=>linhasChurn(),
     series:()=>DATA.churn.series,
     duasColunas:true,
     graficos:[
-      {t:'Churn por semana', s:[{k:'churns', l:'Cancelamentos', tipo:'bar', cor:'var(--acc)', f:fmt.int}]},
+      {t:'Cancelamentos no período', s:[{k:'churns', l:'Cancelamentos', tipo:'bar', cor:'var(--acc)', f:fmt.int}]},
       /* Risco é uma foto de HOJE, não um histórico — por isso não entra no eixo
-         de semanas. Obedece ao filtro de cliente, mas não ao de situação: senão
+         do tempo. Obedece ao filtro de cliente, mas não ao de situação: senão
          o gráfico sumiria justamente na visão de cancelados. */
       {t:'Risco de churn na base', categorias:(t)=>{
         const escopo = escopoClientes(t);
@@ -1224,11 +1396,11 @@ const TABS = [
        reuniões. */
     seriePropria:true,
     series:()=>DATA.reunioes.map(r=>({
-      semana: semanaDoAno(r.data), cliente: r.cliente, cs: r.cs,
+      data: r.data, cliente: r.cliente, cs: r.cs,
       reunioes: 1, fechados: r.resultado==='Fechou negócio' ? 1 : 0,
-    })).filter(x=>x.semana),
+    })).filter(x=>x.data),
     graficos:[
-      {t:'Reuniões × negócios fechados por semana', s:[
+      {t:'Reuniões × negócios fechados', s:[
         {k:'reunioes', l:'Reuniões', tipo:'bar', cor:'var(--acc)', f:fmt.int},
         {k:'fechados', l:'Negócios fechados', tipo:'line', cor:'var(--acc-2)', f:fmt.int},
       ]},
@@ -1280,7 +1452,105 @@ const TABS = [
       ];
     }
   },
+  {
+    /* ---- Bonificação
+       Sete regras que a Laura mandou em 26/08/2026, uma coluna cada, por CS e
+       por MÊS-CALENDÁRIO. Não há pontuação aqui de propósito: "vamos trazer
+       primeiro o número; depois eu penso nas pontuações". Quando os pesos
+       vierem, eles entram como uma coluna calculada em cima destas — nenhuma
+       das medidas precisa mudar.
+
+       Esta aba não usa o filtro de período: as regras comparam mês contra mês
+       (ou contra o mesmo mês do ano passado), então o recorte é o mês inteiro,
+       escolhido no seletor próprio. */
+    id:'bonificacao', grupo:'Operação', nav:'Bonificação', cor:'#7A4FB5', cor2:'#B7791F',
+    titulo:'Bonificação — números do mês',
+    desc:'Uma linha por CS, uma coluna por regra, sempre no <b>mês fechado</b>. '
+      + 'Onde a regra pede comparação, a variação aparece embaixo do número: '
+      + '<b>Tino</b> e <b>mensalidade</b> comparam com o mês anterior; <b>Vesti Pago</b> e '
+      + '<b>GMV</b> com o mesmo mês do ano passado. <b>Reuniões</b>, <b>integrações</b> e '
+      + '<b>varejos</b> são contagem do próprio mês. Passe o mouse no número para ver quais marcas entraram. '
+      + 'Ainda <b>não há pontuação</b> — os pesos de cada item entram depois, por cima destes números. '
+      + '<b>Atenção na comparação com o ano passado:</b> a marca é creditada ao CS que a atende <i>hoje</i>, '
+      + 'porque o cadastro não guarda o histórico de quem atendia antes. Quem assumiu carteira no meio do '
+      + 'caminho aparece com base baixa em 2025 e um crescimento que é troca de responsável, não venda.',
+    filtros:['cs','mesBonificacao'],
+    tabela:'CS', chaveCliente:'cs',
+    colunas:[
+      {k:'cs', l:'CS responsável', tipo:'cs'},
+      ...METRICAS().map(m=>({k:m.k, l:m.titulo, tipo:'bonif', r:true, unidade:m.unidade})),
+    ],
+    linhas:()=>linhasBonificacao(),
+    kpis:(rows)=>{
+      const met = METRICAS();
+      const t = k => rows.reduce((a,r)=>a+(r[k]||0),0);
+      const fmtU = (k)=>{ const m=met.find(x=>x.k===k); return m && m.unidade==='R$' ? fmt.moneyCompact(t(k)) : fmt.int(t(k)) };
+      return [
+        {l:'Reuniões no mês', v:fmtU('reunioes'), s:'time todo'},
+        {l:'Marcas +60 eventos no Tino', v:fmtU('tino60'), s:'no mês escolhido'},
+        {l:'Varejos novos', v:fmtU('filiais'), s:'filiais de marca já existente'},
+        {l:'Receita de mensalidade', v:fmtU('mensalidade'), s:'soma das carteiras na visão'},
+      ];
+    },
+    graficos:[
+      {t:'Comparativo por CS', categorias:(t)=>{
+        const met = METRICAS();
+        const rows = linhasBonificacao().filter(r=>!estado.filtros.cs.size || estado.filtros.cs.has(r.cs));
+        /* Sem escolha explícita, abre na primeira regra que tem número no mês:
+           começar num gráfico vazio (o Tino zera quando a API não respondeu na
+           carga) faz parecer que a aba está quebrada. */
+        const comDado = met.find(m=>rows.some(r=>r[m.k]));
+        const k = estado.filtros.metricaBonificacao || (comDado||met[0]||{}).k;
+        const cores = ['var(--acc)','var(--acc-2)','var(--gold)','var(--pos)','var(--neg)','var(--ink-3)'];
+        return rows.filter(r=>r[k]).sort((a,b)=>b[k]-a[k]).slice(0,12)
+          .map((r,i)=>({l:r.cs, v:Math.round(r[k]), cor:cores[i%cores.length]}));
+      }},
+    ],
+  },
 ];
+
+/* Catálogo das regras. Vem do dados.js (é o fetcher que sabe medir cada uma);
+   a lista abaixo é só o que fazer se o arquivo for antigo e não tiver a aba. */
+function METRICAS(){
+  const b = DATA.bonificacao;
+  return (b && b.metricas && b.metricas.length) ? b.metricas : [];
+}
+
+/* Uma linha por CS no mês escolhido, com o valor de cada regra, a base de
+   comparação e a lista de marcas que entraram (vai no title da célula). */
+function linhasBonificacao(){
+  const b = DATA.bonificacao || {linhas:[], detalhe:[], meses:[]};
+  const mes = mesBonificacao();
+  const met = METRICAS();
+  const porCs = new Map();
+  const linha = cs => {
+    let l = porCs.get(cs);
+    if(!l){ l = {cs}; met.forEach(m=>{ l[m.k]=0; l['_base_'+m.k]=null; l['_quem_'+m.k]=[] }); porCs.set(cs,l) }
+    return l;
+  };
+  (b.linhas||[]).forEach(x=>{
+    if(x.mes!==mes) return;
+    const l = linha(x.cs);
+    l[x.k] = x.valor;
+    l['_base_'+x.k] = x.base;
+  });
+  (b.detalhe||[]).forEach(x=>{
+    if(x.mes!==mes) return;
+    const l = linha(x.cs);
+    const arr = l['_quem_'+x.k]; if(arr) arr.push(x.cliente + (x.valor>1 ? ' ('+fmt.int(x.valor)+')' : ''));
+  });
+  return [...porCs.values()].sort((a,b2)=>
+    /^\(?Sem/i.test(a.cs) ? 1 : /^\(?Sem/i.test(b2.cs) ? -1 : a.cs.localeCompare(b2.cs,'pt-BR'));
+}
+
+/* Mês escolhido no filtro; por padrão, o último mês que tem dado. */
+function mesBonificacao(){
+  const b = DATA.bonificacao || {meses:[]};
+  const meses = b.meses || [];
+  const m = estado.filtros.mesBonificacao;
+  if(m && meses.includes(m)) return m;
+  return meses[meses.length-1] || '';
+}
 
 /* Legenda do KPI "Marcas com Tino": o total que a própria API do Tino informa,
    que é a régua oficial do produto — a tabela mostra menos quando há filtro
@@ -1296,7 +1566,8 @@ const soma=(a,k)=>a.reduce((s,x)=>s+(Number(x[k])||0),0);
 const media=(a,k)=>a.length?soma(a,k)/a.length:0;
 const pctTexto=(p,t)=>t?Math.round(p/t*100)+'%':'—';
 function maisFrequente(a,k){const m={};a.forEach(x=>m[x[k]]=(m[x[k]]||0)+1);const e=Object.entries(m).sort((x,y)=>y[1]-x[1])[0];return e?e[0]:'—'}
-function piorSemana(s){const m={};s.forEach(x=>m[x.semana]=(m[x.semana]||0)+x.churns);const e=Object.entries(m).sort((a,b)=>b[1]-a[1])[0];return e&&e[1]?fmt.wk(e[0]):'—'}
+/* O bucket com mais cancelamentos dentro do período — dia, semana ou mês,
+   conforme o agrupamento que o próprio período escolheu. */
 /* Fechado = SOMENTE 'Ganho'. 'Em aberto' não conta nem como ganho nem como perdido. */
 function kpisDeal(rows){
   const g=rows.filter(r=>r.status==='Ganho'),
@@ -1315,11 +1586,14 @@ function kpisDeal(rows){
    5. ESTADO
    ========================================================================== */
 const FILTROS_PADRAO_BASE = { cliente:'', statusDeal:'todos', situacao:'Cancelado',
-  statusCliente:'todos', resultadoReuniao:'todos', statusTicket:'todos', pipeline:'todos' };
+  statusCliente:'todos', resultadoReuniao:'todos', statusTicket:'todos', pipeline:'todos',
+  /* vazios = "o último mês com dado" e "a primeira regra"; quem resolve é
+     mesBonificacao() / o gráfico da aba */
+  mesBonificacao:'', metricaBonificacao:'' };
 /* `canais` e `cs` vazios querem dizer "todos" — assim o filtro nasce sem nada
    marcado e marcar um item já é o recorte, sem precisar desmarcar os outros. */
 const filtrosPadrao = ()=>Object.assign({}, FILTROS_PADRAO_BASE,
-  { semanas: ultimasSemanas(12), canais: new Set(), cs: new Set() });
+  { periodo: periodoPadrao(), canais: new Set(), cs: new Set() });
 const estado = {
   aba: 'clientes',
   filtros: filtrosPadrao(),
@@ -1414,20 +1688,19 @@ function filtrarLinhas(t){
   // agregado (tabela geral, produtos), o período já entrou na agregação.
   if(t.filtros.includes('periodo')){
     const temData = rows.some(r=>r.data);
-    /* O seletor de semanas só vai até a semana atual, então reunião já marcada
-       para a frente ficaria invisível — e ela é justamente a agenda do que vem.
-       Quando a semana atual está na seleção ("estou olhando o agora"), o que
-       está por vir entra junto. */
-    const futuroVale = t.id==='reunioes' && estado.filtros.semanas.has(DATA.meta.semanaAtual);
-    if(temData) rows = rows.filter(r=>!r.data || dentroDaJanela(semanaDoAno(r.data))
-      || (futuroVale && semanaDoAno(r.data) > DATA.meta.semanaAtual));
+    /* Reunião já marcada para a frente ficaria invisível — e ela é justamente a
+       agenda do que vem. Quando o período vai até hoje ("estou olhando o
+       agora"), o que está por vir entra junto. */
+    const futuroVale = t.id==='reunioes' && estado.filtros.periodo.fim >= LIMITE_DADOS.fim;
+    if(temData) rows = rows.filter(r=>!r.data || dentroDaJanela(r.data)
+      || (futuroVale && String(r.data).slice(0,10) > estado.filtros.periodo.fim));
   }
 
   const o = estado.ordem[t.id];
   if(o){
     rows.sort((a,b)=>{
       let x=a[o.k], y=b[o.k];
-      if(o.k==='_sem'){ x=semanaDoAno(a.data)??-1; y=semanaDoAno(b.data)??-1 }
+      if(o.k==='_dia'){ x=a.data||''; y=b.data||'' }
       if(x==null && y==null) return 0;
       if(x==null) return 1;
       if(y==null) return -1;
@@ -1456,15 +1729,62 @@ function escopoClientes(t){
   return new Set(nomes);
 }
 
+/* --- agrupamento do eixo do tempo ---
+   As séries são diárias. Desenhar 365 barras não se lê, e desenhar 7 dias como
+   um único ponto mensal esconde o que se quer ver — então o passo do gráfico
+   sai do tamanho do período: até 45 dias mostra dia a dia, até 400 agrupa por
+   semana, acima disso por mês. O filtro continua exato: quem agrupa é só o
+   desenho. */
+function grãoDoPeriodo(p){
+  const dias = diasEntre(p.ini, p.fim) + 1;
+  return dias <= 45 ? 'dia' : dias <= 400 ? 'semana' : 'mes';
+}
+/* Data -> chave do bucket a que ela pertence. Na semana, a chave é a
+   segunda-feira: assim a barra "semana de 10/ago" é sempre a mesma, independente
+   de onde o período começa. */
+function bucketDe(iso, grao){
+  if(grao==='mes') return iso.slice(0,7);
+  if(grao==='dia') return iso;
+  const d = new Date(iso+'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay()+6)%7));
+  return d.toISOString().slice(0,10);
+}
+function rotuloBucket(chave, grao){
+  if(grao==='mes') return fmt.mes(chave+'-01');
+  if(grao==='dia') return fmt.dia(chave);
+  return fmt.dia(chave);
+}
+/* Todos os buckets do período, inclusive os vazios — sem eles o gráfico
+   emendaria dois picos separados por uma semana sem venda. */
+function bucketsDoPeriodo(p, grao){
+  const out = [];
+  if(grao==='mes'){
+    let m = p.ini.slice(0,7);
+    while(m <= p.fim.slice(0,7)){
+      out.push(m);
+      const [y,mm] = m.split('-').map(Number);
+      m = new Date(Date.UTC(y, mm, 1)).toISOString().slice(0,7);
+    }
+    return out;
+  }
+  const passo = grao==='dia' ? 1 : 7;
+  let d = bucketDe(p.ini, grao);
+  const fim = bucketDe(p.fim, grao);
+  let guarda = 0;
+  while(d <= fim && guarda++ < 1200){ out.push(d); d = somarDias(d, passo) }
+  return out;
+}
+
 function agregarSerie(t){
   if(!t.series) return [];
-  const sem = semanasAtivas();
+  const p = periodo();
+  const grao = grãoDoPeriodo(p);
   const nomes = escopoClientes(t);
   const mapa = new Map();
-  semanasOrdenadas().forEach(s=>mapa.set(s,{semana:s}));
+  bucketsDoPeriodo(p, grao).forEach(b=>mapa.set(b,{bucket:b, rotulo:rotuloBucket(b,grao), grao}));
   const f = estado.filtros;
   t.series().forEach(x=>{
-    if(!sem.has(x.semana)) return;
+    if(!dentroDaJanela(x.data)) return;
     /* seriePropria: a linha traz o próprio responsável e pode ser de uma marca
        que não está na carteira (empresa do HubSpot, marca só do Tino). Aí o
        recorte é feito na própria linha, senão ela sumiria do gráfico. */
@@ -1473,8 +1793,12 @@ function agregarSerie(t){
          && !String(x.cliente||'').toLowerCase().includes(f.cliente.toLowerCase())) return;
       if(t.filtros.includes('cs') && f.cs.size && !f.cs.has(normalizarCs(x.cs)||'Sem CS')) return;
     } else if(x.cliente && !nomes.has(x.cliente)) return;
-    const alvo = mapa.get(x.semana); if(!alvo) return;
-    for(const k in x){ if(k!=='semana'&&k!=='cliente') alvo[k]=(alvo[k]||0)+x[k] }
+    const alvo = mapa.get(bucketDe(String(x.data).slice(0,10), grao)); if(!alvo) return;
+    for(const k in x){
+      if(k==='data'||k==='cliente'||k==='dominio'||k==='cs') continue;
+      if(typeof x[k]!=='number') continue;
+      alvo[k]=(alvo[k]||0)+x[k];
+    }
   });
   return [...mapa.values()].map(o=>{ for(const k in o) if(o[k]==null) o[k]=0; return o });
 }
@@ -1482,6 +1806,7 @@ function agregarSerie(t){
 function renderPagina(){
   const t = aba();
   aplicarAcento(t);
+  atualizarTopo();
   const page = $('#page'); page.innerHTML='';
 
   const head = el('div',{class:'page-head'});
@@ -1508,8 +1833,12 @@ function renderPagina(){
   }
 
   if(t.graficos && t.graficos.length){
-    page.appendChild(el('div',{class:'section-label'},'<span class="eyebrow">Histórico por semana do ano</span>'));
-    page.appendChild(renderRegua(serie));
+    /* A régua só faz sentido onde o eixo é o tempo. A aba de Bonificação
+       trabalha em mês fechado e tem seletor próprio. */
+    if(t.filtros.includes('periodo')){
+      page.appendChild(el('div',{class:'section-label'},'<span class="eyebrow">Histórico no período</span>'));
+      page.appendChild(renderRegua(serie));
+    }
     const wrap = el('div',{class:'charts'+(t.duasColunas?' two':'')});
     const cats = {};
     t.graficos.forEach((g,i)=>{
@@ -1560,7 +1889,22 @@ function renderFiltros(t){
     add('Pipeline', sel([['todos','Todos os pipelines'],...pipes.map(p=>[p,p])],
       estado.filtros.pipeline, v=>estado.filtros.pipeline=v));
   }
-  if(t.filtros.includes('periodo')) add('Semanas', seletorDeSemanas());
+  if(t.filtros.includes('periodo')) add('Período', seletorDePeriodo());
+  if(t.filtros.includes('mesBonificacao')){
+    const meses = (DATA.bonificacao||{}).meses || [];
+    /* Do mais recente para o mais antigo: quem abre a aba quer o mês que
+       acabou de fechar, não janeiro do ano passado. */
+    add('Mês', sel(meses.slice().reverse().map(m=>[m, rotuloMes(m)]),
+      mesBonificacao(), v=>estado.filtros.mesBonificacao=v));
+    const met = METRICAS();
+    if(met.length){
+      const rows = linhasBonificacao();
+      const comDado = met.find(m=>rows.some(r=>r[m.k]));
+      add('Regra no gráfico', sel(met.map(m=>[m.k, m.titulo]),
+        estado.filtros.metricaBonificacao || (comDado||met[0]).k,
+        v=>estado.filtros.metricaBonificacao=v));
+    }
+  }
   if(t.filtros.includes('statusCliente')){
     add('Situação', sel([['todos','Ativos e inativos'],['ativo','Só ativos'],['inativo','Só inativos']],
       estado.filtros.statusCliente, v=>estado.filtros.statusCliente=v));
@@ -1679,22 +2023,16 @@ function seletorDeCanais(){
   return box;
 }
 
-/* --- seletor de semanas: múltipla escolha, agrupada por mês --- */
-function seletorDeSemanas(){
-  const ano = DATA.meta.ano, atual = DATA.meta.semanaAtual;
+/* --- seletor de período: data início / data fim, com atalhos ---
+   Substituiu a grade de semanas em 26/08/2026. A grade permitia escolher semanas
+   soltas de meses diferentes, o que era bonito e quase nunca usado; o que a CS
+   pede o tempo todo é "o mês fechado", e isso a semana ISO não entrega. */
+function seletorDePeriodo(){
   const box = el('div',{class:'wk-pick'});
-  const sel = estado.filtros.semanas;
-
-  const resumo = ()=>{
-    const l = semanasOrdenadas();
-    if(!l.length) return 'nenhuma semana';
-    if(l.length===atual) return 'ano todo · '+l.length+' semanas';
-    const seq = l.every((s,i)=>i===0||s===l[i-1]+1);
-    return l.length+(l.length===1?' semana':' semanas')+' · '+(seq?fmt.wk(l[0])+'–'+fmt.wk(l[l.length-1]):fmt.wk(l[0])+'…'+fmt.wk(l[l.length-1]));
-  };
+  const p = estado.filtros.periodo;
 
   const botao = el('button',{class:'wk-btn',type:'button'},
-    '<span>'+resumo()+'</span><svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>');
+    '<span>'+rotuloPeriodo(p)+'</span><svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>');
   const painel = el('div',{class:'wk-pop'});
   if(estado.pickerAberto) painel.classList.add('aberto');
   botao.onclick = (e)=>{ e.stopPropagation();
@@ -1702,45 +2040,54 @@ function seletorDeSemanas(){
     painel.classList.toggle('aberto', estado.pickerAberto);
   };
 
-  // atalhos
   const atalhos = el('div',{class:'wk-quick'});
-  [['4 sem',4],['12 sem',12],['26 sem',26],['Ano todo',atual]].forEach(([rot,n])=>{
-    const b = el('button',{class:'wk-chip',type:'button'},rot);
-    b.onclick=(e)=>{e.stopPropagation();estado.filtros.semanas=ultimasSemanas(n);renderPagina()};
+  periodosProntos().forEach(([rot, jan])=>{
+    const marcado = jan.ini===p.ini && jan.fim===p.fim;
+    const b = el('button',{class:'wk-chip'+(marcado?' on':''),type:'button'},rot);
+    b.onclick=(e)=>{e.stopPropagation(); estado.filtros.periodo = jan; renderPagina()};
     atalhos.appendChild(b);
   });
   painel.appendChild(atalhos);
 
-  // meses -> semanas
-  const porMes = new Map();
-  for(let s=1;s<=atual;s++){
-    const m = mesDaSemana(s,ano);
-    if(!porMes.has(m)) porMes.set(m,[]);
-    porMes.get(m).push(s);
-  }
-  const grade = el('div',{class:'wk-grid'});
-  [...porMes.entries()].reverse().forEach(([m,semanas])=>{
-    const linha = el('div',{class:'wk-mes'});
-    const todasMarcadas = semanas.every(s=>sel.has(s));
-    const cab = el('button',{class:'wk-mes-nome'+(todasMarcadas?' on':''),type:'button'},
-      MESES[m]+'<small>'+semanas.length+'</small>');
-    cab.onclick=(e)=>{e.stopPropagation();
-      if(todasMarcadas) semanas.forEach(s=>sel.delete(s)); else semanas.forEach(s=>sel.add(s));
-      renderPagina();
-    };
-    linha.appendChild(cab);
-    const chips = el('div',{class:'wk-chips'});
-    semanas.forEach(s=>{
-      const on = sel.has(s);
-      const c = el('button',{class:'wk-s'+(on?' on':'')+(s===atual?' hoje':''),type:'button',
-        title:'Semana '+s+' do ano · '+semanaDoMes(s,ano)+'ª de '+MESES[m]+' · '+rotuloSemana(s,ano)},
-        String(semanaDoMes(s,ano))+'ª');
-      c.onclick=(e)=>{e.stopPropagation(); on?sel.delete(s):sel.add(s); renderPagina()};
-      chips.appendChild(c);
-    });
-    linha.appendChild(chips);
-    grade.appendChild(linha);
+  /* Os dois campos de data. `min`/`max` prendem a escolha ao que existe no
+     arquivo, e mexer num deles arruma o outro se a ordem inverter — é mais
+     rápido do que recusar a data e explicar por quê. */
+  const linha = el('div',{class:'per-datas'});
+  const campo = (rot, valor, aoMudar)=>{
+    const w = el('label',{class:'per-campo'});
+    w.appendChild(el('span',{},rot));
+    const i = el('input',{type:'date',value:valor,min:LIMITE_DADOS.ini,max:LIMITE_DADOS.fim});
+    i.onchange = ()=>{ if(i.value) aoMudar(i.value) };
+    i.onclick = e=>e.stopPropagation();
+    w.appendChild(i);
+    return w;
+  };
+  linha.appendChild(campo('De', p.ini, v=>{
+    estado.filtros.periodo = { ini: v, fim: v > p.fim ? v : p.fim };
+    renderPagina();
+  }));
+  linha.appendChild(campo('Até', p.fim, v=>{
+    estado.filtros.periodo = { ini: v < p.ini ? v : p.ini, fim: v };
+    renderPagina();
+  }));
+  painel.appendChild(linha);
+
+  /* Meses do ano em grade: um clique fecha o mês inteiro, que é o caso de uso
+     que originou a mudança. Mês no futuro fica desabilitado. */
+  const grade = el('div',{class:'per-meses'});
+  const anoDados = LIMITE_DADOS.fim.slice(0,4);
+  MESES.forEach((nome, idx)=>{
+    const ini = anoDados+'-'+String(idx+1).padStart(2,'0')+'-01';
+    const fim = ultimoDiaDoMes(ini);
+    const futuro = ini > LIMITE_DADOS.fim;
+    const jan = janela(ini, fim);
+    const marcado = !futuro && jan.ini===p.ini && jan.fim===p.fim;
+    const b = el('button',{class:'per-mes'+(marcado?' on':'')+(futuro?' off':''),type:'button',
+      title: futuro ? 'ainda não aconteceu' : rotuloPeriodo(jan)}, nome);
+    if(!futuro) b.onclick=(e)=>{e.stopPropagation(); estado.filtros.periodo = jan; renderPagina()};
+    grade.appendChild(b);
   });
+  painel.appendChild(el('div',{class:'per-titulo'},'Mês fechado de '+anoDados));
   painel.appendChild(grade);
   painel.onclick = e => e.stopPropagation();
 
@@ -1748,34 +2095,40 @@ function seletorDeSemanas(){
   return box;
 }
 
-/* --- régua de semanas: elemento que amarra todos os gráficos --- */
+/* --- régua do período: a faixa escolhida dentro do ano ---
+   Era uma régua de 52 semanas com as semanas selecionadas acesas. Agora desenha
+   o ano inteiro em dias e destaca a janela, com o dia de hoje marcado. */
 function renderRegua(serie){
   const box = el('div',{class:'ruler'});
-  const sel = semanasAtivas();
-  const l = semanasOrdenadas();
-  const seq = l.every((s,i)=>i===0||s===l[i-1]+1);
-  const intervalo = !l.length ? 'nenhuma semana'
-    : seq ? fmt.wk(l[0])+' — '+fmt.wk(l[l.length-1])
-          : l.length+' semanas avulsas';
+  const p = periodo();
+  const ano = LIMITE_DADOS.fim.slice(0,4);
+  const dias = diasEntre(p.ini, p.fim) + 1;
+  const grao = grãoDoPeriodo(p);
+  const comoAgrupa = grao==='dia' ? 'dia a dia' : grao==='semana' ? 'por semana' : 'por mês';
   box.innerHTML = `<div class="ruler-head">
-      <span class="eyebrow">Semanas de ${DATA.meta.ano}</span>
-      <span>${intervalo} · ${l.length} na visão</span>
+      <span class="eyebrow">Período</span>
+      <span>${rotuloPeriodo(p)} · ${fmt.int(dias)} ${dias===1?'dia':'dias'} · gráficos ${comoAgrupa}</span>
     </div><div id="reguaSvg"></div>`;
   requestAnimationFrame(()=>{
     const host = box.querySelector('#reguaSvg'); if(!host) return;
-    const W = host.clientWidth || 900, H = 30, n = 52, pad = 2;
-    const step = (W-pad*2)/n;
-    let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Régua de semanas do ano">`;
-    for(let i=1;i<=n;i++){
-      const x = pad + (i-0.5)*step;
-      const dentro = sel.has(i), atual = i===DATA.meta.semanaAtual;
-      const h = atual?16:(i%4===0?11:7);
-      const cor = atual?'var(--ink)':dentro?'var(--acc)':'#D7DCE3';
-      s += `<rect x="${x-1.1}" y="${18-h}" width="2.2" height="${h}" rx="1" fill="${cor}" opacity="${dentro||atual?1:.9}"/>`;
-      if(i%4===0||atual) s += `<text x="${x}" y="${28}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="${atual?'var(--ink)':'var(--ink-3)'}">${String(i).padStart(2,'0')}</text>`;
-    }
-    s += `</svg>`;
-    host.innerHTML = s;
+    const W = host.clientWidth || 900, H = 30, pad = 2;
+    const inicioAno = ano+'-01-01', fimAno = ano+'-12-31';
+    const total = diasEntre(inicioAno, fimAno) + 1;
+    const x = iso => pad + (diasEntre(inicioAno, iso)/total)*(W-pad*2);
+    const x1 = x(p.ini), x2 = Math.max(x(p.fim)+1.5, x1+2);
+    const hojeX = x(LIMITE_DADOS.fim);
+    let g = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Régua do ano com o período destacado">`;
+    g += `<rect x="${pad}" y="11" width="${W-pad*2}" height="4" rx="2" fill="#D7DCE3"/>`;
+    g += `<rect x="${x1}" y="8" width="${x2-x1}" height="10" rx="3" fill="var(--acc)"/>`;
+    g += `<rect x="${hojeX-1}" y="4" width="2" height="18" rx="1" fill="var(--ink)"/>`;
+    // marcas de mês, para localizar a faixa no ano sem contar dias
+    MESES.forEach((nome, i)=>{
+      const mx = x(ano+'-'+String(i+1).padStart(2,'0')+'-01');
+      g += `<line x1="${mx}" y1="17" x2="${mx}" y2="21" stroke="#C3CAD3" stroke-width="1"/>`;
+      g += `<text x="${mx}" y="29" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink-3)">${nome}</text>`;
+    });
+    g += `</svg>`;
+    host.innerHTML = g;
   });
   return box;
 }
@@ -1823,6 +2176,15 @@ function desenharCategorias(host, cats){
 }
 
 /* --- gráficos SVG --- */
+/* Cabeçalho do tooltip. No agrupamento semanal o rótulo do eixo é só o dia de
+   início — aqui vale dizer o intervalo inteiro, senão "10/ago" parece um dia. */
+function rotuloCheio(d){
+  if(!d || !d.bucket) return '';
+  if(d.grao==='mes') return MESES_LONGOS[Number(d.bucket.slice(5,7))-1]+' de '+d.bucket.slice(0,4);
+  if(d.grao==='dia') return fmt.date(d.bucket);
+  return fmt.date(d.bucket)+' – '+fmt.date(somarDias(d.bucket,6));
+}
+
 function desenhar(host, dados, series){
   if(!host) return;
   const draw = ()=>{
@@ -1875,7 +2237,7 @@ function desenhar(host, dados, series){
     // eixo x
     const passo = Math.ceil(n/12);
     dados.forEach((d,i)=>{ if(i%passo===0||i===n-1)
-      s += `<text x="${cx(i)}" y="${H-9}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--ink-3)">${fmt.wk(d.semana)}</text>`});
+      s += `<text x="${cx(i)}" y="${H-9}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--ink-3)">${d.rotulo??''}</text>`});
     s += `<line id="guia" x1="0" y1="${P.t}" x2="0" y2="${P.t+ih}" stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3 3" opacity="0"/>`;
     s += `<rect x="${P.l}" y="${P.t}" width="${iw}" height="${ih}" fill="transparent" id="hit"/>`;
     s += `</svg>`;
@@ -1889,7 +2251,7 @@ function desenhar(host, dados, series){
       let i = Math.round((x-P.l)/(iw/n)-0.5);
       i = Math.max(0, Math.min(n-1, i)); const d = dados[i]; if(!d) return;
       guia.setAttribute('x1',cx(i)); guia.setAttribute('x2',cx(i)); guia.setAttribute('opacity','.5');
-      tip.innerHTML = `<span class="t-wk">${fmt.wk(d.semana)} · ${DATA.meta.ano}</span>`+
+      tip.innerHTML = `<span class="t-wk">${rotuloCheio(d)}</span>`+
         series.map(sr=>`<span class="t-row">${sr.l} <b>${sr.f?sr.f(d[sr.k]||0):d[sr.k]}</b></span>`).join('');
       tip.style.left = (cx(i)*(rect.width/W))+'px';
       tip.style.top = (P.t+8)+'px';
@@ -2075,7 +2437,6 @@ function celula(r,c){
     case 'linksPagos': {
       const ger = r.linksGerados||0;
       td.innerHTML = `<span class="cell-main">${fmt.int(v)}</span><span class="cell-sub">${pctTexto(v,ger)} dos gerados</span>`; break }
-    case 'semana': { const s = semanaDoAno(r.data); td.textContent = s?fmt.wk(s):'—'; break }
     case 'int': td.textContent = fmt.int(v); break;
     case 'money': td.textContent = fmt.money(v); break;
     case 'moneyC': td.textContent = fmt.moneyC(v); break;
@@ -2085,6 +2446,40 @@ function celula(r,c){
     case 'cadastro': {
       if(!v){ td.textContent = '—'; break }
       td.innerHTML = `<span class="cell-main">${fmt.date(v)}</span><span class="cell-sub">${tempoDeCasa(v)}</span>`;
+      break }
+    /* Desde quando a marca tem o produto. Embaixo, há quanto tempo — é o que
+       responde "esse cliente está usando pouco ou acabou de entrar?". Marca que
+       entrou DENTRO do período selecionado ganha destaque: o número dela cobre
+       menos dias que o dos outros e não deve ser comparado de igual para igual. */
+    /* Número da regra e, embaixo, a comparação que a própria regra pede.
+       `_base_` guarda o valor do comparativo (mês anterior ou mesmo mês do ano
+       passado) e `_quem_` a lista de marcas, que vai no title — é assim que a
+       CS confere de onde saiu o número sem precisar de outra tela. */
+    case 'bonif': {
+      const met = METRICAS().find(m=>m.k===c.k) || {};
+      const dinheiro = met.unidade === 'R$';
+      const vv = v || 0;
+      const base = r['_base_'+c.k];
+      const quem = r['_quem_'+c.k] || [];
+      let sub = '';
+      if(base != null){
+        const d = vv - base;
+        const cls = d > 0 ? 'var-up' : d < 0 ? 'var-down' : 'var-flat';
+        const sinal = d > 0 ? '+' : d < 0 ? '−' : '';
+        const abs = dinheiro ? fmt.moneyCompact(Math.abs(d)) : fmt.int(Math.abs(d));
+        const contra = met.comparacao === 'anoAnterior' ? 'vs. mesmo mês de '+(Number(mesBonificacao().slice(0,4))-1)
+                                                        : 'vs. mês anterior';
+        sub = `<span class="cell-sub ${cls}">${d===0?'igual':sinal+abs} <em>${contra}</em></span>`;
+      }
+      td.innerHTML = `<span class="cell-main">${dinheiro?fmt.moneyCompact(vv):fmt.int(vv)}</span>` + sub;
+      if(quem.length) td.title = quem.slice(0,40).join(', ') + (quem.length>40?` … +${quem.length-40}`:'');
+      break }
+    case 'implantado': {
+      if(!v){ td.textContent = '—'; break }
+      const novo = dentroDaJanela(v);
+      const origem = r.implantadoOrigem ? ' · '+r.implantadoOrigem : '';
+      td.innerHTML = `<span class="cell-main">${fmt.date(v)}</span>`
+        + `<span class="cell-sub${novo?' novo':''}">${novo?'entrou neste período':tempoDeCasa(v)+origem}</span>`;
       break }
     default: td.textContent = v==null?'—':v;
   }
@@ -2096,7 +2491,6 @@ function exportarCSV(){
   const linhas = [colunas.map(c=>c.l).join(';')];
   rows.forEach(r=>linhas.push(colunas.map(c=>{
     let v = r[c.k];
-    if(c.tipo==='semana'){ const s=semanaDoAno(r.data); v = s?fmt.wk(s):'' }
     if(c.tipo==='clienteNegocio') v = `${r.cliente} — ${r.negocio||''}`;
     /* O racional é uma lista; sem isso o CSV sairia com os critérios colados
        por vírgula e ninguém entenderia onde um termina e o outro começa. */
@@ -2106,7 +2500,7 @@ function exportarCSV(){
   }).join(';')));
   const blob = new Blob(['\ufeff'+linhas.join('\n')],{type:'text/csv;charset=utf-8'});
   const a = el('a'); a.href = URL.createObjectURL(blob);
-  a.download = `${estado.aba}-semana-${DATA.meta.semanaAtual}.csv`; a.click();
+  a.download = `${estado.aba}-${periodo().ini}_a_${periodo().fim}.csv`; a.click();
   URL.revokeObjectURL(a.href);
 }
 
@@ -2121,8 +2515,26 @@ document.body.appendChild((()=>{
   return dl;
 })());
 
-$('#wkNow').textContent = 'Semana ' + DATA.meta.semanaAtual;
-$('#wkRange').textContent = intervaloSemana(DATA.meta.semanaAtual, DATA.meta.ano);
+/* O topo passou a espelhar o período escolhido, não a semana corrente: com o
+   filtro em datas, "Semana 33" no cabeçalho e "01/08 a 31/08" no filtro seriam
+   duas respostas diferentes para a mesma pergunta. `atualizarTopo` é chamada a
+   cada render. */
+function atualizarTopo(){
+  const t = aba();
+  /* Aba sem filtro de período (Bonificação) trabalha em mês fechado — mostrar a
+     janela de datas no topo seria uma resposta que não vale para o que está na
+     tela. */
+  if(t && t.filtros && !t.filtros.includes('periodo') && t.filtros.includes('mesBonificacao')){
+    $('#wkNow').textContent = rotuloMes(mesBonificacao());
+    $('#wkRange').textContent = 'mês fechado';
+    return;
+  }
+  const p = periodo();
+  const dias = diasEntre(p.ini, p.fim) + 1;
+  $('#wkNow').textContent = rotuloPeriodo(p);
+  $('#wkRange').textContent = fmt.int(dias) + (dias===1?' dia':' dias') + ' na visão';
+}
+atualizarTopo();
 
 /* selo de origem dos dados + ressalvas de fonte, visíveis no painel */
 (function selo(){

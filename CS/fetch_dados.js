@@ -7,8 +7,13 @@
  *
  * Saída: dados.js  ->  window.PAINEL_DATA, no formato documentado no index.html.
  *
- * Grão temporal: SEMANA ISO do ano corrente (o painel inteiro é "semana do ano").
- * Só entram semanas 1..semanaAtual do ANO definido abaixo.
+ * Grão temporal: DIA. Cada série sai como (marca × data ISO), e é o painel que
+ * agrupa em dia/semana/mês conforme o tamanho do período escolhido. Era semana
+ * ISO até 26/08/2026 — mudou porque "mês fechado" não cabe em semana: a semana
+ * 31 tem dias de julho e de agosto, e todo filtro mensal vazava para o mês vizinho.
+ *
+ * Janela: 1º de janeiro do ANO ANTERIOR até hoje. O ano a mais existe para a aba
+ * de Bonificação, que compara ago/25 com ago/26 — sem ele não há ano contra ano.
  *
  * Rodar:  node fetch_dados.js
  */
@@ -30,6 +35,11 @@ const DS = '`vesti-data-499015.vestilake_BI`';
 const HOJE = new Date();
 const ANO = HOJE.getUTCFullYear();
 const SEMANA_ATUAL = isoWeek(HOJE);
+const HOJE_ISO = HOJE.toISOString().slice(0, 10);
+/* Início da janela de dados. Um ano inteiro a mais que o corrente: é o que a
+   aba de Bonificação precisa para comparar o mesmo mês do ano passado. */
+const ANO_BASE = ANO - 1;
+const INICIO = ANO_BASE + '-01-01';
 
 /* Teto de valor por pedido. Mesmo filtro que o CS-Sucesso e o PainelElisa usam
    para descartar pedido-teste/outlier — mantido para os números baterem entre
@@ -93,9 +103,29 @@ function dataDaSemana(s, ano) {           // quinta-feira da semana ISO
   return seg.toISOString().slice(0, 10);
 }
 const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+/* 'YYYY-MM-DD' passa direto; 'YYYY-Www' vira a segunda-feira daquela semana ISO.
+   A API do Tino devolve um ou outro conforme a granularidade, e o painel só
+   entende dia. */
+function diaDoPeriodo(p) {
+  const t = String(p || '');
+  if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t.slice(0, 10);
+  const m = t.match(/^(\d{4})-W(\d{1,2})$/);
+  if (!m) return null;
+  const base = new Date(Date.UTC(Number(m[1]), 0, 4));
+  const seg = new Date(base);
+  seg.setUTCDate(base.getUTCDate() - ((base.getUTCDay() + 6) % 7) + (Number(m[2]) - 1) * 7);
+  return seg.toISOString().slice(0, 10);
+}
 const fmtBR = v => 'R$ ' + Math.round(num(v)).toLocaleString('pt-BR');
 const r2 = v => Math.round(num(v) * 100) / 100;
 const soDigitos = v => String(v || '').replace(/\D/g, '');
+/* 'YYYY-MM' menos n meses. Serve o comparativo da bonificação: mês anterior
+   (n=1) e mesmo mês do ano passado (n=12). */
+function mesAntes(mes, n) {
+  const [y, m] = String(mes).split('-').map(Number);
+  const d = new Date(Date.UTC(y, m - 1 - n, 1));
+  return d.toISOString().slice(0, 7);
+}
 const iso = v => {
   if (!v) return null;
   const s = typeof v === 'object' && v.value ? v.value : String(v);
@@ -110,10 +140,12 @@ async function q(label, sql) {
   return rows;
 }
 
-// filtro de semana do ano corrente, reaproveitado em várias queries
-const FILTRO_SEMANA = (col) => `
-  EXTRACT(ISOYEAR FROM DATE(CAST(${col} AS TIMESTAMP))) = ${ANO}
-  AND EXTRACT(ISOWEEK FROM DATE(CAST(${col} AS TIMESTAMP))) <= ${SEMANA_ATUAL}`;
+/* Janela de datas, reaproveitada em todas as queries de série. Substituiu o
+   antigo FILTRO_SEMANA (ano corrente, semanas 1..atual). */
+const FILTRO_PERIODO = (col) => `
+  DATE(CAST(${col} AS TIMESTAMP)) BETWEEN DATE '${INICIO}' AND DATE '${HOJE_ISO}'`;
+// a data do dia, já como texto ISO, que é a chave de toda série
+const DIA = (col) => `FORMAT_DATE('%Y-%m-%d', DATE(CAST(${col} AS TIMESTAMP)))`;
 
 // ============================================================== 1. BIGQUERY
 async function puxarBQ() {
@@ -197,9 +229,9 @@ async function puxarBQ() {
     LEFT JOIN ${DS}.odbc_angels a ON CAST(a.id AS STRING) = d.angel_id
     LEFT JOIN part p ON p.id = d.partner_id`);
 
-  const pedidos = await q('pedidos por marca × semana', `
+  const pedidos = await q('pedidos por marca × dia', `
     SELECT CAST(domainId AS STRING) dom,
-      EXTRACT(ISOWEEK FROM DATE(CAST(settings_createdAt AS TIMESTAMP))) sem,
+      ${DIA('settings_createdAt')} d,
       COUNT(*) pedidos,
       COUNTIF(payment_isPaid='True') pagos,
       ROUND(SUM(IF(payment_isPaid='True', CAST(summary_total AS FLOAT64), 0)),2) valor,
@@ -210,7 +242,7 @@ async function puxarBQ() {
     WHERE settings_createdAt IS NOT NULL AND SAFE_CAST(domainId AS INT64) IS NOT NULL
       AND SAFE_CAST(summary_total AS FLOAT64) > 0
       AND SAFE_CAST(summary_total AS FLOAT64) < ${TETO_PEDIDO}
-      AND ${FILTRO_SEMANA('settings_createdAt')}
+      AND ${FILTRO_PERIODO('settings_createdAt')}
     GROUP BY 1,2`);
 
   const ultimoPedido = await q('último pedido por marca', `
@@ -234,9 +266,9 @@ async function puxarBQ() {
      (R$ 8,8M) — misturar os dois faria a aba contar link que não é do produto. */
   const LINK_COBRANCA = `settings_source = 'Link de cobrança'`;
   const VIA_VESTIPAGO = `payment_isPaid='True' AND payment_transaction_provider IS NOT NULL`;
-  const vestipago = await q('Vesti Pago por marca × semana', `
+  const vestipago = await q('Vesti Pago por marca × dia', `
     SELECT CAST(domainId AS STRING) dom,
-      EXTRACT(ISOWEEK FROM DATE(CAST(settings_createdAt AS TIMESTAMP))) sem,
+      ${DIA('settings_createdAt')} d,
       COUNTIF(${LINK_COBRANCA}) gerados,
       COUNTIF(${LINK_COBRANCA} AND payment_isPaid='True') pagos,
       COUNTIF(${VIA_VESTIPAGO}) transacoes,
@@ -250,7 +282,7 @@ async function puxarBQ() {
     WHERE settings_createdAt IS NOT NULL AND SAFE_CAST(domainId AS INT64) IS NOT NULL
       AND SAFE_CAST(summary_total AS FLOAT64) > 0
       AND SAFE_CAST(summary_total AS FLOAT64) < ${TETO_PEDIDO}
-      AND ${FILTRO_SEMANA('settings_createdAt')}
+      AND ${FILTRO_PERIODO('settings_createdAt')}
       AND (${LINK_COBRANCA} OR ${VIA_VESTIPAGO})
     GROUP BY 1,2`);
 
@@ -271,36 +303,36 @@ async function puxarBQ() {
      Por isso o interchange passa a ser medido em vestipago_transaction_detail e
      não mais em MongoDB_Pedidos_Geral: só esta tabela tem a quebra do MDR.
      Antifraude continua inteiro — é cobrança da Vesti, não taxa de banco. */
-  const interchange = await q('interchange líquido por marca × semana', `
+  const interchange = await q('interchange líquido por marca × dia', `
     SELECT CAST(domainId AS STRING) dom,
-      EXTRACT(ISOWEEK FROM DATE(CAST(paidAt AS TIMESTAMP))) sem,
+      ${DIA('paidAt')} d,
       ROUND(SUM(SAFE_CAST(vestiPagoValue AS FLOAT64)),2) fee_bruto,
       ROUND(SUM(SAFE_CAST(mdrCardBrandValue AS FLOAT64)),2) taxa_banco,
       ROUND(SUM(SAFE_CAST(mdrVestiValue AS FLOAT64)),2) fee_vesti,
       ROUND(SUM(SAFE_CAST(antifraudValue AS FLOAT64)),2) antifraude
     FROM ${DS}.vestipago_transaction_detail
     WHERE paidAt IS NOT NULL AND SAFE_CAST(domainId AS INT64) IS NOT NULL
-      AND ${FILTRO_SEMANA('paidAt')}
+      AND ${FILTRO_PERIODO('paidAt')}
     GROUP BY 1,2`);
 
-  const oraculoGmv = await q('Oráculo: GMV por marca × semana', `
+  const oraculoGmv = await q('Oráculo: GMV por marca × dia', `
     SELECT CAST(domainId AS STRING) dom,
-      EXTRACT(ISOWEEK FROM DATE(CAST(settings_createdAt AS TIMESTAMP))) sem,
+      ${DIA('settings_createdAt')} d,
       ROUND(SUM(SAFE_CAST(summary_total AS FLOAT64)),2) gmv_iniciado,
       ROUND(SUM(IF(Tipo_Venda_Oraculo='Venda Direta', SAFE_CAST(summary_total AS FLOAT64), 0)),2) gmv_finalizado
     FROM ${DS}.oraculo_Pedidos
     WHERE Tipo_Venda_Oraculo IS NOT NULL AND settings_createdAt IS NOT NULL
       AND SAFE_CAST(domainId AS INT64) IS NOT NULL
-      AND ${FILTRO_SEMANA('settings_createdAt')}
+      AND ${FILTRO_PERIODO('settings_createdAt')}
     GROUP BY 1,2`);
 
-  const oraculoAtend = await q('Oráculo: atendimentos por marca × semana', `
+  const oraculoAtend = await q('Oráculo: atendimentos por marca × dia', `
     SELECT CAST(domain_id AS STRING) dom,
-      EXTRACT(ISOWEEK FROM DATE(CAST(DataReferencia AS TIMESTAMP))) sem,
+      ${DIA('DataReferencia')} d,
       COUNTIF(source='IA') ia, COUNT(*) total
     FROM ${DS}.oraculo_Atendimentos
     WHERE DataReferencia IS NOT NULL AND SAFE_CAST(domain_id AS INT64) IS NOT NULL
-      AND ${FILTRO_SEMANA('DataReferencia')}
+      AND ${FILTRO_PERIODO('DataReferencia')}
     GROUP BY 1,2`);
 
   /* O Tino saiu do BigQuery (ver puxarTino, seção 1B). A tabela
@@ -311,7 +343,7 @@ async function puxarBQ() {
      Filial, Assistente e taxa de ativação no mesmo total — só 75% é plano. Por
      isso a soma é feita LINHA A LINHA do item, separando o plano do resto.
      O "resto" continua sendo receita e entra na Receita total, em coluna própria. */
-  const mensalidade = await q('Iugu: plano × outros, por CNPJ × semana', `
+  const mensalidade = await q('Iugu: plano × outros, por CNPJ × dia', `
     WITH itens AS (
       SELECT id, items_id,
              ANY_VALUE(payer_cpf_cnpj) cnpj, ANY_VALUE(payer_name) payer, ANY_VALUE(status) status,
@@ -327,7 +359,7 @@ async function puxarBQ() {
               não existe no cadastro (caso Sawary), é por ele que a fatura acha
               a marca. O Iugu grava "Marca = RAZÃO SOCIAL LTDA". */
            ANY_VALUE(payer) payer,
-           EXTRACT(ISOWEEK FROM DATE(due)) sem,
+           FORMAT_DATE('%Y-%m-%d', DATE(due)) d,
            ROUND(SUM(IF(
              LOWER(IFNULL(item,'')) LIKE '%oraculo%' OR LOWER(IFNULL(item,'')) LIKE '%oráculo%'
           OR LOWER(IFNULL(item,'')) LIKE '%assistente%' OR LOWER(IFNULL(item,'')) LIKE '%agente%'
@@ -342,8 +374,7 @@ async function puxarBQ() {
              cents, 0))/100,2) outros
     FROM itens
     WHERE status IN ('paid','externally_paid') AND due IS NOT NULL
-      AND EXTRACT(ISOYEAR FROM DATE(due)) = ${ANO}
-      AND EXTRACT(ISOWEEK FROM DATE(due)) <= ${SEMANA_ATUAL}
+      AND DATE(due) BETWEEN DATE '${INICIO}' AND DATE '${HOJE_ISO}'
     GROUP BY 1,3`);
 
   /* O plano não é uma coluna: é a linha de item mais cara da fatura, tirando
@@ -393,8 +424,75 @@ async function puxarBQ() {
     FROM inv2
     GROUP BY 1`);
 
+  /* ---- DATA DE IMPLANTAÇÃO DE CADA PRODUTO
+     Pedido da Laura (26/08/2026): saber, em Tino / Vesti Pago / Oráculo, desde
+     quando a marca tem o produto — sem isso não dá para ler "eventos no mês" de
+     quem entrou dia 20.
+
+     Vesti Pago: MongoDB_Payment_Companies.createdAt é a criação da conta de
+     pagamento da marca — 1.841 contas, todas com data, de mar/2023 até hoje.
+     Oráculo: o-configurations.created_at é a criação da configuração do produto.
+     Cuidado ao ler: 699 dos 1.055 domínios têm created_at em jan/2026, que é
+     quando a tabela foi criada — para esses, a data é do espelho, não da venda.
+     Por isso o fetcher fica com a MENOR entre ela e o primeiro atendimento
+     registrado, e marca a origem em `origem` para o painel avisar.
+     O Tino já vinha com created_at na própria API (campo `entrouEm`). */
+  const implantacaoVP = await q('Vesti Pago: data de implantação', `
+    SELECT CAST(domainId AS STRING) dom,
+           FORMAT_DATE('%Y-%m-%d', MIN(DATE(CAST(createdAt AS TIMESTAMP)))) implantado
+    FROM ${DS}.MongoDB_Payment_Companies
+    WHERE createdAt IS NOT NULL AND SAFE_CAST(domainId AS INT64) IS NOT NULL
+    GROUP BY 1`);
+
+  const implantacaoOraculo = await q('Oráculo: data de implantação', `
+    WITH cfg AS (
+      SELECT CAST(domain_id AS STRING) dom, MIN(DATE(created_at)) dt
+      FROM ${DS}.\`o-configurations\`
+      WHERE created_at IS NOT NULL AND SAFE_CAST(domain_id AS INT64) IS NOT NULL
+      GROUP BY 1
+    ),
+    prim AS (
+      SELECT CAST(domain_id AS STRING) dom, MIN(DATE(CAST(DataReferencia AS TIMESTAMP))) dt
+      FROM ${DS}.oraculo_Atendimentos
+      WHERE DataReferencia IS NOT NULL AND SAFE_CAST(domain_id AS INT64) IS NOT NULL
+      GROUP BY 1
+    )
+    SELECT COALESCE(c.dom, p.dom) dom,
+           FORMAT_DATE('%Y-%m-%d', LEAST(IFNULL(c.dt, p.dt), IFNULL(p.dt, c.dt))) implantado,
+           FORMAT_DATE('%Y-%m-%d', c.dt) config,
+           FORMAT_DATE('%Y-%m-%d', p.dt) primeiro_atendimento
+    FROM cfg c FULL OUTER JOIN prim p USING(dom)`);
+
+  /* ---- Filiais novas ("varejo"), para a aba de Bonificação.
+     Definição da Laura (26/08/2026): varejo novo = FILIAL nova de uma marca que
+     já existe. Não é conta nova no canal "Varejo Vesti" — esse canal está zerado
+     desde jul/2025 — nem varejista cadastrado pela marca.
+
+     Como se reconhece uma filial: odbc_companies.parent_id nunca é preenchido no
+     espelho (conferido: zero linhas em 20 meses), então filial é a 2ª empresa em
+     diante do mesmo domínio, por ordem de criação. É a mesma régua que o
+     PainelElisa usa para deduplicar filial, e os nomes confirmam ("São Luis 2",
+     "Teresina 4"). Dá de 2 a 22 por mês na carteira inteira.
+     O CS é o do domínio: a filial não tem anjo próprio. */
+  const filiaisNovas = await q('filiais novas por mês (varejo)', `
+    WITH emp AS (
+      SELECT CAST(domain_id AS STRING) dom, id,
+             ANY_VALUE(company_name) company_name, ANY_VALUE(social_name) social_name,
+             MIN(DATE(CAST(created_at AS TIMESTAMP))) criado
+      FROM ${DS}.odbc_companies
+      WHERE created_at IS NOT NULL AND SAFE_CAST(domain_id AS INT64) IS NOT NULL
+      GROUP BY 1,2
+    ),
+    rk AS (
+      SELECT e.*, ROW_NUMBER() OVER (PARTITION BY dom ORDER BY criado, e.id) rn FROM emp e
+    )
+    SELECT dom, FORMAT_DATE('%Y-%m-%d', criado) criado, rn,
+           COALESCE(company_name, social_name) nome
+    FROM rk
+    WHERE rn > 1 AND criado BETWEEN DATE '${INICIO}' AND DATE '${HOJE_ISO}'`);
+
   return { cadastro, cadastroFora, pedidos, ultimoPedido, vestipago, oraculoGmv, oraculoAtend,
-           interchange, mensalidade, faturas };
+           interchange, mensalidade, faturas, implantacaoVP, implantacaoOraculo, filiaisNovas };
 }
 
 // ============================================================ 1B. API DO TINO
@@ -444,17 +542,6 @@ function tinoPost(rota, corpo) {
   });
 }
 
-/* Segunda e domingo (UTC) de uma semana ISO — a API recorta por data, não por
-   semana, então cada semana do painel vira uma janela de 7 dias. */
-function limitesDaSemana(s, ano) {
-  const base = new Date(Date.UTC(ano, 0, 4));
-  const seg = new Date(base);
-  seg.setUTCDate(base.getUTCDate() - ((base.getUTCDay() + 6) % 7) + (s - 1) * 7);
-  const dom = new Date(seg);
-  dom.setUTCDate(seg.getUTCDate() + 6);
-  return [seg.toISOString().slice(0, 10), dom.toISOString().slice(0, 10)];
-}
-
 async function puxarTino() {
   console.log('\n[Tino] ' + TINO_URL);
   if (!TINO_USER || !TINO_PASS) {
@@ -487,18 +574,22 @@ async function puxarTino() {
      teto e já devolve a semana ISO pronta ("2026-W29"); `metrics` da mesma
      empresa fecha os totais (eventos e sessões). São 2 chamadas por marca,
      ~180 no total, rodando 4 em paralelo. */
-  const porSemana = [], totalDe = new Map();
-  const doAno = { date_from: ANO + '-01-01', date_to: hoje };
+  /* `granularity: 'day'` no lugar de 'week': o painel passou a filtrar por data
+     início/fim, então a série do Tino precisa do mesmo grão das outras. A rota
+     devolve `period` como 'YYYY-MM-DD' no modo diário (e 'YYYY-Www' no semanal);
+     o parser aceita os dois e converte a semana para a segunda-feira dela, para
+     o dia continuar existindo caso a API ignore a granularidade pedida. */
+  const porDia = [], totalDe = new Map();
+  const daJanela = { date_from: INICIO, date_to: hoje };
   let feitas = 0;
   async function puxarMarca(slug) {
     const [serie, tot] = await Promise.all([
-      tinoPost('timeline', { ...doAno, granularity: 'week', companies: [slug] }),
-      tinoPost('metrics', { ...doAno, granularity: 'day', companies: [slug] }),
+      tinoPost('timeline', { ...daJanela, granularity: 'day', companies: [slug] }),
+      tinoPost('metrics', { ...daJanela, granularity: 'day', companies: [slug] }),
     ]);
     (serie || []).forEach(l => {
-      const m = String(l.period || '').match(/^(\d{4})-W(\d{1,2})$/);
-      if (!m || Number(m[1]) !== ANO) return;
-      porSemana.push({ sem: Number(m[2]), company: slug, eventos: num(l.cnt) });
+      const d = diaDoPeriodo(l.period);
+      if (d) porDia.push({ d, company: slug, eventos: num(l.cnt) });
     });
     totalDe.set(slug, { eventos: num((tot || {}).total_events), sessoes: num((tot || {}).sessions) });
     process.stdout.write('\r  eventos por marca: ' + (++feitas) + '/' + slugs.length + '   ');
@@ -510,15 +601,15 @@ async function puxarTino() {
 
   console.log('  marcas com Tino'.padEnd(44) + String(marcas.size).padStart(8));
   console.log('  total_brands (KPI da própria API)'.padEnd(44) + String((kpis || {}).total_brands || 0).padStart(8));
-  console.log('  eventos no ano'.padEnd(44)
-    + String(porSemana.reduce((t, x) => t + x.eventos, 0)).padStart(8));
+  console.log('  eventos na janela'.padEnd(44)
+    + String(porDia.reduce((t, x) => t + x.eventos, 0)).padStart(8));
   console.log('  nunca acessaram (sem atividade nenhuma)'.padEnd(44)
     + String(slugs.filter(x => !comAtividade.has(x)).length).padStart(8));
   console.log('    nunca fizeram login (login_days = 0)'.padEnd(44)
     + String((acessos || []).filter(a => !num(a.login_days)).length).padStart(8));
 
   return { kpis: kpis || {}, acessos: acessos || [], marcas: [...marcas.values()],
-           comAtividade, totalDe, porSemana, tipos: tipos || [] };
+           comAtividade, totalDe, porDia, tipos: tipos || [] };
 }
 
 // =============================================================== 2. HUBSPOT
@@ -934,9 +1025,122 @@ function casarMarcaTino(porDom, fora) {
   };
 }
 
+/* ---- Retrato diário de quem tem integração.
+   A Laura perguntou, em 26/08/2026, se dava para "passar a registrar" as
+   integrações novas. Dava — mas só daqui para a frente: `odbc_domains` guarda
+   qual integração a marca tem HOJE e não guarda desde quando, então não existe
+   histórico para reconstruir o passado.
+
+   O que este bloco faz: grava `integracoes_snapshot.json` (domínio -> integração,
+   como está agora) e, comparando com o retrato da carga anterior, acrescenta as
+   marcas que ganharam integração em `integracoes_novas.json`, com a data da
+   carga. O histórico vai se formando sozinho, uma carga por dia. Enquanto ele
+   for curto, o número da aba de Bonificação vem quase todo do HubSpot.
+
+   Os dois arquivos são commitados pelo workflow junto do dados.js — sem isso o
+   retrato nasceria vazio a cada execução e nada seria detectado. */
+function registrarIntegracoes(porDom) {
+  const fSnap = path.join(__dirname, 'integracoes_snapshot.json');
+  const fHist = path.join(__dirname, 'integracoes_novas.json');
+  const leJson = (f, padrao) => {
+    try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return padrao; }
+  };
+
+  const agora = {};
+  porDom.forEach(m => {
+    const i = (m.integracao || '').trim();
+    if (i && i !== 'Sem integração') agora[m.dom] = i;
+  });
+
+  const anterior = leJson(fSnap, null);
+  const historico = leJson(fHist, []);
+  const novas = [];
+
+  /* Na PRIMEIRA carga não existe retrato anterior: aí tudo que tem integração
+     pareceria "novo hoje", e o mês inteiro apareceria inflado. Então a primeira
+     carga só fotografa, sem detectar nada. */
+  if (anterior && anterior.doms) {
+    const hoje = HOJE_ISO;
+    const jaNoHistorico = new Set(historico.map(h => h.dom + '|' + h.integracao));
+    Object.keys(agora).forEach(dom => {
+      const antes = anterior.doms[dom];
+      if (antes === agora[dom]) return;
+      if (jaNoHistorico.has(dom + '|' + agora[dom])) return;
+      const m = porDom.get(dom);
+      novas.push({
+        dom, data: hoje, integracao: agora[dom], anterior: antes || null,
+        cliente: m ? m.nome : dom, cs: m ? m.cs : 'Sem CS',
+      });
+    });
+  }
+
+  const historicoNovo = historico.concat(novas);
+  try {
+    fs.writeFileSync(fSnap, JSON.stringify({ geradoEm: HOJE_ISO, doms: agora }, null, 0) + '\n', 'utf8');
+    fs.writeFileSync(fHist, JSON.stringify(historicoNovo, null, 0) + '\n', 'utf8');
+  } catch (e) {
+    console.log('  não consegui gravar o retrato de integrações: ' + e.message);
+  }
+  console.log('  integrações: marcas com integração'.padEnd(44) + String(Object.keys(agora).length).padStart(8));
+  console.log('    detectadas como novas nesta carga'.padEnd(44)
+    + String(novas.length).padStart(8) + (anterior ? '' : '   (primeira carga: só fotografou)'));
+  return historicoNovo;
+}
+
+/* ---- Empacotamento das séries diárias.
+   Ir de semana para dia multiplicou as linhas por ~6 e o dados.js saltou de
+   6,5 MB para 37 MB — inviável para um arquivo que é commitado todo dia num
+   repositório público. Duas medidas resolveram:
+
+     1. as séries guardam só o ANO CORRENTE. O ano a mais que a carga puxa
+        serve à aba de Bonificação, e essa já sai pronta e agregada por mês.
+     2. o que sobra vai em formato colunar: uma lista de nomes de coluna e uma
+        matriz de valores, com dicionário para as colunas de texto (nome do
+        cliente e domínio se repetem centenas de vezes). Corta ~75%.
+
+   O painel desempacota no boot, em `desempacotar()`. Formato:
+     { _p:1, c:['data','cliente',…], dic:{ cliente:[…nomes…] }, r:[[…],[…]] }
+   Numa coluna com dicionário o valor guardado é o índice; null continua null. */
+function empacotar(linhas) {
+  if (!Array.isArray(linhas) || !linhas.length) return linhas;
+  const cols = [];
+  linhas.forEach(o => { for (const k in o) if (!cols.includes(k)) cols.push(k); });
+
+  const dic = {};
+  cols.forEach(k => {
+    let texto = false;
+    for (const o of linhas) {
+      const v = o[k];
+      if (v == null) continue;
+      if (typeof v === 'string') { texto = true; break; }
+      if (typeof v !== 'number' && typeof v !== 'boolean') return;   // objeto: deixa cru
+    }
+    if (!texto) return;
+    const vistos = new Map();
+    linhas.forEach(o => { const v = o[k]; if (typeof v === 'string' && !vistos.has(v)) vistos.set(v, vistos.size); });
+    /* Dicionário só compensa quando o texto se repete muito. Num campo quase
+       todo único (um id por linha) ele só acrescentaria uma indireção. */
+    if (vistos.size <= linhas.length * 0.6) dic[k] = { idx: vistos, lista: [...vistos.keys()] };
+  });
+
+  const r = linhas.map(o => cols.map(k => {
+    const v = o[k];
+    if (v === undefined) return null;
+    const d = dic[k];
+    if (d && typeof v === 'string') return d.idx.get(v);
+    return v;
+  }));
+  const dicPlano = {};
+  for (const k in dic) dicPlano[k] = dic[k].lista;
+  return { _p: 1, c: cols, dic: dicPlano, r };
+}
+
 function montar(bqd, hsd, tinoDados) {
   console.log('\n[montagem]');
-  const semanaOk = s => Number.isFinite(s) && s >= 1 && s <= SEMANA_ATUAL;
+  /* Toda série é (marca × dia). A guarda troca "semana entre 1 e a atual" por
+     "data dentro da janela": é a mesma proteção contra linha fora do período,
+     só que agora em dia. */
+  const dataOk = d => typeof d === 'string' && d.length === 10 && d >= INICIO && d <= HOJE_ISO;
 
   // ---- índice de marcas
   const porDom = new Map();
@@ -966,11 +1170,11 @@ function montar(bqd, hsd, tinoDados) {
     return o;
   };
 
-  // ---- séries semanais da carteira
-  const serieCli = new Map();               // dom|sem -> {}
+  // ---- séries diárias da carteira
+  const serieCli = new Map();               // dom|data -> {}
   bqd.pedidos.forEach(r => {
-    if (!semanaOk(r.sem) || !porDom.has(r.dom)) return;
-    somaEm(serieCli, r.dom + '|' + r.sem, {
+    if (!dataOk(r.d) || !porDom.has(r.dom)) return;
+    somaEm(serieCli, r.dom + '|' + r.d, {
       pedidos: r.pedidos, pedidosPagos: r.pagos, valorPedidos: r.valor,
       receitaAntecipacao: num(r.antec) * FATOR_ANTECIPACAO_VESTI,
     });
@@ -981,9 +1185,9 @@ function montar(bqd, hsd, tinoDados) {
      numa passada própria, e não junto do laço acima. */
   let feeBruto = 0, taxaBanco = 0;
   bqd.interchange.forEach(r => {
-    if (!semanaOk(r.sem) || !porDom.has(r.dom)) return;
+    if (!dataOk(r.d) || !porDom.has(r.dom)) return;
     feeBruto += num(r.fee_bruto); taxaBanco += num(r.taxa_banco);
-    somaEm(serieCli, r.dom + '|' + r.sem, {
+    somaEm(serieCli, r.dom + '|' + r.d, {
       receitaInterchange: num(r.fee_vesti) + num(r.antifraude),
       taxaBanco: num(r.taxa_banco),
     });
@@ -1032,7 +1236,7 @@ function montar(bqd, hsd, tinoDados) {
   let mensAplicada = 0, mensPorNome = 0, mensPerdida = 0, valorPerdido = 0;
   const perdidas = new Map();
   bqd.mensalidade.forEach(r => {
-    if (!semanaOk(r.sem)) return;
+    if (!dataOk(r.d)) return;
     const dom = domDaFatura(r);
     if (!dom) {
       mensPerdida++; valorPerdido += num(r.plano) + num(r.outros);
@@ -1041,7 +1245,7 @@ function montar(bqd, hsd, tinoDados) {
       return;
     }
     if (!domPorCnpj.get(r.cnpj)) mensPorNome++;
-    somaEm(serieCli, dom + '|' + r.sem, { receitaMensalidade: r.plano, receitaOutrosIugu: r.outros });
+    somaEm(serieCli, dom + '|' + r.d, { receitaMensalidade: r.plano, receitaOutrosIugu: r.outros });
     mensAplicada++;
   });
   console.log('  linhas de mensalidade casadas'.padEnd(44) + String(mensAplicada).padStart(8));
@@ -1053,10 +1257,10 @@ function montar(bqd, hsd, tinoDados) {
 
   const clientesSeries = [];
   serieCli.forEach((v, k) => {
-    const [dom, sem] = k.split('|');
+    const [dom, dia] = k.split('|');
     const m = porDom.get(dom);
     clientesSeries.push({
-      semana: Number(sem), cliente: m.nome,
+      data: dia, cliente: m.nome, dominio: dom,
       pedidos: v.pedidos || 0, valorPedidos: v.valorPedidos || 0,
       receitaInterchange: v.receitaInterchange || 0,
       receitaMensalidade: v.receitaMensalidade || 0,
@@ -1183,24 +1387,43 @@ function montar(bqd, hsd, tinoDados) {
     });
   });
 
+  /* ---- data de implantação de cada produto, por domínio.
+     Entra como coluna nas abas Tino, Vesti Pago e Oráculo: sem ela não dá para
+     ler "eventos no mês" de quem só tem o produto desde o dia 20. */
+  const implVP = new Map();
+  (bqd.implantacaoVP || []).forEach(r => { if (r.implantado) implVP.set(r.dom, r.implantado); });
+  const implOra = new Map();
+  (bqd.implantacaoOraculo || []).forEach(r => {
+    if (!r.implantado) return;
+    /* `origem` diz se a data é confiável. 699 dos 1.055 domínios têm config
+       criada em jan/2026, que é quando a tabela nasceu — nesses, a data é do
+       espelho e não da venda. Quando o primeiro atendimento é anterior, ele
+       manda; quando os dois batem em jan/2026, o painel avisa. */
+    const origem = (r.primeiro_atendimento && r.primeiro_atendimento === r.implantado)
+      ? 'primeiro atendimento' : 'configuração do produto';
+    implOra.set(r.dom, { data: r.implantado, origem });
+  });
+  console.log('  domínios com data de implantação'.padEnd(44)
+    + ('VP ' + implVP.size + ' / Oráculo ' + implOra.size).padStart(8));
+
   // ---- produtos: tabelas + séries
   const nomeDe = dom => (porDom.get(dom) || {}).nome;
   const csDe = dom => (porDom.get(dom) || {}).cs;
 
   const oraSerie = new Map();
   bqd.oraculoGmv.forEach(r => {
-    if (!semanaOk(r.sem) || !porDom.has(r.dom)) return;
-    somaEm(oraSerie, r.dom + '|' + r.sem, { gmvIniciado: r.gmv_iniciado, gmvFinalizado: r.gmv_finalizado });
+    if (!dataOk(r.d) || !porDom.has(r.dom)) return;
+    somaEm(oraSerie, r.dom + '|' + r.d, { gmvIniciado: r.gmv_iniciado, gmvFinalizado: r.gmv_finalizado });
   });
   bqd.oraculoAtend.forEach(r => {
-    if (!semanaOk(r.sem) || !porDom.has(r.dom)) return;
-    somaEm(oraSerie, r.dom + '|' + r.sem, { atendimentos: r.total, atendimentosIA: r.ia });
+    if (!dataOk(r.d) || !porDom.has(r.dom)) return;
+    somaEm(oraSerie, r.dom + '|' + r.d, { atendimentos: r.total, atendimentosIA: r.ia });
   });
   const oraculoSeries = [], oraAcc = new Map();
   oraSerie.forEach((v, k) => {
-    const [dom, sem] = k.split('|');
+    const [dom, dia] = k.split('|');
     oraculoSeries.push({
-      semana: Number(sem), cliente: nomeDe(dom), dominio: dom,
+      data: dia, cliente: nomeDe(dom), dominio: dom,
       atendimentos: v.atendimentos || 0, atendimentosIA: v.atendimentosIA || 0,
       gmvIniciado: v.gmvIniciado || 0, gmvFinalizado: v.gmvFinalizado || 0,
     });
@@ -1208,6 +1431,8 @@ function montar(bqd, hsd, tinoDados) {
   });
   const oraculoTab = [...oraAcc.entries()].map(([dom, v]) => ({
     cliente: nomeDe(dom), dominio: dom, cs: csDe(dom),
+    implantado: (implOra.get(dom) || {}).data || null,
+    implantadoOrigem: (implOra.get(dom) || {}).origem || null,
     pctIA: v.at ? Math.round(v.ia / v.at * 100) : null,
     atendimentos: v.at, gmvIniciado: r2(v.gi), gmvFinalizado: r2(v.gf),
   })).filter(x => x.atendimentos || x.gmvIniciado);
@@ -1218,8 +1443,8 @@ function montar(bqd, hsd, tinoDados) {
      do Tino é casada com o cadastro por nome (ver casarMarcaTino); marca que não
      casa continua na tabela, só sem CS — sumir com cliente por causa de cadastro
      seria pior que mostrá-lo sem CS. */
-  const gmvSemana = new Map();     // dom|sem -> valor pago, para a linha de GMV do Tino
-  bqd.pedidos.forEach(r => { if (semanaOk(r.sem)) gmvSemana.set(r.dom + '|' + r.sem, num(r.valor)); });
+  const gmvDia = new Map();        // dom|data -> valor pago, para a linha de GMV do Tino
+  bqd.pedidos.forEach(r => { if (dataOk(r.d)) gmvDia.set(r.dom + '|' + r.d, num(r.valor)); });
 
   const tinoSeries = [], tinoTab = [];
   let tinoKpis = {}, tinoTipos = [], domComTino = new Set();
@@ -1248,15 +1473,15 @@ function montar(bqd, hsd, tinoDados) {
     }
 
     const acc = new Map();              // slug -> {eventos} do período
-    tinoDados.porSemana.forEach(r => {
-      if (!semanaOk(r.sem)) return;
+    tinoDados.porDia.forEach(r => {
+      if (!dataOk(r.d)) return;
       const dom = domDaCompany.get(r.company);
       const cliente = nomeDaCompany.get(r.company) || nomeBonito(r.company);
       tinoSeries.push({
-        semana: r.sem, cliente, dominio: dom || null,
+        data: r.d, cliente, dominio: dom || null,
         cs: dom ? csDe(dom) : ((foraDaCarteira.get(r.company) || {}).cs || 'Sem CS'),
         eventos: r.eventos,
-        receita: dom ? (gmvSemana.get(dom + '|' + r.sem) || 0) : 0,
+        receita: dom ? (gmvDia.get(dom + '|' + r.d) || 0) : 0,
       });
       somaEm(acc, r.company, { eventos: r.eventos });
     });
@@ -1277,7 +1502,10 @@ function montar(bqd, hsd, tinoDados) {
         diasAcesso: num(m.login_days),
         ultimoAcessoTino: m.last_login || null,
         statusTino: m.status === 'inactive' ? 'Inativa' : 'Ativa',
+        /* A própria API do Tino já dá a data de entrada da marca na base — é
+           essa a "data de implantação" do produto, sem precisar de outra fonte. */
         entrouEm: m.created_at ? String(m.created_at).slice(0, 10) : null,
+        implantado: m.created_at ? String(m.created_at).slice(0, 10) : null,
         /* "Nunca acessou" = nenhuma atividade registrada, que é como o próprio
            Tino conta no card do admin. NÃO é "login_days = 0": quatro marcas
            entram sem que a API registre dia de login (SSO da Vesti) e por isso
@@ -1300,17 +1528,17 @@ function montar(bqd, hsd, tinoDados) {
      os links continuam vindo dos pedidos — só o fee troca de fonte. */
   const feeLiquido = new Map();
   bqd.interchange.forEach(r => {
-    if (!semanaOk(r.sem)) return;
-    feeLiquido.set(r.dom + '|' + r.sem, num(r.fee_vesti) + num(r.antifraude));
+    if (!dataOk(r.d)) return;
+    feeLiquido.set(r.dom + '|' + r.d, num(r.fee_vesti) + num(r.antifraude));
   });
 
   const vpSeries = [], vpAcc = new Map();
   bqd.vestipago.forEach(r => {
-    if (!semanaOk(r.sem) || !porDom.has(r.dom)) return;
-    const fee = feeLiquido.get(r.dom + '|' + r.sem) || 0;
+    if (!dataOk(r.d) || !porDom.has(r.dom)) return;
+    const fee = feeLiquido.get(r.dom + '|' + r.d) || 0;
     const antec = num(r.antec) * FATOR_ANTECIPACAO_VESTI;
     vpSeries.push({
-      semana: r.sem, cliente: nomeDe(r.dom), dominio: r.dom,
+      data: r.d, cliente: nomeDe(r.dom), dominio: r.dom,
       linksGerados: num(r.gerados), linksPagos: num(r.pagos), valor: num(r.valor),
       valorCartao: num(r.valor_cartao), valorPix: num(r.valor_pix),
       receitaFee: r2(fee), receitaAntecipacao: r2(antec),
@@ -1323,32 +1551,36 @@ function montar(bqd, hsd, tinoDados) {
   });
   const vpTab = [...vpAcc.entries()].map(([dom, v]) => ({
     cliente: nomeDe(dom), dominio: dom, cs: csDe(dom),
+    implantado: implVP.get(dom) || null,
     valorTransacionado: v.valorTransacionado,
     valorCartao: v.valorCartao, valorPix: v.valorPix,
     receitaFee: r2(v.receitaFee), receitaAntecipacao: r2(v.receitaAntecipacao),
     linksGerados: v.linksGerados, linksPagos: v.linksPagos,
   })).filter(x => x.linksGerados > 0 || x.valorTransacionado > 0);
 
-  // ---- churn semanal
-  const churnPorSemana = new Map();
+  // ---- churn por dia
+  const churnPorDia = new Map();
   clientes.forEach(c => {
-    if (!c.dataChurn) return;
-    const s = isoWeek(new Date(c.dataChurn));
-    if (!semanaOk(s) || Number(c.dataChurn.slice(0, 4)) !== ANO) return;
-    churnPorSemana.set(c.nome + '|' + s, c._dom || null);
+    if (!c.dataChurn || !dataOk(c.dataChurn)) return;
+    churnPorDia.set(c.nome + '|' + c.dataChurn, c._dom || null);
   });
-  const churnSeries = [...churnPorSemana.entries()].map(([k, dom]) => {
+  const churnSeries = [...churnPorDia.entries()].map(([k, dom]) => {
     const i = k.lastIndexOf('|');
-    return { semana: Number(k.slice(i + 1)), cliente: k.slice(0, i), dominio: dom, churns: 1 };
+    return { data: k.slice(i + 1), cliente: k.slice(0, i), dominio: dom, churns: 1 };
   });
 
-  // ---- só quem teve alguma atividade no ano entra no painel
+  /* ---- só quem teve alguma atividade no ANO CORRENTE entra no painel.
+     A janela de dados agora vai até o ano anterior (a bonificação precisa dele
+     para comparar ago/25 com ago/26), mas a carteira continua sendo a de 2026 —
+     senão o painel encheria de marca que morreu no ano passado. As séries de
+     2025 ficam guardadas: quem está na carteira leva o histórico junto. */
+  const doAnoCorrente = x => String(x.data || '').slice(0, 4) === String(ANO);
   const ativos = new Set([
-    ...clientesSeries.map(x => x.cliente),
-    ...oraculoSeries.map(x => x.cliente),
-    ...tinoSeries.map(x => x.cliente),
-    ...vpSeries.map(x => x.cliente),
-    ...churnSeries.map(x => x.cliente),
+    ...clientesSeries.filter(doAnoCorrente).map(x => x.cliente),
+    ...oraculoSeries.filter(doAnoCorrente).map(x => x.cliente),
+    ...tinoSeries.filter(doAnoCorrente).map(x => x.cliente),
+    ...vpSeries.filter(doAnoCorrente).map(x => x.cliente),
+    ...churnSeries.filter(doAnoCorrente).map(x => x.cliente),
   ]);
   const clientesFinal = clientes.filter(c => ativos.has(c.nome));
   clientesFinal.forEach(c => { c.temTino = domComTino.has(c._dom); });
@@ -1358,6 +1590,147 @@ function montar(bqd, hsd, tinoDados) {
     + String(clientesFinal.filter(c => c.temOraculo).length).padStart(8));
   clientesFinal.forEach(c => { delete c._dom; delete c._cnpj; });
   console.log('  marcas com atividade em ' + ANO + ''.padEnd(20) + String(clientesFinal.length).padStart(13));
+
+
+  /* ============================================================ BONIFICAÇÃO
+     Pedido da Laura (26/08/2026): "vamos trazer primeiro o número; depois eu
+     penso nas pontuações". Então aqui NÃO existe peso, nota nem ponto — só a
+     medida crua de cada regra, por CS e por mês-calendário, com o valor do
+     comparativo ao lado para o painel mostrar quanto subiu ou caiu.
+
+     As sete regras vieram da planilha dela. Duas comparam com o mês anterior,
+     duas com o mesmo mês do ano passado, três são contagem do próprio mês.
+     Mês-calendário, não semana — foi justamente por isso que o painel inteiro
+     trocou de grão. */
+  const METRICAS_BONIFICACAO = [
+    { k: 'tino60', titulo: 'Marcas com +60 eventos no Tino', unidade: 'marcas',
+      comparacao: 'mesAnterior',
+      regra: 'Marcas da carteira do CS que passaram de 60 eventos no Tino dentro do mês. '
+           + 'O comparativo é o mesmo número no mês anterior — a régua da Laura é "a cada cliente extra".' },
+    { k: 'mensalidade', titulo: 'Receita de mensalidade', unidade: 'R$',
+      comparacao: 'mesAnterior',
+      regra: 'Soma das linhas de PLANO das faturas Iugu pagas das marcas do CS, pelo vencimento. '
+           + 'Não inclui Oráculo, Filial, Assistente nem ativação (esses são "Outros (Iugu)").' },
+    { k: 'vestipago', titulo: 'Vesti Pago transacionado', unidade: 'R$',
+      comparacao: 'anoAnterior',
+      regra: 'Valor pago com provider Vesti Pago (cartão + PIX) nas marcas do CS. '
+           + 'Comparado com o MESMO mês do ano anterior, como na planilha (ago/25 × ago/26).' },
+    { k: 'reunioes', titulo: 'Reuniões com cliente', unidade: 'reuniões',
+      comparacao: 'nenhuma',
+      regra: 'Reuniões do HubSpot no mês, pelo dono do registro. Inclui as presenciais e as de evento — '
+           + 'a base não separa uma coisa da outra.' },
+    { k: 'integracoes', titulo: 'Novas integrações', unidade: 'integrações',
+      comparacao: 'nenhuma',
+      regra: 'Negócio de Integração GANHO no HubSpot dentro do mês (pipeline Expand). '
+           + 'É o único registro de integração nova que existe hoje: o cadastro guarda quem TEM integração, '
+           + 'não quando passou a ter. Por isso o fetcher começou a fotografar a carteira todo dia — '
+           + 'ver integracoes_snapshot.json.' },
+    { k: 'gmv', titulo: 'GMV da carteira', unidade: 'R$',
+      comparacao: 'anoAnterior',
+      regra: 'Valor dos pedidos pagos das marcas do CS no mês, comparado com o mesmo mês do ano anterior.' },
+    { k: 'filiais', titulo: 'Varejos novos (filiais)', unidade: 'filiais',
+      comparacao: 'nenhuma',
+      regra: 'Filial nova de marca que já existia: a 2ª empresa em diante do mesmo domínio, criada no mês. '
+           + 'O CS é o do domínio.' },
+  ];
+
+  /* O HubSpot grava o mesmo responsável com nome curto na carteira e completo no
+     dono do registro ("Jennyfer Rabelo" × "Jennyfer Rabelo dos Santos"). Sem
+     juntar os dois, a mesma pessoa vira duas linhas na tabela de bonificação.
+     Mesma regra que o index.html usa nas abas de HubSpot. */
+  const NOMES_CS_CARTEIRA = [...new Set([...porDom.values()].map(m => m.cs))]
+    .filter(n => n && n !== 'Sem CS');
+  const normalizarCsNome = n => {
+    if (!n) return 'Sem CS';
+    return NOMES_CS_CARTEIRA.find(c => c !== n && (n.startsWith(c + ' ') || c.startsWith(n + ' '))) || n;
+  };
+
+  const mesDe = d => String(d || '').slice(0, 7);
+  const bonAcc = new Map();      // mes|cs|k -> valor
+  const bonDet = new Map();      // mes|cs|k|cliente -> valor
+  const somaBon = (mes, cs, k, v, cliente) => {
+    if (!mes || mes.length !== 7 || !v) return;
+    const nome = cs || 'Sem CS';
+    const ch = mes + '|' + nome + '|' + k;
+    bonAcc.set(ch, r2((bonAcc.get(ch) || 0) + num(v)));
+    if (cliente) {
+      const cd = ch + '|' + cliente;
+      bonDet.set(cd, r2((bonDet.get(cd) || 0) + num(v)));
+    }
+  };
+
+  // GMV e Vesti Pago: direto das séries diárias já filtradas pela carteira
+  bqd.pedidos.forEach(r => {
+    const m = porDom.get(r.dom); if (!m || !dataOk(r.d)) return;
+    somaBon(mesDe(r.d), m.cs, 'gmv', num(r.valor), m.nome);
+  });
+  bqd.vestipago.forEach(r => {
+    const m = porDom.get(r.dom); if (!m || !dataOk(r.d)) return;
+    somaBon(mesDe(r.d), m.cs, 'vestipago', num(r.valor), m.nome);
+  });
+  // Mensalidade: passa pelo mesmo casamento CNPJ -> nome do pagador da tabela geral
+  bqd.mensalidade.forEach(r => {
+    if (!dataOk(r.d)) return;
+    const dom = domDaFatura(r); if (!dom) return;
+    const m = porDom.get(dom); if (!m) return;
+    somaBon(mesDe(r.d), m.cs, 'mensalidade', num(r.plano), m.nome);
+  });
+  // Filiais novas: contagem, com o nome da filial no detalhe
+  (bqd.filiaisNovas || []).forEach(r => {
+    const m = porDom.get(r.dom); if (!m || !dataOk(r.criado)) return;
+    somaBon(mesDe(r.criado), m.cs, 'filiais', 1, (r.nome || m.nome));
+  });
+  // Reuniões e integrações vêm do HubSpot
+  (hsd.reunioes || []).forEach(r => somaBon(mesDe(r.data), normalizarCsNome(r.cs), 'reunioes', 1, r.cliente));
+  /* Integração nova tem duas fontes e elas se somam sem contar duas vezes: o
+     negócio ganho no HubSpot (o registro que existe hoje) e a detecção pelo
+     retrato diário do cadastro (o registro que passa a existir a partir de
+     agora — ver `registrarIntegracoes`). A chave de dedupe é mês+CS+marca. */
+  const jaContada = new Set();
+  const contarIntegracao = (mes, cs, cliente) => {
+    const ch = mes + '|' + cs + '|' + (cliente || '');
+    if (!mes || jaContada.has(ch)) return;
+    jaContada.add(ch);
+    somaBon(mes, cs, 'integracoes', 1, cliente);
+  };
+  (hsd.negocios || []).forEach(r => {
+    if (r.status !== 'Ganho' || r.produto !== 'Integração') return;
+    contarIntegracao(mesDe(r.data), normalizarCsNome(r.cs), r.cliente);
+  });
+  const integracoesDetectadas = registrarIntegracoes(porDom);
+  integracoesDetectadas.forEach(r => contarIntegracao(mesDe(r.data), r.cs, r.cliente));
+  /* Tino: a régua é por MARCA — só entra quem passou de 60 eventos no mês, e o
+     que se conta é quantas marcas passaram, não quantos eventos. Por isso a
+     soma é feita em dois tempos. */
+  const tinoMes = new Map();     // mes|dominio -> eventos
+  tinoSeries.forEach(x => {
+    if (!x.dominio || !dataOk(x.data)) return;
+    const ch = mesDe(x.data) + '|' + x.dominio;
+    tinoMes.set(ch, (tinoMes.get(ch) || 0) + num(x.eventos));
+  });
+  const LIMITE_TINO = 60;
+  tinoMes.forEach((eventos, ch) => {
+    if (eventos < LIMITE_TINO) return;
+    const [mes, dom] = ch.split('|');
+    const m = porDom.get(dom); if (!m) return;
+    somaBon(mes, m.cs, 'tino60', 1, m.nome);
+  });
+
+  const bonMeses = [...new Set([...bonAcc.keys()].map(k => k.split('|')[0]))].sort();
+  const bonLinhas = [...bonAcc.entries()].map(([ch, valor]) => {
+    const [mes, cs, k] = ch.split('|');
+    const met = METRICAS_BONIFICACAO.find(x => x.k === k);
+    let base = null;
+    if (met && met.comparacao === 'mesAnterior') base = bonAcc.get(mesAntes(mes, 1) + '|' + cs + '|' + k) ?? 0;
+    if (met && met.comparacao === 'anoAnterior') base = bonAcc.get(mesAntes(mes, 12) + '|' + cs + '|' + k) ?? 0;
+    return { mes, cs, k, valor, base };
+  });
+  const bonDetalhe = [...bonDet.entries()].map(([ch, valor]) => {
+    const [mes, cs, k, cliente] = ch.split('|');
+    return { mes, cs, k, cliente, valor };
+  });
+  console.log('  bonificação'.padEnd(44)
+    + (bonLinhas.length + ' linhas / ' + bonMeses.length + ' meses').padStart(8));
 
   const csLista = [...new Set(clientesFinal.map(c => c.cs))].sort();
   const canaisLista = [...new Set(clientesFinal.map(c => c.canal))]
@@ -1425,12 +1798,32 @@ function montar(bqd, hsd, tinoDados) {
   return {
     meta: {
       ano: ANO, semanaAtual: SEMANA_ATUAL, cs: csLista, canais: canaisLista,
+      /* A janela dos dados. O painel usa para não deixar escolher uma data
+         anterior ao que existe no arquivo, e para o rótulo do filtro. */
+      inicio: INICIO, hoje: HOJE_ISO, grao: 'dia',
       geradoEm: new Date().toISOString(),
       fatorAntecipacaoVesti: FATOR_ANTECIPACAO_VESTI,
       diasChurn: DIAS_CHURN,
       diasInadimplencia: DIAS_INADIMPLENCIA,
       tetoPedido: TETO_PEDIDO,
       avisos: {
+        periodo: 'O painel passou a ser filtrado por DATA de início e fim (26/08/2026), no lugar da '
+               + 'escolha de semanas. Motivo: semana ISO atravessa a virada do mês — a semana 31 de 2026 '
+               + 'tem dias de julho e de agosto — e por isso nenhum filtro semanal fechava um mês. '
+               + 'Todas as séries agora são por dia; o gráfico é que agrupa em dia, semana ou mês conforme '
+               + 'o tamanho do período. A janela de dados começa em ' + INICIO + ' (um ano a mais que o '
+               + 'corrente, para a aba de Bonificação comparar mês contra o mesmo mês do ano passado).',
+        implantacao: 'Data de implantação por produto: Tino = created_at da marca na base do próprio Tino; '
+               + 'Vesti Pago = criação da conta de pagamento (MongoDB_Payment_Companies.createdAt); '
+               + 'Oráculo = a MENOR entre a criação da configuração (o-configurations.created_at) e o '
+               + 'primeiro atendimento registrado. Cuidado no Oráculo: 699 dos 1.055 domínios têm '
+               + 'configuração criada em jan/2026, que é quando a tabela nasceu no espelho — nesses a data '
+               + 'é do espelho e não da venda. A coluna mostra de onde veio cada data.',
+        bonificacao: 'A aba traz só o NÚMERO de cada regra por CS e por mês; não existe peso nem pontuação '
+               + 'ainda (decidido com a Laura em 26/08/2026: "vamos trazer primeiro o número"). '
+               + 'Integração nova sai do negócio ganho no HubSpot; o cadastro não guarda desde quando a '
+               + 'marca tem integração, então a carga passou a fotografar isso todo dia e o histórico vai '
+               + 'se formando (integracoes_novas.json). Varejo novo = filial nova de marca já existente.',
         ultimoAcesso: 'Sem fonte: não existe coluna de login/sessão do lojista no vestilake_BI.',
         dataCadastro: 'Data de cadastro = odbc_domains.created_at (criação do domínio da marca). '
                     + 'Completo em todas as marcas, de ago/2016 até hoje. Nenhuma empresa em '
@@ -1496,15 +1889,25 @@ function montar(bqd, hsd, tinoDados) {
       },
     },
     clientes: clientesFinal,
-    clientesSeries: clientesSeries.filter(x => ativos.has(x.cliente)),
+    /* As séries que vão para o painel são só do ano corrente — o ano anterior
+       ficou na carga para alimentar a bonificação, que já sai agregada. */
+    clientesSeries: empacotar(clientesSeries.filter(x => ativos.has(x.cliente) && doAnoCorrente(x))),
     negocios: hsd.negocios,
-    oraculo: { tabela: oraculoTab, series: oraculoSeries },
+    oraculo: { tabela: oraculoTab, series: empacotar(oraculoSeries.filter(doAnoCorrente)) },
     /* A tabela do Tino traz as marcas que TÊM o produto (a lista vem da API do
        Tino), inclusive quem nunca entrou — é justamente essa lista que a CS
        precisa atacar. Não é filtrada por "teve atividade no painel". */
-    tino: { tabela: tinoTab, series: tinoSeries, kpis: tinoKpis, tiposDeEvento: tinoTipos },
-    vestiPago: { tabela: vpTab, series: vpSeries },
-    churn: { series: churnSeries },
+    tino: { tabela: tinoTab, series: empacotar(tinoSeries.filter(doAnoCorrente)),
+            kpis: tinoKpis, tiposDeEvento: tinoTipos },
+    vestiPago: { tabela: vpTab, series: empacotar(vpSeries.filter(doAnoCorrente)) },
+    churn: { series: churnSeries.filter(doAnoCorrente) },
+    bonificacao: {
+      meses: bonMeses,
+      metricas: METRICAS_BONIFICACAO,
+      linhas: bonLinhas,
+      detalhe: bonDetalhe,
+      limiteTino: LIMITE_TINO,
+    },
     reunioes: hsd.reunioes,
     tickets,
   };
@@ -1513,7 +1916,7 @@ function montar(bqd, hsd, tinoDados) {
 // ==================================================================== MAIN
 (async () => {
   console.log('Painel de Clientes — carga de dados');
-  console.log('ano ' + ANO + ', semanas 1..' + SEMANA_ATUAL);
+  console.log('janela ' + INICIO + ' a ' + HOJE_ISO + ' (grão: dia)');
 
   const bqd = await puxarBQ();
   const hsd = await puxarHubSpot().catch(e => {
@@ -1534,16 +1937,19 @@ function montar(bqd, hsd, tinoDados) {
 
   console.log('\n[pronto] dados.js  ' + mb + ' MB');
   console.log('  clientes        ' + data.clientes.length);
-  console.log('  séries carteira ' + data.clientesSeries.length);
+  const tam = s => (s && s._p ? s.r.length : (s || []).length);
+  console.log('  séries carteira ' + tam(data.clientesSeries));
   console.log('  negócios        ' + data.negocios.length);
   console.log('  reuniões        ' + data.reunioes.length
     + ' (' + data.reunioes.filter(r => r.resultado === 'Fechou negócio').length + ' com negócio fechado)');
   console.log('  tickets         ' + data.tickets.length
     + ' (' + data.tickets.filter(t => t.situacao === 'Aberto').length + ' abertos)');
   console.log('  canais          ' + data.meta.canais.join(', '));
-  console.log('  oráculo         ' + data.oraculo.tabela.length + ' marcas / ' + data.oraculo.series.length + ' semanas-marca');
+  console.log('  oráculo         ' + data.oraculo.tabela.length + ' marcas / ' + tam(data.oraculo.series) + ' dias-marca');
   console.log('  tino            ' + data.tino.tabela.length + ' marcas com o produto / '
-    + data.tino.series.length + ' semanas-marca');
-  console.log('  vesti pago      ' + data.vestiPago.tabela.length + ' marcas / ' + data.vestiPago.series.length);
+    + tam(data.tino.series) + ' dias-marca');
+  console.log('  vesti pago      ' + data.vestiPago.tabela.length + ' marcas / ' + tam(data.vestiPago.series));
   console.log('  churn           ' + data.churn.series.length);
+  console.log('  bonificação     ' + data.bonificacao.linhas.length + ' linhas / '
+    + data.bonificacao.meses.length + ' meses / ' + data.bonificacao.metricas.length + ' regras');
 })().catch(e => { console.error('\nFALHOU:', e.message); process.exit(1); });

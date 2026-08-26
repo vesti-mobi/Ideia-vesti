@@ -1,14 +1,46 @@
 # Painel de Clientes — CS
 
-Painel estático de 9 abas, grão semanal (semana ISO do ano corrente).
+Painel estático de **10 abas**, grão de **dia**, filtrado por **data de início e fim**.
 
 ```
 index.html          o painel (layout + lógica, sem dependência externa)
 publicar.js         sobe para vesti-mobi/dados/CS via Git Data API
 dados.js            dados reais gerados pelo fetcher — window.PAINEL_DATA
-fetch_dados.js      carga: BigQuery + HubSpot -> dados.js
+fetch_dados.js      carga: BigQuery + HubSpot + Tino -> dados.js
+integracoes_snapshot.json  retrato de quem tem integração, da última carga
+integracoes_novas.json     histórico das integrações detectadas como novas
 painel-clientes.html  layout de referência original (não é usado em produção)
 ```
+
+## O filtro é por data (mudou em 26/08/2026)
+
+Era uma seleção de semanas ISO. A Laura levantou o problema: **semana ISO
+atravessa a virada do mês** — a semana 31 de 2026 vai de 27/julho a 2/agosto —
+então nenhum recorte semanal fechava um mês, e todo número mensal vinha com
+sobra do mês vizinho. Agora o filtro é **De … Até**, com atalhos (este mês, mês
+passado, últimos 30/90 dias, ano todo) e uma grade de meses fechados.
+
+O que mudou por baixo:
+
+- **Todas as séries passaram de `semana` para `data`** (`AAAA-MM-DD`), no fetcher
+  e no painel. A carga vai de 1º de janeiro do **ano anterior** até hoje — o ano a
+  mais existe só para a aba de Bonificação comparar mês contra o mesmo mês do ano
+  passado; as séries que vão para o navegador continuam só com o ano corrente.
+- **Os gráficos agrupam sozinhos**: até 45 dias de período, dia a dia; até 400,
+  por semana; acima disso, por mês. O filtro continua exato — quem agrupa é só o
+  desenho.
+- **As séries vão empacotadas** em formato colunar (`{c:[colunas], dic:{}, r:[[…]]}`).
+  Sem isso o `dados.js` iria de 6,5 MB para 37 MB, e ele é commitado todo dia.
+  O painel desempacota no boot, em `desempacotar()`.
+- **Correção de brinde:** a tabela geral e as abas de produto passaram a agregar
+  **por domínio** e não por nome. 28 marcas da carteira são homônimas de outra
+  (mesmo apelido, domínios diferentes) e as duas linhas recebiam a soma das duas —
+  R$ 684 mil a mais de GMV só em julho de 2026. O domínio só passou a viajar na
+  série quando o grão virou dia; antes não dava para corrigir.
+- **Compatibilidade:** se o painel novo abrir com um `dados.js` ainda no formato
+  de semana (a janela entre publicar o layout e a carga da madrugada), cada linha
+  antiga vira a segunda-feira da semana dela e um aviso vai para o console. Os
+  números ficam aproximados até a carga seguinte, em vez de zerados.
 
 No ar: **https://vesti-mobi.github.io/dados/CS/** — senha `Mudar123`.
 Local: `start index.html`. Sem `dados.js` o painel cai num mock com semente fixa
@@ -34,7 +66,7 @@ Precisa de:
   `vesti-mobi/dados` é público.
 
 Sem HubSpot o painel carrega mesmo assim: Cross-sell, Upsell, Reuniões e Tickets
-ficam vazias. Sem a credencial do Tino, a aba do Tino e a coluna "Tino" da
+ficam vazias (e, na Bonificação, as colunas de reuniões e integrações). Sem a credencial do Tino, a aba do Tino e a coluna "Tino" da
 tabela geral ficam vazias — o resto carrega igual.
 
 ### Automático, todo dia às 04:00 BRT
@@ -75,6 +107,8 @@ de layout continua indo por `node publicar.js`.
 | Tino | marcas, eventos, sessões, dias de acesso | **API do Tino** — `companies_chart`, `login_days`, `customer_kpis` |
 | Vesti Pago | valor / fee / antecipação | `MongoDB_Pedidos_Geral` com provider Vesti Pago |
 | Vesti Pago | links | pedidos com `settings_source = 'Link de cobrança'` |
+| Tino / Vesti Pago / Oráculo | Implantado em | Tino: `created_at` da marca na base do produto. Vesti Pago: `MongoDB_Payment_Companies.createdAt`. Oráculo: a menor entre `o-configurations.created_at` e o primeiro atendimento |
+| Bonificação | tudo | agregado por CS e por mês, calculado no fetcher (ver abaixo) |
 | Churn | data | derivado do Iugu (ver abaixo) |
 | Reuniões | reunião / data / responsável | HubSpot `meetings` (`hs_meeting_start_time` + owner) |
 | Reuniões | Cliente | empresa associada à reunião no HubSpot |
@@ -185,6 +219,41 @@ por medição pedido a pedido (ressalva 4).
    em 2026 são vendas registradas na plataforma mas pagas por fora. Entram no GMV da
    tabela geral e ficam fora da aba Vesti Pago. É por isso que marcas grandes como
    Egoiste e JDL aparecem com receita R$ 0 — está certo, elas não usam o produto.
+
+6b. **Data de implantação por produto (26/08/2026).** Cada aba de produto ganhou
+   a coluna "Implantado em", com o tempo de casa embaixo; marca que entrou dentro
+   do período selecionado aparece destacada, porque o número dela cobre menos
+   dias que o das outras. As fontes estão na tabela acima. **A do Oráculo pede
+   cuidado**: 699 dos 1.055 domínios têm a configuração criada em jan/2026, que é
+   quando a tabela nasceu no espelho — para esses, a data é do espelho e não da
+   venda. Quando o primeiro atendimento é anterior, ele é que vale, e a coluna diz
+   de onde veio cada data.
+
+6c. **Bonificação: os números, sem os pontos.** A aba traz as sete regras da
+   planilha da Laura, uma coluna cada, por CS e por mês-calendário. Não há peso
+   nem pontuação — decisão dela em 26/08/2026: "vamos trazer primeiro o número;
+   depois eu penso nas pontuações". Duas regras comparam com o mês anterior
+   (Tino +60 eventos, mensalidade), duas com o mesmo mês do ano passado (Vesti
+   Pago, GMV) e três são contagem do próprio mês (reuniões, integrações,
+   varejos). Passar o mouse no número lista as marcas que entraram nele.
+
+   Três coisas para ler junto com a tabela:
+   - **A carteira é a de hoje.** A marca é creditada ao CS que a atende agora,
+     porque o cadastro não guarda o histórico de quem atendia antes. Quem assumiu
+     carteira no meio do caminho aparece com base baixa em 2025 e um "crescimento"
+     que é troca de responsável.
+   - **Varejo novo = filial nova de marca já existente** (definição da Laura). Não
+     é conta nova no canal "Varejo Vesti" — esse canal está zerado desde
+     jul/2025 — nem varejista cadastrado pela marca. `odbc_companies.parent_id`
+     nunca vem preenchido no espelho, então filial é a 2ª empresa em diante do
+     mesmo domínio, por ordem de criação: a mesma régua do PainelElisa. Dá de 2 a
+     22 por mês na carteira inteira.
+   - **Integração nova ainda é o que o HubSpot registrou.** O cadastro guarda quem
+     TEM integração, não desde quando — não há histórico para reconstruir. A partir
+     desta versão a carga fotografa a carteira todo dia (`integracoes_snapshot.json`)
+     e acumula o que mudou (`integracoes_novas.json`), então o número melhora
+     sozinho a cada dia que passa. Os dois arquivos são commitados pelo workflow:
+     sem isso o retrato nasceria vazio a cada execução e nada seria detectado.
 
 7. **Churn é derivado, não é um campo.** Regra: sem fatura Iugu paga há mais de 45
    dias **e** sem fatura futura em aberto; a data do churn é a última fatura paga +

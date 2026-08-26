@@ -2,7 +2,11 @@
 # No repositório ele vive em .github/workflows/painel-clientes-cs.yml
 #
 # Roda todo dia às 04:00 BRT (07:00 UTC), refaz o CS/dados.js inteiro
-# (BigQuery + HubSpot) e commita. Todas as abas, tabelas e gráficos do painel
+# (BigQuery + HubSpot) e commita, junto com o retrato de integrações
+# (CS/integracoes_snapshot.json + CS/integracoes_novas.json). Esses dois
+# precisam voltar para o repositório: é a comparação com o retrato da carga
+# anterior que detecta integração nova, e sem commitar o retrato nasceria vazio
+# toda vez. Todas as abas, tabelas e gráficos do painel
 # saem desse único arquivo, então uma carga atualiza o painel inteiro.
 #
 # Secrets usados (todos já existem no repo): GCP_SA_KEY, HUBSPOT_TOKEN e
@@ -64,12 +68,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           MSG="Painel de Clientes CS: dados de $(TZ=America/Sao_Paulo date +'%d/%m/%Y %H:%M')"
-          cp CS/dados.js "$RUNNER_TEMP/dados.js"
+          ARQS="dados.js integracoes_snapshot.json integracoes_novas.json"
+          for a in $ARQS; do if [ -f "CS/$a" ]; then cp "CS/$a" "$RUNNER_TEMP/$a"; fi; done
           for i in 1 2 3 4 5; do
             git fetch -q origin main
             git reset -q --hard origin/main
-            cp "$RUNNER_TEMP/dados.js" CS/dados.js
-            git add CS/dados.js
+            for a in $ARQS; do if [ -f "$RUNNER_TEMP/$a" ]; then cp "$RUNNER_TEMP/$a" "CS/$a"; fi; done
+            for a in $ARQS; do if [ -f "CS/$a" ]; then git add "CS/$a"; fi; done
             if git diff --cached --quiet; then echo "sem mudancas"; exit 0; fi
             git commit -q -m "$MSG"
             if git push; then echo "push ok (tentativa $i)"; exit 0; fi
