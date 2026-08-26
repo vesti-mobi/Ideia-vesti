@@ -2683,7 +2683,7 @@ function varejoJson(){
     _leia: 'Marcacao manual Atacado x Varejo das filiais novas, usada pela aba de Bonificacao do Painel de '
          + 'Clientes. Vale mais que a classificacao do Relatorio Confeccoes. Gerado pelo proprio painel: aba '
          + 'Bonificacao > coluna "Varejos novos" > "Baixar varejo_manual.json". Salve por cima de '
-         + 'CS/varejo_manual.json e publique (node publicar.js --sem-dados) para valer para todo mundo na '
+         + 'CS/varejo_manual.json e publique (node publicar.js --varejo --sem-dados) para valer para todo mundo na '
          + 'proxima carga.',
     filiais, extras,
   };
@@ -2896,7 +2896,7 @@ function abrirEditorVarejo(cs){
         });
     };
     /* Plano B para quando a API estiver fora: o arquivo continua podendo ser
-       publicado à mão (node publicar.js --sem-dados). */
+       publicado à mão (node publicar.js --varejo --sem-dados). */
     const baixar = el('button',{class:'btn btn-ghost',type:'button'},'Baixar arquivo');
     baixar.title = 'Plano B: gera o varejo_manual.json para publicar à mão';
     baixar.onclick = ()=>{

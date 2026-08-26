@@ -299,7 +299,7 @@ por medição pedido a pedido (ressalva 4).
      Enquanto não foi salvo, fica **só no navegador** (`localStorage`, chave
      `painelcs:varejo-manual`) e aparece com um **ponto dourado** — inclusive se a
      API estiver fora. O botão **"Baixar arquivo"** é o plano B: gera o
-     `varejo_manual.json` para publicar à mão (`node publicar.js --sem-dados`).
+     `varejo_manual.json` para publicar à mão (`node publicar.js --varejo --sem-dados`).
 
      O `fetch_dados.js` lê esse mesmo arquivo em cada carga, então os números
      agregados do `dados.js` também nascem já com a marcação.
