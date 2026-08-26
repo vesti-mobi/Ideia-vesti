@@ -463,20 +463,29 @@ async function puxarBQ() {
            FORMAT_DATE('%Y-%m-%d', p.dt) primeiro_atendimento
     FROM cfg c FULL OUTER JOIN prim p USING(dom)`);
 
-  /* ---- Filiais novas ("varejo"), para a aba de Bonificação.
-     Definição da Laura (26/08/2026): varejo novo = FILIAL nova de uma marca que
-     já existe. Não é conta nova no canal "Varejo Vesti" — esse canal está zerado
-     desde jul/2025 — nem varejista cadastrado pela marca.
+  /* ---- Filiais novas de VAREJO, para a aba de Bonificação.
+     Definição da Laura (26/08/2026): varejo novo = filial nova de uma marca que
+     já existe, e "querem varejo especificamente" — não serve contar filial de
+     atacado junto.
 
-     Como se reconhece uma filial: odbc_companies.parent_id nunca é preenchido no
-     espelho (conferido: zero linhas em 20 meses), então filial é a 2ª empresa em
-     diante do mesmo domínio, por ordem de criação. É a mesma régua que o
-     PainelElisa usa para deduplicar filial, e os nomes confirmam ("São Luis 2",
-     "Teresina 4"). Dá de 2 a 22 por mês na carteira inteira.
-     O CS é o do domínio: a filial não tem anjo próprio. */
-  const filiaisNovas = await q('filiais novas por mês (varejo)', `
+     Duas peças, porque nenhuma resolve sozinha:
+     a) QUEM É FILIAL: `odbc_companies.parent_id` nunca é preenchido no espelho
+        (zero linhas em 20 meses), então filial é a 2ª empresa em diante do mesmo
+        domínio, por ordem de criação. Mesma régua do PainelElisa.
+     b) SE É VAREJO: não existe no espelho `odbc_*` — `lojista` vem false em
+        todas, `market` vem nulo, as 18 tags são de segmento de moda e o canal
+        "Varejo Vesti" está zerado desde jul/2025. A marcação de verdade é a
+        coluna "Tipo _Atacado | Varejo_" do Relatório Confecções, no Fabric, que
+        em 26/08/2026 foi trazida para o BigQuery em `confeccao_tipo_empresa`
+        (ver carregar_tipo_empresa.js).
+
+     `tipo` vem null para empresa que a classificação ainda não alcançou — a
+     carga atual é de 30/03/2026, então filial recente cai nesse caso. Elas NÃO
+     entram na conta (contar sem saber inflaria o número), mas são devolvidas
+     para o painel poder dizer quantas ficaram de fora. */
+  const filiaisNovas = await q('filiais novas por mês (com tipo)', `
     WITH emp AS (
-      SELECT CAST(domain_id AS STRING) dom, id,
+      SELECT CAST(domain_id AS STRING) dom, CAST(id AS STRING) id,
              ANY_VALUE(company_name) company_name, ANY_VALUE(social_name) social_name,
              MIN(DATE(CAST(created_at AS TIMESTAMP))) criado
       FROM ${DS}.odbc_companies
@@ -486,13 +495,24 @@ async function puxarBQ() {
     rk AS (
       SELECT e.*, ROW_NUMBER() OVER (PARTITION BY dom ORDER BY criado, e.id) rn FROM emp e
     )
-    SELECT dom, FORMAT_DATE('%Y-%m-%d', criado) criado, rn,
-           COALESCE(company_name, social_name) nome
+    SELECT rk.dom, FORMAT_DATE('%Y-%m-%d', rk.criado) criado, rk.rn,
+           COALESCE(rk.company_name, rk.social_name) nome,
+           t.tipo
     FROM rk
-    WHERE rn > 1 AND criado BETWEEN DATE '${INICIO}' AND DATE '${HOJE_ISO}'`);
+    LEFT JOIN ${DS}.confeccao_tipo_empresa t ON t.id_empresa = rk.id
+    WHERE rk.rn > 1 AND rk.criado BETWEEN DATE '${INICIO}' AND DATE '${HOJE_ISO}'
+      /* "FILIAL TESTE ALEXIA" estava entrando na conta de varejo de set/2025. */
+      AND LOWER(IFNULL(COALESCE(rk.company_name, rk.social_name),'')) NOT LIKE '%teste%'`);
+
+  /* Até quando a classificação cobre. Vai para o painel avisar — sem isso um mês
+     recente apareceria com zero varejos como se nenhum tivesse sido criado. */
+  const coberturaTipo = await q('cobertura da classificação Atacado/Varejo', `
+    SELECT FORMAT_DATE('%Y-%m-%d', MAX(atualizado_em)) ate, ANY_VALUE(fonte) fonte,
+           COUNT(*) empresas, COUNTIF(tipo = 'Varejo') varejo
+    FROM ${DS}.confeccao_tipo_empresa`);
 
   return { cadastro, cadastroFora, pedidos, ultimoPedido, vestipago, oraculoGmv, oraculoAtend,
-           interchange, mensalidade, faturas, implantacaoVP, implantacaoOraculo, filiaisNovas };
+           interchange, mensalidade, faturas, implantacaoVP, implantacaoOraculo, filiaisNovas, coberturaTipo };
 }
 
 // ============================================================ 1B. API DO TINO
@@ -1630,8 +1650,11 @@ function montar(bqd, hsd, tinoDados) {
       regra: 'Valor dos pedidos pagos das marcas do CS no mês, comparado com o mesmo mês do ano anterior.' },
     { k: 'filiais', titulo: 'Varejos novos (filiais)', unidade: 'filiais',
       comparacao: 'nenhuma',
-      regra: 'Filial nova de marca que já existia: a 2ª empresa em diante do mesmo domínio, criada no mês. '
-           + 'O CS é o do domínio.' },
+      regra: 'Filial nova de marca que já existia — a 2ª empresa em diante do mesmo domínio, criada no mês — '
+           + 'E classificada como VAREJO. O tipo Atacado/Varejo não existe no espelho odbc_*: vem do Relatório '
+           + 'Confecções (Fabric), trazido para o BigQuery em confeccao_tipo_empresa. Filial que a '
+           + 'classificação ainda não alcançou fica fora da conta e aparece como "sem classificação". '
+           + 'O CS é o do domínio: a filial não tem anjo próprio.' },
   ];
 
   /* O HubSpot grava o mesmo responsável com nome curto na carteira e completo no
@@ -1675,10 +1698,15 @@ function montar(bqd, hsd, tinoDados) {
     const m = porDom.get(dom); if (!m) return;
     somaBon(mesDe(r.d), m.cs, 'mensalidade', num(r.plano), m.nome);
   });
-  // Filiais novas: contagem, com o nome da filial no detalhe
+  /* Varejos novos: só filial classificada como VAREJO entra na conta. A que a
+     classificação ainda não alcançou é contada à parte, em 'filiaisSemTipo', que
+     não é uma regra (não está em METRICAS_BONIFICACAO) — serve só para a célula
+     do painel dizer "+N sem classificação" e ninguém ler zero como "não teve". */
   (bqd.filiaisNovas || []).forEach(r => {
     const m = porDom.get(r.dom); if (!m || !dataOk(r.criado)) return;
-    somaBon(mesDe(r.criado), m.cs, 'filiais', 1, (r.nome || m.nome));
+    const tipo = (r.tipo || '').trim();
+    if (tipo === 'Varejo') somaBon(mesDe(r.criado), m.cs, 'filiais', 1, (r.nome || m.nome));
+    else if (!tipo) somaBon(mesDe(r.criado), m.cs, 'filiaisSemTipo', 1, (r.nome || m.nome));
   });
   // Reuniões e integrações vêm do HubSpot
   (hsd.reunioes || []).forEach(r => somaBon(mesDe(r.data), normalizarCsNome(r.cs), 'reunioes', 1, r.cliente));
@@ -1907,6 +1935,9 @@ function montar(bqd, hsd, tinoDados) {
       linhas: bonLinhas,
       detalhe: bonDetalhe,
       limiteTino: LIMITE_TINO,
+      /* Até quando a classificação Atacado/Varejo cobre. O painel usa para
+         avisar na coluna de varejos, em vez de mostrar zero sem explicação. */
+      coberturaTipo: (bqd.coberturaTipo || [])[0] || null,
     },
     reunioes: hsd.reunioes,
     tickets,

@@ -1471,6 +1471,9 @@ const TABS = [
       + '<b>GMV</b> com o mesmo mês do ano passado. <b>Reuniões</b>, <b>integrações</b> e '
       + '<b>varejos</b> são contagem do próprio mês. Passe o mouse no número para ver quais marcas entraram. '
       + 'Ainda <b>não há pontuação</b> — os pesos de cada item entram depois, por cima destes números. '
+      + '<b>Varejo</b> conta só filial nova classificada como varejo — a classificação vem do Relatório '
+      + 'Confecções e tem data de corte, então filial mais nova que isso aparece como "sem classificação" '
+      + 'ao lado do número, e não some da tela. '
       + '<b>Atenção na comparação com o ano passado:</b> a marca é creditada ao CS que a atende <i>hoje</i>, '
       + 'porque o cadastro não guarda o histórico de quem atendia antes. Quem assumiu carteira no meio do '
       + 'caminho aparece com base baixa em 2025 e um crescimento que é troca de responsável, não venda.',
@@ -1525,12 +1528,20 @@ function linhasBonificacao(){
   const porCs = new Map();
   const linha = cs => {
     let l = porCs.get(cs);
-    if(!l){ l = {cs}; met.forEach(m=>{ l[m.k]=0; l['_base_'+m.k]=null; l['_quem_'+m.k]=[] }); porCs.set(cs,l) }
+    if(!l){
+      l = {cs};
+      met.forEach(m=>{ l[m.k]=0; l['_base_'+m.k]=null; l['_quem_'+m.k]=[] });
+      l.filiaisSemTipo = 0; l['_quem_filiaisSemTipo'] = [];   // não é regra, é aviso
+      porCs.set(cs,l);
+    }
     return l;
   };
   (b.linhas||[]).forEach(x=>{
     if(x.mes!==mes) return;
     const l = linha(x.cs);
+    /* `filiaisSemTipo` não é uma regra (não está em METRICAS): vem junto para a
+       célula de varejos poder dizer quantas filiais do mês ficaram sem
+       classificação, em vez de mostrar zero sem explicação. */
     l[x.k] = x.valor;
     l['_base_'+x.k] = x.base;
   });
@@ -1539,6 +1550,9 @@ function linhasBonificacao(){
     const l = linha(x.cs);
     const arr = l['_quem_'+x.k]; if(arr) arr.push(x.cliente + (x.valor>1 ? ' ('+fmt.int(x.valor)+')' : ''));
   });
+  /* Quem não teve nenhuma linha no mês ainda precisa existir na tabela: um CS
+     zerado é informação, não ausência de dado. */
+  DATA.meta.cs?.forEach(cs=>{ if(cs && cs!=='Sem CS') linha(cs) });
   return [...porCs.values()].sort((a,b2)=>
     /^\(?Sem/i.test(a.cs) ? 1 : /^\(?Sem/i.test(b2.cs) ? -1 : a.cs.localeCompare(b2.cs,'pt-BR'));
 }
@@ -2471,8 +2485,18 @@ function celula(r,c){
                                                         : 'vs. mês anterior';
         sub = `<span class="cell-sub ${cls}">${d===0?'igual':sinal+abs} <em>${contra}</em></span>`;
       }
+      /* Varejos: a classificação Atacado/Varejo tem uma data de corte, e filial
+         criada depois dela ainda não tem tipo. Mostrar só "0" faria parecer que
+         não abriu nenhuma loja no mês. */
+      if(c.k==='filiais'){
+        const semTipo = r.filiaisSemTipo || 0;
+        if(semTipo) sub = `<span class="cell-sub">+${fmt.int(semTipo)} sem classificação</span>`;
+      }
       td.innerHTML = `<span class="cell-main">${dinheiro?fmt.moneyCompact(vv):fmt.int(vv)}</span>` + sub;
-      if(quem.length) td.title = quem.slice(0,40).join(', ') + (quem.length>40?` … +${quem.length-40}`:'');
+      const quemSem = c.k==='filiais' ? (r['_quem_filiaisSemTipo']||[]) : [];
+      const titulo = quem.slice(0,40).join(', ')
+        + (quemSem.length ? (quem.length?' · ':'') + 'sem classificação: ' + quemSem.slice(0,20).join(', ') : '');
+      if(titulo) td.title = titulo;
       break }
     case 'implantado': {
       if(!v){ td.textContent = '—'; break }

@@ -7,6 +7,7 @@ index.html          o painel (layout + lógica, sem dependência externa)
 publicar.js         sobe para vesti-mobi/dados/CS via Git Data API
 dados.js            dados reais gerados pelo fetcher — window.PAINEL_DATA
 fetch_dados.js      carga: BigQuery + HubSpot + Tino -> dados.js
+carregar_tipo_empresa.js   leva a classificação Atacado × Varejo para o BigQuery
 integracoes_snapshot.json  retrato de quem tem integração, da última carga
 integracoes_novas.json     histórico das integrações detectadas como novas
 painel-clientes.html  layout de referência original (não é usado em produção)
@@ -242,12 +243,32 @@ por medição pedido a pedido (ressalva 4).
      porque o cadastro não guarda o histórico de quem atendia antes. Quem assumiu
      carteira no meio do caminho aparece com base baixa em 2025 e um "crescimento"
      que é troca de responsável.
-   - **Varejo novo = filial nova de marca já existente** (definição da Laura). Não
-     é conta nova no canal "Varejo Vesti" — esse canal está zerado desde
-     jul/2025 — nem varejista cadastrado pela marca. `odbc_companies.parent_id`
-     nunca vem preenchido no espelho, então filial é a 2ª empresa em diante do
-     mesmo domínio, por ordem de criação: a mesma régua do PainelElisa. Dá de 2 a
-     22 por mês na carteira inteira.
+   - **Varejo novo = filial nova de marca já existente, e de VAREJO.** São duas
+     perguntas, e cada uma tem sua fonte:
+     - *é filial?* `odbc_companies.parent_id` nunca vem preenchido no espelho
+       (zero linhas em 20 meses), então filial é a 2ª empresa em diante do mesmo
+       domínio, por ordem de criação — a mesma régua do PainelElisa. Filial com
+       "teste" no nome fica de fora.
+     - *é de varejo?* **Não existe no espelho `odbc_*`**: `lojista` vem `false` em
+       todas as filiais, `market` vem nulo, as 18 tags são de segmento de moda
+       (jeans, fitness, praia) e o canal "Varejo Vesti" está zerado desde
+       jul/2025. A marcação real é a coluna **"Tipo _Atacado | Varejo_"** do
+       Relatório Confecções (Fabric, `dbo.Confeccao2025_Query1`), a mesma que o
+       CS-Sucesso usa. Ela foi trazida para o BigQuery em **`confeccao_tipo_empresa`**
+       por `carregar_tipo_empresa.js`.
+
+     Isso muda o número: contando qualquer filial dava 3 a 13 por mês; contando só
+     as de varejo dá **1 a 4**. Cerca de cinco em cada seis filiais novas são de
+     atacado.
+
+     ⚠️ **A classificação tem data de corte.** A carga atual é de **30/03/2026**,
+     porque veio do CSV do CS-Sucesso: em 26/08/2026 o warehouse do Fabric não
+     respondia nem a um `SELECT 1` ("Couldn't complete the operation due to a
+     system update", em 6 tentativas com reconexão). Filial criada depois disso
+     fica sem tipo, **não entra na conta** e aparece na célula como
+     "+N sem classificação" — para ninguém ler zero como "não abriu nenhuma".
+     Quando o Fabric voltar, `node carregar_tipo_empresa.js --fabric` atualiza a
+     tabela e a aba melhora sozinha, sem mexer em mais nada.
    - **Integração nova ainda é o que o HubSpot registrou.** O cadastro guarda quem
      TEM integração, não desde quando — não há histórico para reconstruir. A partir
      desta versão a carga fotografa a carteira todo dia (`integracoes_snapshot.json`)
