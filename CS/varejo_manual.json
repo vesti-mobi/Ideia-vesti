@@ -1,5 +1,12 @@
 {
-  "_leia": "Marcacao manual Atacado x Varejo das filiais novas, usada pela aba de Bonificacao. Vale MAIS que a classificacao do Relatorio Confeccoes (que esta congelada em 30/03/2026). Quem gera este arquivo e o proprio painel: aba Bonificacao > clique na coluna 'Varejos novos' > 'Baixar varejo_manual.json'. Salve por cima deste arquivo e publique (node publicar.js --sem-dados) para a marcacao valer para todo mundo na proxima carga.",
-  "filiais": {},
-  "extras": []
+  "_leia": "Marcacao manual Atacado x Varejo das filiais novas, usada pela aba de Bonificacao do Painel de Clientes. Vale mais que a classificacao do Relatorio Confeccoes (congelada em 30/03/2026). Escrito pelo botao \"Salvar para todo mundo\" do proprio painel, via stark-admin /api/varejo. Lido por CS/fetch_dados.js em cada carga.",
+  "filiais": {
+    "3316bb52-e5bc-4f60-b42b-d09dc60dc7dd": {
+      "tipo": "Varejo",
+      "nome": "Sam Modas",
+      "em": "2026-08-26"
+    }
+  },
+  "extras": [],
+  "atualizadoEm": "2026-08-26T19:14:48.832Z"
 }
