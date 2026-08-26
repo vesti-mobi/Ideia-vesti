@@ -206,6 +206,38 @@ button,input,select{font:inherit;color:inherit}
 .wk-s:hover{border-color:var(--acc-line)}
 .wk-s.on{background:var(--acc);border-color:var(--acc);color:#fff}
 .wk-s.hoje{box-shadow:0 0 0 2px var(--acc-soft)}
+
+/* --- editor de varejos (aba de Bonificação): marcar filial por filial --- */
+.td-edit{cursor:pointer}
+.td-edit:hover{background:var(--acc-soft)}
+.ed-pend{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.ed-back{position:fixed;inset:0;z-index:60;background:rgba(17,20,24,.34);
+  display:flex;align-items:center;justify-content:center;padding:24px}
+.ed-box{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  box-shadow:0 24px 60px -20px rgba(17,20,24,.5);width:min(760px,100%);max-height:86vh;
+  display:flex;flex-direction:column}
+.ed-head{padding:16px 18px 12px;border-bottom:1px solid var(--line-2)}
+.ed-head h3{margin:0;font-size:15px}
+.ed-head p{margin:7px 0 0;font-size:12px;color:var(--ink-3);line-height:1.5}
+.ed-corpo{overflow:auto;padding:4px 18px 14px}
+.ed-linha{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-2)}
+.ed-nome{flex:1;min-width:0;font-size:13px}
+.ed-nome small{display:block;font-size:11px;color:var(--ink-3);margin-top:2px}
+.ed-op{display:flex;gap:4px;flex:none}
+.ed-op button{border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);
+  padding:4px 9px;font-size:11.5px;cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.ed-op button:hover{border-color:var(--acc-line)}
+.ed-op button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.ed-vazio{font-size:12.5px;color:var(--ink-3);line-height:1.5;padding:16px 0}
+.ed-sec{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);margin:18px 0 0}
+.ed-add{display:flex;gap:6px;margin-top:8px}
+.ed-add input{flex:1;border:1px solid var(--line);background:var(--sunken);
+  border-radius:var(--r-sm);padding:7px 9px;font-size:12.5px;color:var(--ink)}
+.ed-foot{padding:12px 18px;border-top:1px solid var(--line-2);display:flex;
+  align-items:center;gap:8px;flex-wrap:wrap}
+.ed-nota{flex:1;min-width:240px;font-size:11.5px;color:var(--ink-3);line-height:1.45}
+.ed-nota code{font-family:var(--f-mono);font-size:11px}
 /* --- seletor de período: dois campos de data + grade de meses --- */
 .per-datas{display:flex;gap:8px;margin-bottom:12px}
 .per-campo{flex:1;display:flex;flex-direction:column;gap:4px}
@@ -1471,9 +1503,10 @@ const TABS = [
       + '<b>GMV</b> com o mesmo mês do ano passado. <b>Reuniões</b>, <b>integrações</b> e '
       + '<b>varejos</b> são contagem do próprio mês. Passe o mouse no número para ver quais marcas entraram. '
       + 'Ainda <b>não há pontuação</b> — os pesos de cada item entram depois, por cima destes números. '
-      + '<b>Varejo</b> conta só filial nova classificada como varejo — a classificação vem do Relatório '
-      + 'Confecções e tem data de corte, então filial mais nova que isso aparece como "sem classificação" '
-      + 'ao lado do número, e não some da tela. '
+      + '<b>Varejo</b> conta só filial nova classificada como varejo. A classificação automática vem do '
+      + 'Relatório Confecções e tem data de corte, então filial mais nova que isso aparece como '
+      + '"sem classificação" ao lado do número, e não some da tela — <b>clique no número de varejos para '
+      + 'marcar na mão</b> quais filiais são de varejo. A marcação fica salva e vale por cima do cadastro. '
       + '<b>Atenção na comparação com o ano passado:</b> a marca é creditada ao CS que a atende <i>hoje</i>, '
       + 'porque o cadastro não guarda o histórico de quem atendia antes. Quem assumiu carteira no meio do '
       + 'caminho aparece com base baixa em 2025 e um crescimento que é troca de responsável, não venda.',
@@ -1550,6 +1583,24 @@ function linhasBonificacao(){
     const l = linha(x.cs);
     const arr = l['_quem_'+x.k]; if(arr) arr.push(x.cliente + (x.valor>1 ? ' ('+fmt.int(x.valor)+')' : ''));
   });
+  /* Varejos novos: o número é RECONTADO aqui a partir da lista de filiais, em
+     vez de lido pronto do dados.js. É isso que faz a marcação feita na tela
+     valer na hora, sem esperar a carga das 04:00 do dia seguinte. Com dados.js
+     antigo (sem a lista), filiaisDoMes devolve null e continua valendo o
+     agregado que veio da carga. */
+  const filiaisMes = filiaisDoMes(mes);
+  if(filiaisMes){
+    porCs.forEach(l=>{ l.filiais=0; l.filiaisSemTipo=0;
+      l['_quem_filiais']=[]; l['_quem_filiaisSemTipo']=[] });
+    filiaisMes.forEach(f=>{
+      const l = linha(f.cs);
+      const t = varejoTipo(f);
+      if(t==='Varejo'){ l.filiais++; l['_quem_filiais'].push(f.nome) }
+      /* Marca apontada à mão nunca é "sem classificação": ela só existe porque
+         alguém já disse que é varejo. */
+      else if(!t && !f.extra){ l.filiaisSemTipo++; l['_quem_filiaisSemTipo'].push(f.nome) }
+    });
+  }
   /* Quem não teve nenhuma linha no mês ainda precisa existir na tabela: um CS
      zerado é informação, não ausência de dado. */
   DATA.meta.cs?.forEach(cs=>{ if(cs && cs!=='Sem CS') linha(cs) });
@@ -2494,8 +2545,19 @@ function celula(r,c){
       }
       td.innerHTML = `<span class="cell-main">${dinheiro?fmt.moneyCompact(vv):fmt.int(vv)}</span>` + sub;
       const quemSem = c.k==='filiais' ? (r['_quem_filiaisSemTipo']||[]) : [];
-      const titulo = quem.slice(0,40).join(', ')
+      let titulo = quem.slice(0,40).join(', ')
         + (quemSem.length ? (quem.length?' · ':'') + 'sem classificação: ' + quemSem.slice(0,20).join(', ') : '');
+      /* Varejos é a única coluna editável do painel: o cadastro não sabe dizer
+         se a filial é de varejo (a classificação está parada em 30/03/2026),
+         então quem sabe é a CS. Clicar abre a lista daquele mês. */
+      if(c.k==='filiais' && filiaisDoMes(mesBonificacao())){
+        td.classList.add('td-edit');
+        if(filiaisDoMes(mesBonificacao()).some(f=>f.cs===r.cs && varejoPendente(f))){
+          td.innerHTML += '<span class="ed-pend" style="display:inline-block;margin-left:6px;vertical-align:middle"></span>';
+        }
+        td.onclick = ()=>abrirEditorVarejo(r.cs);
+        titulo = (titulo ? titulo + ' · ' : '') + 'clique para marcar quais são de varejo';
+      }
       if(titulo) td.title = titulo;
       break }
     case 'implantado': {
@@ -2508,6 +2570,238 @@ function celula(r,c){
     default: td.textContent = v==null?'—':v;
   }
   return td;
+}
+
+/* ============================================================================
+   6.5 MARCAÇÃO MANUAL DE VAREJO
+   ----------------------------------------------------------------------------
+   A regra "varejos novos" só conta filial classificada como VAREJO, e essa
+   classificação vem do Relatório Confecções, CONGELADO em 30/03/2026 — na
+   prática, toda filial nova nasce "sem classificação" e fica fora da conta. A
+   Laura pediu (26/08/2026) para poder dizer na mão quais são de varejo e para
+   que isso ficasse salvo.
+
+   Fica salvo em DOIS lugares, de propósito:
+   - no navegador (localStorage), no instante do clique. Sobrevive à carga
+     diária, que reescreve o dados.js inteiro toda madrugada — sem isso a
+     marcação sumiria às 04:00;
+   - em CS/varejo_manual.json, que o fetcher lê na carga seguinte. É o que faz a
+     marcação virar o número oficial, igual para todo mundo que abre o painel.
+     Como uma página estática não commita nada sozinha, quem gera o arquivo é o
+     botão "Baixar varejo_manual.json" do editor.
+   Enquanto a marcação está só no navegador, ela aparece com um ponto dourado.
+
+   Precedência do tipo de uma filial:
+     marcação neste navegador  >  varejo_manual.json publicado  >  cadastro. */
+const VAREJO_LS = 'painelcs:varejo-manual';
+let _varejoCache = null;
+function varejoLocal(){
+  if(_varejoCache) return _varejoCache;
+  let j = null;
+  try{ j = JSON.parse(localStorage.getItem(VAREJO_LS)) }catch(e){ j = null }
+  _varejoCache = { filiais:(j&&j.filiais)||{}, extras:(j&&j.extras)||[] };
+  return _varejoCache;
+}
+function varejoLocalSalvar(v){
+  _varejoCache = v;
+  try{ localStorage.setItem(VAREJO_LS, JSON.stringify(v)) }
+  catch(e){ alert('Não consegui guardar a marcação neste navegador: '+e.message) }
+}
+function varejoPublicado(){
+  const m = (DATA.bonificacao||{}).marcacaoManual || {};
+  return { filiais: m.filiais||{}, extras: m.extras||[] };
+}
+const chaveExtra = x => 'extra:'+x.dom+':'+x.mes;
+const hojeISO = ()=>new Date().toISOString().slice(0,10);
+
+/* Filiais novas do mês + as marcas apontadas à mão que ainda não foram
+   publicadas. Devolve null quando o dados.js é antigo e não traz a lista. */
+function filiaisDoMes(mes){
+  const b = DATA.bonificacao || {};
+  if(!b.filiais) return null;
+  const jaPublicado = new Set(varejoPublicado().extras.map(chaveExtra));
+  const locais = varejoLocal().extras
+    .filter(x=>x.mes===mes && !jaPublicado.has(chaveExtra(x)))
+    .map(x=>({ mes:x.mes, cs:x.cs||'Sem CS', dom:String(x.dom), id:chaveExtra(x),
+               nome:x.nome||x.dom, tipo:'Varejo', auto:null, manual:true, extra:true, soLocal:true }));
+  return b.filiais.filter(f=>f.mes===mes).concat(locais);
+}
+/* f.tipo já vem do fetcher com o varejo_manual.json aplicado; o que falta somar
+   é a marcação deste navegador, que ainda não passou por nenhuma carga. */
+function varejoTipo(f){
+  const loc = varejoLocal().filiais[f.id];
+  if(!loc) return f.tipo || null;
+  return loc.tipo==='auto' ? (f.auto||null) : loc.tipo;
+}
+function varejoPendente(f){ return !!f.soLocal || !!varejoLocal().filiais[f.id] }
+/* Existe uma decisão humana valendo (deste navegador ou já publicada)? */
+function varejoNaMao(f){ return !!varejoLocal().filiais[f.id] || !!f.manual }
+
+/* valor: 'Varejo' | 'Atacado' | 'auto' (voltar a seguir o cadastro) */
+function varejoMarcar(f, valor){
+  const v = varejoLocal();
+  if(f.soLocal && valor!=='Varejo'){
+    // marca apontada à mão que ainda não foi publicada: some da lista
+    v.extras = v.extras.filter(x=>chaveExtra(x)!==f.id);
+  }else if(valor==='auto' && !f.extra && !varejoPublicado().filiais[f.id]){
+    delete v.filiais[f.id];
+  }else{
+    /* Desfazer uma marcação JÁ PUBLICADA também é uma marcação: precisa ficar
+       guardada como 'auto', senão o valor do arquivo voltaria a valer. */
+    v.filiais[f.id] = { tipo:valor, nome:f.nome };
+  }
+  varejoLocalSalvar(v);
+}
+function varejoAdicionarMarca(cs, mes, nome, dom){
+  const v = varejoLocal();
+  const x = { mes, dom:String(dom), nome, cs, em:hojeISO() };
+  if(v.extras.some(y=>chaveExtra(y)===chaveExtra(x))) return false;
+  v.extras.push(x); varejoLocalSalvar(v); return true;
+}
+
+/* O arquivo final: o que já está publicado, com as marcações deste navegador
+   por cima. É este JSON que vai para CS/varejo_manual.json. */
+function varejoJson(){
+  const pub = varejoPublicado(), loc = varejoLocal();
+  const filiais = {};
+  Object.keys(pub.filiais).forEach(id=>filiais[id]=Object.assign({},pub.filiais[id]));
+  const desfeitos = new Set();
+  Object.keys(loc.filiais).forEach(id=>{
+    const m = loc.filiais[id];
+    if(m.tipo==='auto'){ delete filiais[id]; desfeitos.add(id); return }
+    filiais[id] = { tipo:m.tipo, nome:m.nome||null, em:hojeISO() };
+  });
+  const extras = pub.extras.filter(x=>!desfeitos.has(chaveExtra(x))).map(x=>Object.assign({},x));
+  const vistos = new Set(extras.map(chaveExtra));
+  loc.extras.forEach(x=>{ if(!vistos.has(chaveExtra(x))){ vistos.add(chaveExtra(x)); extras.push(x) } });
+  return {
+    _leia: 'Marcacao manual Atacado x Varejo das filiais novas, usada pela aba de Bonificacao do Painel de '
+         + 'Clientes. Vale mais que a classificacao do Relatorio Confeccoes. Gerado pelo proprio painel: aba '
+         + 'Bonificacao > coluna "Varejos novos" > "Baixar varejo_manual.json". Salve por cima de '
+         + 'CS/varejo_manual.json e publique (node publicar.js --sem-dados) para valer para todo mundo na '
+         + 'proxima carga.',
+    filiais, extras,
+  };
+}
+
+/* --- o editor: uma linha por filial, três botões por linha --- */
+function abrirEditorVarejo(cs){
+  const mes = mesBonificacao();
+  // nunca dois editores abertos ao mesmo tempo: o de baixo ficaria mostrando o estado velho
+  document.querySelectorAll('.ed-back').forEach(x=>x.remove());
+  const back = el('div',{class:'ed-back'});
+  const box = el('div',{class:'ed-box'});
+  back.appendChild(box);
+  const aoTeclar = e => { if(e.key==='Escape') fechar() };
+  const fechar = ()=>{ back.remove(); document.removeEventListener('keydown', aoTeclar) };
+  document.addEventListener('keydown', aoTeclar);
+  back.onclick = e => { if(e.target===back) fechar() };
+
+  const cob = (DATA.bonificacao||{}).coberturaTipo || null;
+  const head = el('div',{class:'ed-head'});
+  const corpo = el('div',{class:'ed-corpo'});
+  const foot = el('div',{class:'ed-foot'});
+  box.appendChild(head); box.appendChild(corpo); box.appendChild(foot);
+
+  /* A lista de marcas do "varejo em domínio próprio" é só a da carteira do CS —
+     é onde esse caso vai estar. */
+  const dlId = 'lista-marcas-varejo';
+  const antigo = $('#'+dlId); if(antigo) antigo.remove();
+  const dl = el('datalist',{id:dlId});
+  (DATA.clientes||[]).filter(c=>c.cs===cs).forEach(c=>dl.appendChild(el('option',{value:c.nome})));
+  document.body.appendChild(dl);
+
+  const pintar = ()=>{
+    const lista = (filiaisDoMes(mes)||[]).filter(f=>f.cs===cs)
+      .sort((a,b)=>String(a.nome||'').localeCompare(String(b.nome||''),'pt-BR'));
+    const varejos = lista.filter(f=>varejoTipo(f)==='Varejo').length;
+    const pendentes = lista.filter(varejoPendente).length;
+
+    head.innerHTML = '<h3>Varejos novos — '+cs+' · '+rotuloMes(mes)+'</h3>'
+      + '<p>Filiais novas desta carteira no mês. Marque quais são de <b>varejo</b>: essa marcação entra na '
+      + 'conta da bonificação por cima da classificação do cadastro'
+      + (cob && cob.ate ? ', que só cobre até <b>'+fmt.date(cob.ate)+'</b>' : '')
+      + '. Fica salva neste navegador na hora; para valer para todo mundo, baixe o arquivo aqui embaixo e publique.</p>';
+
+    corpo.innerHTML = '';
+    if(!lista.length){
+      corpo.appendChild(el('div',{class:'ed-vazio'},
+        'Nenhuma filial nova desta carteira em '+rotuloMes(mes)+'.'));
+    }
+    lista.forEach(f=>{
+      const t = varejoTipo(f), naMao = varejoNaMao(f);
+      const linha = el('div',{class:'ed-linha'});
+      const ponto = varejoPendente(f)
+        ? '<span class="ed-pend" style="display:inline-block;margin-right:6px;vertical-align:middle"></span>' : '';
+      const origem = f.extra ? 'marca apontada à mão · não é filial no cadastro'
+        : 'criada em '+fmt.date(f.criado)+' · cadastro diz: '+(f.auto || 'sem classificação');
+      const nota = varejoPendente(f) ? ' · marcado aqui, ainda não publicado'
+                 : (f.manual ? ' · marcado à mão e publicado' : '');
+      linha.appendChild(el('div',{class:'ed-nome'},
+        ponto + (f.nome||'—') + '<small>' + origem + nota + '</small>'));
+      const ops = el('div',{class:'ed-op'});
+      [['Varejo','Varejo'],['Atacado','Atacado'],[f.extra?'Remover':'Automático','auto']].forEach(([rot,val])=>{
+        /* Aceso = a decisão que está valendo. Sem decisão humana, quem está
+           valendo é o cadastro — e o botão aceso é o "Automático". */
+        const aceso = val==='auto' ? !naMao : (naMao && t===val);
+        const b = el('button',{type:'button',class:aceso?'on':''},rot);
+        b.onclick = ()=>{ varejoMarcar(f,val); pintar(); renderPagina() };
+        ops.appendChild(b);
+      });
+      linha.appendChild(ops);
+      corpo.appendChild(linha);
+    });
+
+    /* Varejo em domínio separado ("Nicoboco Varejo"): não existe filial no
+       cadastro para marcar, então a marca inteira é apontada como varejo novo
+       do mês. São poucos casos, mas são justamente os que a régua não pega. */
+    corpo.appendChild(el('div',{class:'ed-sec'},'Varejo em domínio próprio'));
+    corpo.appendChild(el('div',{class:'ed-vazio',style:'padding:6px 0 0'},
+      'Marca desta carteira que abriu varejo sem virar filial no cadastro. Entra como varejo novo de '
+      + rotuloMes(mes)+'.'));
+    const add = el('div',{class:'ed-add'});
+    const inp = el('input',{type:'text',list:dlId,placeholder:'nome da marca'});
+    const bt = el('button',{class:'btn',type:'button'},'Adicionar');
+    const adicionar = ()=>{
+      const nome = inp.value.trim(); if(!nome) return;
+      const c = (DATA.clientes||[]).find(x=>x.nome===nome)
+             || (DATA.clientes||[]).find(x=>String(x.nome||'').toLowerCase()===nome.toLowerCase());
+      if(!c){ alert('Não achei "'+nome+'" na lista de marcas.'); return }
+      if(!varejoAdicionarMarca(c.cs||cs, mes, c.nome, c.dominio)){ alert('Essa marca já está na lista.'); return }
+      inp.value=''; pintar(); renderPagina();
+    };
+    bt.onclick = adicionar;
+    inp.onkeydown = e => { if(e.key==='Enter') adicionar() };
+    add.appendChild(inp); add.appendChild(bt);
+    corpo.appendChild(add);
+
+    foot.innerHTML = '';
+    foot.appendChild(el('div',{class:'ed-nota'},
+      '<b>'+varejos+'</b> '+(varejos===1?'varejo novo':'varejos novos')+' em '+rotuloMes(mes)+' para '+cs+'. '
+      + (pendentes ? '<b>'+pendentes+'</b> '+(pendentes===1?'marcação salva':'marcações salvas')
+          + ' só neste navegador — baixe o arquivo, salve por cima de <code>CS/varejo_manual.json</code> e rode '
+          + '<code>node publicar.js --sem-dados</code> para valer para todo mundo.'
+        : 'Nada pendente de publicação.')));
+    const baixar = el('button',{class:'btn',type:'button'},'Baixar varejo_manual.json');
+    baixar.onclick = ()=>{
+      const blob = new Blob([JSON.stringify(varejoJson(),null,2)+'\n'],{type:'application/json'});
+      const a = el('a'); a.href = URL.createObjectURL(blob); a.download='varejo_manual.json'; a.click();
+      URL.revokeObjectURL(a.href);
+    };
+    const copiar = el('button',{class:'btn',type:'button'},'Copiar JSON');
+    copiar.onclick = ()=>{
+      const txt = JSON.stringify(varejoJson(),null,2);
+      const ok = ()=>{ copiar.textContent='Copiado'; setTimeout(()=>copiar.textContent='Copiar JSON',1600) };
+      if(navigator.clipboard) navigator.clipboard.writeText(txt).then(ok)
+        .catch(()=>window.prompt('Copie o conteúdo do varejo_manual.json:', txt));
+      else window.prompt('Copie o conteúdo do varejo_manual.json:', txt);
+    };
+    const sair = el('button',{class:'btn',type:'button'},'Fechar');
+    sair.onclick = fechar;
+    foot.appendChild(baixar); foot.appendChild(copiar); foot.appendChild(sair);
+  };
+  pintar();
+  document.body.appendChild(back);
 }
 
 function exportarCSV(){

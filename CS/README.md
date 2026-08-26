@@ -10,6 +10,7 @@ fetch_dados.js      carga: BigQuery + HubSpot + Tino -> dados.js
 carregar_tipo_empresa.js   leva a classificação Atacado × Varejo para o BigQuery
 integracoes_snapshot.json  retrato de quem tem integração, da última carga
 integracoes_novas.json     histórico das integrações detectadas como novas
+varejo_manual.json         marcação FEITA NA MÃO de quais filiais são de varejo
 painel-clientes.html  layout de referência original (não é usado em produção)
 ```
 
@@ -269,6 +270,30 @@ por medição pedido a pedido (ressalva 4).
      "+N sem classificação" — para ninguém ler zero como "não abriu nenhuma".
      Quando o Fabric voltar, `node carregar_tipo_empresa.js --fabric` atualiza a
      tabela e a aba melhora sozinha, sem mexer em mais nada.
+
+     ✍️ **Dá para marcar na mão, e é o que vale.** Como a classificação automática
+     está congelada, a aba deixa dizer filial por filial se é de varejo: na coluna
+     **"Varejos novos"**, clicar no número abre a lista daquele CS naquele mês, com
+     três botões por filial — *Varejo*, *Atacado* e *Automático* (seguir o cadastro).
+     Também dá para apontar uma **marca inteira**, para o varejo que abre em domínio
+     próprio ("Nicoboco Varejo") e que a régua de "2ª empresa do mesmo domínio" nunca
+     enxerga como filial.
+
+     A marcação é salva em dois lugares, de propósito:
+     - **no navegador** (`localStorage`, chave `painelcs:varejo-manual`), no instante
+       do clique. É o que faz ela sobreviver à carga das 04:00, que reescreve o
+       `dados.js` inteiro. Enquanto está só aí, aparece com um **ponto dourado**;
+     - **em `varejo_manual.json`**, que o fetcher lê na carga seguinte e aplica por
+       cima do `confeccao_tipo_empresa`. É o que faz a marcação valer para todo mundo.
+       Uma página estática não commita nada sozinha, então quem gera o arquivo é o
+       botão **"Baixar varejo_manual.json"** do próprio editor: ele já vem com o que
+       está publicado + o que foi marcado no navegador. Salvar por cima de
+       `CS/varejo_manual.json` e rodar `node publicar.js --sem-dados`.
+
+     Precedência: **marcação no navegador > `varejo_manual.json` > cadastro**. O
+     `publicar.js` se recusa a subir um `varejo_manual.json` local que tenha MENOS
+     marcações do que o que já está no repositório — seria apagar o trabalho de
+     outra pessoa; nesse caso ele avisa e publica o resto.
    - **Integração nova ainda é o que o HubSpot registrou.** O cadastro guarda quem
      TEM integração, não desde quando — não há histórico para reconstruir. A partir
      desta versão a carga fotografa a carteira todo dia (`integracoes_snapshot.json`)

@@ -1,0 +1,5 @@
+{
+  "_leia": "Marcacao manual Atacado x Varejo das filiais novas, usada pela aba de Bonificacao. Vale MAIS que a classificacao do Relatorio Confeccoes (que esta congelada em 30/03/2026). Quem gera este arquivo e o proprio painel: aba Bonificacao > clique na coluna 'Varejos novos' > 'Baixar varejo_manual.json'. Salve por cima deste arquivo e publique (node publicar.js --sem-dados) para a marcacao valer para todo mundo na proxima carga.",
+  "filiais": {},
+  "extras": []
+}

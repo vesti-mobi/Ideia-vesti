@@ -495,7 +495,7 @@ async function puxarBQ() {
     rk AS (
       SELECT e.*, ROW_NUMBER() OVER (PARTITION BY dom ORDER BY criado, e.id) rn FROM emp e
     )
-    SELECT rk.dom, FORMAT_DATE('%Y-%m-%d', rk.criado) criado, rk.rn,
+    SELECT rk.dom, rk.id, FORMAT_DATE('%Y-%m-%d', rk.criado) criado, rk.rn,
            COALESCE(rk.company_name, rk.social_name) nome,
            t.tipo
     FROM rk
@@ -1107,6 +1107,45 @@ function registrarIntegracoes(porDom) {
   return historicoNovo;
 }
 
+/* ---- Marcação manual Atacado × Varejo (CS/varejo_manual.json).
+
+   A classificação automática vem do Relatório Confecções (Fabric) e está
+   CONGELADA em 30/03/2026 — toda filial criada depois disso nasce sem tipo e
+   fica fora da conta de varejos novos. A Laura pediu, em 26/08/2026, para poder
+   dizer na mão se a filial é de varejo e para que isso ficasse salvo. Este
+   arquivo é onde fica.
+
+   Ele vale MAIS que a classificação automática: é alguém olhando o cliente e
+   afirmando, contra um cadastro que não sabe. Formato:
+
+     { "filiais": { "<id_empresa>": { "tipo": "Varejo"|"Atacado", "nome": "..." } },
+       "extras":  [ { "mes": "2026-08", "dom": "123", "nome": "...", "cs": "..." } ] }
+
+   "extras" existe para o varejo que abre em DOMÍNIO separado ("Nicoboco Varejo"),
+   que a régua de "2ª empresa do mesmo domínio" nunca pega: ali não há filial no
+   cadastro para marcar, então a marca inteira entra como varejo novo daquele mês.
+
+   Quem escreve o arquivo é a aba de Bonificação do painel, pelo botão
+   "Baixar varejo_manual.json" — o navegador não commita nada sozinho. Enquanto
+   não for publicado, o painel segura a marcação no localStorage de quem marcou. */
+function lerVarejoManual() {
+  const arq = path.join(__dirname, 'varejo_manual.json');
+  let j = null;
+  try { j = JSON.parse(fs.readFileSync(arq, 'utf8')); } catch { j = null; }
+  const filiais = {};
+  const cru = (j && j.filiais) || {};
+  Object.keys(cru).forEach(id => {
+    const t = String((cru[id] || {}).tipo || '').trim();
+    // só os dois valores válidos entram: lixo no arquivo não pode virar número
+    if (t === 'Varejo' || t === 'Atacado') filiais[id] = { tipo: t, nome: (cru[id] || {}).nome || null };
+  });
+  const extras = ((j && j.extras) || []).filter(x => x && String(x.mes || '').length === 7 && x.dom)
+    .map(x => ({ mes: String(x.mes), dom: String(x.dom), nome: x.nome || null, cs: x.cs || null, em: x.em || null }));
+  console.log('  marcação manual de varejo'.padEnd(44) + String(Object.keys(filiais).length).padStart(8)
+    + ' filiais' + (extras.length ? ' + ' + extras.length + ' marcas à parte' : ''));
+  return { filiais, extras };
+}
+
 /* ---- Empacotamento das séries diárias.
    Ir de semana para dia multiplicou as linhas por ~6 e o dados.js saltou de
    6,5 MB para 37 MB — inviável para um arquivo que é commitado todo dia num
@@ -1652,8 +1691,9 @@ function montar(bqd, hsd, tinoDados) {
       comparacao: 'nenhuma',
       regra: 'Filial nova de marca que já existia — a 2ª empresa em diante do mesmo domínio, criada no mês — '
            + 'E classificada como VAREJO. O tipo Atacado/Varejo não existe no espelho odbc_*: vem do Relatório '
-           + 'Confecções (Fabric), trazido para o BigQuery em confeccao_tipo_empresa. Filial que a '
-           + 'classificação ainda não alcançou fica fora da conta e aparece como "sem classificação". '
+           + 'Confecções (Fabric), trazido para o BigQuery em confeccao_tipo_empresa. Como essa classificação '
+           + 'está congelada, a marcação FEITA NA MÃO na própria aba vale por cima dela (varejo_manual.json); '
+           + 'o que ninguém classificou fica fora da conta e aparece como "sem classificação". '
            + 'O CS é o do domínio: a filial não tem anjo próprio.' },
   ];
 
@@ -1702,11 +1742,31 @@ function montar(bqd, hsd, tinoDados) {
      classificação ainda não alcançou é contada à parte, em 'filiaisSemTipo', que
      não é uma regra (não está em METRICAS_BONIFICACAO) — serve só para a célula
      do painel dizer "+N sem classificação" e ninguém ler zero como "não teve". */
+  const marcacaoVarejo = lerVarejoManual();
+  const bonFiliais = [];
   (bqd.filiaisNovas || []).forEach(r => {
     const m = porDom.get(r.dom); if (!m || !dataOk(r.criado)) return;
-    const tipo = (r.tipo || '').trim();
-    if (tipo === 'Varejo') somaBon(mesDe(r.criado), m.cs, 'filiais', 1, (r.nome || m.nome));
-    else if (!tipo) somaBon(mesDe(r.criado), m.cs, 'filiaisSemTipo', 1, (r.nome || m.nome));
+    const auto = (r.tipo || '').trim() || null;
+    const mm = marcacaoVarejo.filiais[String(r.id)];
+    const tipo = mm ? mm.tipo : auto;          // a mão ganha do cadastro
+    const mes = mesDe(r.criado), nome = r.nome || m.nome, cs = m.cs || 'Sem CS';
+    /* A lista vai inteira para o painel — inclusive as de atacado e as sem tipo.
+       É ela que a aba mostra no editor: para marcar "esta é de varejo" é preciso
+       ver as que não são, senão só dá para concordar com o cadastro. */
+    bonFiliais.push({ mes, cs, dom: r.dom, id: String(r.id), nome, criado: r.criado,
+                      tipo: tipo || null, auto, manual: !!mm });
+    if (tipo === 'Varejo') somaBon(mes, m.cs, 'filiais', 1, nome);
+    else if (!tipo) somaBon(mes, m.cs, 'filiaisSemTipo', 1, nome);
+  });
+  /* Varejo em domínio separado: não existe filial para marcar, a marca inteira
+     é apontada à mão como varejo novo daquele mês. */
+  marcacaoVarejo.extras.forEach(x => {
+    const m = porDom.get(x.dom);
+    const cs = (m && m.cs) || x.cs || 'Sem CS';
+    const nome = (m && m.nome) || x.nome || x.dom;
+    bonFiliais.push({ mes: x.mes, cs, dom: x.dom, id: 'extra:' + x.dom + ':' + x.mes,
+                      nome, criado: x.em || null, tipo: 'Varejo', auto: null, manual: true, extra: true });
+    somaBon(x.mes, cs, 'filiais', 1, nome);
   });
   // Reuniões e integrações vêm do HubSpot
   (hsd.reunioes || []).forEach(r => somaBon(mesDe(r.data), normalizarCsNome(r.cs), 'reunioes', 1, r.cliente));
@@ -1938,6 +1998,10 @@ function montar(bqd, hsd, tinoDados) {
       /* Até quando a classificação Atacado/Varejo cobre. O painel usa para
          avisar na coluna de varejos, em vez de mostrar zero sem explicação. */
       coberturaTipo: (bqd.coberturaTipo || [])[0] || null,
+      /* Uma linha por filial nova da janela, com o tipo que valeu e de onde ele
+         veio (cadastro ou mão). É o que o editor de varejos da aba mostra. */
+      filiais: bonFiliais,
+      marcacaoManual: marcacaoVarejo,
     },
     reunioes: hsd.reunioes,
     tickets,
