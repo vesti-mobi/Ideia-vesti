@@ -316,7 +316,7 @@
   },
   "829798": {
     "ligado": true,
-    "update": "2026-08-25",
+    "update": "2026-08-27",
     "religamentoReal": true,
     "nomePlanilha": "L2M",
     "canalPlanilha": "Vesti"
@@ -540,7 +540,7 @@
   },
   "63957": {
     "ligado": true,
-    "update": "2026-08-17",
+    "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "Amiska",
     "canalPlanilha": "Vesti"
@@ -560,7 +560,7 @@
     "canalPlanilha": ""
   },
   "894067": {
-    "ligado": false,
+    "ligado": true,
     "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "Dreams Atacado",
@@ -581,7 +581,7 @@
     "canalPlanilha": "Starter"
   },
   "503164": {
-    "ligado": false,
+    "ligado": true,
     "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "Rosa Chick",
@@ -616,8 +616,8 @@
     "canalPlanilha": "Starter"
   },
   "1376999": {
-    "ligado": true,
-    "update": "2026-07-16",
+    "ligado": false,
+    "update": "2026-08-27",
     "religamentoReal": false,
     "nomePlanilha": "DELAS PLUS SIZE",
     "canalPlanilha": "Varejo Vesti"
@@ -686,8 +686,8 @@
     "canalPlanilha": "Vesti"
   },
   "1791859": {
-    "ligado": true,
-    "update": "2026-07-23",
+    "ligado": false,
+    "update": "2026-08-27",
     "religamentoReal": false,
     "nomePlanilha": "Milenka Modas",
     "canalPlanilha": "Uemtel"
@@ -701,8 +701,8 @@
   },
   "909617": {
     "ligado": true,
-    "update": "2026-08-01",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Bella Moda Intima",
     "canalPlanilha": "Vesti"
   },
@@ -729,7 +729,7 @@
   },
   "350323": {
     "ligado": true,
-    "update": "2026-07-31",
+    "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "MISSMEL",
     "canalPlanilha": "Vesti"
@@ -1029,7 +1029,7 @@
     "canalPlanilha": "Vesti"
   },
   "1078045": {
-    "ligado": false,
+    "ligado": true,
     "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "ZUA - Apucarana",
@@ -1184,8 +1184,8 @@
   },
   "1210327": {
     "ligado": true,
-    "update": "2026-07-25",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Daiany Confecções",
     "canalPlanilha": "Vesti"
   },
@@ -1233,7 +1233,7 @@
   },
   "98224": {
     "ligado": true,
-    "update": "2026-07-26",
+    "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "Liriumix",
     "canalPlanilha": "Varejo Vesti"
@@ -2374,7 +2374,7 @@
   },
   "993211": {
     "ligado": true,
-    "update": "2026-07-26",
+    "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "Celer",
     "canalPlanilha": "Starter"
@@ -2618,9 +2618,9 @@
     "canalPlanilha": "Uemtel"
   },
   "479020": {
-    "ligado": false,
-    "update": "2026-08-25",
-    "religamentoReal": false,
+    "ligado": true,
+    "update": "2026-08-26",
+    "religamentoReal": true,
     "nomePlanilha": "Upper Concept",
     "canalPlanilha": "Vesti"
   },
@@ -2648,7 +2648,7 @@
   "166026": {
     "ligado": true,
     "update": "2026-08-26",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Barraca do Willinha",
     "canalPlanilha": "Vesti"
   },
@@ -3033,7 +3033,7 @@
   "94995": {
     "ligado": true,
     "update": "2026-08-26",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Gliss Jeans",
     "canalPlanilha": "Starter"
   },
@@ -3438,7 +3438,7 @@
   },
   "402982": {
     "ligado": true,
-    "update": "2026-07-30",
+    "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "Refúgio Modas",
     "canalPlanilha": "Vesti"
@@ -3558,14 +3558,14 @@
   "1011737": {
     "ligado": true,
     "update": "2026-08-26",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Vida Marinha Atacado",
     "canalPlanilha": "Vesti"
   },
   "15266": {
     "ligado": true,
-    "update": "2026-08-24",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Rosa Fina",
     "canalPlanilha": "Vesti"
   },
@@ -3578,7 +3578,7 @@
   },
   "1024333": {
     "ligado": true,
-    "update": "2026-07-27",
+    "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "Kauly",
     "canalPlanilha": "Vesti"
@@ -3599,15 +3599,15 @@
   },
   "156781": {
     "ligado": true,
-    "update": "2026-07-30",
+    "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "LARAS MODA FITNESS",
     "canalPlanilha": "Vesti"
   },
   "1431828": {
     "ligado": true,
-    "update": "2026-07-28",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Volpy Girls",
     "canalPlanilha": "Vesti"
   },
@@ -3648,15 +3648,15 @@
   },
   "1375391": {
     "ligado": true,
-    "update": "2026-07-28",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Charisma",
     "canalPlanilha": "Vesti"
   },
   "1737241": {
     "ligado": true,
-    "update": "2026-07-28",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "CHARISMA - SOMENTE VESTIPAGO",
     "canalPlanilha": "Vesti"
   },
@@ -3670,13 +3670,13 @@
   "13160": {
     "ligado": true,
     "update": "2026-08-26",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Amofany",
     "canalPlanilha": "Vesti"
   },
   "831661": {
     "ligado": true,
-    "update": "2026-07-28",
+    "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "K- OFFICIAL JEANS",
     "canalPlanilha": "Vesti"
@@ -3859,7 +3859,7 @@
   "957264": {
     "ligado": true,
     "update": "2026-08-26",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Teaser",
     "canalPlanilha": "Vesti"
   },
@@ -3970,22 +3970,22 @@
   },
   "1040413": {
     "ligado": true,
-    "update": "2026-07-24",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "J&R Modas Feminina",
     "canalPlanilha": "Vesti"
   },
   "1090412": {
     "ligado": true,
     "update": "2026-08-26",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Bela Gaia",
     "canalPlanilha": "Vesti"
   },
   "1300009": {
     "ligado": true,
-    "update": "2026-08-18",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Zero Confecções",
     "canalPlanilha": "Vesti"
   },
@@ -5244,7 +5244,7 @@
   },
   "132195": {
     "ligado": true,
-    "update": "2026-07-26",
+    "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "Priscila Pires",
     "canalPlanilha": "Starter"
@@ -6798,14 +6798,14 @@
   },
   "411562": {
     "ligado": true,
-    "update": "2026-07-26",
+    "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "Sandra choque",
     "canalPlanilha": "N/A"
   },
   "1943437": {
     "ligado": true,
-    "update": "2026-07-26",
+    "update": "2026-08-26",
     "religamentoReal": false,
     "nomePlanilha": "Sedanbi",
     "canalPlanilha": "Attasoft"
@@ -7414,7 +7414,7 @@
   },
   "1629345": {
     "ligado": true,
-    "update": "2026-08-11",
+    "update": "2026-08-26",
     "religamentoReal": true,
     "nomePlanilha": "Michelle Dos Santos",
     "canalPlanilha": ""
