@@ -2,6 +2,12 @@
 const fmtBRL = (n) => Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0});
 const fmtInt = (n) => Number(n||0).toLocaleString("pt-BR");
 const $ = (id) => document.getElementById(id);
+// R$ curto pros numeros desenhados na barra (R$ 12,3 mil nao vira borrao)
+const fmtBRLCurto = (n) => {
+  const v = Number(n) || 0;
+  return v >= 1000 ? "R$ " + (v/1000).toLocaleString("pt-BR",{maximumFractionDigits:1}) + "k"
+                   : "R$ " + v.toLocaleString("pt-BR",{maximumFractionDigits:0});
+};
 
 // state.chaves = lista de periodos selecionados (multi-selecao). 1 item = comportamento antigo.
 const CANAIS = ["Starter","Vesti","Uemtel","Atta","Parceiros"];
@@ -140,10 +146,17 @@ function reativNoPeriodo(e) {
 // faixa dentro dela (so quando cabe, senao vira borrao) e o total da coluna logo
 // acima. Passa-se no config do grafico (`plugins:[valoresNaBarra]`), entao vale so
 // onde for pedido. Respeita a legenda: dataset escondido nao conta no total.
+// Com UM dataset so' (barra simples) o de dentro sairia igual ao de cima -- nesse
+// caso desenha so' o de cima. Para formatar (R$, %), passar em
+// options.plugins.valoresNaBarra.fmt.
 const valoresNaBarra = {
   id: "valoresNaBarra",
   afterDatasetsDraw(chart) {
     const ctx = chart.ctx;
+    const opt = (chart.options.plugins && chart.options.plugins.valoresNaBarra) || {};
+    const fmt = typeof opt.fmt === "function" ? opt.fmt : (v => v);
+    const visiveis = chart.data.datasets.filter(
+      (_, di) => !chart.isDatasetVisible || chart.isDatasetVisible(di)).length;
     const totais = [], topoY = [], topoX = [];
     ctx.save();
     ctx.textAlign = "center";
@@ -159,18 +172,19 @@ const valoresNaBarra = {
         if (!v) return;
         totais[i] = (totais[i] || 0) + v;
         if (topoY[i] === undefined || barra.y < topoY[i]) { topoY[i] = barra.y; topoX[i] = barra.x; }
+        if (visiveis < 2) return;   // barra simples: so' o numero de cima
         const base = barra.base === undefined ? barra.y : barra.base;
         if (Math.abs(base - barra.y) < 14) return;   // faixa fina: o numero nao cabe
         ctx.fillStyle = "#fff";
         ctx.textBaseline = "middle";
-        ctx.fillText(v, barra.x, (barra.y + base) / 2);
+        ctx.fillText(fmt(v), barra.x, (barra.y + base) / 2);
       });
     });
     ctx.fillStyle = Chart.defaults.color || "#666";
     ctx.textBaseline = "bottom";
     totais.forEach((t, i) => {
       if (!t || topoY[i] === undefined) return;
-      ctx.fillText(t, topoX[i], topoY[i] - 4);
+      ctx.fillText(fmt(t), topoX[i], topoY[i] - 4);
     });
     ctx.restore();
   },
@@ -827,6 +841,7 @@ function renderTabInadimplentes() {
   }
   makeChart("chart-inad-faixa", {
     type:"bar",
+    plugins:[valoresNaBarra],   // numeros visiveis sem passar o mouse
     data:{labels:Object.keys(faixas), datasets:[{label:"marcas", data:Object.values(faixas),
       backgroundColor:["#F5C518","#E74C3C","#D63031","#C0392B","#8E1B14"]}]},
     options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
@@ -839,8 +854,10 @@ function renderTabInadimplentes() {
   const csOrd = Object.keys(porCs).sort((a,b)=>porCs[b]-porCs[a]);
   makeChart("chart-inad-cs", {
     type:"bar",
+    plugins:[valoresNaBarra],
     data:{labels:csOrd, datasets:[{label:"em aberto", data:csOrd.map(c=>porCs[c]), backgroundColor:COLORS[3]}]},
-    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, valoresNaBarra:{fmt:fmtBRLCurto}},
       scales:{y:{ticks:{callback:v=>"R$"+fmtInt(v)}}}}
   });
   renderTable("tbl-inadimplentes", [
