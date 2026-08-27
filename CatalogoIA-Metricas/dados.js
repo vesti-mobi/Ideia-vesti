@@ -1,6 +1,6 @@
 window.DADOS = {
-  "gerado_em": "2026-08-27T00:22:38.951Z",
-  "hoje": "2026-08-26",
+  "gerado_em": "2026-08-27T21:29:14.616Z",
+  "hoje": "2026-08-27",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
   "auto_publica_desde": "2026-08-10",
@@ -15,12 +15,12 @@ window.DADOS = {
     "ativas": 4,
     "usando": 9,
     "nunca_usaram": 7,
-    "paradas": 3,
+    "paradas": 2,
     "com_conta": 10,
     "contas": 9,
-    "produtos_total": 348,
-    "produtos_7d": 121,
-    "descricoes_total": 453,
+    "produtos_total": 349,
+    "produtos_7d": 85,
+    "descricoes_total": 464,
     "total_estimado": true
   },
   "marcas": [
@@ -30,16 +30,16 @@ window.DADOS = {
       "arquetipo": "explorador",
       "tem_conta": true,
       "email": "nicoboco.shop@nicoboco.com.br",
-      "produtos": 133,
+      "produtos": 134,
       "estimado": false,
-      "produtos_7d": 29,
+      "produtos_7d": 13,
       "ativa": true,
-      "acessos": 61,
-      "buscas": 321,
-      "descricoes": 182,
-      "envios": 208,
+      "acessos": 62,
+      "buscas": 322,
+      "descricoes": 183,
+      "envios": 209,
       "primeiro": "2026-08-10T19:02:35.392Z",
-      "ultimo": "2026-08-26T18:06:12.777Z",
+      "ultimo": "2026-08-27T19:14:21.254Z",
       "dias": 0
     },
     {
@@ -50,14 +50,14 @@ window.DADOS = {
       "email": "contato@operakids.com.br",
       "produtos": 81,
       "estimado": false,
-      "produtos_7d": 77,
+      "produtos_7d": 55,
       "ativa": true,
-      "acessos": 66,
-      "buscas": 88,
+      "acessos": 67,
+      "buscas": 93,
       "descricoes": 128,
       "envios": 116,
       "primeiro": "2026-07-28T11:47:18.529Z",
-      "ultimo": "2026-08-26T16:20:57.492Z",
+      "ultimo": "2026-08-27T17:51:14.774Z",
       "dias": 0
     },
     {
@@ -68,7 +68,7 @@ window.DADOS = {
       "email": "missmilliebr@gmail.com",
       "produtos": 72,
       "estimado": true,
-      "produtos_7d": 11,
+      "produtos_7d": 7,
       "ativa": true,
       "acessos": 8,
       "buscas": 44,
@@ -76,7 +76,7 @@ window.DADOS = {
       "envios": 53,
       "primeiro": "2026-07-28T18:41:18.639Z",
       "ultimo": "2026-08-26T13:17:15.126Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "petit",
@@ -86,15 +86,15 @@ window.DADOS = {
       "email": "anderson@mundotaci.com.br",
       "produtos": 43,
       "estimado": true,
-      "produtos_7d": 0,
-      "ativa": false,
+      "produtos_7d": 10,
+      "ativa": true,
       "acessos": 0,
       "buscas": 0,
-      "descricoes": 0,
-      "envios": 0,
-      "primeiro": "",
-      "ultimo": "2026-07-22T20:22:50.872Z",
-      "dias": 35
+      "descricoes": 10,
+      "envios": 10,
+      "primeiro": "2026-08-27T10:08:32.689Z",
+      "ultimo": "2026-08-27T12:01:46.047Z",
+      "dias": 0
     },
     {
       "slug": "andressa-vesti",
@@ -112,7 +112,7 @@ window.DADOS = {
       "envios": 12,
       "primeiro": "2026-08-10T16:01:03.796Z",
       "ultimo": "2026-08-20T11:06:21.271Z",
-      "dias": 6
+      "dias": 7
     },
     {
       "slug": "monnika-marikinha",
@@ -122,15 +122,15 @@ window.DADOS = {
       "email": "monnikamarikinhaloja@gmail.com",
       "produtos": 5,
       "estimado": false,
-      "produtos_7d": 4,
-      "ativa": true,
+      "produtos_7d": 0,
+      "ativa": false,
       "acessos": 2,
       "buscas": 1,
       "descricoes": 5,
       "envios": 5,
       "primeiro": "2026-08-06T14:16:43.085Z",
       "ultimo": "2026-08-21T01:34:35.135Z",
-      "dias": 5
+      "dias": 6
     },
     {
       "slug": "optimist-jeans",
@@ -148,7 +148,7 @@ window.DADOS = {
       "envios": 5,
       "primeiro": "2026-08-07T13:23:05.929Z",
       "ultimo": "2026-08-07T14:55:31.596Z",
-      "dias": 19
+      "dias": 20
     },
     {
       "slug": "optimist-feirinha",
@@ -166,7 +166,7 @@ window.DADOS = {
       "envios": 2,
       "primeiro": "2026-08-07T13:33:14.591Z",
       "ultimo": "2026-08-07T14:33:01.598Z",
-      "dias": 19
+      "dias": 20
     },
     {
       "slug": "anne-blanc",
@@ -292,7 +292,7 @@ window.DADOS = {
       "envios": 0,
       "primeiro": "2026-08-04T14:28:52.117Z",
       "ultimo": "2026-08-26T13:29:09.288Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "ttng",
@@ -416,9 +416,9 @@ window.DADOS = {
     {
       "inicio": "2026-08-24",
       "fim": "2026-08-30",
-      "produtos": 68,
-      "ativas": 3,
-      "usaram": 4,
+      "produtos": 79,
+      "ativas": 4,
+      "usaram": 5,
       "cadastros": 9,
       "novos": 0
     }
@@ -430,15 +430,15 @@ window.DADOS = {
       "prefixo": "app:auto:",
       "kpis": {
         "liberadas": 16,
-        "ativas": 4,
-        "usando": 5,
-        "nunca_usaram": 11,
+        "ativas": 3,
+        "usando": 6,
+        "nunca_usaram": 10,
         "paradas": 0,
         "com_conta": 10,
         "contas": 9,
-        "produtos_total": 223,
-        "produtos_7d": 113,
-        "descricoes_total": 299,
+        "produtos_total": 234,
+        "produtos_7d": 78,
+        "descricoes_total": 310,
         "total_estimado": true,
         "produtos_atribuidos": 5
       },
@@ -449,18 +449,18 @@ window.DADOS = {
           "arquetipo": "explorador",
           "tem_conta": true,
           "email": "nicoboco.shop@nicoboco.com.br",
-          "produtos": 131,
+          "produtos": 132,
           "estimado": false,
-          "produtos_7d": 29,
+          "produtos_7d": 13,
           "ativa": true,
-          "acessos": 52,
-          "buscas": 281,
-          "descricoes": 179,
-          "envios": 183,
+          "acessos": 53,
+          "buscas": 282,
+          "descricoes": 180,
+          "envios": 184,
           "primeiro": "2026-08-11T18:28:02.542Z",
-          "ultimo": "2026-08-26T18:06:12.777Z",
+          "ultimo": "2026-08-27T19:14:21.254Z",
           "dias": 0,
-          "produtos_medidos": 131,
+          "produtos_medidos": 132,
           "atribuido": 0
         },
         {
@@ -471,17 +471,37 @@ window.DADOS = {
           "email": "contato@operakids.com.br",
           "produtos": 81,
           "estimado": true,
-          "produtos_7d": 76,
+          "produtos_7d": 55,
           "ativa": true,
-          "acessos": 6,
-          "buscas": 27,
+          "acessos": 7,
+          "buscas": 32,
           "descricoes": 102,
           "envios": 101,
           "primeiro": "2026-08-18T13:22:59.954Z",
-          "ultimo": "2026-08-26T16:20:57.492Z",
+          "ultimo": "2026-08-27T17:51:14.774Z",
           "dias": 0,
           "produtos_medidos": 76,
           "atribuido": 5
+        },
+        {
+          "slug": "petit",
+          "nome": "Petit",
+          "arquetipo": "inocente",
+          "tem_conta": true,
+          "email": "anderson@mundotaci.com.br",
+          "produtos": 10,
+          "estimado": false,
+          "produtos_7d": 10,
+          "ativa": true,
+          "acessos": 0,
+          "buscas": 0,
+          "descricoes": 10,
+          "envios": 10,
+          "primeiro": "2026-08-27T10:08:32.689Z",
+          "ultimo": "2026-08-27T12:01:46.047Z",
+          "dias": 0,
+          "produtos_medidos": 10,
+          "atribuido": 0
         },
         {
           "slug": "amiska",
@@ -491,15 +511,15 @@ window.DADOS = {
           "email": "missmilliebr@gmail.com",
           "produtos": 4,
           "estimado": false,
-          "produtos_7d": 4,
-          "ativa": true,
+          "produtos_7d": 0,
+          "ativa": false,
           "acessos": 0,
           "buscas": 0,
           "descricoes": 4,
           "envios": 4,
           "primeiro": "2026-08-21T01:32:04.730Z",
           "ultimo": "2026-08-21T01:32:24.963Z",
-          "dias": 5,
+          "dias": 6,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -511,15 +531,15 @@ window.DADOS = {
           "email": "monnikamarikinhaloja@gmail.com",
           "produtos": 4,
           "estimado": false,
-          "produtos_7d": 4,
-          "ativa": true,
+          "produtos_7d": 0,
+          "ativa": false,
           "acessos": 0,
           "buscas": 0,
           "descricoes": 4,
           "envios": 4,
           "primeiro": "2026-08-21T01:34:17.651Z",
           "ultimo": "2026-08-21T01:34:35.135Z",
-          "dias": 5,
+          "dias": 6,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -539,7 +559,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-13T17:14:37.157Z",
           "ultimo": "2026-08-20T11:06:21.271Z",
-          "dias": 6,
+          "dias": 7,
           "produtos_medidos": 3,
           "atribuido": 0
         },
@@ -669,26 +689,6 @@ window.DADOS = {
           "arquetipo": "governante",
           "tem_conta": true,
           "email": "ecommerce@optimistjeans.com.br",
-          "produtos": 0,
-          "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
-          "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null,
-          "produtos_medidos": 0,
-          "atribuido": 0
-        },
-        {
-          "slug": "petit",
-          "nome": "Petit",
-          "arquetipo": "inocente",
-          "tem_conta": true,
-          "email": "anderson@mundotaci.com.br",
           "produtos": 0,
           "estimado": false,
           "produtos_7d": 0,
@@ -889,12 +889,12 @@ window.DADOS = {
         {
           "inicio": "2026-08-24",
           "fim": "2026-08-30",
-          "produtos": 61,
-          "ativas": 2,
-          "usaram": 2,
+          "produtos": 72,
+          "ativas": 3,
+          "usaram": 3,
           "cadastros": 9,
           "novos": 0,
-          "produtos_medidos": 61,
+          "produtos_medidos": 72,
           "atribuido": 0
         }
       ]
@@ -911,11 +911,11 @@ window.DADOS = {
         "paradas": 0,
         "com_conta": 10,
         "contas": 9,
-        "produtos_total": 211,
-        "produtos_7d": 8,
+        "produtos_total": 202,
+        "produtos_7d": 7,
         "descricoes_total": 64,
         "total_estimado": true,
-        "produtos_atribuidos": 192
+        "produtos_atribuidos": 183
       },
       "marcas": [
         {
@@ -954,7 +954,7 @@ window.DADOS = {
           "envios": 18,
           "primeiro": "2026-08-17T12:54:41.838Z",
           "ultimo": "2026-08-26T13:17:13.174Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 17,
           "atribuido": 52
         },
@@ -964,7 +964,7 @@ window.DADOS = {
           "arquetipo": "inocente",
           "tem_conta": true,
           "email": "anderson@mundotaci.com.br",
-          "produtos": 43,
+          "produtos": 34,
           "estimado": true,
           "produtos_7d": 0,
           "ativa": false,
@@ -976,7 +976,7 @@ window.DADOS = {
           "ultimo": "",
           "dias": null,
           "produtos_medidos": 0,
-          "atribuido": 43
+          "atribuido": 34
         },
         {
           "slug": "andressa-vesti",
@@ -994,7 +994,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T12:06:46.387Z",
           "ultimo": "2026-08-20T02:30:36.116Z",
-          "dias": 6,
+          "dias": 7,
           "produtos_medidos": 0,
           "atribuido": 8
         },
@@ -1046,7 +1046,7 @@ window.DADOS = {
           "email": "contato@operakids.com.br",
           "produtos": 2,
           "estimado": false,
-          "produtos_7d": 1,
+          "produtos_7d": 0,
           "ativa": false,
           "acessos": 16,
           "buscas": 9,
@@ -1054,7 +1054,7 @@ window.DADOS = {
           "envios": 3,
           "primeiro": "2026-08-12T12:05:03.861Z",
           "ultimo": "2026-08-20T13:45:53.884Z",
-          "dias": 6,
+          "dias": 7,
           "produtos_medidos": 2,
           "atribuido": 0
         },
@@ -1214,7 +1214,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T11:49:43.332Z",
           "ultimo": "2026-08-26T13:29:09.288Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 0,
           "atribuido": 0
         },
@@ -1364,13 +1364,13 @@ window.DADOS = {
         {
           "inicio": "2026-08-24",
           "fim": "2026-08-30",
-          "produtos": 9,
+          "produtos": 10,
           "ativas": 1,
           "usaram": 2,
           "cadastros": 9,
           "novos": 0,
           "produtos_medidos": 7,
-          "atribuido": 2
+          "atribuido": 3
         }
       ]
     }
