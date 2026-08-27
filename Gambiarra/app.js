@@ -184,6 +184,15 @@ const valoresNaBarra = {
     ctx.textBaseline = "bottom";
     totais.forEach((t, i) => {
       if (!t || topoY[i] === undefined) return;
+      // barra mais alta encosta no topo do canvas: o numero sairia cortado --
+      // nesse caso escreve DENTRO da barra, logo abaixo do topo.
+      if (topoY[i] < 14) {
+        ctx.save();
+        ctx.fillStyle = "#fff"; ctx.textBaseline = "top";
+        ctx.fillText(fmt(t), topoX[i], topoY[i] + 4);
+        ctx.restore();
+        return;
+      }
       ctx.fillText(fmt(t), topoX[i], topoY[i] - 4);
     });
     ctx.restore();
