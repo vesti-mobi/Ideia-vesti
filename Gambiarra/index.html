@@ -368,7 +368,16 @@
 
 </div><!-- /#dashContent -->
 
-<script src="dashboard_data.js"></script>
-<script src="app.js"></script>
+<!-- O GH Pages serve estes arquivos com Cache-Control: max-age=600, entao o
+     navegador podia ficar com o dado de uma versao e o codigo de outra (aba
+     aparentemente vazia). O ?v= por hora forca a rebusca sem baixar os 7 MB a
+     cada clique. O <meta no-store> la em cima so' cobre o proprio index.html. -->
+<script>
+(function(){
+  var v = "?v=" + Math.floor(Date.now() / 3600000);
+  document.write('<script src="dashboard_data.js' + v + '"><\/script>');
+  document.write('<script src="app.js' + v + '"><\/script>');
+})();
+</script>
 </body>
 </html>

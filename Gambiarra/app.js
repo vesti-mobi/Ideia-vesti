@@ -191,6 +191,24 @@ const valoresNaBarra = {
 };
 
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+// Grafico sem nenhum dado desenha eixos vazios e parece "quebrado". Escreve o
+// motivo no proprio canvas -- pedido depois do susto do filtro Uemtel (27/08).
+function chartVazio(id, msg) {
+  destroyChart(id);
+  const cv = document.getElementById(id);
+  if (!cv) return;
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth || 300, h = cv.clientHeight || 150;
+  cv.width = w * dpr; cv.height = h * dpr;
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = "#636E72";
+  ctx.font = "500 13px system-ui, -apple-system, 'Segoe UI', sans-serif";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText(msg, w / 2, h / 2);
+}
+
 function makeChart(id, cfg) {
   destroyChart(id);
   const ctx = document.getElementById(id);
@@ -832,6 +850,13 @@ function renderTabInadimplentes() {
     : "nenhuma marca acima dessa régua";
 
   // faixas cortadas na regua das tags: a primeira e' o amarelo (alerta), o resto e' bloqueio
+  if (!lista.length) {
+    const recado = "Nenhuma marca com fatura vencida nesses filtros";
+    chartVazio("chart-inad-faixa", recado);
+    chartVazio("chart-inad-cs", recado);
+    renderTable("tbl-inadimplentes", [{label:"Marca", fn:r=>r.name}], []);
+    return;
+  }
   const faixas = {"1-10d (alerta)":0,"11-30d":0,"31-60d":0,"61-90d":0,"90d+":0};
   for (const e of lista) {
     const d = e.diasAtraso || 0;
