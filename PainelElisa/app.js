@@ -235,7 +235,8 @@ function renderTable(tableId, columns, rows) {
     th.addEventListener('click', () => {
       const idx = +th.dataset.col;
       const cur = _sortState[tableId];
-      const dir = (cur && cur.col === idx && cur.dir === 'desc') ? 'asc' : 'desc';
+      // 1o clique ordena CRESCENTE, o 2o inverte (pedido da Laura 27/08)
+      const dir = (cur && cur.col === idx && cur.dir === 'asc') ? 'desc' : 'asc';
       _sortState[tableId] = {col: idx, dir};
       renderTable(tableId, columns, rows);
     });
@@ -357,12 +358,13 @@ function renderTabGmv() {
   });
   const rows = lista.map(e=>({...e,_g:bucket(e)})).filter(e=>e._g.valTotal>0).sort((a,b)=>b._g.valTotal-a._g.valTotal);
   renderTable("tbl-gmv", [
-    {label:"Marca", fn:r=>r.name},
-    {label:"CS", fn:r=>r.cs},
-    {label:"Canal", fn:r=>r.canal+(r.starter_interno?" (Int)":"")},
-    {label:"GMV", cls:"num", fn:r=>fmtBRL(r._g.valTotal)},
-    {label:"Pedidos", cls:"num", fn:r=>fmtInt(r._g.qtTotal)},
-    {label:"Mensalidade", cls:"num", fn:r=>fmtBRL(r.valor_mensal)},
+    {label:"Marca", fn:r=>r.name, sort:r=>r.name},
+    {label:"CS", fn:r=>r.cs, sort:r=>r.cs},
+    {label:"Canal", fn:r=>r.canal+(r.starter_interno?" (Int)":""),
+      sort:r=>r.canal+(r.starter_interno?" (Int)":"")},
+    {label:"GMV", cls:"num", fn:r=>fmtBRL(r._g.valTotal), sort:r=>r._g.valTotal},
+    {label:"Pedidos", cls:"num", fn:r=>fmtInt(r._g.qtTotal), sort:r=>r._g.qtTotal},
+    {label:"Mensalidade", cls:"num", fn:r=>fmtBRL(r.valor_mensal), sort:r=>r.valor_mensal||0},
   ], rows);
 }
 
