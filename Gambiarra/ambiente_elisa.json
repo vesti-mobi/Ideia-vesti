@@ -3585,8 +3585,8 @@
   },
   "53378": {
     "ligado": true,
-    "update": "2026-07-27",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Scera",
     "canalPlanilha": "Attasoft"
   },
@@ -4816,8 +4816,8 @@
     "canalPlanilha": "Vesti"
   },
   "542723": {
-    "ligado": true,
-    "update": "2026-08-24",
+    "ligado": false,
+    "update": "2026-08-27",
     "religamentoReal": false,
     "nomePlanilha": "Kokada",
     "canalPlanilha": "Vesti"
