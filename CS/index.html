@@ -1512,7 +1512,8 @@ const TABS = [
       + 'anterior e <b>Vesti Pago</b> e <b>GMV</b> com o mesmo mês do ano passado, os três '
       + '<b>em porcentagem</b> (o valor em reais da diferença fica no balãozinho do mouse). <b>Reuniões</b>, <b>integrações</b> e '
       + '<b>varejos</b> são contagem do próprio mês. Passe o mouse no número para ver quais marcas entraram. '
-      + 'A <b>pontuação</b> de cada CS está na segunda tabela, embaixo desta, com a régua de cada regra. '
+      + 'A <b>pontuação</b> está na segunda tabela, embaixo desta, com a régua de cada regra — ela vale '
+      + 'para <b>Thamiris, Gabriella e Luana</b>, de <b>julho de 2026</b> em diante. '
       + '<b>Varejo</b> conta só filial nova classificada como varejo. A classificação automática vem do '
       + 'Relatório Confecções e tem data de corte, então filial mais nova que isso aparece como '
       + '"sem classificação" ao lado do número, e não some da tela — <b>clique no número de varejos para '
@@ -1680,22 +1681,44 @@ function pontosPct(r, k, passo){
     + (suspeito ? ' · base de '+(Number(mesBonificacao().slice(0,4))-1)+': '+fmt.moneyCompact(base) : ''),
     alerta: suspeito};
 }
-/* Segunda tabela da aba: os mesmos CS, agora em pontos. Recebe as linhas já
+/* Quem entra na bonificação e desde quando (Laura, 27/08/2026). A tabela de cima
+   continua mostrando o time inteiro — é medida, não é prêmio; a pontuação é só
+   destas três, e só de julho/2026 para frente. Mês anterior a isso não mostra
+   pontuação nenhuma: não existiu bonificação lá atrás, e um número na tela seria
+   lido como se tivesse existido. */
+const CS_PONTUADOS = ['Thamiris Ribeiro', 'Gabriella Busto', 'Luana Coutinho'];
+const MES_INICIO_PONTOS = '2026-07';
+/* O HubSpot escreve a mesma pessoa com nome curto e completo, então a comparação
+   é por prefixo — a mesma régua que o fetcher usa para não duplicar a linha. */
+function ehPontuado(cs){
+  return CS_PONTUADOS.some(n => n===cs || String(cs||'').startsWith(n+' ') || n.startsWith(cs+' '));
+}
+
+/* Segunda tabela da aba: os CS bonificados, agora em pontos. Recebe as linhas já
    filtradas pela tabela de cima, para os dois quadros nunca discordarem. */
 function renderPontos(rows){
   const card = el('div',{class:'table-card'});
   card.style.marginTop = '18px';
+  const mes = mesBonificacao();
   const head = el('div',{class:'table-head'});
   head.innerHTML = '<h3>Pontuação por CS</h3>'
-    + `<span class="count">${rotuloMes(mesBonificacao())}</span>`;
+    + `<span class="count">${rotuloMes(mes)}</span>`;
   card.appendChild(head);
+  if(mes < MES_INICIO_PONTOS){
+    card.appendChild(el('div',{class:'empty'},
+      '<h4>Sem pontuação neste mês</h4><p>A bonificação começa em <b>julho de 2026</b>. '
+      + 'Os meses anteriores continuam na tabela de cima, como número — só não valem ponto.</p>'));
+    return card;
+  }
   /* A régua em cima da tabela, em texto corrido e QUEBRANDO LINHA: em uma linha
      só (que é como o .eyebrow desenha) ela some na borda do card. */
   card.appendChild(el('div',{style:'padding:0 18px 12px;font-size:12px;line-height:1.7;color:var(--ink-3)'},
     REGRAS_PONTOS.map(g=>`<b>${g.l}</b>: ${g.regra}`).join(' &nbsp;·&nbsp; ')
-    + ' &nbsp;·&nbsp; queda não tira ponto'));
+    + ' &nbsp;·&nbsp; queda não tira ponto'
+    + '<br><b>Quem pontua:</b> ' + CS_PONTUADOS.join(', ').replace(/, ([^,]*)$/,' e $1')
+    + ', de julho de 2026 em diante.'));
 
-  const linhas = rows.map(r=>{
+  const linhas = rows.filter(r=>ehPontuado(r.cs)).map(r=>{
     const o = {cs:r.cs, total:0};
     REGRAS_PONTOS.forEach(g=>{
       const res = g.calc(r) || {p:0};
@@ -1705,6 +1728,14 @@ function renderPontos(rows){
     });
     return o;
   }).sort((a,b)=> b.total - a.total || a.cs.localeCompare(b.cs,'pt-BR'));
+
+  if(!linhas.length){
+    card.appendChild(el('div',{class:'empty'},
+      '<h4>Nenhum CS bonificado nesta seleção</h4><p>A pontuação vale para '
+      + CS_PONTUADOS.join(', ').replace(/, ([^,]*)$/,' e $1')
+      + '. Limpe o filtro de CS para ver.</p>'));
+    return card;
+  }
 
   const scroll = el('div',{class:'table-scroll'});
   const table = el('table');
@@ -1733,10 +1764,10 @@ function renderPontos(rows){
       `<span class="cell-main" style="font-weight:700">${fmt.int(l.total)}</span>`));
     tbody.appendChild(tr);
   });
-  /* Fecha com o somatório: a bonificação é discutida em time, e "quanto o time
-     fez no mês" é a primeira pergunta depois de "quanto eu fiz". */
+  /* Fecha com o somatório das três: a bonificação é discutida em conjunto, e
+     "quanto deu no mês" é a primeira pergunta depois de "quanto eu fiz". */
   const tot = el('tr'); tot.style.fontWeight = '600';
-  tot.appendChild(el('td',{},'<span class="cell-sub">Time todo</span>'));
+  tot.appendChild(el('td',{},'<span class="cell-sub">Soma das três</span>'));
   REGRAS_PONTOS.forEach(g=>tot.appendChild(el('td',{class:'r num'},
     fmt.int(linhas.reduce((a,l)=>a+l[g.k],0)))));
   tot.appendChild(el('td',{class:'r num'}, fmt.int(linhas.reduce((a,l)=>a+l.total,0))));
