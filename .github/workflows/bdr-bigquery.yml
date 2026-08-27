@@ -28,7 +28,7 @@ jobs:
       # Sem commit/push: o script so escreve na tabela
       # vesti-data-499015.vestilake_BI.bdr (DELETE do intervalo + INSERT).
       - name: Atualizar bdr a partir da API da BDR Asset
-        working-directory: PainelElisa
+        working-directory: Gambiarra
         env:
           BDR_USER: ${{ secrets.BDR_USER }}
           BDR_PASS: ${{ secrets.BDR_PASS }}
