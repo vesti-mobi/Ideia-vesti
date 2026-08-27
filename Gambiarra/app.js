@@ -201,27 +201,44 @@ const valoresNaBarra = {
 
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 // Grafico sem nenhum dado desenha eixos vazios e parece "quebrado". Escreve o
-// motivo no proprio canvas -- pedido depois do susto do filtro Uemtel (27/08).
+// motivo no meio da area do grafico.
+// NAO mexer em canvas.width/height na mao: sem o Chart.js no controle o canvas
+// perde o style que o destroy() removeu, vira 1200x600 no layout e ESTOURA o
+// .cw (altura fixa de 260px) -- foi o que deixou os graficos brancos e os cards
+// gigantes em 27/08 ao desmarcar todos os canais. Aqui e' um Chart de verdade,
+// sem dados e sem eixos, com o recado desenhado por plugin.
 function chartVazio(id, msg) {
-  destroyChart(id);
-  const cv = document.getElementById(id);
-  if (!cv) return;
-  const dpr = window.devicePixelRatio || 1;
-  const w = cv.clientWidth || 300, h = cv.clientHeight || 150;
-  cv.width = w * dpr; cv.height = h * dpr;
-  const ctx = cv.getContext("2d");
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "#636E72";
-  ctx.font = "500 13px system-ui, -apple-system, 'Segoe UI', sans-serif";
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.fillText(msg, w / 2, h / 2);
+  makeChart(id, {
+    type: "bar",
+    data: { labels: [], datasets: [] },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: {display: false}, tooltip: {enabled: false} },
+      scales: { x: {display: false}, y: {display: false} } },
+    plugins: [{
+      id: "recadoVazio",
+      afterDraw(chart) {
+        const { ctx, chartArea } = chart;
+        if (!chartArea) return;
+        ctx.save();
+        ctx.fillStyle = "#636E72";
+        ctx.font = "500 13px system-ui, -apple-system, 'Segoe UI', sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(msg, (chartArea.left + chartArea.right) / 2,
+                          (chartArea.top + chartArea.bottom) / 2);
+        ctx.restore();
+      }
+    }]
+  });
 }
 
 function makeChart(id, cfg) {
   destroyChart(id);
   const ctx = document.getElementById(id);
   if (!ctx) return;
+  // rede de seguranca: se alguem deixou o canvas com tamanho cravado, devolve o
+  // controle pro Chart.js em vez de renderizar num canvas estourado
+  ctx.removeAttribute("width"); ctx.removeAttribute("height");
+  ctx.style.width = ""; ctx.style.height = "";
   charts[id] = new Chart(ctx, cfg);
 }
 
