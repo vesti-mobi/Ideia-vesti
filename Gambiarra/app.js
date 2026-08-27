@@ -231,6 +231,45 @@ function chartVazio(id, msg) {
   });
 }
 
+// Barras em HTML puro, sem biblioteca nenhuma. Serve de plano B quando o
+// Chart.js nao esta disponivel (CDN bloqueado, canvas quebrado): a aba mostra os
+// numeros do mesmo jeito, em vez de um retangulo branco.
+function barrasHTML(canvasId, itens, fmt) {
+  const cv = document.getElementById(canvasId);
+  if (!cv || !cv.parentNode) return;
+  const f = typeof fmt === "function" ? fmt : (v => fmtInt(v));
+  const max = Math.max(...itens.map(i => Number(i.valor) || 0), 0) || 1;
+  const linhas = itens.map(i => {
+    const v = Number(i.valor) || 0;
+    const pct = Math.max(2, Math.round((v / max) * 100));
+    return `<div style="display:flex;align-items:center;gap:8px;margin:6px 0">
+      <div style="flex:0 0 130px;font-size:11px;color:#636E72;text-align:right">${i.label}</div>
+      <div style="flex:1;background:#F1F3F5;border-radius:4px;height:18px;position:relative">
+        <div style="width:${pct}%;height:100%;border-radius:4px;background:${i.cor || "#6C5CE7"}"></div>
+      </div>
+      <div style="flex:0 0 90px;font-size:11px;font-weight:600">${f(v)}</div>
+    </div>`;
+  }).join("");
+  cv.style.display = "none";
+  let box = cv.parentNode.querySelector(".barras-html");
+  if (!box) {
+    box = document.createElement("div");
+    box.className = "barras-html";
+    box.style.cssText = "position:absolute;inset:0;overflow:auto;padding:4px 2px";
+    cv.parentNode.appendChild(box);
+  }
+  box.innerHTML = linhas;
+}
+function limpaBarrasHTML(canvasId) {
+  try {
+    const cv = document.getElementById(canvasId);
+    if (!cv || !cv.parentNode || !cv.parentNode.querySelector) return;
+    const box = cv.parentNode.querySelector(".barras-html");
+    if (box && box.remove) box.remove();
+    cv.style.display = "";
+  } catch (e) { /* plano B nunca derruba o plano A */ }
+}
+
 // Falha de grafico nao pode ser silenciosa: card branco sem explicacao custou
 // horas em 27/08. Escreve o motivo por cima do lugar do grafico.
 function avisoNoCard(id, msg) {
@@ -258,6 +297,7 @@ function limpaAviso(id) {
 function makeChart(id, cfg) {
   destroyChart(id);
   limpaAviso(id);
+  limpaBarrasHTML(id);
   const ctx = document.getElementById(id);
   if (!ctx) return;
   if (typeof Chart === "undefined") {
@@ -927,7 +967,13 @@ function renderTabInadimplentes() {
     else if (d<=90) faixas["61-90d"]++;
     else faixas["90d+"]++;
   }
-  makeChart("chart-inad-faixa", {
+  const semChart = (typeof Chart === "undefined");
+  if (semChart) {
+    const cores = ["#F5C518","#E74C3C","#D63031","#C0392B","#8E1B14"];
+    barrasHTML("chart-inad-faixa",
+      Object.keys(faixas).map((k,i)=>({label:k, valor:faixas[k], cor:cores[i]})));
+  }
+  if (!semChart) makeChart("chart-inad-faixa", {
     type:"bar",
     plugins:[valoresNaBarra],   // numeros visiveis sem passar o mouse
     data:{labels:Object.keys(faixas), datasets:[{label:"marcas", data:Object.values(faixas),
@@ -940,7 +986,11 @@ function renderTabInadimplentes() {
     porCs[cs] = (porCs[cs]||0) + (e.valorEmAberto||0);
   }
   const csOrd = Object.keys(porCs).sort((a,b)=>porCs[b]-porCs[a]);
-  makeChart("chart-inad-cs", {
+  if (semChart) {
+    barrasHTML("chart-inad-cs",
+      csOrd.map(c=>({label:c, valor:porCs[c], cor:COLORS[3]})), fmtBRLCurto);
+  }
+  if (!semChart) makeChart("chart-inad-cs", {
     type:"bar",
     plugins:[valoresNaBarra],
     data:{labels:csOrd, datasets:[{label:"em aberto", data:csOrd.map(c=>porCs[c]), backgroundColor:COLORS[3]}]},

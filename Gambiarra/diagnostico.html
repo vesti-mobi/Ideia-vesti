@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<title>Gambiarra — diagnóstico</title>
+<style>
+ body{font-family:system-ui,Segoe UI,sans-serif;background:#F8F9FA;color:#2D3436;padding:24px;max-width:900px;margin:auto}
+ h1{font-size:20px;margin-bottom:4px} p.sub{color:#636E72;font-size:13px;margin-bottom:18px}
+ .item{background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:14px 16px;margin-bottom:10px}
+ .ok{color:#00875A;font-weight:700} .bad{color:#C0392B;font-weight:700}
+ code{background:#F1F3F5;padding:1px 5px;border-radius:4px;font-size:12px}
+ #cw{position:relative;height:240px;background:#fff;border-radius:10px;padding:10px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+</style>
+</head>
+<body>
+<h1>Diagnóstico do painel Gambiarra</h1>
+<p class="sub">Esta página testa, no SEU navegador, cada peça que a aba Inadimplentes precisa. Tire um print de tudo.</p>
+<div id="saida"></div>
+<div id="cw"><canvas id="teste"></canvas></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>window.__cdnOk = (typeof Chart !== "undefined");</script>
+<script>if (typeof Chart === "undefined") { document.write('<script src="chart.umd.min.js?d=' + Date.now() + '"><\/script>'); }</script>
+<script src="dashboard_data.js"></script>
+<script src="app.js"></script>
+<script>
+(function(){
+  var out = document.getElementById("saida");
+  function linha(titulo, ok, detalhe){
+    out.insertAdjacentHTML("beforeend",
+      '<div class="item"><b>' + titulo + ':</b> <span class="' + (ok?"ok":"bad") + '">' +
+      (ok?"OK":"FALHOU") + '</span><br><code>' + detalhe + '</code></div>');
+  }
+  linha("Chart.js pelo CDN (jsdelivr)", !!window.__cdnOk, window.__cdnOk ? "carregou" : "BLOQUEADO nesta rede");
+  linha("Chart.js disponivel (CDN ou copia local)", typeof Chart !== "undefined",
+        typeof Chart !== "undefined" ? ("versao " + (Chart.version||"?")) : "nao existe");
+  var temD = (typeof DADOS !== "undefined" && DADOS.empresas);
+  linha("Dados do painel (dashboard_data.js)", !!temD,
+        temD ? (DADOS.empresas.length + " marcas · gerado em " + String(DADOS.geradoEm).slice(0,16)) : "nao carregou");
+  var temApp = (typeof marcasInadimplentes === "function");
+  linha("Codigo do painel (app.js)", temApp,
+        temApp ? ("versao com: " + (typeof barrasHTML === "function" ? "plano B de barras" : "SEM plano B (arquivo antigo!)")) : "nao carregou");
+  if (temD && temApp) {
+    try {
+      state.canais = new Set(["Uemtel"]);
+      var lista = marcasInadimplentes();
+      linha("Filtro Uemtel + inadimplentes", lista.length > 0,
+            lista.length + " marcas · exemplos: " + lista.slice(0,3).map(function(e){return e.name+" ("+e.diasAtraso+"d)";}).join(", "));
+    } catch(e){ linha("Filtro Uemtel + inadimplentes", false, "ERRO: " + e.message); }
+  }
+  try {
+    if (typeof Chart !== "undefined") {
+      new Chart(document.getElementById("teste"), {type:"bar",
+        data:{labels:["a","b","c"],datasets:[{data:[3,1,2],backgroundColor:"#6C5CE7"}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+      linha("Desenho de teste no canvas", true, "se voce ve barras roxas abaixo, o canvas funciona");
+    } else { linha("Desenho de teste no canvas", false, "sem Chart.js nao da pra testar"); }
+  } catch(e){ linha("Desenho de teste no canvas", false, "ERRO: " + e.message); }
+  window.addEventListener("error", function(ev){
+    linha("Erro de JavaScript", false, ev.message + " (" + (ev.filename||"") + ":" + (ev.lineno||"") + ")");
+  });
+})();
+</script>
+</body>
+</html>
