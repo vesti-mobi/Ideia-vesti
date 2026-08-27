@@ -1177,8 +1177,8 @@
   },
   "80179": {
     "ligado": true,
-    "update": "2026-07-27",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Charmonte",
     "canalPlanilha": "Starter"
   },
@@ -1758,8 +1758,8 @@
   },
   "24540": {
     "ligado": true,
-    "update": "2026-07-28",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Cashier",
     "canalPlanilha": "Attasoft"
   },
@@ -3536,8 +3536,8 @@
   },
   "317136": {
     "ligado": true,
-    "update": "2026-07-27",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Carmila Moda",
     "canalPlanilha": "Vesti"
   },
@@ -3641,8 +3641,8 @@
   },
   "323816": {
     "ligado": true,
-    "update": "2026-07-27",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Amore",
     "canalPlanilha": "Attasoft"
   },
@@ -3893,8 +3893,8 @@
   },
   "1524639": {
     "ligado": true,
-    "update": "2026-07-29",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Tropical Colors",
     "canalPlanilha": "Uemtel"
   },
@@ -6833,22 +6833,22 @@
   },
   "1942215": {
     "ligado": true,
-    "update": "2026-07-27",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Jullyta Sales",
     "canalPlanilha": "Starter"
   },
   "21682": {
     "ligado": true,
-    "update": "2026-07-27",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Canoni",
     "canalPlanilha": "Attasoft"
   },
   "2032548": {
     "ligado": true,
-    "update": "2026-07-27",
-    "religamentoReal": false,
+    "update": "2026-08-27",
+    "religamentoReal": true,
     "nomePlanilha": "Mari Modas",
     "canalPlanilha": "Vesti"
   },
