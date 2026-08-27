@@ -231,15 +231,50 @@ function chartVazio(id, msg) {
   });
 }
 
+// Falha de grafico nao pode ser silenciosa: card branco sem explicacao custou
+// horas em 27/08. Escreve o motivo por cima do lugar do grafico.
+function avisoNoCard(id, msg) {
+  const cv = document.getElementById(id);
+  if (!cv || !cv.parentNode || !cv.parentNode.querySelector) return;
+  let box = cv.parentNode.querySelector(".chart-erro");
+  if (!box) {
+    box = document.createElement("div");
+    box.className = "chart-erro";
+    box.style.cssText = "position:absolute;inset:0;display:flex;align-items:center;"
+      + "justify-content:center;text-align:center;padding:12px;font-size:12px;color:#A62016";
+    cv.parentNode.appendChild(box);
+  }
+  box.textContent = msg;
+}
+function limpaAviso(id) {
+  try {
+    const cv = document.getElementById(id);
+    const box = cv && cv.parentNode && cv.parentNode.querySelector
+      && cv.parentNode.querySelector(".chart-erro");
+    if (box && box.remove) box.remove();
+  } catch (e) { /* aviso e' enfeite: nunca pode derrubar o grafico */ }
+}
+
 function makeChart(id, cfg) {
   destroyChart(id);
+  limpaAviso(id);
   const ctx = document.getElementById(id);
   if (!ctx) return;
+  if (typeof Chart === "undefined") {
+    avisoNoCard(id, "A biblioteca de graficos (Chart.js) nao carregou nesta rede. "
+      + "Os numeros das tabelas continuam valendo.");
+    return;
+  }
   // rede de seguranca: se alguem deixou o canvas com tamanho cravado, devolve o
   // controle pro Chart.js em vez de renderizar num canvas estourado
   ctx.removeAttribute("width"); ctx.removeAttribute("height");
   ctx.style.width = ""; ctx.style.height = "";
-  charts[id] = new Chart(ctx, cfg);
+  try {
+    charts[id] = new Chart(ctx, cfg);
+  } catch (err) {
+    console.error("[grafico " + id + "]", err);
+    avisoNoCard(id, "Nao consegui desenhar este grafico: " + (err && err.message || err));
+  }
 }
 
 const _sortState = {}; // {tableId: {col: idx, dir: 'desc'|'asc'}}
