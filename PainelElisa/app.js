@@ -5,7 +5,8 @@ const $ = (id) => document.getElementById(id);
 
 // state.chaves = lista de periodos selecionados (multi-selecao). 1 item = comportamento antigo.
 const CANAIS = ["Starter","Vesti","Uemtel","Atta","Parceiros"];
-const state = { periodo:"mensal", chaves:[], cs:"todas", canais:new Set(CANAIS), empresa:"todas", tab:"home", cadMes:"todos", upgMin:300000, soCoorte:true, reativOrigem:"todas", reativDrill:null, portesSel:new Set() };
+const state = { periodo:"mensal", chaves:[], cs:"todas", canais:new Set(CANAIS), empresa:"todas", tab:"home", cadMes:"todos", upgMin:300000, soCoorte:true, reativOrigem:"todas", reativDrill:null, portesSel:new Set(),
+  inadDias:0 };
 const D = (typeof DADOS !== "undefined") ? DADOS : { empresas:[], mesesList:[], semanasList:[], anosList:[] };
 // parceiros que NAO entram no ranking "TOP 10 Parceiros" (viram canal proprio)
 const PARC_EXCL = new Set(["atta","attasoft","onix","uemtel","vesti","varejo vesti"]);
@@ -14,6 +15,10 @@ const isAtta   = (e) => ["atta","attasoft"].includes((e.partner_raw||"").toLower
 const isVesti  = (e) => ["vesti","varejo vesti"].includes((e.partner_raw||"").toLowerCase());
 const COLORS = ["#6C5CE7","#00B894","#F39C12","#E17055","#0984E3","#FD79A8","#00CEC9","#A29BFE","#D63031","#74B9FF","#FFB94A","#55EFC4"];
 const charts = {}; // canvas id -> Chart instance
+// Regua das TAGS de inadimplencia (pedido da Laura): 1 a 10 dias de atraso = alerta
+// (amarelo); 11 dias ou mais = bloqueado (vermelho). O atraso vem do vencimento MAIS
+// ANTIGO em aberto (ver build_inadimplencia em fetch_elisa_bq.py).
+const INAD_LIMITE_ALERTA = 10;
 
 // ---------- helpers ----------
 function canalDe(e) {
@@ -45,6 +50,21 @@ function empresasFiltradas() {
     return true;
   });
 }
+function inadStatus(dias) {
+  const d = Number(dias) || 0;
+  if (d <= 0) return null;
+  return d <= INAD_LIMITE_ALERTA ? "alerta" : "bloqueado";
+}
+
+function inadBadge(dias) {
+  const st = inadStatus(dias);
+  if (!st) return "—";
+  const d = Number(dias) || 0;
+  return st === "alerta"
+    ? `<span class="pill pill-inad-alerta">⚠️ Alerta · ${d}d</span>`
+    : `<span class="pill pill-inad-bloq">⛔ Bloqueado · ${d}d</span>`;
+}
+
 function vpBadge(e) {
   if (e.temPixAtivo && e.temCartaoAtivo) return `<span class="pill pill-ambos">PIX + Cartão</span>`;
   if (e.temPixAtivo) return `<span class="pill pill-pix">só PIX</span>`;
@@ -209,6 +229,16 @@ function renderTable(tableId, columns, rows) {
 }
 
 // ---------- HOME KPIs ----------
+// Marcas com fatura vencida e ainda em aberto ha mais dias que a regua.
+// Nao depende do filtro de periodo -- e' uma foto de hoje, igual Sem VP/Travadas.
+// Os dias vem do vencimento MAIS ANTIGO em aberto (ver build_inadimplencia).
+function marcasInadimplentes(minDias) {
+  const min = minDias === undefined ? state.inadDias : minDias;
+  return empresasFiltradas()
+    .filter(e => (e.faturasVencidas || 0) > 0 && (e.diasAtraso || 0) > min)
+    .sort((a, b) => (b.diasAtraso || 0) - (a.diasAtraso || 0));
+}
+
 function renderKpis() {
   const lista = empresasFiltradas();
   let gmv=0,cartao=0,pix=0,semVP=0,semFrete=0,cadProds=0,cadMarcas=0,p5=0,p25=0,cartaoMarcas=0,pixMarcas=0,reativ=0;
@@ -268,6 +298,14 @@ function renderKpis() {
   $("kpi-upgrade-sub").textContent = mesesUpg.length
     ? `${fmtBRL(state.upgMin)}+ em ${mesesUpg[0]} … ${mesesUpg[mesesUpg.length-1]}`
     : "sem meses fechados";
+  // Card da Home ignora o filtro da aba: mostra TODO mundo com fatura vencida,
+  // quebrado entre bloqueadas (11d+) e em alerta (1-10d).
+  const inad = marcasInadimplentes(0);
+  const bloqN = inad.filter(e => inadStatus(e.diasAtraso) === "bloqueado").length;
+  $("kpi-inad").textContent = fmtInt(inad.length);
+  $("kpi-inad-sub").textContent =
+    `${fmtInt(bloqN)} bloqueadas · ${fmtInt(inad.length - bloqN)} em alerta · `
+    + `${fmtBRL(inad.reduce((s,e)=>s+(e.valorEmAberto||0),0))} em aberto`;
   $("kpi-cliques").textContent    = fmtInt(cliquesTot);
   $("kpi-links").textContent      = fmtInt(linksTot);
   $("kpi-marcas-link").textContent = fmtInt(marcasLink);
@@ -760,6 +798,59 @@ function renderTabTravadas() {
   ], lista.map(e=>({...e,_alert:true})));
 }
 
+function renderTabInadimplentes() {
+  const lista = marcasInadimplentes();
+  const total = lista.reduce((s,e)=>s+(e.valorEmAberto||0), 0);
+  const bloq = lista.filter(e => inadStatus(e.diasAtraso) === "bloqueado");
+  const alerta = lista.filter(e => inadStatus(e.diasAtraso) === "alerta");
+  const hint = $("inad-hint");
+  if (hint) hint.innerHTML = lista.length
+    ? `${fmtInt(lista.length)} marcas · ${fmtBRL(total)} em aberto `
+      + `<span class="pill pill-inad-bloq">${fmtInt(bloq.length)} bloqueadas</span>`
+      + `<span class="pill pill-inad-alerta">${fmtInt(alerta.length)} em alerta</span>`
+    : "nenhuma marca acima dessa régua";
+
+  // faixas cortadas na regua das tags: a primeira e' o amarelo (alerta), o resto e' bloqueio
+  const faixas = {"1-10d (alerta)":0,"11-30d":0,"31-60d":0,"61-90d":0,"90d+":0};
+  for (const e of lista) {
+    const d = e.diasAtraso || 0;
+    if (d<=INAD_LIMITE_ALERTA) faixas["1-10d (alerta)"]++;
+    else if (d<=30) faixas["11-30d"]++;
+    else if (d<=60) faixas["31-60d"]++;
+    else if (d<=90) faixas["61-90d"]++;
+    else faixas["90d+"]++;
+  }
+  makeChart("chart-inad-faixa", {
+    type:"bar",
+    data:{labels:Object.keys(faixas), datasets:[{label:"marcas", data:Object.values(faixas),
+      backgroundColor:["#F5C518","#E74C3C","#D63031","#C0392B","#8E1B14"]}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
+  });
+  const porCs = {};
+  for (const e of lista) {
+    const cs = e.cs || "sem CS";
+    porCs[cs] = (porCs[cs]||0) + (e.valorEmAberto||0);
+  }
+  const csOrd = Object.keys(porCs).sort((a,b)=>porCs[b]-porCs[a]);
+  makeChart("chart-inad-cs", {
+    type:"bar",
+    data:{labels:csOrd, datasets:[{label:"em aberto", data:csOrd.map(c=>porCs[c]), backgroundColor:COLORS[3]}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{y:{ticks:{callback:v=>"R$"+fmtInt(v)}}}}
+  });
+  renderTable("tbl-inadimplentes", [
+    {label:"Marca", fn:r=>r.name, sort:r=>r.name},
+    {label:"Situação", fn:r=>inadBadge(r.diasAtraso), sort:r=>r.diasAtraso||0},
+    {label:"CS", fn:r=>r.cs, sort:r=>r.cs},
+    {label:"Canal", fn:r=>r.canal, sort:r=>r.canal},
+    {label:"Venc. mais antigo", fn:r=>r.vencimentoMaisAntigo||"—", sort:r=>r.vencimentoMaisAntigo||""},
+    {label:"Dias em atraso", cls:"num", fn:r=>fmtInt(r.diasAtraso||0), sort:r=>r.diasAtraso||0},
+    {label:"Faturas vencidas", cls:"num", fn:r=>fmtInt(r.faturasVencidas||0), sort:r=>r.faturasVencidas||0},
+    {label:"Valor em aberto", cls:"num", fn:r=>fmtBRL(r.valorEmAberto||0), sort:r=>r.valorEmAberto||0},
+    {label:"Mensalidade", cls:"num", fn:r=>fmtBRL(r.valor_mensal), sort:r=>r.valor_mensal||0},
+  ], lista.map(e=>({...e, _alert: inadStatus(e.diasAtraso) === "bloqueado"})));
+}
+
 function renderTabLinks() {
   const lista = empresasFiltradas();
   // evolução mensal — duas linhas: cliques e links
@@ -1032,7 +1123,8 @@ const TAB_LABELS = {
   primeiras5:"Primeiras 5 Vendas", primeiras25:"Primeiras 25 Vendas",
   reativ:"Ativações e reativações", topstarter:"TOP 10 Starter", topparceiros:"TOP 10 Parceiros",
   vpinativo:"Sem VP Ativo", freteinativo:"Sem Frete Ativo", travadas:"Marcas Travadas",
-  upgrade:"Oportunidades de Upgrade", tamanho:"Tamanho da marca", links:"Links & Cliques"
+  upgrade:"Oportunidades de Upgrade", tamanho:"Tamanho da marca",
+  inadimplentes:"Inadimplentes", links:"Links & Cliques"
 };
 
 function switchTab(tab) {
@@ -1066,6 +1158,7 @@ function renderActiveTab() {
   else if (state.tab === "reativ") renderTabReativ();
   else if (state.tab === "upgrade") renderTabUpgrade();
   else if (state.tab === "tamanho") renderTabTamanho();
+  else if (state.tab === "inadimplentes") renderTabInadimplentes();
   else if (state.tab === "links") renderTabLinks();
 }
 
@@ -1224,6 +1317,8 @@ function bind() {
   });
   bindEmpresaCbx();
   $("filter-cad-mes").addEventListener("change", e=>{ state.cadMes=e.target.value; renderActiveTab(); });
+  $("filter-inad-dias").value = String(state.inadDias);
+  $("filter-inad-dias").addEventListener("change", e=>{ state.inadDias=Number(e.target.value)||0; renderActiveTab(); });
   $("filter-upg-min").addEventListener("change", e=>{ state.upgMin=Number(e.target.value)||300000; renderActiveTab(); });
   // mudar filtro invalida a seleção feita no gráfico (o pedaço clicado pode nem existir mais)
   $("filter-tam-porte").addEventListener("change", e=>{

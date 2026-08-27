@@ -111,6 +111,10 @@
         <div class="hl-icon">⚠️</div><div class="hl-label">Marcas travadas</div>
         <div class="hl-val" id="kpi-travadas">0</div><div class="hl-sub">implantação parada</div>
       </div>
+      <div class="hl-card" onclick="switchTab('inadimplentes')" style="background:linear-gradient(135deg,#C0392B,#F0704F)">
+        <div class="hl-icon">💸</div><div class="hl-label">Inadimplentes</div>
+        <div class="hl-val" id="kpi-inad">0</div><div class="hl-sub" id="kpi-inad-sub">marcas com fatura vencida</div>
+      </div>
       <div class="hl-card" onclick="switchTab('upgrade')" style="background:linear-gradient(135deg,#00B894,#26D0A5)">
         <div class="hl-icon">📈</div><div class="hl-label">Oportunidades de Upgrade</div>
         <div class="hl-val" id="kpi-upgrade">0</div><div class="hl-sub" id="kpi-upgrade-sub">marcas · 300 mil+ em 3 meses</div>
@@ -264,6 +268,34 @@
       <div class="ch"><h4>Marcas travadas por canal</h4><div class="cw"><canvas id="chart-trav-canal"></canvas></div></div>
     </div>
     <div class="tbl-card"><h4>Marcas paradas (cadastraram pedido mas não venderam)</h4><div class="tbl-wrap"><table class="dt" id="tbl-travadas"></table></div></div>
+  </div>
+
+  <div id="tab-inadimplentes" class="tab-panel">
+    <h2 class="tab-title">💸 Marcas inadimplentes</h2>
+    <p class="hint" style="margin-bottom:12px;color:var(--g);font-size:12px">
+      Marcas com fatura <strong>vencida há mais dias que a régua</strong> e ainda <strong>não paga</strong>.
+      Conta como em aberto o que está <em>pending, expired, partially_paid ou in_protest</em> com vencimento anterior a hoje —
+      fatura <em>cancelada</em> ou <em>estornada</em> fica de fora, porque não é dívida do lojista (a Iugu cancela a fatura
+      antiga antes de gerar a próxima). Os <strong>dias de atraso contam do vencimento mais antigo</strong> ainda em aberto,
+      não do último. Fonte: espelho da Iugu no BigQuery — não depende do filtro de período.
+      <br><strong>Tags:</strong> <span class="pill pill-inad-alerta">⚠️ Alerta</span> de 1 a 10 dias de atraso ·
+      <span class="pill pill-inad-bloq">⛔ Bloqueado</span> com 11 dias ou mais (linha em vermelho).
+    </p>
+    <div class="sub-filter">
+      <label>Atraso mínimo:</label>
+      <select class="f-select" id="filter-inad-dias">
+        <option value="0" selected>todas (1 dia ou mais)</option>
+        <option value="10">só bloqueadas (mais de 10 dias)</option>
+        <option value="30">mais de 30 dias</option>
+        <option value="60">mais de 60 dias</option>
+      </select>
+      <span class="hint" id="inad-hint"></span>
+    </div>
+    <div class="chart-row">
+      <div class="ch"><h4>Marcas por faixa de atraso</h4><div class="cw"><canvas id="chart-inad-faixa"></canvas></div></div>
+      <div class="ch"><h4>Valor em aberto por CS</h4><div class="cw"><canvas id="chart-inad-cs"></canvas></div></div>
+    </div>
+    <div class="tbl-card"><h4>Marcas com fatura vencida em aberto</h4><div class="tbl-wrap"><table class="dt" id="tbl-inadimplentes"></table></div></div>
   </div>
 
   <div id="tab-upgrade" class="tab-panel">
