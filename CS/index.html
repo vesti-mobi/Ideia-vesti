@@ -894,6 +894,9 @@ const fmt = {
   money:v=>nfMoney.format(v||0),
   moneyC:v=>nfMoneyC.format(v||0),
   pct:v=>(v==null?'—':nfInt.format(v)+'%'),
+  /* Uma casa decimal, para a variação % da aba de Bonificação: com números
+     grandes de GMV, arredondar para inteiro esconde meio ponto de crescimento. */
+  pct1:v=>(v==null?'—':(Math.abs(v)>=100?nfInt.format(Math.round(v)):v.toFixed(1).replace('.',','))+'%'),
   date:v=>v?v.split('-').reverse().join('/'):'—',
   compact:v=>{const a=Math.abs(v);if(a>=1e6)return (v/1e6).toFixed(a>=1e7?0:1).replace('.',',')+'M';if(a>=1e3)return (v/1e3).toFixed(a>=1e4?0:1).replace('.',',')+'k';return nfInt.format(v)},
   moneyCompact:v=>'R$ '+fmt.compact(v),
@@ -1503,8 +1506,9 @@ const TABS = [
     titulo:'Bonificação — números do mês',
     desc:'Uma linha por CS, uma coluna por regra, sempre no <b>mês fechado</b>. '
       + 'Onde a regra pede comparação, a variação aparece embaixo do número: '
-      + '<b>Tino</b> e <b>mensalidade</b> comparam com o mês anterior; <b>Vesti Pago</b> e '
-      + '<b>GMV</b> com o mesmo mês do ano passado. <b>Reuniões</b>, <b>integrações</b> e '
+      + '<b>Tino</b> e <b>mensalidade</b> comparam com o mês anterior, em número; <b>Vesti Pago</b> e '
+      + '<b>GMV</b> com o mesmo mês do ano passado, <b>em porcentagem</b> (o valor em reais da '
+      + 'diferença fica no balãozinho do mouse). <b>Reuniões</b>, <b>integrações</b> e '
       + '<b>varejos</b> são contagem do próprio mês. Passe o mouse no número para ver quais marcas entraram. '
       + 'Ainda <b>não há pontuação</b> — os pesos de cada item entram depois, por cima destes números. '
       + '<b>Varejo</b> conta só filial nova classificada como varejo. A classificação automática vem do '
@@ -2531,15 +2535,28 @@ function celula(r,c){
       const vv = v || 0;
       const base = r['_base_'+c.k];
       const quem = r['_quem_'+c.k] || [];
-      let sub = '';
+      /* Vesti Pago e GMV mostram a variação em PORCENTAGEM, não em reais
+         (pedido da Laura, 27/08/2026): nessas duas o que interessa é o quanto a
+         carteira cresceu ou caiu, e o valor em R$ já está no número de cima. O
+         delta em reais continua no title, para quem quiser conferir. */
+      const emPct = c.k==='vestipago' || c.k==='gmv';
+      let sub = '', deltaTxt = '';
       if(base != null){
         const d = vv - base;
         const cls = d > 0 ? 'var-up' : d < 0 ? 'var-down' : 'var-flat';
         const sinal = d > 0 ? '+' : d < 0 ? '−' : '';
-        const abs = dinheiro ? fmt.moneyCompact(Math.abs(d)) : fmt.int(Math.abs(d));
+        const absR = dinheiro ? fmt.moneyCompact(Math.abs(d)) : fmt.int(Math.abs(d));
         const contra = met.comparacao === 'anoAnterior' ? 'vs. mesmo mês de '+(Number(mesBonificacao().slice(0,4))-1)
                                                         : 'vs. mês anterior';
-        sub = `<span class="cell-sub ${cls}">${d===0?'igual':sinal+abs} <em>${contra}</em></span>`;
+        let txt;
+        if(!emPct) txt = d===0 ? 'igual' : sinal+absR;
+        /* Sem base não existe porcentagem: dividir por zero daria ∞, e dizer
+           "+100%" quando o ano passado foi zero seria inventar crescimento. */
+        else if(!base) txt = vv ? 'sem base' : 'igual';
+        else txt = d===0 ? 'igual' : sinal+fmt.pct1(Math.abs(d)/base*100);
+        deltaTxt = (dinheiro?fmt.moneyCompact(d):fmt.int(d)) + ' ' + contra
+          + ' (base ' + (dinheiro?fmt.moneyCompact(base):fmt.int(base)) + ')';
+        sub = `<span class="cell-sub ${cls}">${txt} <em>${contra}</em></span>`;
       }
       /* Varejos: a classificação Atacado/Varejo tem uma data de corte, e filial
          criada depois dela ainda não tem tipo. Mostrar só "0" faria parecer que
@@ -2550,7 +2567,8 @@ function celula(r,c){
       }
       td.innerHTML = `<span class="cell-main">${dinheiro?fmt.moneyCompact(vv):fmt.int(vv)}</span>` + sub;
       const quemSem = c.k==='filiais' ? (r['_quem_filiaisSemTipo']||[]) : [];
-      let titulo = quem.slice(0,40).join(', ')
+      let titulo = (emPct && deltaTxt ? deltaTxt + (quem.length?' · ':'') : '')
+        + quem.slice(0,40).join(', ')
         + (quemSem.length ? (quem.length?' · ':'') + 'sem classificação: ' + quemSem.slice(0,20).join(', ') : '');
       /* Varejos é a única coluna editável do painel: o cadastro não sabe dizer
          se a filial é de varejo (a classificação está parada em 30/03/2026),
