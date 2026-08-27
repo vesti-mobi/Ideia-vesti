@@ -270,6 +270,41 @@ function limpaBarrasHTML(canvasId) {
   } catch (e) { /* plano B nunca derruba o plano A */ }
 }
 
+// Depois de criar os graficos, confere se o canvas realmente ganhou tamanho.
+// Container medido enquanto a aba estava escondida (display:none) faz o Chart.js
+// nascer 0x0 e o card fica branco sem erro nenhum. Se acontecer, manda remedir; se
+// ainda assim ficar sem tamanho, cai pro plano B em HTML. O texto do estado vai
+// pra tela (span diag) -- foi o que faltou pra achar o problema em 27/08.
+function conferePosRender(ids, planoB) {
+  setTimeout(function(){
+    const partes = [];
+    let algumZerado = false;
+    ids.forEach(function(id){
+      const cv = document.getElementById(id);
+      if (!cv) { partes.push(id + ": sem canvas"); algumZerado = true; return; }
+      let w = cv.clientWidth || 0, h = cv.clientHeight || 0;
+      if ((w < 5 || h < 5) && charts[id] && charts[id].resize) {
+        try { charts[id].resize(); } catch (e) {}
+        w = cv.clientWidth || 0; h = cv.clientHeight || 0;
+      }
+      if (w < 5 || h < 5) algumZerado = true;
+      partes.push(id.replace("chart-inad-","") + " " + w + "x" + h + (charts[id] ? "" : " SEM CHART"));
+    });
+    if (algumZerado && typeof planoB === "function") planoB();
+    const hint = document.getElementById("inad-hint");
+    if (hint && hint.parentNode) {
+      let d = document.getElementById("inad-diag");
+      if (!d) {
+        d = document.createElement("span");
+        d.id = "inad-diag";
+        d.style.cssText = "display:block;margin-top:4px;font-size:10px;color:#B2BEC3";
+        hint.parentNode.appendChild(d);
+      }
+      d.textContent = "diag: " + partes.join(" · ");
+    }
+  }, 60);
+}
+
 // Falha de grafico nao pode ser silenciosa: card branco sem explicacao custou
 // horas em 27/08. Escreve o motivo por cima do lugar do grafico.
 function avisoNoCard(id, msg) {
@@ -1010,6 +1045,15 @@ function renderTabInadimplentes() {
     {label:"Valor em aberto", cls:"num", fn:r=>fmtBRL(r.valorEmAberto||0), sort:r=>r.valorEmAberto||0},
     {label:"Mensalidade", cls:"num", fn:r=>fmtBRL(r.valor_mensal), sort:r=>r.valor_mensal||0},
   ], lista.map(e=>({...e, _alert: inadStatus(e.diasAtraso) === "bloqueado"})));
+
+  // rede de seguranca: canvas sem tamanho -> remede -> se persistir, barras HTML
+  conferePosRender(["chart-inad-faixa","chart-inad-cs"], function(){
+    const cores = ["#F5C518","#E74C3C","#D63031","#C0392B","#8E1B14"];
+    barrasHTML("chart-inad-faixa",
+      Object.keys(faixas).map((k,i)=>({label:k, valor:faixas[k], cor:cores[i]})));
+    barrasHTML("chart-inad-cs",
+      csOrd.map(c=>({label:c, valor:porCs[c], cor:COLORS[3]})), fmtBRLCurto);
+  });
 }
 
 function renderTabLinks() {
