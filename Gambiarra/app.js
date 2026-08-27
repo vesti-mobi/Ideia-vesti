@@ -151,8 +151,22 @@ function reativNoPeriodo(e) {
 // options.plugins.valoresNaBarra.fmt.
 const valoresNaBarra = {
   id: "valoresNaBarra",
+  // O QUE ELE DESENHA E' ENFEITE; o grafico e' o que importa. Se o plugin lanca
+  // dentro do draw, o Chart.js aborta a animacao no 1o quadro -- as barras ficam
+  // com altura 0 e o card fica BRANCO, com canvas do tamanho certo e sem erro
+  // visivel. Foi o que segurou a aba Inadimplentes em 27/08. Por isso o try/catch:
+  // no pior caso perde-se o numero, nunca o grafico.
   afterDatasetsDraw(chart) {
-    const ctx = chart.ctx;
+    try { desenhaValoresNaBarra(chart); }
+    catch (e) {
+      window.__erroPlugin = String((e && e.message) || e);
+      console.error("[valoresNaBarra]", e);
+    }
+  }
+};
+
+function desenhaValoresNaBarra(chart) {
+  const ctx = chart.ctx;
     const opt = (chart.options.plugins && chart.options.plugins.valoresNaBarra) || {};
     const fmt = typeof opt.fmt === "function" ? opt.fmt : (v => v);
     const visiveis = chart.data.datasets.filter(
@@ -196,8 +210,7 @@ const valoresNaBarra = {
       ctx.fillText(fmt(t), topoX[i], topoY[i] - 4);
     });
     ctx.restore();
-  },
-};
+}
 
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 // Grafico sem nenhum dado desenha eixos vazios e parece "quebrado". Escreve o
@@ -290,6 +303,7 @@ function conferePosRender(ids, planoB) {
       if (w < 5 || h < 5) algumZerado = true;
       partes.push(id.replace("chart-inad-","") + " " + w + "x" + h + (charts[id] ? "" : " SEM CHART"));
     });
+    if (window.__erroPlugin) partes.push("plugin: " + window.__erroPlugin);
     if (algumZerado && typeof planoB === "function") planoB();
     const hint = document.getElementById("inad-hint");
     if (hint && hint.parentNode) {
