@@ -333,6 +333,8 @@ thead th .th-btn{
 }
 thead th .th-btn:hover{color:var(--ink)}
 thead th.r .th-btn{justify-content:flex-end}
+/* Tabela sem botão de ordenar (a de pontos): o texto do cabeçalho alinha sozinho. */
+thead th.r{text-align:right}
 thead th[data-sorted] .th-btn{color:var(--brand)}
 .th-btn .arw{opacity:0;font-size:9px}
 thead th[data-sorted] .arw{opacity:1}
@@ -1506,11 +1508,11 @@ const TABS = [
     titulo:'Bonificação — números do mês',
     desc:'Uma linha por CS, uma coluna por regra, sempre no <b>mês fechado</b>. '
       + 'Onde a regra pede comparação, a variação aparece embaixo do número: '
-      + '<b>Tino</b> e <b>mensalidade</b> comparam com o mês anterior, em número; <b>Vesti Pago</b> e '
-      + '<b>GMV</b> com o mesmo mês do ano passado, <b>em porcentagem</b> (o valor em reais da '
-      + 'diferença fica no balãozinho do mouse). <b>Reuniões</b>, <b>integrações</b> e '
+      + '<b>Tino</b> compara com o mês anterior em número de marcas; <b>mensalidade</b> com o mês '
+      + 'anterior e <b>Vesti Pago</b> e <b>GMV</b> com o mesmo mês do ano passado, os três '
+      + '<b>em porcentagem</b> (o valor em reais da diferença fica no balãozinho do mouse). <b>Reuniões</b>, <b>integrações</b> e '
       + '<b>varejos</b> são contagem do próprio mês. Passe o mouse no número para ver quais marcas entraram. '
-      + 'Ainda <b>não há pontuação</b> — os pesos de cada item entram depois, por cima destes números. '
+      + 'A <b>pontuação</b> de cada CS está na segunda tabela, embaixo desta, com a régua de cada regra. '
       + '<b>Varejo</b> conta só filial nova classificada como varejo. A classificação automática vem do '
       + 'Relatório Confecções e tem data de corte, então filial mais nova que isso aparece como '
       + '"sem classificação" ao lado do número, e não some da tela — <b>clique no número de varejos para '
@@ -1526,13 +1528,14 @@ const TABS = [
       ...METRICAS().map(m=>({k:m.k, l:m.titulo, tipo:'bonif', r:true, unidade:m.unidade})),
     ],
     linhas:()=>linhasBonificacao(),
+    extra:(rows)=>renderPontos(rows),
     kpis:(rows)=>{
       const met = METRICAS();
       const t = k => rows.reduce((a,r)=>a+(r[k]||0),0);
       const fmtU = (k)=>{ const m=met.find(x=>x.k===k); return m && m.unidade==='R$' ? fmt.moneyCompact(t(k)) : fmt.int(t(k)) };
       return [
         {l:'Reuniões no mês', v:fmtU('reunioes'), s:'time todo'},
-        {l:'Marcas +60 eventos no Tino', v:fmtU('tino60'), s:'no mês escolhido'},
+        {l:'Marcas +40 eventos no Tino', v:fmtU('tino60'), s:'no mês escolhido'},
         {l:'Varejos novos', v:fmtU('filiais'), s:'filiais de marca já existente'},
         {l:'Receita de mensalidade', v:fmtU('mensalidade'), s:'soma das carteiras na visão'},
       ];
@@ -1615,6 +1618,134 @@ function linhasBonificacao(){
   DATA.meta.cs?.forEach(cs=>{ if(cs && cs!=='Sem CS') linha(cs) });
   return [...porCs.values()].sort((a,b2)=>
     /^\(?Sem/i.test(a.cs) ? 1 : /^\(?Sem/i.test(b2.cs) ? -1 : a.cs.localeCompare(b2.cs,'pt-BR'));
+}
+
+/* ----------------------------------------------------------------------------
+   PONTUAÇÃO DA BONIFICAÇÃO
+   ----------------------------------------------------------------------------
+   A régua que a Laura passou em 27/08/2026. Cada regra vira pontos em cima do
+   MESMO número da tabela de cima — nada é medido de novo aqui, só convertido:
+
+     Tino ........... 10 pontos por cliente EXTRA (vs. mês anterior) com 40+ eventos
+     Mensalidade .... 10 pontos a cada R$ 1.000 a mais que o mês anterior (quebrado
+                      arredonda PARA CIMA: R$ 1.200 já são 20 pontos)
+     Vesti Pago ..... 1 ponto a cada 2% a mais que o mesmo mês do ano passado
+     Reuniões ....... 1 ponto cada
+     Integrações .... 5 pontos cada
+     GMV ............ 1 ponto a cada 1% a mais que o mesmo mês do ano passado
+     Varejos ........ 10 pontos cada
+
+   Duas decisões que não estavam escritas na régua e valem dizer:
+   - queda não tira ponto. Mês pior que o anterior dá zero naquela regra, não
+     pontuação negativa;
+   - a mensalidade é a única que arredonda para cima (foi o que ela pediu). Nas
+     porcentagens, só bloco fechado conta: 3,9% no Vesti Pago é 1 ponto, não 2. */
+const REGRAS_PONTOS = [
+  { k:'tino60', l:'Tino', regra:'10 pts por cliente extra (40+ eventos) vs. mês anterior',
+    calc:r=>{ const extra = (r.tino60||0) - (r['_base_tino60']||0);
+              return extra>0 ? {p:extra*10, como:fmt.int(extra)+' cliente(s) extra × 10'} : {p:0} } },
+  { k:'mensalidade', l:'Mensalidade', regra:'10 pts a cada R$ 1k a mais que o mês anterior (arredonda para cima)',
+    calc:r=>{ const extra = (r.mensalidade||0) - (r['_base_mensalidade']||0);
+              if(extra<=0) return {p:0};
+              const blocos = Math.ceil(extra/1000);
+              return {p:blocos*10, como:fmt.moneyCompact(extra)+' a mais = '+blocos+' × 1k × 10'} } },
+  { k:'vestipago', l:'Vesti Pago', regra:'1 pt a cada 2% a mais que o mesmo mês do ano passado',
+    calc:r=>pontosPct(r,'vestipago',2) },
+  { k:'reunioes', l:'Reuniões', regra:'1 pt por reunião',
+    calc:r=>({p:(r.reunioes||0)*1, como:fmt.int(r.reunioes||0)+' × 1'}) },
+  { k:'integracoes', l:'Integrações', regra:'5 pts por integração nova',
+    calc:r=>({p:(r.integracoes||0)*5, como:fmt.int(r.integracoes||0)+' × 5'}) },
+  { k:'gmv', l:'GMV', regra:'1 pt a cada 1% a mais que o mesmo mês do ano passado',
+    calc:r=>pontosPct(r,'gmv',1) },
+  { k:'filiais', l:'Varejos', regra:'10 pts por varejo novo',
+    calc:r=>({p:(r.filiais||0)*10, como:fmt.int(r.filiais||0)+' × 10'}) },
+];
+/* Regras de crescimento percentual: conta quantos blocos fechados de `passo`%
+   a marca subiu. Sem base (ano passado zerado) não há porcentagem — e não dá
+   para chamar de crescimento o que não tem de onde crescer, então vale zero. */
+function pontosPct(r, k, passo){
+  const base = r['_base_'+k], v = r[k]||0;
+  if(!base) return {p:0, como: v ? 'sem base no ano anterior' : ''};
+  const pct = (v - base)/base*100;
+  if(pct <= 0) return {p:0};
+  const p = Math.floor(pct/passo);
+  /* Base minúscula em 2025 estoura a regra: quem tinha R$ 1,1 mil de GMV no ano
+     passado e tem R$ 220 mil hoje cresce 19.000% e faria 19 mil pontos sozinho.
+     Isso quase nunca é venda — é carteira que mudou de dono (a marca é creditada
+     ao CS de HOJE, o cadastro não guarda quem atendia antes) ou marca que nem
+     existia. O ponto continua sendo o que a régra manda: quem decide se corta é
+     a Laura. Aqui a célula só avisa, para ninguém ler o número como crescimento. */
+  const suspeito = pct > 300;
+  return {p, como: fmt.pct1(pct)+' ÷ '+passo+'% = '+p
+    + (suspeito ? ' · base de '+(Number(mesBonificacao().slice(0,4))-1)+': '+fmt.moneyCompact(base) : ''),
+    alerta: suspeito};
+}
+/* Segunda tabela da aba: os mesmos CS, agora em pontos. Recebe as linhas já
+   filtradas pela tabela de cima, para os dois quadros nunca discordarem. */
+function renderPontos(rows){
+  const card = el('div',{class:'table-card'});
+  card.style.marginTop = '18px';
+  const head = el('div',{class:'table-head'});
+  head.innerHTML = '<h3>Pontuação por CS</h3>'
+    + `<span class="count">${rotuloMes(mesBonificacao())}</span>`;
+  card.appendChild(head);
+  /* A régua em cima da tabela, em texto corrido e QUEBRANDO LINHA: em uma linha
+     só (que é como o .eyebrow desenha) ela some na borda do card. */
+  card.appendChild(el('div',{style:'padding:0 18px 12px;font-size:12px;line-height:1.7;color:var(--ink-3)'},
+    REGRAS_PONTOS.map(g=>`<b>${g.l}</b>: ${g.regra}`).join(' &nbsp;·&nbsp; ')
+    + ' &nbsp;·&nbsp; queda não tira ponto'));
+
+  const linhas = rows.map(r=>{
+    const o = {cs:r.cs, total:0};
+    REGRAS_PONTOS.forEach(g=>{
+      const res = g.calc(r) || {p:0};
+      o[g.k] = res.p || 0; o['_como_'+g.k] = res.como || '';
+      o['_alerta_'+g.k] = !!res.alerta;
+      o.total += o[g.k];
+    });
+    return o;
+  }).sort((a,b)=> b.total - a.total || a.cs.localeCompare(b.cs,'pt-BR'));
+
+  const scroll = el('div',{class:'table-scroll'});
+  const table = el('table');
+  const thead = el('thead'), trh = el('tr');
+  trh.appendChild(el('th',{},'CS responsável'));
+  REGRAS_PONTOS.forEach(g=>{ const th = el('th',{class:'r'},g.l); th.title = g.regra; trh.appendChild(th) });
+  trh.appendChild(el('th',{class:'r'},'Total'));
+  thead.appendChild(trh); table.appendChild(thead);
+
+  const tbody = el('tbody');
+  linhas.forEach(l=>{
+    const tr = el('tr');
+    tr.appendChild(el('td',{},`<span class="cs-chip"><b>${iniciais(l.cs)}</b>${l.cs}</span>`));
+    REGRAS_PONTOS.forEach(g=>{
+      const td = el('td',{class:'r num'});
+      td.innerHTML = l[g.k] ? `<span class="cell-main">${fmt.int(l[g.k])}</span>`
+                            : '<span class="cell-sub">—</span>';
+      if(l['_alerta_'+g.k]) td.innerHTML += '<span class="cell-sub var-down">base ~0 no ano anterior</span>';
+      /* De onde saiu o ponto: sem isso a CS vê "30" e não tem como conferir se
+         são 3 clientes no Tino ou arredondamento da mensalidade. */
+      const como = l['_como_'+g.k];
+      td.title = g.regra + (como ? ' · ' + como : '');
+      tr.appendChild(td);
+    });
+    tr.appendChild(el('td',{class:'r num strong'},
+      `<span class="cell-main" style="font-weight:700">${fmt.int(l.total)}</span>`));
+    tbody.appendChild(tr);
+  });
+  /* Fecha com o somatório: a bonificação é discutida em time, e "quanto o time
+     fez no mês" é a primeira pergunta depois de "quanto eu fiz". */
+  const tot = el('tr'); tot.style.fontWeight = '600';
+  tot.appendChild(el('td',{},'<span class="cell-sub">Time todo</span>'));
+  REGRAS_PONTOS.forEach(g=>tot.appendChild(el('td',{class:'r num'},
+    fmt.int(linhas.reduce((a,l)=>a+l[g.k],0)))));
+  tot.appendChild(el('td',{class:'r num'}, fmt.int(linhas.reduce((a,l)=>a+l.total,0))));
+  tbody.appendChild(tot);
+
+  table.appendChild(tbody);
+  scroll.appendChild(table);
+  card.appendChild(scroll);
+  return card;
 }
 
 /* Mês escolhido no filtro; por padrão, o último mês que tem dado. */
@@ -1933,6 +2064,9 @@ function renderPagina(){
   }
 
   page.appendChild(renderTabela(t, rows));
+  /* Espaço para uma segunda tabela na aba, quando a primeira não conta a
+     história inteira — hoje só a Bonificação usa, para a pontuação. */
+  if(t.extra){ const ex = t.extra(rows); if(ex) page.appendChild(ex) }
   ultimoRender = { rows, colunas:t.colunas };
 }
 
@@ -2535,11 +2669,11 @@ function celula(r,c){
       const vv = v || 0;
       const base = r['_base_'+c.k];
       const quem = r['_quem_'+c.k] || [];
-      /* Vesti Pago e GMV mostram a variação em PORCENTAGEM, não em reais
-         (pedido da Laura, 27/08/2026): nessas duas o que interessa é o quanto a
-         carteira cresceu ou caiu, e o valor em R$ já está no número de cima. O
-         delta em reais continua no title, para quem quiser conferir. */
-      const emPct = c.k==='vestipago' || c.k==='gmv';
+      /* As três colunas de dinheiro (Vesti Pago, GMV e mensalidade) mostram a
+         variação em PORCENTAGEM, não em reais (pedido da Laura, 27/08/2026):
+         nelas o que interessa é o quanto a carteira cresceu ou caiu, e o valor
+         em R$ já está no número de cima. O delta em reais continua no title. */
+      const emPct = c.k==='vestipago' || c.k==='gmv' || c.k==='mensalidade';
       let sub = '', deltaTxt = '';
       if(base != null){
         const d = vv - base;

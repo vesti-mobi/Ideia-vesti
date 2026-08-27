@@ -231,13 +231,35 @@ por medição pedido a pedido (ressalva 4).
    venda. Quando o primeiro atendimento é anterior, ele é que vale, e a coluna diz
    de onde veio cada data.
 
-6c. **Bonificação: os números, sem os pontos.** A aba traz as sete regras da
-   planilha da Laura, uma coluna cada, por CS e por mês-calendário. Não há peso
-   nem pontuação — decisão dela em 26/08/2026: "vamos trazer primeiro o número;
-   depois eu penso nas pontuações". Duas regras comparam com o mês anterior
-   (Tino +60 eventos, mensalidade), duas com o mesmo mês do ano passado (Vesti
-   Pago, GMV) e três são contagem do próprio mês (reuniões, integrações,
-   varejos). Passar o mouse no número lista as marcas que entraram nele.
+6c. **Bonificação: os números e, embaixo, os pontos.** A aba traz as sete regras
+   da planilha da Laura, uma coluna cada, por CS e por mês-calendário. Duas regras
+   comparam com o mês anterior (Tino +40 eventos, mensalidade), duas com o mesmo
+   mês do ano passado (Vesti Pago, GMV) e três são contagem do próprio mês
+   (reuniões, integrações, varejos). Passar o mouse no número lista as marcas que
+   entraram nele. As três de dinheiro (mensalidade, Vesti Pago, GMV) mostram a
+   variação em **porcentagem**, não em reais (27/08/2026) — o valor em R$ da
+   diferença fica no title da célula.
+
+   A **segunda tabela** converte esses mesmos números em pontos (régua da Laura,
+   27/08/2026), sem medir nada de novo:
+
+   | regra | pontos |
+   |---|---|
+   | Tino | 10 por cliente extra com 40+ eventos, vs. mês anterior |
+   | Mensalidade | 10 a cada R$ 1.000 a mais que o mês anterior, arredondando **para cima** |
+   | Vesti Pago | 1 a cada 2% a mais que o mesmo mês do ano passado |
+   | Reuniões | 1 cada |
+   | Integrações | 5 cada |
+   | GMV | 1 a cada 1% a mais que o mesmo mês do ano passado |
+   | Varejos | 10 cada |
+
+   Duas decisões que a régua não dizia: **queda não tira ponto** (mês pior dá
+   zero, não negativo) e, nas porcentagens, **só bloco fechado conta** — 3,9% no
+   Vesti Pago é 1 ponto, não 2. A mensalidade é a única que arredonda para cima,
+   porque foi o que ela pediu. Quem não tem base no ano anterior (marca que não
+   existia, ou CS que assumiu a carteira depois) faz zero ponto nas regras de %:
+   não dá para chamar de crescimento o que não tem de onde crescer. O title de
+   cada célula mostra a conta que gerou o ponto.
 
    Três coisas para ler junto com a tabela:
    - **A carteira é a de hoje.** A marca é creditada ao CS que a atende agora,

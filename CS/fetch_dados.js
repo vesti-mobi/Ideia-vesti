@@ -1662,9 +1662,14 @@ function montar(bqd, hsd, tinoDados) {
      Mês-calendário, não semana — foi justamente por isso que o painel inteiro
      trocou de grão. */
   const METRICAS_BONIFICACAO = [
-    { k: 'tino60', titulo: 'Marcas com +60 eventos no Tino', unidade: 'marcas',
+    /* A chave continua 'tino60' de propósito, mesmo com a régua em 40: é ela que
+       casa o histórico já gravado no dados.js e a coluna do painel. O número que
+       vale é o LIMITE_TINO lá embaixo — mudar a régua muda o passado junto, já
+       que a carga recalcula todos os meses do zero. */
+    { k: 'tino60', titulo: 'Marcas com +40 eventos no Tino', unidade: 'marcas',
       comparacao: 'mesAnterior',
-      regra: 'Marcas da carteira do CS que passaram de 60 eventos no Tino dentro do mês. '
+      regra: 'Marcas da carteira do CS que passaram de 40 eventos no Tino dentro do mês '
+           + '(era 60 até 27/08/2026). '
            + 'O comparativo é o mesmo número no mês anterior — a régua da Laura é "a cada cliente extra".' },
     { k: 'mensalidade', titulo: 'Receita de mensalidade', unidade: 'R$',
       comparacao: 'mesAnterior',
@@ -1787,7 +1792,7 @@ function montar(bqd, hsd, tinoDados) {
   });
   const integracoesDetectadas = registrarIntegracoes(porDom);
   integracoesDetectadas.forEach(r => contarIntegracao(mesDe(r.data), r.cs, r.cliente));
-  /* Tino: a régua é por MARCA — só entra quem passou de 60 eventos no mês, e o
+  /* Tino: a régua é por MARCA — só entra quem passou de 40 eventos no mês, e o
      que se conta é quantas marcas passaram, não quantos eventos. Por isso a
      soma é feita em dois tempos. */
   const tinoMes = new Map();     // mes|dominio -> eventos
@@ -1796,7 +1801,7 @@ function montar(bqd, hsd, tinoDados) {
     const ch = mesDe(x.data) + '|' + x.dominio;
     tinoMes.set(ch, (tinoMes.get(ch) || 0) + num(x.eventos));
   });
-  const LIMITE_TINO = 60;
+  const LIMITE_TINO = 40;      // era 60; a Laura baixou a régua em 27/08/2026
   tinoMes.forEach((eventos, ch) => {
     if (eventos < LIMITE_TINO) return;
     const [mes, dom] = ch.split('|');
