@@ -38,7 +38,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          FILES="PainelElisa/dashboard_data.js PainelElisa/companies_elisa.json PainelElisa/gmv_elisa.json PainelElisa/cadastros_elisa.json PainelElisa/vestipago_elisa.json PainelElisa/reativacao_elisa.json PainelElisa/links_elisa.json PainelElisa/pagamentos_elisa.json PainelElisa/ambiente_elisa.json"
+          FILES="PainelElisa/dashboard_data.js PainelElisa/companies_elisa.json PainelElisa/gmv_elisa.json PainelElisa/cadastros_elisa.json PainelElisa/vestipago_elisa.json PainelElisa/reativacao_elisa.json PainelElisa/links_elisa.json PainelElisa/pagamentos_elisa.json PainelElisa/ambiente_elisa.json PainelElisa/inadimplentes_elisa.json"
           MSG="Atualizacao Painel Elisa $(date +'%d/%m/%Y %H:%M')"
           for i in 1 2 3 4 5; do
             git fetch -q origin main

@@ -34,6 +34,7 @@ OUT_VP        = ROOT / "vestipago_elisa.json"
 OUT_REATIV    = ROOT / "reativacao_elisa.json"
 OUT_LINKS     = ROOT / "links_elisa.json"
 OUT_PAGTOS    = ROOT / "pagamentos_elisa.json"
+OUT_INADIMP   = ROOT / "inadimplentes_elisa.json"
 
 PROJECT = "vesti-data-499015"
 DATASET = "vestilake_BI"
@@ -250,6 +251,83 @@ SELECT MIN(DATE(SUBSTR(paid_at, 1, 10))) piso
 FROM `{PROJECT}.{DATASET}.iugu_invoices`
 WHERE status='paid' AND paid_at IS NOT NULL AND paid_at NOT IN ('None','')
 """
+
+
+# -----------------------------------------------------------------------------
+# 7) INADIMPLENTES = marca com fatura VENCIDA e ainda em aberto.
+#
+#    Em aberto = pending | expired | partially_paid | in_protest com vencimento
+#    anterior a hoje. `canceled` e `refunded` NAO entram: nao sao divida do
+#    lojista (a Iugu cancela a fatura antiga antes de gerar a proxima). Mesmo
+#    criterio ja usado na aba Churn do Painel de Clientes (CS).
+#
+#    Dias de atraso contam do vencimento MAIS ANTIGO em aberto, nao do ultimo.
+#
+#    A regua e' aplicada no FRONT -- aqui sai toda fatura vencida, pro painel
+#    poder trocar a faixa de dias sem rodar o pipeline de novo.
+#
+#    TODAS as subcontas da Iugu entram: a query nao filtra account_id (sao 15
+#    contas -- **VESTI**, *Vesti Starter*, *Vesti - Uemtel*, *Vesti Setup*,
+#    *Vesti - Va Vantagens* etc) e `account_name` sai junto pro painel mostrar
+#    de qual subconta veio cada divida.
+#
+#    O mapa customer->dominio e' 1:N (a view silver_ casa por CNPJ e a mesma
+#    empresa tem varios dominios). Sem escolher UM dominio por fatura a mesma
+#    divida aparecia em 2 marcas e DOBRAVA o total (medido: 36 marcas / R$ 31,8k
+#    virou 14 marcas / R$ 15,1k). Por isso a query sai no grao FATURA x DOMINIO
+#    CANDIDATO com `prio` (1 = custom_variables do proprio customer da Iugu,
+#    2 = casamento por CNPJ) e o desempate acontece em build_inadimplencia.
+# -----------------------------------------------------------------------------
+SQL_INADIMPLENTES = f"""
+WITH abertas AS (
+  SELECT DISTINCT id, account_name, customer_id, payer_cpf_cnpj, status,
+    SAFE.PARSE_DATE('%Y-%m-%d', due_date) due_dt,
+    SAFE_CAST(total_cents AS INT64) total_cents
+  FROM `{PROJECT}.{DATASET}.iugu_invoices`
+  WHERE status IN ('pending', 'expired', 'partially_paid', 'in_protest')
+    AND due_date IS NOT NULL AND due_date NOT IN ('None', '')),
+venc AS (
+  SELECT * FROM abertas WHERE due_dt < CURRENT_DATE('America/Sao_Paulo')),
+direto AS (
+  SELECT DISTINCT SAFE_CAST(custom_variables_value AS INT64) domain_id, id customer_id, 1 prio
+  FROM `{PROJECT}.{DATASET}.iugu_customers`
+  WHERE LOWER(custom_variables_name) LIKE '%domain%'
+    AND SAFE_CAST(custom_variables_value AS INT64) IS NOT NULL),
+por_cnpj AS (
+  SELECT DISTINCT co.domain_id, cu.id customer_id, 2 prio
+  FROM `{PROJECT}.{DATASET}.odbc_companies` co
+  JOIN `{PROJECT}.{DATASET}.iugu_customers` cu
+    ON REGEXP_REPLACE(co.tax_document, r'[^0-9]', '') = REGEXP_REPLACE(cu.cpf_cnpj, r'[^0-9]', '')
+  WHERE co.tax_document IS NOT NULL AND co.tax_document <> ''
+    AND LENGTH(REGEXP_REPLACE(co.tax_document, r'[^0-9]', '')) >= 11),
+mapa AS (
+  SELECT customer_id, domain_id, MIN(prio) prio
+  FROM (SELECT * FROM direto UNION ALL SELECT * FROM por_cnpj) GROUP BY 1, 2),
+cands AS (
+  -- 1/2) pelo customer da Iugu (custom_variables domain, depois CNPJ do customer)
+  SELECT v.id fatura_id, CAST(m.domain_id AS STRING) domain_id, m.prio, v.customer_id,
+    v.account_name, v.status, v.due_dt, v.total_cents
+  FROM venc v JOIN mapa m ON m.customer_id = v.customer_id
+  UNION ALL
+  -- 3) pelo CNPJ do PAGADOR da propria fatura: cobre subconta cujo customer nao
+  --    esta espelhado em iugu_customers (caso *Vesti - Va Vantagens*).
+  SELECT v.id, CAST(co.domain_id AS STRING), 3, v.customer_id,
+    v.account_name, v.status, v.due_dt, v.total_cents
+  FROM venc v JOIN `{PROJECT}.{DATASET}.odbc_companies` co
+    ON REGEXP_REPLACE(co.tax_document, r'[^0-9]', '') = REGEXP_REPLACE(IFNULL(v.payer_cpf_cnpj, ''), r'[^0-9]', '')
+  WHERE LENGTH(REGEXP_REPLACE(IFNULL(v.payer_cpf_cnpj, ''), r'[^0-9]', '')) >= 11)
+SELECT c.fatura_id, c.domain_id, c.prio, c.customer_id, c.account_name, c.status,
+  c.due_dt, c.total_cents,
+  DATE_DIFF(CURRENT_DATE('America/Sao_Paulo'), c.due_dt, DAY) dias_atraso,
+  d.created_at dom_created
+FROM cands c
+LEFT JOIN `{PROJECT}.{DATASET}.odbc_domains` d ON CAST(d.ID AS STRING) = c.domain_id
+"""
+
+# Regua so' pra este print/relatorio. As TAGS do painel sao decididas no front
+# (INAD_LIMITE_ALERTA em app.js): 1 a 10 dias de atraso = alerta amarelo, 11 dias
+# ou mais = bloqueado vermelho. A aba abre com TODA marca vencida (1 dia+).
+REGUA_INADIMPLENCIA = 15
 
 
 # =============================================================================
@@ -502,6 +580,68 @@ def build_reativacao(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict
     return out
 
 
+def build_inadimplencia(rows: list[dict], empresas_by_dom: dict[str, dict]) -> dict:
+    """Uma entrada por dominio do painel com as faturas vencidas e em aberto.
+
+    Cada fatura e' contada UMA vez: o mapa customer->dominio e' 1:N (ver
+    SQL_INADIMPLENTES), entao aqui escolhemos o melhor dominio candidato --
+    dominio do painel primeiro, depois `prio` (custom_variables > CNPJ do
+    customer > CNPJ do pagador da fatura), depois o dominio criado mais
+    recentemente. Fatura cujo melhor candidato esta fora do painel e'
+    descartada (nao e' marca dessas CS) -- mas vai contada em `semDominio`,
+    pro painel poder dizer quanto ficou de fora em vez de sumir calado.
+
+    Guarda tambem a SUBCONTA da Iugu (account_name) de cada fatura e a lista
+    de subcontas por marca: as dividas estao espalhadas em ~10 das 15 contas.
+    """
+    def _iso(v):
+        return v.isoformat()[:10] if hasattr(v, "isoformat") else (str(v)[:10] if v else "")
+
+    candidatos: dict[str, list[dict]] = {}
+    for r in rows:
+        candidatos.setdefault(str(r.get("fatura_id") or ""), []).append(r)
+
+    out: dict[str, dict] = {}
+    fora = {"qtFaturas": 0, "valor": 0.0, "subcontas": {}}
+    for cands in candidatos.values():
+        no_painel = [c for c in cands if str(c.get("domain_id") or "") in empresas_by_dom]
+        escolha = sorted(
+            no_painel or cands,
+            key=lambda c: (int(c.get("prio") or 9),
+                           -(c["dom_created"].toordinal() if c.get("dom_created") else 0)),
+        )[0]
+        dom = str(escolha.get("domain_id") or "")
+        if dom not in empresas_by_dom:
+            fora["qtFaturas"] += 1
+            fora["valor"] = round(fora["valor"] + int(escolha.get("total_cents") or 0) / 100.0, 2)
+            conta_f = (escolha.get("account_name") or "").strip()
+            if conta_f:
+                fora["subcontas"][conta_f] = fora["subcontas"].get(conta_f, 0) + 1
+            continue
+        slot = out.setdefault(dom, {"qtFaturas": 0, "valorEmAberto": 0.0,
+                                    "diasAtraso": 0, "vencimentoMaisAntigo": "",
+                                    "subcontas": [], "faturas": []})
+        venc = _iso(escolha.get("due_dt"))
+        dias = int(escolha.get("dias_atraso") or 0)
+        valor = round(int(escolha.get("total_cents") or 0) / 100.0, 2)
+        slot["qtFaturas"] += 1
+        slot["valorEmAberto"] = round(slot["valorEmAberto"] + valor, 2)
+        conta = (escolha.get("account_name") or "").strip()
+        if conta and conta not in slot["subcontas"]:
+            slot["subcontas"].append(conta)
+        slot["faturas"].append({"venc": venc, "dias": dias, "valor": valor,
+                                "status": escolha.get("status") or "",
+                                "subconta": conta})
+        # atraso da marca = vencimento MAIS ANTIGO ainda em aberto
+        if dias > slot["diasAtraso"]:
+            slot["diasAtraso"] = dias
+            slot["vencimentoMaisAntigo"] = venc
+    for slot in out.values():
+        slot["faturas"].sort(key=lambda f: f["venc"])
+    return {"geradoEm": datetime.now(timezone.utc).isoformat(),
+            "reguaDias": REGUA_INADIMPLENCIA, "semDominio": fora, "dominios": out}
+
+
 # =============================================================================
 # BigQuery
 # =============================================================================
@@ -568,6 +708,7 @@ def coletar_do_bq(client: bigquery.Client):
     links_rows  = run_query(client, SQL_LINKS, "links/cliques compartilhados")
     pag_rows    = run_query(client, SQL_PAGAMENTOS, "datas de pagamento por dominio")
     piso_rows   = run_query(client, SQL_PISO_PAGAMENTOS, "piso do espelho de faturas")
+    inad_rows   = run_query(client, SQL_INADIMPLENTES, "faturas vencidas em aberto")
 
     # Produtos: so se `odbc_products` estiver ingerido (odbc_product_details NAO serve).
     if _table_exists(client, "odbc_products"):
@@ -579,7 +720,7 @@ def coletar_do_bq(client: bigquery.Client):
               "Ver _MIGRACAO_BQ_STATUS.md.", file=sys.stderr, flush=True)
 
     return (emp_rows, gmv_rows, prod_rows, pp_rows, reativ_rows, links_rows,
-            pag_rows, piso_rows)
+            pag_rows, piso_rows, inad_rows)
 
 
 def main() -> None:
@@ -589,7 +730,7 @@ def main() -> None:
 
     prod_disponivel = _table_exists(client, "odbc_products")
     (emp_rows, gmv_rows, prod_rows, pp_rows, reativ_rows, links_rows,
-     pag_rows, piso_rows) = coletar_do_bq(client)
+     pag_rows, piso_rows, inad_rows) = coletar_do_bq(client)
 
     empresas = build_empresas(emp_rows)
     OUT_COMPANIES.write_text(json.dumps(empresas, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -627,6 +768,16 @@ def main() -> None:
     pagtos = build_pagamentos(pag_rows, piso, empresas_by_dom)
     OUT_PAGTOS.write_text(json.dumps(pagtos, ensure_ascii=False), encoding="utf-8")
     print(f"[write] {OUT_PAGTOS.name} ({len(pagtos['dominios'])} dominios, piso {piso})")
+
+    inad = build_inadimplencia(inad_rows, empresas_by_dom)
+    OUT_INADIMP.write_text(json.dumps(inad, ensure_ascii=False, indent=2), encoding="utf-8")
+    acima = [d for d in inad["dominios"].values() if d["diasAtraso"] > REGUA_INADIMPLENCIA]
+    n_doms = len(inad["dominios"])
+    contas = sorted({c for d in inad["dominios"].values() for c in d.get("subcontas", [])})
+    print(f"[write] {OUT_INADIMP.name} ({n_doms} dominios com fatura vencida, "
+          f"{len(acima)} com mais de {REGUA_INADIMPLENCIA} dias, "
+          f"{len(contas)} subcontas Iugu; {inad['semDominio']['qtFaturas']} faturas "
+          f"fora do painel = R$ {inad['semDominio']['valor']:,.2f})")
 
     print("[ok] coleta BQ concluida. Rode fetch_ambiente.py e build_data.py em seguida.")
 

@@ -804,10 +804,15 @@ function renderTabInadimplentes() {
   const bloq = lista.filter(e => inadStatus(e.diasAtraso) === "bloqueado");
   const alerta = lista.filter(e => inadStatus(e.diasAtraso) === "alerta");
   const hint = $("inad-hint");
+  // faturas que nao casaram com nenhuma marca do painel -- melhor dizer do que sumir
+  const fora = (D.inadSemDominio || {});
+  const foraTxt = (fora.qtFaturas || 0)
+    ? ` · <span class="hint">${fmtInt(fora.qtFaturas)} faturas sem marca no painel (${fmtBRL(fora.valor||0)})</span>`
+    : "";
   if (hint) hint.innerHTML = lista.length
     ? `${fmtInt(lista.length)} marcas · ${fmtBRL(total)} em aberto `
       + `<span class="pill pill-inad-bloq">${fmtInt(bloq.length)} bloqueadas</span>`
-      + `<span class="pill pill-inad-alerta">${fmtInt(alerta.length)} em alerta</span>`
+      + `<span class="pill pill-inad-alerta">${fmtInt(alerta.length)} em alerta</span>` + foraTxt
     : "nenhuma marca acima dessa régua";
 
   // faixas cortadas na regua das tags: a primeira e' o amarelo (alerta), o resto e' bloqueio
@@ -846,6 +851,7 @@ function renderTabInadimplentes() {
     {label:"Venc. mais antigo", fn:r=>r.vencimentoMaisAntigo||"—", sort:r=>r.vencimentoMaisAntigo||""},
     {label:"Dias em atraso", cls:"num", fn:r=>fmtInt(r.diasAtraso||0), sort:r=>r.diasAtraso||0},
     {label:"Faturas vencidas", cls:"num", fn:r=>fmtInt(r.faturasVencidas||0), sort:r=>r.faturasVencidas||0},
+    {label:"Subconta Iugu", fn:r=>(r.subcontasIugu||[]).join(", ")||"—", sort:r=>(r.subcontasIugu||[])[0]||""},
     {label:"Valor em aberto", cls:"num", fn:r=>fmtBRL(r.valorEmAberto||0), sort:r=>r.valorEmAberto||0},
     {label:"Mensalidade", cls:"num", fn:r=>fmtBRL(r.valor_mensal), sort:r=>r.valor_mensal||0},
   ], lista.map(e=>({...e, _alert: inadStatus(e.diasAtraso) === "bloqueado"})));

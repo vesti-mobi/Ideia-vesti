@@ -234,6 +234,10 @@ def main():
             tam_cnpj[t["cnpj"]] = t
         if t.get("marca"):
             tam_nome[_norm_marca(t["marca"])] = t
+    inad_p    = ROOT / "inadimplentes_elisa.json"
+    inad      = _load(inad_p) if inad_p.exists() else {"reguaDias": 15, "dominios": {}}
+    inad_dom  = inad.get("dominios") or {}
+    inad_regua = int(inad.get("reguaDias") or 15)
     pag_p     = ROOT / "pagamentos_elisa.json"
     pagtos    = _load(pag_p) if pag_p.exists() else {"piso": "", "dominios": {}}
     pag_piso  = pagtos.get("piso") or ""
@@ -310,6 +314,16 @@ def main():
             **_tamanho_da_marca(e, tam_cnpj, tam_nome),
             "ambienteLigado": (ambiente.get(dom) or {}).get("ligado", None),
             "ambienteUpdate": (ambiente.get(dom) or {}).get("update", ""),
+            # Inadimplencia (faturas vencidas e em aberto na Iugu). A regua de
+            # dias fica no front -- aqui vai o atraso cru do vencimento MAIS
+            # ANTIGO em aberto. Ver SQL_INADIMPLENTES em fetch_elisa_bq.py.
+            "faturasVencidas": (inad_dom.get(dom) or {}).get("qtFaturas", 0),
+            "valorEmAberto": (inad_dom.get(dom) or {}).get("valorEmAberto", 0.0),
+            "diasAtraso": (inad_dom.get(dom) or {}).get("diasAtraso", 0),
+            "vencimentoMaisAntigo": (inad_dom.get(dom) or {}).get("vencimentoMaisAntigo", ""),
+            "faturasAbertas": (inad_dom.get(dom) or {}).get("faturas", []),
+            # subcontas da Iugu de onde vem a divida (sao 15 contas no espelho)
+            "subcontasIugu": (inad_dom.get(dom) or {}).get("subcontas", []),
             "linksCompartilhados": (links.get(dom) or {}).get("linksCompartilhados", 0),
             "cliquesTotal": (links.get(dom) or {}).get("cliquesTotal", 0),
             "cliquesPorMes": (links.get(dom) or {}).get("cliquesPorMes", {}),
@@ -322,6 +336,9 @@ def main():
         "empresas": enriched,
         "mesesList": sorted(meses_set),
         "semanasList": sorted(semanas_set),
+        "reguaInadimplencia": inad_regua,
+        # faturas vencidas que nao casaram com nenhuma marca do painel
+        "inadSemDominio": inad.get("semDominio") or {"qtFaturas": 0, "valor": 0.0},
         "pendentes": ["Reativacao", "Link compartilhado", "Clicks no link"],
     }
     out = ROOT / "dashboard_data.js"
