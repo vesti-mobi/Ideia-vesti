@@ -939,13 +939,27 @@ function renderTabReativ() {
   ], rows);
 }
 
+// O espelho de pedidos no BQ comeca no piso (hoje 2025-07-01). Marca que ja
+// era da Vesti antes disso tem o "1o pedido cadastrado" truncado no piso, entao
+// o "dias travada" dela e' um MINIMO -- o real so pode ser maior. Marcamos com
+// ">=" em vez de fingir precisao. Some sozinho quando houver backfill.
+function diasCensurado(e) {
+  const piso = D.pisoPrimeiroPedido || "";
+  const entrada = (e.dataEntrada || "").slice(0,10);
+  return !!(piso && entrada && entrada < piso);
+}
+
 function renderTabTravadas() {
   const hoje = new Date();
+  const elPiso = $("trav-piso");
+  if (elPiso) elPiso.textContent = D.pisoPrimeiroPedido
+    ? D.pisoPrimeiroPedido.split("-").reverse().join("/")
+    : "sem piso conhecido";
   const lista = empresasFiltradas().map(e => {
     const ped = e.primeiroPedidoCadastrado ? new Date(e.primeiroPedidoCadastrado) : null;
     const venda = e.primeiraVenda ? new Date(e.primeiraVenda) : null;
     const dias = ped ? Math.floor((hoje-ped)/86400000) : null;
-    return {...e, _ped:ped, _venda:venda, _dias:dias};
+    return {...e, _ped:ped, _venda:venda, _dias:dias, _diasMin:diasCensurado(e)};
   }).filter(e => e.modulos === undefined || (e.modulos||"").toLowerCase().includes("vendas"))
     .filter(e => (e._ped && !e._venda && e._dias > 14) || (e._ped && (e.qtProdutos||0) === 0))
     .sort((a,b)=>(b._dias||0)-(a._dias||0));
@@ -978,7 +992,12 @@ function renderTabTravadas() {
     {label:"1º pedido cadastrado", fn:r=>(r.primeiroPedidoCadastrado||"—").slice(0,10), sort:r=>r.primeiroPedidoCadastrado||""},
     {label:"1ª venda", fn:r=>(r.primeiraVenda||"—").slice(0,10), sort:r=>r.primeiraVenda||""},
     {label:"Produtos", cls:"num", fn:r=>fmtInt(r.qtProdutos||0), sort:r=>r.qtProdutos||0},
-    {label:"Dias travada", cls:"num", fn:r=>r._dias??"—", sort:r=>r._dias??-1},
+    {label:"Dias travada", cls:"num", sort:r=>r._dias??-1, fn:r=>{
+      if (r._dias == null) return "—";
+      return r._diasMin
+        ? `<span class="dias-min" title="A marca entrou na Vesti em ${(r.dataEntrada||"").slice(0,10)}, antes do espelho de pedidos comecar (${D.pisoPrimeiroPedido}). O 1o pedido real pode ser bem mais antigo, entao esse numero e' um minimo.">≥${r._dias}</span>`
+        : String(r._dias);
+    }},
   ], lista.map(e=>({...e,_alert:true})));
 }
 

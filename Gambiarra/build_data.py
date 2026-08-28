@@ -331,8 +331,16 @@ def main():
             "influenciadores": (links.get(dom) or {}).get("influenciadores", []),
         })
 
+    # Piso do espelho de pedidos. O MongoDB_Pedidos_Geral do BQ so tem dados de
+    # 2025-07 em diante, entao o "1o pedido cadastrado" de marca antiga vem
+    # grudado nesse piso -- e o "dias travada" do painel vira um MINIMO, nao a
+    # data real. Exportamos o piso pro front conseguir marcar isso.
+    _pp = [ (e.get("primeiroPedidoCadastrado") or "")[:10] for e in enriched ]
+    piso_pedidos = min([x for x in _pp if x], default="")
+
     dados = {
         "geradoEm": datetime.now(timezone.utc).isoformat(),
+        "pisoPrimeiroPedido": piso_pedidos,
         "empresas": enriched,
         "mesesList": sorted(meses_set),
         "semanasList": sorted(semanas_set),

@@ -265,6 +265,8 @@
     <p class="hint" style="margin-bottom:12px;color:var(--g);font-size:12px">
       Critério: marca cadastrou pelo menos 1 pedido mas ainda não vendeu (>14d), ou cadastrou pedido sem nenhum produto cadastrado.
       Coluna <strong>Dias travada</strong> = dias desde o 1º pedido cadastrado até hoje.
+      <br><strong>≥</strong> antes do número = marca que já era da Vesti antes do espelho de pedidos começar
+      (<span id="trav-piso">—</span>): o 1º pedido dela pode ser bem mais antigo, então o valor é um mínimo.
     </p>
     <div class="chart-row">
       <div class="ch"><h4>Distribuição por dias travada</h4><div class="cw"><canvas id="chart-trav-dias"></canvas></div></div>

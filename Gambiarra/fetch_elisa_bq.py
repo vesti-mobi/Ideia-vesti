@@ -139,11 +139,16 @@ GROUP BY domainId, DATE(CAST(settings_createdAt AS TIMESTAMP))
 # 3a) PRODUTOS (BLOQUEADO): so roda se `odbc_products` existir no BQ.
 #     odbc_product_details NAO serve (grao de variante). Ver _MIGRACAO_BQ_STATUS.md.
 # -----------------------------------------------------------------------------
+# SEM piso de data, de proposito. O piso jun/2025 existe pras series temporais
+# (GMV, links, reativacao); produto e' ESTOQUE ACUMULADO -- marca que cadastrou
+# todo o catalogo em 2023 e nao mexeu mais tem que contar, senao ela aparece com
+# 0 produtos e cai na aba "Marcas travadas" como falso positivo. A query do
+# Fabric (dbo.ODBC_Products) tambem nao tinha piso.
 SQL_PRODUTOS = f"""
 SELECT domain_id, FORMAT_DATETIME('%Y-%m', CAST(created_at AS DATETIME)) mes,
   COUNT(*) qt_produtos, MIN(CAST(created_at AS DATETIME)) primeiro_cadastro
 FROM `{PROJECT}.{DATASET}.odbc_products`
-WHERE created_at IS NOT NULL AND CAST(created_at AS DATETIME) >= '{PISO}'
+WHERE created_at IS NOT NULL
 GROUP BY 1, 2
 """
 

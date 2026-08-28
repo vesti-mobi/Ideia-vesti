@@ -147,3 +147,6 @@ table.dt tr.row-alert td{background:rgba(225,112,85,.08)}
 .empty-state{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:40px;text-align:center;color:var(--g)}
 .empty-state p{margin:6px 0;font-size:14px}
 .empty-state ul{display:inline-block;text-align:left;margin-top:10px}
+
+/* "Dias travada" truncado no piso do espelho de pedidos: e' um minimo, nao a data real */
+.dias-min { border-bottom: 1px dotted currentColor; cursor: help; opacity: .85; }
