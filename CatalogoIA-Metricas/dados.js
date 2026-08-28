@@ -1,6 +1,6 @@
 window.DADOS = {
-  "gerado_em": "2026-08-27T21:29:14.616Z",
-  "hoje": "2026-08-27",
+  "gerado_em": "2026-08-28T05:01:00.836Z",
+  "hoje": "2026-08-28",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
   "auto_publica_desde": "2026-08-10",
@@ -19,7 +19,7 @@ window.DADOS = {
     "com_conta": 10,
     "contas": 9,
     "produtos_total": 349,
-    "produtos_7d": 85,
+    "produtos_7d": 79,
     "descricoes_total": 464,
     "total_estimado": true
   },
@@ -32,7 +32,7 @@ window.DADOS = {
       "email": "nicoboco.shop@nicoboco.com.br",
       "produtos": 134,
       "estimado": false,
-      "produtos_7d": 13,
+      "produtos_7d": 7,
       "ativa": true,
       "acessos": 62,
       "buscas": 322,
@@ -130,7 +130,7 @@ window.DADOS = {
       "envios": 5,
       "primeiro": "2026-08-06T14:16:43.085Z",
       "ultimo": "2026-08-21T01:34:35.135Z",
-      "dias": 6
+      "dias": 7
     },
     {
       "slug": "optimist-jeans",
@@ -437,7 +437,7 @@ window.DADOS = {
         "com_conta": 10,
         "contas": 9,
         "produtos_total": 234,
-        "produtos_7d": 78,
+        "produtos_7d": 72,
         "descricoes_total": 310,
         "total_estimado": true,
         "produtos_atribuidos": 5
@@ -451,7 +451,7 @@ window.DADOS = {
           "email": "nicoboco.shop@nicoboco.com.br",
           "produtos": 132,
           "estimado": false,
-          "produtos_7d": 13,
+          "produtos_7d": 7,
           "ativa": true,
           "acessos": 53,
           "buscas": 282,
@@ -519,7 +519,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-21T01:32:04.730Z",
           "ultimo": "2026-08-21T01:32:24.963Z",
-          "dias": 6,
+          "dias": 7,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -539,7 +539,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-21T01:34:17.651Z",
           "ultimo": "2026-08-21T01:34:35.135Z",
-          "dias": 6,
+          "dias": 7,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -908,7 +908,7 @@ window.DADOS = {
         "ativas": 1,
         "usando": 9,
         "nunca_usaram": 7,
-        "paradas": 0,
+        "paradas": 1,
         "com_conta": 10,
         "contas": 9,
         "produtos_total": 202,
@@ -994,7 +994,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T12:06:46.387Z",
           "ultimo": "2026-08-20T02:30:36.116Z",
-          "dias": 7,
+          "dias": 8,
           "produtos_medidos": 0,
           "atribuido": 8
         },
