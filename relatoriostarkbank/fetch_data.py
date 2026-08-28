@@ -416,15 +416,21 @@ def _assemble(pedidos: list[dict]) -> dict:
             paid = (pc.get("paidAt") or "")[:10]
             due = (pc.get("dueAt") or "")[:10]
             if is_antec:
-                # Antecipacao: liquidacao pro marca e D+1 do pagamento do cliente,
-                # pulando fim de semana. Usa customer_paid_at (ja em BRT via SQL).
-                base = cpa_d or _parse_day(paid) or order_d
-                if base:
-                    pay_date = _next_business_day(base + _td(days=1)).isoformat()
+                # Antecipacao: o dueAt da parcela ja e a data em que a StarkBank
+                # liquida pra marca (D+1 com o corte noturno DELA). Manda nele.
+                # A heuristica "proximo dia util de (pagamento do cliente + 1)"
+                # so entra quando a API nao trouxe dueAt — ela erra em venda
+                # tarde da noite (vira o dia em UTC) e desloca o valor de dia.
+                if paid:
+                    pay_date = paid
                 elif due:
                     pay_date = due
                 else:
-                    pay_date = ""
+                    base = cpa_d or order_d
+                    pay_date = (
+                        _next_business_day(base + _td(days=1)).isoformat()
+                        if base else ""
+                    )
             elif paid:
                 pay_date = paid
             elif due:
