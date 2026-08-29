@@ -1,5 +1,5 @@
 window.DADOS = {
-  "gerado_em": "2026-08-28T21:38:32.576Z",
+  "gerado_em": "2026-08-29T03:00:04.435Z",
   "hoje": "2026-08-28",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
@@ -15,7 +15,7 @@ window.DADOS = {
     "ativas": 4,
     "usando": 9,
     "nunca_usaram": 7,
-    "paradas": 3,
+    "paradas": 4,
     "com_conta": 10,
     "contas": 9,
     "produtos_total": 349,
@@ -130,7 +130,7 @@ window.DADOS = {
       "envios": 5,
       "primeiro": "2026-08-06T14:16:43.085Z",
       "ultimo": "2026-08-21T01:34:35.135Z",
-      "dias": 7
+      "dias": 8
     },
     {
       "slug": "optimist-jeans",
@@ -433,7 +433,7 @@ window.DADOS = {
         "ativas": 3,
         "usando": 6,
         "nunca_usaram": 10,
-        "paradas": 1,
+        "paradas": 3,
         "com_conta": 10,
         "contas": 9,
         "produtos_total": 234,
@@ -519,7 +519,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-21T01:32:04.730Z",
           "ultimo": "2026-08-21T01:32:24.963Z",
-          "dias": 7,
+          "dias": 8,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -539,7 +539,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-21T01:34:17.651Z",
           "ultimo": "2026-08-21T01:34:35.135Z",
-          "dias": 7,
+          "dias": 8,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -994,7 +994,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T12:06:46.387Z",
           "ultimo": "2026-08-20T02:30:36.116Z",
-          "dias": 8,
+          "dias": 9,
           "produtos_medidos": 0,
           "atribuido": 8
         },
