@@ -1,5 +1,5 @@
 window.DADOS = {
-  "gerado_em": "2026-08-29T15:57:35.803Z",
+  "gerado_em": "2026-08-29T22:54:31.256Z",
   "hoje": "2026-08-29",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
@@ -40,7 +40,7 @@ window.DADOS = {
       "envios": 209,
       "primeiro": "2026-08-10T19:02:35.392Z",
       "ultimo": "2026-08-27T19:14:21.254Z",
-      "dias": 1
+      "dias": 2
     },
     {
       "slug": "opera-kids",
@@ -459,7 +459,7 @@ window.DADOS = {
           "envios": 184,
           "primeiro": "2026-08-11T18:28:02.542Z",
           "ultimo": "2026-08-27T19:14:21.254Z",
-          "dias": 1,
+          "dias": 2,
           "produtos_medidos": 132,
           "atribuido": 0
         },
