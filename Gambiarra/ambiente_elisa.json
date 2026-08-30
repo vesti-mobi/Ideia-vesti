@@ -203,8 +203,8 @@
     "canalPlanilha": ""
   },
   "1791824": {
-    "ligado": true,
-    "update": "2026-07-21",
+    "ligado": false,
+    "update": "2026-08-30",
     "religamentoReal": false,
     "nomePlanilha": "Camila Style",
     "canalPlanilha": "Uemtel"
@@ -1304,7 +1304,7 @@
   "1842018": {
     "ligado": true,
     "update": "2026-08-29",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Tutti Sposa",
     "canalPlanilha": "Vesti"
   },
@@ -1351,8 +1351,8 @@
     "canalPlanilha": "Attasoft"
   },
   "844570": {
-    "ligado": true,
-    "update": "2026-08-04",
+    "ligado": false,
+    "update": "2026-08-30",
     "religamentoReal": false,
     "nomePlanilha": "Modas Itsen",
     "canalPlanilha": "Uemtel"
@@ -1898,7 +1898,7 @@
   },
   "1927282": {
     "ligado": true,
-    "update": "2026-07-29",
+    "update": "2026-08-29",
     "religamentoReal": false,
     "nomePlanilha": "Outlet recanto",
     "canalPlanilha": "Starter"
@@ -3635,7 +3635,7 @@
   "1030215": {
     "ligado": true,
     "update": "2026-08-29",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Balum Baby",
     "canalPlanilha": "Vesti"
   },
@@ -3719,7 +3719,7 @@
   "125339": {
     "ligado": true,
     "update": "2026-08-29",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Optimist Jeans",
     "canalPlanilha": "Vesti"
   },
@@ -3747,14 +3747,14 @@
   "1407398": {
     "ligado": true,
     "update": "2026-08-29",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "RCR Original Clothing",
     "canalPlanilha": "Vesti"
   },
   "67022": {
     "ligado": true,
     "update": "2026-08-29",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Gabifit",
     "canalPlanilha": "Attasoft"
   },
@@ -3866,7 +3866,7 @@
   "261508": {
     "ligado": true,
     "update": "2026-08-29",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Gitaa",
     "canalPlanilha": "Vesti"
   },
@@ -3936,7 +3936,7 @@
   "567903": {
     "ligado": true,
     "update": "2026-08-29",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Nono Modas",
     "canalPlanilha": "Vesti"
   },
@@ -7016,13 +7016,13 @@
   "1880528": {
     "ligado": true,
     "update": "2026-08-29",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Clovis Calçados",
     "canalPlanilha": "Vesti"
   },
   "156269": {
     "ligado": true,
-    "update": "2026-07-29",
+    "update": "2026-08-29",
     "religamentoReal": false,
     "nomePlanilha": "Emdu",
     "canalPlanilha": "Attasoft"
