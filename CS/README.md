@@ -107,9 +107,9 @@ de layout continua indo por `node publicar.js`.
 | Oráculo | GMV | `oraculo_Pedidos.Tipo_Venda_Oraculo` |
 | Tabela geral | Tino / Oráculo | Tino: marca presente na base do produto (API do Tino). Oráculo: tem atendimento em `oraculo_Atendimentos` |
 | Tino | marcas, eventos, sessões, dias de acesso | **API do Tino** — `companies_chart`, `login_days`, `customer_kpis` |
-| Vesti Pago | valor / fee / antecipação | `MongoDB_Pedidos_Geral` com provider Vesti Pago |
-| Vesti Pago | links | pedidos com `settings_source = 'Link de cobrança'` |
-| Tino / Vesti Pago / Oráculo | Implantado em | Tino: `created_at` da marca na base do produto. Vesti Pago: `MongoDB_Payment_Companies.createdAt`. Oráculo: a menor entre `o-configurations.created_at` e o primeiro atendimento |
+| VestiPago | valor / fee / antecipação | `MongoDB_Pedidos_Geral` com provider VestiPago |
+| VestiPago | links | pedidos com `settings_source = 'Link de cobrança'` |
+| Tino / VestiPago / Oráculo | Implantado em | Tino: `created_at` da marca na base do produto. VestiPago: `MongoDB_Payment_Companies.createdAt`. Oráculo: a menor entre `o-configurations.created_at` e o primeiro atendimento |
 | Bonificação | tudo | agregado por CS e por mês, calculado no fetcher (ver abaixo) |
 | Churn | data | derivado do Iugu (ver abaixo) |
 | Reuniões | reunião / data / responsável | HubSpot `meetings` (`hs_meeting_start_time` + owner) |
@@ -122,7 +122,7 @@ de layout continua indo por `node publicar.js`.
 ### Domínio nas abas
 
 A coluna **Domínio** (`odbc_domains.ID`) aparece nas nove abas, ao lado do cliente.
-Onde a linha nasce de um domínio — tabela geral, Oráculo, Tino, Vesti Pago, Churn —
+Onde a linha nasce de um domínio — tabela geral, Oráculo, Tino, VestiPago, Churn —
 o id vem direto e a cobertura é de 97% a 100%. Nas abas que vêm do HubSpot
 (Cross-sell, Upsell, Reuniões, Tickets) a linha nasce com o **nome da empresa no
 HubSpot**, então o id é resolvido pelo mesmo casamento em três tentativas usado
@@ -176,7 +176,7 @@ por medição pedido a pedido (ressalva 4).
 
 2. **O fee da Vesti só existe para cartão.** Em PIX o campo vem nulo tanto em
    `MongoDB_Pedidos_Geral` quanto em `vestipago_transaction_detail`, e PIX é ~53%
-   das transações Vesti Pago (108.950 transações / R$ 90,2M em 2026). Então
+   das transações VestiPago (108.950 transações / R$ 90,2M em 2026). Então
    "Interchange" e "Receita (fee)" cobrem só o cartão; **valor transacionado cobre
    os dois** e está quebrado em Cartão e PIX na aba.
 
@@ -210,16 +210,16 @@ por medição pedido a pedido (ressalva 4).
    (`antecipationVestiFee / antecipationValue` = **18,83%**) e aplica sobre o valor
    cobrado. O fator é recalculado a cada carga e fica em `meta.fatorAntecipacaoVesti`.
 
-5. **Links do Vesti Pago = só `'Link de cobrança'`.** Conferido no dado: os pedidos
+5. **Links do VestiPago = só `'Link de cobrança'`.** Conferido no dado: os pedidos
    dessa origem que aparecem sem provider são exatamente os que ninguém pagou
-   (8.562 pedidos, 0 pagos), ou seja, o link é do Vesti Pago de ponta a ponta.
+   (8.562 pedidos, 0 pagos), ou seja, o link é do VestiPago de ponta a ponta.
    `'Link sem preço'` ficou de fora porque tem 4.226 pedidos **pagos por fora**
    (R$ 8,8M), e `'Link'` puro (573k pedidos) é o link de compartilhamento do
    vendedor, não de cobrança.
 
-6. **Pedido com provider nulo não é Vesti Pago.** 162k pedidos pagos / R$ 352M de GMV
+6. **Pedido com provider nulo não é VestiPago.** 162k pedidos pagos / R$ 352M de GMV
    em 2026 são vendas registradas na plataforma mas pagas por fora. Entram no GMV da
-   tabela geral e ficam fora da aba Vesti Pago. É por isso que marcas grandes como
+   tabela geral e ficam fora da aba VestiPago. É por isso que marcas grandes como
    Egoiste e JDL aparecem com receita R$ 0 — está certo, elas não usam o produto.
 
 6b. **Data de implantação por produto (26/08/2026).** Cada aba de produto ganhou
@@ -233,10 +233,10 @@ por medição pedido a pedido (ressalva 4).
 
 6c. **Bonificação: os números e, embaixo, os pontos.** A aba traz as sete regras
    da planilha da Laura, uma coluna cada, por CS e por mês-calendário. Duas regras
-   comparam com o mês anterior (Tino +40 eventos, mensalidade), duas com o mesmo
-   mês do ano passado (Vesti Pago, GMV) e três são contagem do próprio mês
+   comparam com a **marca d'água** do CS (Tino +40 eventos, mensalidade), duas com
+   o mesmo mês do ano passado (VestiPago, GMV) e três são contagem do próprio mês
    (reuniões, integrações, varejos). Passar o mouse no número lista as marcas que
-   entraram nele. As três de dinheiro (mensalidade, Vesti Pago, GMV) mostram a
+   entraram nele. As três de dinheiro (mensalidade, VestiPago, GMV) mostram a
    variação em **porcentagem**, não em reais (27/08/2026) — o valor em R$ da
    diferença fica no title da célula.
 
@@ -245,17 +245,26 @@ por medição pedido a pedido (ressalva 4).
 
    | regra | pontos |
    |---|---|
-   | Tino | 10 por cliente extra com 40+ eventos, vs. mês anterior |
-   | Mensalidade | 10 a cada R$ 1.000 a mais que o mês anterior, arredondando **para cima** |
-   | Vesti Pago | 1 a cada 2% a mais que o mesmo mês do ano passado |
+   | Tino | 10 por cliente extra com 40+ eventos, acima da marca d'água |
+   | Mensalidade | 10 a cada R$ 1.000 acima da marca d'água, arredondando **para cima** |
+   | VestiPago | 1 a cada 2% a mais que o mesmo mês do ano passado |
    | Reuniões | 1 cada |
    | Integrações | 5 cada |
    | GMV | 1 a cada 1% a mais que o mesmo mês do ano passado |
    | Varejos | 10 cada |
 
-   Duas decisões que a régua não dizia: **queda não tira ponto** (mês pior dá
-   zero, não negativo) e, nas porcentagens, **só bloco fechado conta** — 3,9% no
-   Vesti Pago é 1 ponto, não 2. A mensalidade é a única que arredonda para cima,
+   A **marca d'água** (31/08/2026) é o maior número que aquele CS já registrou em
+   um mês, contando só os meses **anteriores** ao escolhido — incluir o próprio mês
+   faria a diferença ser sempre zero ou negativa e ninguém bateria a própria marca.
+   Antes, Tino e mensalidade comparavam com o mês anterior; na prática o ponto
+   ficou mais caro, porque só pontua quem faz o melhor mês da própria história. O
+   primeiro mês da série não tem recorde atrás e compara contra zero, igual ao que
+   já acontecia com um "mês anterior" inexistente.
+
+   Duas decisões que a régua não dizia: **queda não tira ponto** (mês que não bate
+   a marca d'água, ou pior que o ano passado, dá zero, não negativo) e, nas
+   porcentagens, **só bloco fechado conta** — 3,9% no
+   VestiPago é 1 ponto, não 2. A mensalidade é a única que arredonda para cima,
    porque foi o que ela pediu. Quem não tem base no ano anterior (marca que não
    existia, ou CS que assumiu a carteira depois) faz zero ponto nas regras de %:
    não dá para chamar de crescimento o que não tem de onde crescer. O title de
@@ -345,7 +354,7 @@ por medição pedido a pedido (ressalva 4).
 8. **Cross-sell × upsell sai do nome do negócio.** A API não liberou escopo de
    `line_items` (403), então a classificação usa os padrões em `REGRAS_PRODUTO`.
    Regra definida na revisão de 13/08: **upsell = só upgrade de plano**; todo o
-   resto (Filial, Multiloja, Oráculo, Integração, Assistente, Vesti Pago, Tino) é
+   resto (Filial, Multiloja, Oráculo, Integração, Assistente, VestiPago, Tino) é
    cross-sell. Exceções em `EXCECOES`: Kelly Rodrigues Store Fortaleza = Filial,
    Jay & Co e Landê Oficial = Upgrade. Fechado é só o estágio "Ganho (Expand)";
    "Em aberto" não conta como perdido.
@@ -420,7 +429,7 @@ por medição pedido a pedido (ressalva 4).
     empresa associada à reunião. O **negócio ganho é creditado à última reunião
     daquela empresa antes do fechamento** — sem isso, uma empresa com cinco
     reuniões e um negócio viraria cinco negócios. Negócio ganho de qualquer
-    pipeline conta (o time fecha filial, upgrade e Vesti Pago em pipelines
+    pipeline conta (o time fecha filial, upgrade e VestiPago em pipelines
     diferentes); dos 370 ganhos em 2026, 59 caíram em alguma reunião — o resto
     fechou sem reunião registrada. Reunião com data futura aparece como
     **Agendada** quando a semana atual está na seleção.
