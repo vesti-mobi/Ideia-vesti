@@ -257,16 +257,16 @@ async function puxarBQ() {
          'Link' (573k pedidos) é o link de compartilhamento do vendedor, não
          de cobrança — incluir ele inflava o número em ~20x.
        - valor transacionado / fee / antecipação = pedidos pagos por um
-         provider do Vesti Pago (IUGU, STARKBANK, PAGARME), qualquer origem.
+         provider do VestiPago (IUGU, STARKBANK, PAGARME), qualquer origem.
          Pedido com provider nulo é venda registrada na plataforma mas paga
          por fora: não gera receita e precisa ficar de fora. */
   /* Só 'Link de cobrança'. Conferido no dado: os 'Link de cobrança' sem provider
-     são exatamente os que ninguém pagou (0 pagos), então o link é do Vesti Pago
+     são exatamente os que ninguém pagou (0 pagos), então o link é do VestiPago
      de ponta a ponta. Já 'Link sem preço' tem 4.226 pedidos PAGOS por fora
      (R$ 8,8M) — misturar os dois faria a aba contar link que não é do produto. */
   const LINK_COBRANCA = `settings_source = 'Link de cobrança'`;
   const VIA_VESTIPAGO = `payment_isPaid='True' AND payment_transaction_provider IS NOT NULL`;
-  const vestipago = await q('Vesti Pago por marca × dia', `
+  const vestipago = await q('VestiPago por marca × dia', `
     SELECT CAST(domainId AS STRING) dom,
       ${DIA('settings_createdAt')} d,
       COUNTIF(${LINK_COBRANCA}) gerados,
@@ -425,11 +425,11 @@ async function puxarBQ() {
     GROUP BY 1`);
 
   /* ---- DATA DE IMPLANTAÇÃO DE CADA PRODUTO
-     Pedido da Laura (26/08/2026): saber, em Tino / Vesti Pago / Oráculo, desde
+     Pedido da Laura (26/08/2026): saber, em Tino / VestiPago / Oráculo, desde
      quando a marca tem o produto — sem isso não dá para ler "eventos no mês" de
      quem entrou dia 20.
 
-     Vesti Pago: MongoDB_Payment_Companies.createdAt é a criação da conta de
+     VestiPago: MongoDB_Payment_Companies.createdAt é a criação da conta de
      pagamento da marca — 1.841 contas, todas com data, de mar/2023 até hoje.
      Oráculo: o-configurations.created_at é a criação da configuração do produto.
      Cuidado ao ler: 699 dos 1.055 domínios têm created_at em jan/2026, que é
@@ -437,7 +437,7 @@ async function puxarBQ() {
      Por isso o fetcher fica com a MENOR entre ela e o primeiro atendimento
      registrado, e marca a origem em `origem` para o painel avisar.
      O Tino já vinha com created_at na própria API (campo `entrouEm`). */
-  const implantacaoVP = await q('Vesti Pago: data de implantação', `
+  const implantacaoVP = await q('VestiPago: data de implantação', `
     SELECT CAST(domainId AS STRING) dom,
            FORMAT_DATE('%Y-%m-%d', MIN(DATE(CAST(createdAt AS TIMESTAMP)))) implantado
     FROM ${DS}.MongoDB_Payment_Companies
@@ -744,7 +744,7 @@ const REGRAS_PRODUTO = [
   // O \w* no fim consome a palavra inteira, senão sobra "ento" no nome da marca.
   { re: /ag(ente)?\.?\s*(de\s*)?atendim\w*|assistente( do)? vendedor|\bagente\b/, produto: 'Assistente do Vendedor', cat: 'cross' },
   { re: /integracao|totvs|millennium|bling|tiny|presence/, produto: 'Integração',  cat: 'cross' },
-  { re: /vesti\s?pago|\bvp\b/,                     produto: 'Vesti Pago',          cat: 'cross' },
+  { re: /vesti\s?pago|\bvp\b/,                     produto: 'VestiPago',          cat: 'cross' },
   { re: /\btino\b/,                                produto: 'Tino',                cat: 'cross' },
   { re: /antecipa/,                                produto: 'Antecipação',         cat: 'cross' },
   { re: /catalogo|vitrine/,                        produto: 'Catálogo',            cat: 'cross' },
@@ -885,7 +885,7 @@ async function puxarReunioes(owners) {
   console.log('  reuniões (só o time de CS)'.padEnd(44) + String(reunioes.length).padStart(8));
 
   /* Negócios ganhos de QUALQUER pipeline — o time fecha filial, upgrade e
-     Vesti Pago em pipelines diferentes, e o painel das planilhas conta todos. */
+     VestiPago em pipelines diferentes, e o painel das planilhas conta todos. */
   const ganhos = await buscarTudo('deals',
     ['dealname', 'amount', 'closedate', 'hs_is_closed_won'],
     [{ filters: [
@@ -1447,7 +1447,7 @@ function montar(bqd, hsd, tinoDados) {
   });
 
   /* ---- data de implantação de cada produto, por domínio.
-     Entra como coluna nas abas Tino, Vesti Pago e Oráculo: sem ela não dá para
+     Entra como coluna nas abas Tino, VestiPago e Oráculo: sem ela não dá para
      ler "eventos no mês" de quem só tem o produto desde o dia 20. */
   const implVP = new Map();
   (bqd.implantacaoVP || []).forEach(r => { if (r.implantado) implVP.set(r.dom, r.implantado); });
@@ -1581,7 +1581,7 @@ function montar(bqd, hsd, tinoDados) {
     tinoTipos = tinoDados.tipos;
   }
 
-  /* O fee da aba Vesti Pago segue a MESMA régua do interchange da tabela geral:
+  /* O fee da aba VestiPago segue a MESMA régua do interchange da tabela geral:
      já sem a taxa do banco. Manter um bruto aqui e um líquido lá faria a mesma
      receita aparecer com dois valores no mesmo painel. O valor transacionado e
      os links continuam vindo dos pedidos — só o fee troca de fonte. */
@@ -1657,8 +1657,9 @@ function montar(bqd, hsd, tinoDados) {
      medida crua de cada regra, por CS e por mês-calendário, com o valor do
      comparativo ao lado para o painel mostrar quanto subiu ou caiu.
 
-     As sete regras vieram da planilha dela. Duas comparam com o mês anterior,
-     duas com o mesmo mês do ano passado, três são contagem do próprio mês.
+     As sete regras vieram da planilha dela. Duas comparam com a MARCA D'ÁGUA
+     do CS (o maior número que ele já fez em um mês), duas com o mesmo mês do
+     ano passado, três são contagem do próprio mês.
      Mês-calendário, não semana — foi justamente por isso que o painel inteiro
      trocou de grão. */
   const METRICAS_BONIFICACAO = [
@@ -1667,17 +1668,20 @@ function montar(bqd, hsd, tinoDados) {
        vale é o LIMITE_TINO lá embaixo — mudar a régua muda o passado junto, já
        que a carga recalcula todos os meses do zero. */
     { k: 'tino60', titulo: 'Marcas com +40 eventos no Tino', unidade: 'marcas',
-      comparacao: 'mesAnterior',
+      comparacao: 'marcaDagua',
       regra: 'Marcas da carteira do CS que passaram de 40 eventos no Tino dentro do mês '
            + '(era 60 até 27/08/2026). '
-           + 'O comparativo é o mesmo número no mês anterior — a régua da Laura é "a cada cliente extra".' },
+           + 'O comparativo é a MARCA D\'ÁGUA do CS: o maior número que ele já fez em um mês, '
+           + 'não o mês anterior (mudou em 31/08/2026) — a régua da Laura é "a cada cliente extra".' },
     { k: 'mensalidade', titulo: 'Receita de mensalidade', unidade: 'R$',
-      comparacao: 'mesAnterior',
+      comparacao: 'marcaDagua',
       regra: 'Soma das linhas de PLANO das faturas Iugu pagas das marcas do CS, pelo vencimento. '
-           + 'Não inclui Oráculo, Filial, Assistente nem ativação (esses são "Outros (Iugu)").' },
-    { k: 'vestipago', titulo: 'Vesti Pago transacionado', unidade: 'R$',
+           + 'Não inclui Oráculo, Filial, Assistente nem ativação (esses são "Outros (Iugu)"). '
+           + 'O comparativo é a MARCA D\'ÁGUA do CS: a maior mensalidade que ele já fez em um mês, '
+           + 'não o mês anterior (mudou em 31/08/2026).' },
+    { k: 'vestipago', titulo: 'VestiPago transacionado', unidade: 'R$',
       comparacao: 'anoAnterior',
-      regra: 'Valor pago com provider Vesti Pago (cartão + PIX) nas marcas do CS. '
+      regra: 'Valor pago com provider VestiPago (cartão + PIX) nas marcas do CS. '
            + 'Comparado com o MESMO mês do ano anterior, como na planilha (ago/25 × ago/26).' },
     { k: 'reunioes', titulo: 'Reuniões com cliente', unidade: 'reuniões',
       comparacao: 'nenhuma',
@@ -1727,7 +1731,7 @@ function montar(bqd, hsd, tinoDados) {
     }
   };
 
-  // GMV e Vesti Pago: direto das séries diárias já filtradas pela carteira
+  // GMV e VestiPago: direto das séries diárias já filtradas pela carteira
   bqd.pedidos.forEach(r => {
     const m = porDom.get(r.dom); if (!m || !dataOk(r.d)) return;
     somaBon(mesDe(r.d), m.cs, 'gmv', num(r.valor), m.nome);
@@ -1810,12 +1814,37 @@ function montar(bqd, hsd, tinoDados) {
   });
 
   const bonMeses = [...new Set([...bonAcc.keys()].map(k => k.split('|')[0]))].sort();
+  /* MARCA D'ÁGUA (Laura, 31/08/2026): para Tino e mensalidade o comparativo
+     deixou de ser o mês anterior e passou a ser o RECORDE do CS — o maior valor
+     que ele já registrou em um mês. O recorde é sempre dos meses ANTERIORES ao
+     da linha: incluir o próprio mês faria a diferença ser sempre zero ou
+     negativa, e ninguém bateria a própria marca. Mês sem recorde atrás (o
+     primeiro da série) vale 0, como valia o "mês anterior inexistente".
+     Uma passada só, em ordem de mês, guardando o máximo acumulado até ali. */
+  const recordeAte = new Map();     // cs|k|mes -> maior valor em mês ANTERIOR a `mes`
+  {
+    const porSerie = new Map();     // cs|k -> [{mes, valor}]
+    bonAcc.forEach((valor, ch) => {
+      const [mes, cs, k] = ch.split('|');
+      const met = METRICAS_BONIFICACAO.find(x => x.k === k);
+      if (!met || met.comparacao !== 'marcaDagua') return;
+      const s = cs + '|' + k;
+      if (!porSerie.has(s)) porSerie.set(s, []);
+      porSerie.get(s).push({ mes, valor });
+    });
+    porSerie.forEach((lista, s) => {
+      lista.sort((a, b) => a.mes.localeCompare(b.mes));
+      let max = 0;
+      lista.forEach(x => { recordeAte.set(s + '|' + x.mes, max); if (x.valor > max) max = x.valor; });
+    });
+  }
   const bonLinhas = [...bonAcc.entries()].map(([ch, valor]) => {
     const [mes, cs, k] = ch.split('|');
     const met = METRICAS_BONIFICACAO.find(x => x.k === k);
     let base = null;
     if (met && met.comparacao === 'mesAnterior') base = bonAcc.get(mesAntes(mes, 1) + '|' + cs + '|' + k) ?? 0;
     if (met && met.comparacao === 'anoAnterior') base = bonAcc.get(mesAntes(mes, 12) + '|' + cs + '|' + k) ?? 0;
+    if (met && met.comparacao === 'marcaDagua') base = recordeAte.get(cs + '|' + k + '|' + mes) ?? 0;
     return { mes, cs, k, valor, base };
   });
   const bonDetalhe = [...bonDet.entries()].map(([ch, valor]) => {
@@ -1907,7 +1936,7 @@ function montar(bqd, hsd, tinoDados) {
                + 'o tamanho do período. A janela de dados começa em ' + INICIO + ' (um ano a mais que o '
                + 'corrente, para a aba de Bonificação comparar mês contra o mesmo mês do ano passado).',
         implantacao: 'Data de implantação por produto: Tino = created_at da marca na base do próprio Tino; '
-               + 'Vesti Pago = criação da conta de pagamento (MongoDB_Payment_Companies.createdAt); '
+               + 'VestiPago = criação da conta de pagamento (MongoDB_Payment_Companies.createdAt); '
                + 'Oráculo = a MENOR entre a criação da configuração (o-configurations.created_at) e o '
                + 'primeiro atendimento registrado. Cuidado no Oráculo: 699 dos 1.055 domínios têm '
                + 'configuração criada em jan/2026, que é quando a tabela nasceu no espelho — nesses a data '
@@ -1931,16 +1960,16 @@ function montar(bqd, hsd, tinoDados) {
                + 'O antifraude continua inteiro: é cobrança da Vesti, não taxa de banco. '
                + 'Antecipação = payment_transaction_antecipationValue x ' + FATOR_ANTECIPACAO_VESTI
                + ' (parcela da Vesti, medida na mesma tabela) — essa também já é líquida do banco.',
-        feeLiquido: 'Receita (fee) da aba Vesti Pago e Interchange da tabela geral são a MESMA régua: '
+        feeLiquido: 'Receita (fee) da aba VestiPago e Interchange da tabela geral são a MESMA régua: '
                   + 'fee do cartão menos o MDR do banco, mais o antifraude. A semana do fee é a do '
                   + 'pagamento (paidAt), a das outras colunas é a do pedido — daí uma diferença de ~1%.',
         feePix: 'ATENÇÃO: o fee da Vesti só existe para CARTÃO. Em PIX o campo vem nulo tanto em '
               + 'MongoDB_Pedidos_Geral quanto em vestipago_transaction_detail — e PIX é ~53% das '
-              + 'transações Vesti Pago. Logo "Receita (fee)" e "Interchange" cobrem só o cartão; '
+              + 'transações VestiPago. Logo "Receita (fee)" e "Interchange" cobrem só o cartão; '
               + 'o valor transacionado cobre os dois.',
-        vestiPago: 'Valor transacionado = pedidos pagos com provider Vesti Pago (IUGU/STARKBANK/PAGARME), '
+        vestiPago: 'Valor transacionado = pedidos pagos com provider VestiPago (IUGU/STARKBANK/PAGARME), '
                  + 'qualquer origem, separado por cartão e PIX. Links gerados/pagos = só "Link de cobrança": '
-                 + 'os que aparecem sem provider são exatamente os não pagos, então o link é do Vesti Pago '
+                 + 'os que aparecem sem provider são exatamente os não pagos, então o link é do VestiPago '
                  + 'de ponta a ponta. "Link sem preço" ficou de fora (tem 4.226 pedidos pagos por fora, '
                  + 'R$ 8,8M) e "Link" puro é o link de compartilhamento do vendedor.',
         negociosCat: 'Upsell = só upgrade de plano. Filial e Multiloja contam como cross-sell. '

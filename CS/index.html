@@ -579,8 +579,8 @@ if(_ss('get')==='1'){
      churn:     { series:[{ data, cliente, churns }] },   // tabela vem de `clientes`
 
      // --- bonificação: já agregada por CS e por mês, direto do fetcher ---
-     // `base` é o valor do comparativo que a regra pede (mês anterior ou mesmo
-     // mês do ano passado); null quando a regra não compara.
+     // `base` é o valor do comparativo que a regra pede (marca d'água do CS ou
+     // mesmo mês do ano passado); null quando a regra não compara.
      bonificacao: { meses:['AAAA-MM'],
                     metricas:[{ k, titulo, unidade, comparacao, regra }],
                     linhas:[{ mes, cs, k, valor, base }],
@@ -608,7 +608,7 @@ function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.i
 const PRODUTOS = [
   {nome:'Oráculo',          cat:'cross'},
   {nome:'Tino',             cat:'cross'},
-  {nome:'Vesti Pago',       cat:'cross'},
+  {nome:'VestiPago',       cat:'cross'},
   {nome:'Módulo Fiscal',    cat:'cross'},
   {nome:'Antecipação',      cat:'cross'},
   {nome:'Filial',           cat:'up'},
@@ -880,6 +880,13 @@ if(!DATA.reunioes) DATA.reunioes = [];
 if(!DATA.tino) DATA.tino = {tabela:[], series:[]};
 if(!DATA.tino.kpis) DATA.tino.kpis = {};
 DATA.clientes.forEach(c=>{ if(!c.canal) c.canal = 'Sem canal' });
+/* "VestiPago" virou palavra só (Laura, 31/08/2026). O dados.js escreve o rótulo
+   da coluna de bonificação, e a carga que reescreve esse arquivo só roda de
+   madrugada — normalizar aqui faz o nome novo valer já nesta abertura, em vez
+   de amanhã. Quando o arquivo já vier certo, o replace não acha nada. */
+const umNomeSo = t => String(t||'').replace(/Vesti\s+Pago/g,'VestiPago');
+(DATA.bonificacao?.metricas || []).forEach(m=>{ if(m && m.titulo) m.titulo = umNomeSo(m.titulo) });
+if(DATA.meta.avisos) for(const k in DATA.meta.avisos) DATA.meta.avisos[k] = umNomeSo(DATA.meta.avisos[k]);
 if(!DATA.meta.canais){
   DATA.meta.canais = [...new Set(DATA.clientes.map(c=>c.canal))]
     .sort((a,b)=> a==='Sem canal' ? 1 : b==='Sem canal' ? -1 : a.localeCompare(b,'pt-BR'));
@@ -1315,8 +1322,8 @@ const TABS = [
     ]
   },
   {
-    id:'vestiPago', grupo:'Produtos', nav:'Vesti Pago', cor:'#2E7D46', cor2:'#1E74C8',
-    titulo:'Vesti Pago',
+    id:'vestiPago', grupo:'Produtos', nav:'VestiPago', cor:'#2E7D46', cor2:'#1E74C8',
+    titulo:'VestiPago',
     desc:'Volume transacionado, receita de fee e de antecipação, e quantos links de cobrança cada cliente emitiu — e quantos foram pagos. A <b>receita de fee já é líquida</b>: o que o lojista paga menos o MDR do banco (Iugu, Starkbank, Pagarme), mais o antifraude — a mesma régua do Interchange da tabela geral. <b>A receita cobre só cartão</b>: em PIX o fee da Vesti não é registrado na fonte, embora o valor transacionado inclua os dois.',
     filtros:['cliente','cs','canal','periodo'],
     tabela:'Clientes', chaveCliente:'cliente',
@@ -1508,9 +1515,10 @@ const TABS = [
     titulo:'Bonificação — números do mês',
     desc:'Uma linha por CS, uma coluna por regra, sempre no <b>mês fechado</b>. '
       + 'Onde a regra pede comparação, a variação aparece embaixo do número: '
-      + '<b>Tino</b> compara com o mês anterior em número de marcas; <b>mensalidade</b> com o mês '
-      + 'anterior e <b>Vesti Pago</b> e <b>GMV</b> com o mesmo mês do ano passado, os três '
-      + '<b>em porcentagem</b> (o valor em reais da diferença fica no balãozinho do mouse). <b>Reuniões</b>, <b>integrações</b> e '
+      + '<b>Tino</b> e <b>mensalidade</b> comparam com a <b>marca d\'água</b> do CS — o maior número '
+      + 'que ele já registrou em um mês, contando só os meses anteriores ao escolhido; '
+      + '<b>VestiPago</b> e <b>GMV</b> comparam com o mesmo mês do ano passado. Mensalidade, '
+      + 'VestiPago e GMV aparecem <b>em porcentagem</b> (o valor em reais da diferença fica no balãozinho do mouse). <b>Reuniões</b>, <b>integrações</b> e '
       + '<b>varejos</b> são contagem do próprio mês. Passe o mouse no número para ver quais marcas entraram. '
       + 'A <b>pontuação</b> está na segunda tabela, embaixo desta, com a régua de cada regra — ela vale '
       + 'para <b>Thamiris, Gabriella e Luana</b>, de <b>julho de 2026</b> em diante. '
@@ -1567,10 +1575,29 @@ function METRICAS(){
 
 /* Uma linha por CS no mês escolhido, com o valor de cada regra, a base de
    comparação e a lista de marcas que entraram (vai no title da célula). */
+/* Regras que comparam com a MARCA D'ÁGUA em vez do mês anterior (Laura,
+   31/08/2026): o comparativo é o RECORDE do CS — o maior valor que ele já fez
+   em um mês. O fetcher já grava essa base no dados.js, mas o painel recalcula a
+   partir do histórico que veio junto: a carga que reescreve o dados.js só roda
+   de madrugada, e sem isso a tela ficaria um dia inteiro mostrando a régua nova
+   com a base velha. Com o arquivo já atualizado, os dois chegam ao mesmo
+   número. */
+const MARCA_DAGUA = new Set(['tino60','mensalidade']);
+
 function linhasBonificacao(){
   const b = DATA.bonificacao || {linhas:[], detalhe:[], meses:[]};
   const mes = mesBonificacao();
   const met = METRICAS();
+  /* Recorde de cada CS ANTES do mês escolhido. O próprio mês fica de fora de
+     propósito: incluí-lo faria a diferença ser sempre zero ou negativa e
+     ninguém bateria a própria marca. Sem histórico atrás, o recorde é zero —
+     o mesmo que valia quando o comparativo era um mês anterior inexistente. */
+  const recorde = new Map();      // cs|k -> maior valor em mês < mes
+  (b.linhas||[]).forEach(x=>{
+    if(!MARCA_DAGUA.has(x.k) || !(x.mes < mes)) return;
+    const ch = x.cs+'|'+x.k;
+    if((x.valor||0) > (recorde.get(ch)||0)) recorde.set(ch, x.valor||0);
+  });
   const porCs = new Map();
   const linha = cs => {
     let l = porCs.get(cs);
@@ -1589,7 +1616,7 @@ function linhasBonificacao(){
        célula de varejos poder dizer quantas filiais do mês ficaram sem
        classificação, em vez de mostrar zero sem explicação. */
     l[x.k] = x.valor;
-    l['_base_'+x.k] = x.base;
+    l['_base_'+x.k] = MARCA_DAGUA.has(x.k) ? (recorde.get(x.cs+'|'+x.k) || 0) : x.base;
   });
   (b.detalhe||[]).forEach(x=>{
     if(x.mes!==mes) return;
@@ -1627,30 +1654,35 @@ function linhasBonificacao(){
    A régua que a Laura passou em 27/08/2026. Cada regra vira pontos em cima do
    MESMO número da tabela de cima — nada é medido de novo aqui, só convertido:
 
-     Tino ........... 10 pontos por cliente EXTRA (vs. mês anterior) com 40+ eventos
-     Mensalidade .... 10 pontos a cada R$ 1.000 a mais que o mês anterior (quebrado
+     Tino ........... 10 pontos por cliente EXTRA com 40+ eventos acima da MARCA
+                      D'ÁGUA do CS (o maior mês que ele já fez)
+     Mensalidade .... 10 pontos a cada R$ 1.000 acima da MARCA D'ÁGUA (quebrado
                       arredonda PARA CIMA: R$ 1.200 já são 20 pontos)
-     Vesti Pago ..... 1 ponto a cada 2% a mais que o mesmo mês do ano passado
+     VestiPago ...... 1 ponto a cada 2% a mais que o mesmo mês do ano passado
      Reuniões ....... 1 ponto cada
      Integrações .... 5 pontos cada
      GMV ............ 1 ponto a cada 1% a mais que o mesmo mês do ano passado
      Varejos ........ 10 pontos cada
 
    Duas decisões que não estavam escritas na régua e valem dizer:
-   - queda não tira ponto. Mês pior que o anterior dá zero naquela regra, não
-     pontuação negativa;
+   - queda não tira ponto. Mês que não bate a marca d'água (ou pior que o ano
+     passado) dá zero naquela regra, não pontuação negativa;
    - a mensalidade é a única que arredonda para cima (foi o que ela pediu). Nas
-     porcentagens, só bloco fechado conta: 3,9% no Vesti Pago é 1 ponto, não 2. */
+     porcentagens, só bloco fechado conta: 3,9% no VestiPago é 1 ponto, não 2.
+
+   Marca d'água (Laura, 31/08/2026): Tino e mensalidade comparavam com o mês
+   anterior e passaram a comparar com o recorde do CS. Na prática o ponto ficou
+   mais caro — só pontua quem faz o melhor mês da própria história. */
 const REGRAS_PONTOS = [
-  { k:'tino60', l:'Tino', regra:'10 pts por cliente extra (40+ eventos) vs. mês anterior',
+  { k:'tino60', l:'Tino', regra:'10 pts por cliente extra (40+ eventos) acima da marca d\u2019água',
     calc:r=>{ const extra = (r.tino60||0) - (r['_base_tino60']||0);
               return extra>0 ? {p:extra*10, como:fmt.int(extra)+' cliente(s) extra × 10'} : {p:0} } },
-  { k:'mensalidade', l:'Mensalidade', regra:'10 pts a cada R$ 1k a mais que o mês anterior (arredonda para cima)',
+  { k:'mensalidade', l:'Mensalidade', regra:'10 pts a cada R$ 1k acima da marca d\u2019água (arredonda para cima)',
     calc:r=>{ const extra = (r.mensalidade||0) - (r['_base_mensalidade']||0);
               if(extra<=0) return {p:0};
               const blocos = Math.ceil(extra/1000);
               return {p:blocos*10, como:fmt.moneyCompact(extra)+' a mais = '+blocos+' × 1k × 10'} } },
-  { k:'vestipago', l:'Vesti Pago', regra:'1 pt a cada 2% a mais que o mesmo mês do ano passado',
+  { k:'vestipago', l:'VestiPago', regra:'1 pt a cada 2% a mais que o mesmo mês do ano passado',
     calc:r=>pontosPct(r,'vestipago',2) },
   { k:'reunioes', l:'Reuniões', regra:'1 pt por reunião',
     calc:r=>({p:(r.reunioes||0)*1, como:fmt.int(r.reunioes||0)+' × 1'}) },
@@ -2700,7 +2732,7 @@ function celula(r,c){
       const vv = v || 0;
       const base = r['_base_'+c.k];
       const quem = r['_quem_'+c.k] || [];
-      /* As três colunas de dinheiro (Vesti Pago, GMV e mensalidade) mostram a
+      /* As três colunas de dinheiro (VestiPago, GMV e mensalidade) mostram a
          variação em PORCENTAGEM, não em reais (pedido da Laura, 27/08/2026):
          nelas o que interessa é o quanto a carteira cresceu ou caiu, e o valor
          em R$ já está no número de cima. O delta em reais continua no title. */
@@ -2712,6 +2744,7 @@ function celula(r,c){
         const sinal = d > 0 ? '+' : d < 0 ? '−' : '';
         const absR = dinheiro ? fmt.moneyCompact(Math.abs(d)) : fmt.int(Math.abs(d));
         const contra = met.comparacao === 'anoAnterior' ? 'vs. mesmo mês de '+(Number(mesBonificacao().slice(0,4))-1)
+                    : MARCA_DAGUA.has(c.k)               ? 'vs. marca d\u2019água'
                                                         : 'vs. mês anterior';
         let txt;
         if(!emPct) txt = d===0 ? 'igual' : sinal+absR;
