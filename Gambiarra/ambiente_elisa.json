@@ -98,9 +98,9 @@
     "canalPlanilha": ""
   },
   "606611": {
-    "ligado": false,
-    "update": "2026-08-29",
-    "religamentoReal": false,
+    "ligado": true,
+    "update": "2026-08-31",
+    "religamentoReal": true,
     "nomePlanilha": "Uezz",
     "canalPlanilha": "Vesti"
   },
@@ -113,8 +113,8 @@
   },
   "33269": {
     "ligado": true,
-    "update": "2026-07-31",
-    "religamentoReal": false,
+    "update": "2026-08-31",
+    "religamentoReal": true,
     "nomePlanilha": "Quebela",
     "canalPlanilha": "Attasoft"
   },
@@ -141,8 +141,8 @@
   },
   "820612": {
     "ligado": true,
-    "update": "2026-07-30",
-    "religamentoReal": false,
+    "update": "2026-08-31",
+    "religamentoReal": true,
     "nomePlanilha": "MARIA DUTRA JEANS",
     "canalPlanilha": "Vesti"
   },
@@ -232,8 +232,8 @@
   },
   "1548808": {
     "ligado": true,
-    "update": "2026-07-22",
-    "religamentoReal": false,
+    "update": "2026-08-31",
+    "religamentoReal": true,
     "nomePlanilha": "Liz Bijux e Acessorios",
     "canalPlanilha": "Uemtel"
   },
@@ -449,7 +449,7 @@
   },
   "1568965": {
     "ligado": true,
-    "update": "2026-07-21",
+    "update": "2026-08-31",
     "religamentoReal": true,
     "nomePlanilha": "Oxigênio Modas",
     "canalPlanilha": "Vesti"
@@ -672,9 +672,9 @@
     "canalPlanilha": "Attasoft"
   },
   "731799": {
-    "ligado": false,
-    "update": "2026-08-29",
-    "religamentoReal": false,
+    "ligado": true,
+    "update": "2026-08-31",
+    "religamentoReal": true,
     "nomePlanilha": "Nega Maluca",
     "canalPlanilha": "Vesti"
   },
@@ -764,7 +764,7 @@
   },
   "1091249": {
     "ligado": true,
-    "update": "2026-07-27",
+    "update": "2026-08-30",
     "religamentoReal": false,
     "nomePlanilha": "LIÊ",
     "canalPlanilha": "Starter"
@@ -1114,8 +1114,8 @@
   },
   "873969": {
     "ligado": true,
-    "update": "2026-07-29",
-    "religamentoReal": false,
+    "update": "2026-08-31",
+    "religamentoReal": true,
     "nomePlanilha": "Estação Fit integração",
     "canalPlanilha": "Vesti"
   },
@@ -1128,8 +1128,8 @@
   },
   "166159": {
     "ligado": true,
-    "update": "2026-07-31",
-    "religamentoReal": false,
+    "update": "2026-08-31",
+    "religamentoReal": true,
     "nomePlanilha": "Aqua",
     "canalPlanilha": "Attasoft"
   },
@@ -1436,7 +1436,7 @@
   },
   "1840960": {
     "ligado": true,
-    "update": "2026-08-10",
+    "update": "2026-08-30",
     "religamentoReal": false,
     "nomePlanilha": "JULY PLUS STORE",
     "canalPlanilha": "Starter"
@@ -1996,8 +1996,8 @@
   },
   "1151598": {
     "ligado": true,
-    "update": "2026-07-29",
-    "religamentoReal": false,
+    "update": "2026-08-31",
+    "religamentoReal": true,
     "nomePlanilha": "Estação Fit",
     "canalPlanilha": "Vesti"
   },
@@ -3347,8 +3347,8 @@
   },
   "613719": {
     "ligado": true,
-    "update": "2026-04-23",
-    "religamentoReal": false,
+    "update": "2026-08-31",
+    "religamentoReal": true,
     "nomePlanilha": "Gowara",
     "canalPlanilha": "Starter"
   },
@@ -5803,8 +5803,8 @@
     "canalPlanilha": "Varejo Vesti"
   },
   "2066617": {
-    "ligado": true,
-    "update": "2026-08-10",
+    "ligado": false,
+    "update": "2026-08-31",
     "religamentoReal": false,
     "nomePlanilha": "EMERSON SALES",
     "canalPlanilha": "Starter"
@@ -6384,8 +6384,8 @@
     "canalPlanilha": "Attasoft"
   },
   "774035": {
-    "ligado": true,
-    "update": "2026-07-20",
+    "ligado": false,
+    "update": "2026-08-31",
     "religamentoReal": false,
     "nomePlanilha": "Regineide Benevinuto",
     "canalPlanilha": "Varejo Vesti"
@@ -6454,8 +6454,8 @@
     "canalPlanilha": "N/A"
   },
   "995393": {
-    "ligado": true,
-    "update": "2026-08-18",
+    "ligado": false,
+    "update": "2026-08-31",
     "religamentoReal": false,
     "nomePlanilha": "Francyane Dos Santos Martins",
     "canalPlanilha": "N/A"
@@ -7593,5 +7593,12 @@
     "religamentoReal": true,
     "nomePlanilha": "Priscila",
     "canalPlanilha": "N/A"
+  },
+  "1995145": {
+    "ligado": false,
+    "update": "2026-08-31",
+    "religamentoReal": false,
+    "nomePlanilha": "",
+    "canalPlanilha": ""
   }
 }
