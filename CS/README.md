@@ -105,7 +105,7 @@ de layout continua indo por `node publicar.js`.
 | Cross-sell / Upsell | tudo | HubSpot, pipeline **Expand (Upgrades)** |
 | Oráculo | atendimentos / % IA | `oraculo_Atendimentos` (`source` IA/HUMAN) |
 | Oráculo | GMV | `oraculo_Pedidos.Tipo_Venda_Oraculo` |
-| Tabela geral | Tino / Oráculo | Tino: marca presente na base do produto (API do Tino). Oráculo: tem atendimento em `oraculo_Atendimentos` |
+| Tabela geral | Tino / Oráculo / VestiPago | Tino: marca presente na base do produto (API do Tino). Oráculo: tem atendimento em `oraculo_Atendimentos`. VestiPago: tem conta de pagamento em `MongoDB_Payment_Companies` — é TER o produto, não usar; quem contratou e não transacionou aparece como Sim |
 | Tino | marcas, eventos, sessões, dias de acesso | **API do Tino** — `companies_chart`, `login_days`, `customer_kpis` |
 | VestiPago | valor / fee / antecipação | `MongoDB_Pedidos_Geral` com provider VestiPago |
 | VestiPago | links | pedidos com `settings_source = 'Link de cobrança'` |

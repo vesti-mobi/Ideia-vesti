@@ -1438,10 +1438,12 @@ function montar(bqd, hsd, tinoDados) {
       inadimplente: inad.inadimplente,
       dataChurn,
       /* Produtos contratados. Oráculo vem do próprio produto (tem atendimento
-         registrado); Tino é preenchido logo abaixo, depois que a lista de marcas
-         da API do Tino é casada com o cadastro. */
+         registrado); Tino e VestiPago são preenchidos logo abaixo, depois que a
+         lista de marcas da API do Tino e as contas de pagamento são casadas com
+         o cadastro. */
       temOraculo: !!m.temOraculo,
       temTino: false,
+      temVestiPago: false,
       _dom: m.dom, _cnpj: m.cnpj,
     });
   });
@@ -1642,11 +1644,21 @@ function montar(bqd, hsd, tinoDados) {
     ...churnSeries.filter(doAnoCorrente).map(x => x.cliente),
   ]);
   const clientesFinal = clientes.filter(c => ativos.has(c.nome));
-  clientesFinal.forEach(c => { c.temTino = domComTino.has(c._dom); });
+  /* TEM o produto, que não é o mesmo que USA o produto. Para o VestiPago o
+     sinal é a CONTA DE PAGAMENTO criada (implVP, de MongoDB_Payment_Companies),
+     igual ao Tino, que sai da base do próprio produto. De propósito não é
+     "transacionou": a aba VestiPago já mostra o volume, e quem contratou e
+     ainda não rodou nada é exatamente a marca que a CS precisa enxergar. */
+  clientesFinal.forEach(c => {
+    c.temTino = domComTino.has(c._dom);
+    c.temVestiPago = implVP.has(c._dom);
+  });
   console.log('  marcas com Tino na tabela geral'.padEnd(44)
     + String(clientesFinal.filter(c => c.temTino).length).padStart(8));
   console.log('  marcas com Oráculo na tabela geral'.padEnd(44)
     + String(clientesFinal.filter(c => c.temOraculo).length).padStart(8));
+  console.log('  marcas com VestiPago na tabela geral'.padEnd(44)
+    + String(clientesFinal.filter(c => c.temVestiPago).length).padStart(8));
   clientesFinal.forEach(c => { delete c._dom; delete c._cnpj; });
   console.log('  marcas com atividade em ' + ANO + ''.padEnd(20) + String(clientesFinal.length).padStart(13));
 

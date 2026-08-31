@@ -655,7 +655,7 @@ const MOCK = (function buildMock(){
       vencimento: '2026-09-'+String(int(1,28)).padStart(2,'0'),
       riscoChurn: 'Baixo',   // recalculado abaixo, depois de definir quem cancelou
       dataChurn: null,
-      temTino: r()<0.6, temOraculo: r()<0.45,
+      temTino: r()<0.6, temOraculo: r()<0.45, temVestiPago: r()<0.5,
       _semAcesso: semAcesso, _plano: plano, _inativo: inativo,
     };
   });
@@ -1173,7 +1173,7 @@ const TABS = [
   {
     id:'clientes', grupo:'Carteira', nav:'Tabela geral', cor:'#0E7A73', cor2:'#B7791F',
     titulo:'Tabela geral dos clientes',
-    desc:'Uma linha por cliente com contrato, uso e composição de receita. Pedidos e receita são somados dentro do período selecionado — que agora é uma <b>janela de datas</b>, então "agosto" é agosto inteiro e só ele. <b>Data de cadastro</b> é a entrada da marca na Vesti (criação do domínio), com o tempo de casa embaixo. <b>Canal</b> é o parceiro dono da conta (Vesti, Attasoft, Uemtel…). <b>Tino</b> e <b>Oráculo</b> dizem se a marca tem o produto — o Tino vem da base do próprio produto, o Oráculo de ter atendimento registrado. <b>Interchange</b> já é líquido: o fee do cartão menos a taxa do banco. <b>Último acesso</b> ainda não tem fonte: o BigQuery não guarda login de lojista.',
+    desc:'Uma linha por cliente com contrato, uso e composição de receita. Pedidos e receita são somados dentro do período selecionado — que agora é uma <b>janela de datas</b>, então "agosto" é agosto inteiro e só ele. <b>Data de cadastro</b> é a entrada da marca na Vesti (criação do domínio), com o tempo de casa embaixo. <b>Canal</b> é o parceiro dono da conta (Vesti, Attasoft, Uemtel…). <b>Tino</b>, <b>Oráculo</b> e <b>VestiPago</b> dizem se a marca <i>tem</i> o produto, não se usa: o Tino vem da base do próprio produto, o VestiPago de ter conta de pagamento criada e o Oráculo de ter atendimento registrado. Quem contratou e ainda não rodou nada aparece como <b>Sim</b> — o volume de cada um está nas abas de produto. <b>Interchange</b> já é líquido: o fee do cartão menos a taxa do banco. <b>Último acesso</b> ainda não tem fonte: o BigQuery não guarda login de lojista.',
     filtros:['cliente','cs','canal','statusCliente','periodo'],
     tabela:'Clientes', chaveCliente:'nome',
     colunas:[
@@ -1186,6 +1186,7 @@ const TABS = [
       {k:'plano', l:'Plano', tipo:'tag'},
       {k:'temTino', l:'Tino', tipo:'temProduto'},
       {k:'temOraculo', l:'Oráculo', tipo:'temProduto'},
+      {k:'temVestiPago', l:'VestiPago', tipo:'temProduto'},
       {k:'dataCadastro', l:'Data de cadastro', tipo:'cadastro'},
       {k:'ultimoAcesso', l:'Último acesso', tipo:'rel'},
       {k:'ultimoPedido', l:'Último pedido', tipo:'rel'},
@@ -2655,8 +2656,19 @@ function celula(r,c){
       const prazo = d<0 ? 'em '+Math.abs(d)+' d' : d===0 ? 'vence hoje' : 'venceu há '+d+' d';
       td.innerHTML = `<span class="cell-main">${fmt.date(v)}</span><span class="cell-sub">${prazo}</span>`; break }
     /* Tem o produto ou não: verde quando tem, vermelho quando não tem. É uma
-       coluna de conferência rápida na tabela geral — sem meio-termo de propósito. */
-    case 'temProduto': td.innerHTML = v
+       coluna de conferência rápida na tabela geral — sem meio-termo de propósito.
+       Campo AUSENTE é caso à parte: quando a coluna é mais nova que o dados.js
+       (o VestiPago entrou em 31/08/2026 e o arquivo só se refaz às 04:00), o
+       valor vem undefined. Pintar tudo de "Não" faria a tela afirmar o contrário
+       do que se sabe, então fica travessão até a próxima carga. */
+    case 'temProduto':
+      if(v == null){
+        td.innerHTML = '<span class="cell-main">—</span>'
+          + '<span class="cell-sub">aguardando a carga</span>';
+        td.title = 'Esta coluna é mais nova que o dados.js em uso. Ela se preenche na próxima carga (04:00).';
+        break;
+      }
+      td.innerHTML = v
         ? '<span class="pill ok"><i></i>Sim</span>'
         : '<span class="pill bad"><i></i>Não</span>'; break;
     case 'statusTino': {
