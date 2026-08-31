@@ -1,8 +1,37 @@
 name: Atualizar Relatorio StarkBank VestiPago
 
+# ATRASO DO SCHEDULER DO GITHUB (constatado em 31/08/2026)
+# Desde 27/08/2026 o GitHub passou a entregar os eventos `schedule` deste
+# repositorio com 6 a 12h de atraso — nao so aqui: painel-clientes-cs (cron
+# '0 7'), update-dashboard ('30 7') e relatoriocs2 ('40 8') sofreram o mesmo
+# desvio nos mesmos dias. Ex.: o cron das 07:10 UTC disparou 18:15 (27/08),
+# 19:24 (28/08), 13:08 (29/08), 12:49 (30/08) e 15:03 (31/08). Ate 26/08 o
+# atraso era de ~35-50min. `created_at == run_started_at` em todos, ou seja,
+# o run nasce tarde: o evento e que atrasa, nao a fila de runners.
+#
+# Isso e comportamento conhecido e best-effort do lado do GitHub (schedules
+# podem ser atrasados ou descartados sob carga) e nao tem correcao no nosso
+# lado. O que da pra fazer e nao depender de um unico disparo:
+#   1. varios crons ao longo da manha (abaixo), em minutos nao-redondos;
+#   2. um job `guard` que sai na hora se o relatorio completo de hoje (BRT)
+#      ja foi gerado — entao os crons extras custam ~10s quando o primeiro
+#      funcionou, e so fazem trabalho de verdade quando ele foi pulado;
+#   3. `concurrency` pra dois disparos nunca rodarem em paralelo;
+#   4. `repository_dispatch`, pra um agendador externo (cron-job.org, Cloud
+#      Scheduler, etc.) chamar isto na hora certa quando quisermos horario
+#      garantido: POST /repos/vesti-mobi/dados/dispatches
+#      com {"event_type":"starkbank-update"}.
+
 on:
   schedule:
-    - cron: '10 7 * * *'   # 04:10 BRT: run COMPLETO 1x/dia (CR + CP, ambos API Vesti). Obs: o GitHub pode disparar alguns minutos (as vezes ~1h) depois do horario exato sob carga.
+    # Run COMPLETO (CR + CP, ambos API Vesti). O primeiro que pegar o dia faz
+    # o trabalho; os demais viram no-op via job `guard`.
+    - cron: '10 7 * * *'    # 04:10 BRT - principal
+    - cron: '48 8 * * *'    # 05:48 BRT - fallback 1
+    - cron: '26 10 * * *'   # 07:26 BRT - fallback 2
+    - cron: '52 12 * * *'   # 09:52 BRT - ultimo recurso
+  repository_dispatch:
+    types: [starkbank-update]
   workflow_dispatch:
     inputs:
       reason:
@@ -15,8 +44,55 @@ on:
         required: false
         default: false
 
+# Um run por vez. Sem isso, um cron de fallback disparando enquanto o
+# principal (atrasado) ainda roda geraria trabalho duplicado e disputa de
+# push. Enfileirado, o fallback so comeca depois — e ai o `guard` ja ve o
+# invoices.js de hoje e sai limpo.
+concurrency:
+  group: update-starkbank
+  cancel-in-progress: false
+
 jobs:
+  guard:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - name: O relatorio completo de hoje ja foi gerado?
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENTO: ${{ github.event_name }}
+        run: |
+          # Disparo manual / externo sempre roda: quem pediu, pediu.
+          if [ "$EVENTO" != "schedule" ]; then
+            echo "Evento '$EVENTO': roda sem checar."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # invoices.js (CR) so e commitado quando o run completo roda, entao
+          # a data do ultimo commit dele e o marcador confiavel do dia.
+          ULTIMO=$(gh api "repos/${GITHUB_REPOSITORY}/commits?path=relatoriostarkbank/invoices.js&per_page=1" \
+                     --jq '.[0].commit.committer.date // empty' || true)
+          if [ -z "$ULTIMO" ]; then
+            echo "Nao consegui ler o ultimo commit do invoices.js; roda por seguranca."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          HOJE=$(TZ=America/Sao_Paulo date +%F)
+          DIA=$(TZ=America/Sao_Paulo date -d "$ULTIMO" +%F)
+          echo "Ultimo invoices.js: $ULTIMO (BRT $DIA) | hoje BRT: $HOJE"
+          if [ "$DIA" = "$HOJE" ]; then
+            echo "Relatorio de hoje ja esta no repo — nada a fazer."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Relatorio de hoje ainda nao rodou — seguindo."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
   update:
+    needs: guard
+    if: needs.guard.outputs.skip != 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -59,12 +135,12 @@ jobs:
 
       - name: Rodar fetcher Faturas (API Vesti)
         # Etapa lenta (~22min) que pagina todas as marcas na API Vesti e
-        # sobrecarrega o banco de producao. Por isso roda SO 1x/dia, no run
-        # agendado das 04:10 BRT (cron '10 7 * * *'), ou em disparo manual
-        # completo (workflow_dispatch com somente_fabric=false). Nos runs de 3h
-        # (so CP) e no modo rapido, e pulada. Quando roda, deixa o marcador
-        # .cr_updated pro passo de commit saber que deve incluir o invoices.js.
-        if: ${{ github.event.inputs.somente_fabric != 'true' && (github.event.schedule == '10 7 * * *' || github.event_name == 'workflow_dispatch') }}
+        # sobrecarrega o banco de producao. Roda 1x por dia: qualquer um dos
+        # crons pode ser o do dia, e o job `guard` garante que so o primeiro
+        # a chegar faca o trabalho. So e pulada no modo rapido (somente_fabric).
+        # Quando roda, deixa o marcador .cr_updated pro passo de commit saber
+        # que deve incluir o invoices.js.
+        if: ${{ github.event.inputs.somente_fabric != 'true' }}
         working-directory: relatoriostarkbank
         env:
           VESTIAPI_TOKEN: ${{ secrets.VESTIAPI_TOKEN }}
@@ -107,8 +183,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Arquivos gerados sao regeracoes completas. So incluimos o invoices.js
           # (CR) quando o fetcher da API rodou de fato (marcador .cr_updated) —
-          # senao (runs de 3h so-CP / modo rapido) estariamos re-adicionando uma
-          # copia possivelmente defasada e revertendo o update diario concorrente.
+          # senao (modo rapido) estariamos re-adicionando uma copia possivelmente
+          # defasada e revertendo o update diario concorrente.
           if [ -f .cr_updated ]; then
             FILES="relatoriostarkbank/dados.js relatoriostarkbank/invoices.js relatoriostarkbank/cancelados_valores.js"
           else
