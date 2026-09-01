@@ -186,7 +186,7 @@ async function puxarBQ() {
       SELECT CAST(id AS STRING) id, ANY_VALUE(name) nome
       FROM ${DS}.odbc_partners GROUP BY 1
     )
-    SELECT d.id, d.name nome, d.integration_type, i.nome integracao_nome,
+    SELECT d.id, d.name nome, d.integration_type, d.integration_owner, i.nome integracao_nome,
            a.name cs, c.tax_document cnpj, c.social_name, c.company_name, c.status status_empresa,
            SUBSTR(CAST(d.created_at AS STRING),1,10) criacao,
            p.nome canal,
@@ -1212,6 +1212,12 @@ function montar(bqd, hsd, tinoDados) {
       social: c.social_name || null,
       fantasia: c.company_name || null,
       integracao: c.integracao_nome || c.integration_type || 'Sem integração',
+      /* Dono da integração (odbc_domains.integration_owner, que vem do
+         `SELECT * FROM domains` da produção). 'VESTI' é a integração que a Vesti
+         mantém — é essa que o Power BI "GMV - Métricas 2025" chama de ATIVA; a do
+         parceiro/ERP é a passiva. Guardado normalizado porque a comparação do
+         modelo é contra o literal "VESTI". */
+      integracaoDona: (c.integration_owner || '').trim().toUpperCase() || null,
       // canal = parceiro dono da conta; "N/A" no cadastro é o mesmo que sem canal
       canal: (c.canal && c.canal !== 'N/A') ? c.canal : 'Sem canal',
       cnpj: soDigitos(c.cnpj),
@@ -1221,6 +1227,14 @@ function montar(bqd, hsd, tinoDados) {
     });
   });
   console.log('  marcas no cadastro'.padEnd(44) + String(porDom.size).padStart(8));
+  /* O valor 'VESTI' é o que define integração ATIVA. Se o cadastro mudar a
+     grafia, a coluna zera em silêncio — por isso a carga imprime o que achou. */
+  {
+    const donas = {};
+    porDom.forEach(m => { const k = m.integracaoDona || '(sem dono)'; donas[k] = (donas[k] || 0) + 1; });
+    console.log('  integration_owner no cadastro'.padEnd(44)
+      + Object.entries(donas).sort((a, b) => b[1] - a[1]).map(([k, v]) => k + ' ' + v).join(' · '));
+  }
 
   const somaEm = (mapa, chave, campos) => {
     let o = mapa.get(chave);
@@ -1669,9 +1683,10 @@ function montar(bqd, hsd, tinoDados) {
      medida crua de cada regra, por CS e por mês-calendário, com o valor do
      comparativo ao lado para o painel mostrar quanto subiu ou caiu.
 
-     As sete regras vieram da planilha dela. Duas comparam com a MARCA D'ÁGUA
-     do CS (o maior número que ele já fez em um mês), duas com o mesmo mês do
-     ano passado, três são contagem do próprio mês.
+     As sete regras vieram da planilha dela; "Integrações ativas" entrou depois
+     (01/09/2026), vinda do Power BI "GMV - Métricas 2025". Três comparam com a
+     MARCA D'ÁGUA do CS (o maior número que ele já fez em um mês), duas com o
+     mesmo mês do ano passado, três são contagem do próprio mês.
      Mês-calendário, não semana — foi justamente por isso que o painel inteiro
      trocou de grão. */
   const METRICAS_BONIFICACAO = [
@@ -1705,6 +1720,18 @@ function montar(bqd, hsd, tinoDados) {
            + 'É o único registro de integração nova que existe hoje: o cadastro guarda quem TEM integração, '
            + 'não quando passou a ter. Por isso o fetcher começou a fotografar a carteira todo dia — '
            + 'ver integracoes_snapshot.json.' },
+    /* ESTOQUE, não fluxo: não confundir com 'integracoes' logo acima, que conta
+       integração NOVA no mês. Esta conta quantas marcas integradas pela Vesti o
+       CS tinha vendendo no mês. */
+    { k: 'integracoesAtivas', titulo: 'Integrações ativas', unidade: 'marcas',
+      comparacao: 'marcaDagua',
+      regra: 'Marcas da carteira do CS que venderam no mês E têm integração da Vesti '
+           + '(odbc_domains.integration_owner = "VESTI"). É a definição da medida `Integracao Ativa` '
+           + 'do Power BI "GMV - Métricas 2025" (Laura, 01/09/2026): integração que a Vesti mantém, '
+           + 'por oposição à do parceiro/ERP, que é a passiva. '
+           + '"Vendeu no mês" é o que dá história mensal a uma medida de estoque — o cadastro guarda '
+           + 'quem TEM integração, não desde quando. '
+           + 'O comparativo é a MARCA D\'ÁGUA do CS: o maior número que ele já teve em um mês.' },
     { k: 'gmv', titulo: 'GMV da carteira', unidade: 'R$',
       comparacao: 'anoAnterior',
       regra: 'Valor dos pedidos pagos das marcas do CS no mês, comparado com o mesmo mês do ano anterior.' },
@@ -1751,6 +1778,21 @@ function montar(bqd, hsd, tinoDados) {
   bqd.vestipago.forEach(r => {
     const m = porDom.get(r.dom); if (!m || !dataOk(r.d)) return;
     somaBon(mesDe(r.d), m.cs, 'vestipago', num(r.valor), m.nome);
+  });
+  /* Integrações ATIVAS: uma marca conta UMA vez no mês, não uma por pedido —
+     daí o Set antes da soma, mesma mecânica do Tino. A marca entra no mês em que
+     vendeu, e é isso que reconstrói o passado: sem amarrar no pedido não haveria
+     série mensal nenhuma para a marca d'água comparar. */
+  const ativaNoMes = new Set();          // mes|dom
+  bqd.pedidos.forEach(r => {
+    const m = porDom.get(r.dom);
+    if (!m || m.integracaoDona !== 'VESTI' || !dataOk(r.d)) return;
+    ativaNoMes.add(mesDe(r.d) + '|' + r.dom);
+  });
+  ativaNoMes.forEach(ch => {
+    const i = ch.indexOf('|');
+    const m = porDom.get(ch.slice(i + 1));
+    somaBon(ch.slice(0, i), m.cs, 'integracoesAtivas', 1, m.nome);
   });
   // Mensalidade: passa pelo mesmo casamento CNPJ -> nome do pagador da tabela geral
   bqd.mensalidade.forEach(r => {

@@ -1516,11 +1516,15 @@ const TABS = [
     titulo:'Bonificação — números do mês',
     desc:'Uma linha por CS, uma coluna por regra, sempre no <b>mês fechado</b>. '
       + 'Onde a regra pede comparação, a variação aparece embaixo do número: '
-      + '<b>Tino</b> e <b>mensalidade</b> comparam com a <b>marca d\'água</b> do CS — o maior número '
+      + '<b>Tino</b>, <b>mensalidade</b> e <b>integrações ativas</b> comparam com a <b>marca d\'água</b> do CS — o maior número '
       + 'que ele já registrou em um mês, contando só os meses anteriores ao escolhido; '
       + '<b>VestiPago</b> e <b>GMV</b> comparam com o mesmo mês do ano passado. Mensalidade, '
-      + 'VestiPago e GMV aparecem <b>em porcentagem</b> (o valor em reais da diferença fica no balãozinho do mouse). <b>Reuniões</b>, <b>integrações</b> e '
-      + '<b>varejos</b> são contagem do próprio mês. Passe o mouse no número para ver quais marcas entraram. '
+      + 'VestiPago e GMV aparecem <b>em porcentagem</b> (o valor em reais da diferença fica no balãozinho do mouse). <b>Reuniões</b>, <b>novas integrações</b> e '
+      + '<b>varejos</b> são contagem do próprio mês. '
+      + '<b>Integrações ativas</b> é ESTOQUE, não fluxo: marcas do CS que venderam no mês e têm integração '
+      + 'da Vesti (<i>integration_owner</i> = VESTI), a mesma definição do Power BI — não confundir com '
+      + '<b>novas integrações</b>, que conta integração nova. Ela <b>não vale pontos</b>: entrou como número. '
+      + 'Passe o mouse no número para ver quais marcas entraram. '
       + 'A <b>pontuação</b> está na segunda tabela, embaixo desta, com a régua de cada regra — ela vale '
       + 'para <b>Thamiris, Gabriella e Luana</b>, de <b>julho de 2026</b> em diante. '
       + '<b>Varejo</b> conta só filial nova classificada como varejo. A classificação automática vem do '
@@ -1583,7 +1587,7 @@ function METRICAS(){
    de madrugada, e sem isso a tela ficaria um dia inteiro mostrando a régua nova
    com a base velha. Com o arquivo já atualizado, os dois chegam ao mesmo
    número. */
-const MARCA_DAGUA = new Set(['tino60','mensalidade']);
+const MARCA_DAGUA = new Set(['tino60','mensalidade','integracoesAtivas']);
 
 function linhasBonificacao(){
   const b = DATA.bonificacao || {linhas:[], detalhe:[], meses:[]};

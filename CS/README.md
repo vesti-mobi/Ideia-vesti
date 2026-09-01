@@ -105,6 +105,7 @@ de layout continua indo por `node publicar.js`.
 | Cross-sell / Upsell | tudo | HubSpot, pipeline **Expand (Upgrades)** |
 | Oráculo | atendimentos / % IA | `oraculo_Atendimentos` (`source` IA/HUMAN) |
 | Oráculo | GMV | `oraculo_Pedidos.Tipo_Venda_Oraculo` |
+| Bonificação | Integrações ativas | Marcas do CS que venderam no mês E têm `odbc_domains.integration_owner = 'VESTI'`. Definição da medida `Integracao Ativa` do Power BI "GMV - Métricas 2025": integração que a Vesti mantém, por oposição à do parceiro/ERP (a passiva). É estoque, não fluxo — não confundir com "Novas integrações" |
 | Tabela geral | Tino / Oráculo / VestiPago | Tino: marca presente na base do produto (API do Tino). Oráculo: tem atendimento em `oraculo_Atendimentos`. VestiPago: tem conta de pagamento em `MongoDB_Payment_Companies` — é TER o produto, não usar; quem contratou e não transacionou aparece como Sim |
 | Tino | marcas, eventos, sessões, dias de acesso | **API do Tino** — `companies_chart`, `login_days`, `customer_kpis` |
 | VestiPago | valor / fee / antecipação | `MongoDB_Pedidos_Geral` com provider VestiPago |
@@ -232,8 +233,10 @@ por medição pedido a pedido (ressalva 4).
    de onde veio cada data.
 
 6c. **Bonificação: os números e, embaixo, os pontos.** A aba traz as sete regras
-   da planilha da Laura, uma coluna cada, por CS e por mês-calendário. Duas regras
-   comparam com a **marca d'água** do CS (Tino +40 eventos, mensalidade), duas com
+   da planilha da Laura, uma coluna cada, por CS e por mês-calendário — mais
+   "Integrações ativas", que entrou em 01/09/2026 vinda do Power BI. Três regras
+   comparam com a **marca d'água** do CS (Tino +40 eventos, mensalidade,
+   integrações ativas), duas com
    o mesmo mês do ano passado (VestiPago, GMV) e três são contagem do próprio mês
    (reuniões, integrações, varejos). Passar o mouse no número lista as marcas que
    entraram nele. As três de dinheiro (mensalidade, VestiPago, GMV) mostram a
@@ -252,6 +255,10 @@ por medição pedido a pedido (ressalva 4).
    | Integrações | 5 cada |
    | GMV | 1 a cada 1% a mais que o mesmo mês do ano passado |
    | Varejos | 10 cada |
+
+   **Integrações ativas não pontua.** Entrou como número, para a CS enxergar o
+   estoque de marcas integradas pela Vesti que estão vendendo. Se um dia virar
+   ponto, é só somar uma linha em `REGRAS_PONTOS` — a medida já está pronta.
 
    A **marca d'água** (31/08/2026) é o maior número que aquele CS já registrou em
    um mês, contando só os meses **anteriores** ao escolhido — incluir o próprio mês
