@@ -295,8 +295,8 @@
   },
   "85355": {
     "ligado": true,
-    "update": "2026-08-12",
-    "religamentoReal": false,
+    "update": "2026-09-01",
+    "religamentoReal": true,
     "nomePlanilha": "Look Kids",
     "canalPlanilha": "Varejo Vesti"
   },
@@ -735,9 +735,9 @@
     "canalPlanilha": "Vesti"
   },
   "196201": {
-    "ligado": false,
+    "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": false,
+    "religamentoReal": true,
     "nomePlanilha": "Sigui Atacado",
     "canalPlanilha": "Vesti"
   },
@@ -876,8 +876,8 @@
   },
   "60719": {
     "ligado": true,
-    "update": "2026-08-01",
-    "religamentoReal": false,
+    "update": "2026-09-01",
+    "religamentoReal": true,
     "nomePlanilha": "Shyros",
     "canalPlanilha": "Vesti"
   },
@@ -3844,7 +3844,7 @@
   },
   "3277": {
     "ligado": true,
-    "update": "2026-07-07",
+    "update": "2026-09-01",
     "religamentoReal": true,
     "nomePlanilha": "",
     "canalPlanilha": ""
@@ -5300,15 +5300,15 @@
   },
   "1437352": {
     "ligado": true,
-    "update": "2026-08-01",
-    "religamentoReal": false,
+    "update": "2026-09-01",
+    "religamentoReal": true,
     "nomePlanilha": "Traffos Atacado",
     "canalPlanilha": "Vesti"
   },
   "1378010": {
     "ligado": true,
-    "update": "2026-08-18",
-    "religamentoReal": false,
+    "update": "2026-09-01",
+    "religamentoReal": true,
     "nomePlanilha": "Monnika Marikinha",
     "canalPlanilha": "Starter"
   },
@@ -6245,8 +6245,8 @@
   },
   "1238997": {
     "ligado": true,
-    "update": "2026-08-18",
-    "religamentoReal": false,
+    "update": "2026-09-01",
+    "religamentoReal": true,
     "nomePlanilha": "Monnika Marikinha Brand",
     "canalPlanilha": "N/A"
   },
@@ -7106,8 +7106,8 @@
   },
   "1217456": {
     "ligado": true,
-    "update": "2026-08-01",
-    "religamentoReal": false,
+    "update": "2026-09-01",
+    "religamentoReal": true,
     "nomePlanilha": "GO Padel",
     "canalPlanilha": "Vesti"
   },
@@ -7365,8 +7365,8 @@
   },
   "138772": {
     "ligado": true,
-    "update": "2026-08-10",
-    "religamentoReal": false,
+    "update": "2026-09-01",
+    "religamentoReal": true,
     "nomePlanilha": "Amy",
     "canalPlanilha": "Attasoft"
   },
