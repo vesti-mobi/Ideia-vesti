@@ -8,11 +8,14 @@ Substitui o Streamlit `vesti-pix-automatico/` para casos cliente-facing.
 Você manda um link tipo:
 
 ```
-https://vesti-pix.vercel.app/?parceiro=starter&plano=mensal_49_90
+https://vesti-pix-vercel.vercel.app/?parceiro=starter&plano=starter.27
 ```
 
 - `parceiro` → nome curto da subconta Iugu (ex: `starter`, `uemtel`, `alcance`).
-- `plano` → o `identifier` do plano cadastrado na Iugu.
+- `plano` → o `identifier` do plano cadastrado na Iugu. **Nao e o nome**: a Iugu
+  gera um identifier proprio quando o desejado ja existe na subconta, entao o
+  mesmo plano pode ter identifier diferente em cada parceiro (o plano
+  "Starter.1" de R$499 e `starter.1` na Uemtel e `starter.27` na Starter).
 
 O cliente abre, vê o plano (nome/valor/frequência puxados da Iugu), preenche nome/email/CPF e gera o Pix.
 
@@ -35,6 +38,8 @@ O cliente abre, vê o plano (nome/valor/frequência puxados da Iugu), preenche n
 
 Edita direto no painel da Iugu — não precisa mexer no código nem deployar.
 Use o `identifier` do plano na query string.
+
+Todo plano novo tambem precisa entrar no mapa `VALORES_PERMITIDOS` (em `api/plano.py` **e** `api/gerar-pix.py`) com o valor em centavos — identifier fora do mapa e recusado de proposito.
 
 ## Endpoints
 
