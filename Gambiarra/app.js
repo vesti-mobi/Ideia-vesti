@@ -1001,13 +1001,63 @@ function renderTabTravadas() {
   ], lista.map(e=>({...e,_alert:true})));
 }
 
+// Marcas que devem mas NAO estao no painel. A marca bloqueada perde o modulo
+// `vendas` e cai fora do SQL_EMPRESAS -- some do painel justo quando vira
+// inadimplente. Vem nomeada pela odbc_domains (ver foraDoPainel em
+// build_inadimplencia). Nao entra em KPI nenhum: e' so' listagem de cobranca.
+function marcasForaDoPainel(minDias) {
+  const min = minDias === undefined ? state.inadDias : minDias;
+  return (D.inadForaDoPainel || [])
+    .filter(e => {
+      if ((e.diasAtraso || 0) <= min) return false;
+      // mesmos filtros do topo (empresasFiltradas): a aba tem que ficar coerente
+      if (state.cs !== "todas" && e.cs !== state.cs) return false;
+      if (!state.canais.has(canalDe(e))) return false;
+      if (state.empresa !== "todas" && e.name !== state.empresa) return false;
+      return true;
+    })
+    .sort((a, b) => (b.diasAtraso || 0) - (a.diasAtraso || 0));
+}
+
+function renderInadFora() {
+  const card = $("card-inad-fora");
+  if (!card) return;
+  const lista = marcasForaDoPainel();
+  if (!lista.length) {
+    card.style.display = "none";
+    const tbl = $("tbl-inad-fora");
+    if (tbl) tbl.innerHTML = "";   // nao deixa a tabela anterior encalhada no DOM
+    return;
+  }
+  card.style.display = "";
+  const total = lista.reduce((s,e)=>s+(e.valorEmAberto||0), 0);
+  const bloq = lista.filter(e => e.bloqueada).length;
+  const hint = $("inad-fora-hint");
+  if (hint) hint.innerHTML =
+    `${fmtInt(lista.length)} marcas · ${fmtBRL(total)} em aberto `
+    + `<span class="pill pill-inad-bloq">${fmtInt(bloq)} bloqueadas</span>`;
+  renderTable("tbl-inad-fora", [
+    {label:"Marca", fn:r=>r.name, sort:r=>r.name},
+    {label:"Situação", fn:r=>inadBadge(r.diasAtraso), sort:r=>r.diasAtraso||0},
+    {label:"CS", fn:r=>r.cs||"—", sort:r=>r.cs||""},
+    {label:"Canal", fn:r=>canalDe(r), sort:r=>canalDe(r)},
+    {label:"Domínio", cls:"num", fn:r=>r.domain_id, sort:r=>+r.domain_id||0},
+    {label:"Venc. mais antigo", fn:r=>r.vencimentoMaisAntigo||"—", sort:r=>r.vencimentoMaisAntigo||""},
+    {label:"Dias em atraso", cls:"num", fn:r=>fmtInt(r.diasAtraso||0), sort:r=>r.diasAtraso||0},
+    {label:"Faturas vencidas", cls:"num", fn:r=>fmtInt(r.qtFaturas||0), sort:r=>r.qtFaturas||0},
+    {label:"Subconta Iugu", fn:r=>(r.subcontas||[]).join(", ")||"—", sort:r=>(r.subcontas||[])[0]||""},
+    {label:"Valor em aberto", cls:"num", fn:r=>fmtBRL(r.valorEmAberto||0), sort:r=>r.valorEmAberto||0},
+  ], lista.map(e=>({...e, _alert: !!e.bloqueada})));
+}
+
 function renderTabInadimplentes() {
   const lista = marcasInadimplentes();
   const total = lista.reduce((s,e)=>s+(e.valorEmAberto||0), 0);
   const bloq = lista.filter(e => inadStatus(e.diasAtraso) === "bloqueado");
   const alerta = lista.filter(e => inadStatus(e.diasAtraso) === "alerta");
   const hint = $("inad-hint");
-  // faturas que nao casaram com nenhuma marca do painel -- melhor dizer do que sumir
+  // faturas que nao casaram com nenhuma marca do painel -- melhor dizer do que sumir.
+  // As que deu pra nomear vao na tabela de baixo (renderInadFora).
   const fora = (D.inadSemDominio || {});
   const foraTxt = (fora.qtFaturas || 0)
     ? ` · <span class="hint">${fmtInt(fora.qtFaturas)} faturas sem marca no painel (${fmtBRL(fora.valor||0)})</span>`
@@ -1017,6 +1067,9 @@ function renderTabInadimplentes() {
       + `<span class="pill pill-inad-bloq">${fmtInt(bloq.length)} bloqueadas</span>`
       + `<span class="pill pill-inad-alerta">${fmtInt(alerta.length)} em alerta</span>` + foraTxt
     : "nenhuma marca acima dessa régua";
+
+  // roda antes do early-return: a marca bloqueada pode ser a UNICA coisa a mostrar
+  renderInadFora();
 
   // faixas cortadas na regua das tags: a primeira e' o amarelo (alerta), o resto e' bloqueio
   if (!lista.length) {

@@ -282,6 +282,11 @@ WHERE status='paid' AND paid_at IS NOT NULL AND paid_at NOT IN ('None','')
 #    virou 14 marcas / R$ 15,1k). Por isso a query sai no grao FATURA x DOMINIO
 #    CANDIDATO com `prio` (1 = custom_variables do proprio customer da Iugu,
 #    2 = casamento por CNPJ) e o desempate acontece em build_inadimplencia.
+#
+#    Os LEFT JOINs finais (odbc_domains / odbc_angels / odbc_partners) existem
+#    pra NOMEAR a marca cujo dominio nao esta no painel: a marca bloqueada perde
+#    `modulos LIKE '%vendas%'` e sai do SQL_EMPRESAS. Ver `foraDoPainel` em
+#    build_inadimplencia.
 # -----------------------------------------------------------------------------
 SQL_INADIMPLENTES = f"""
 WITH abertas AS (
@@ -324,9 +329,15 @@ cands AS (
 SELECT c.fatura_id, c.domain_id, c.prio, c.customer_id, c.account_name, c.status,
   c.due_dt, c.total_cents,
   DATE_DIFF(CURRENT_DATE('America/Sao_Paulo'), c.due_dt, DAY) dias_atraso,
-  d.created_at dom_created
+  d.created_at dom_created, d.name dom_name, d.modulos dom_modulos,
+  ang.name dom_cs, prt.name dom_partner
 FROM cands c
 LEFT JOIN `{PROJECT}.{DATASET}.odbc_domains` d ON CAST(d.ID AS STRING) = c.domain_id
+LEFT JOIN `{PROJECT}.{DATASET}.odbc_angels` ang ON ang.id = d.angel_id
+-- odbc_partners vem 2x no BQ; mesmo dedup do SQL_EMPRESAS
+LEFT JOIN (SELECT id, name FROM (
+    SELECT id, name, ROW_NUMBER() OVER(PARTITION BY id ORDER BY updated_at DESC) rn
+    FROM `{PROJECT}.{DATASET}.odbc_partners`) WHERE rn = 1) prt ON prt.id = d.partner_id
 """
 
 # Regua so' pra este print/relatorio. As TAGS do painel sao decididas no front
@@ -598,6 +609,16 @@ def build_inadimplencia(rows: list[dict], empresas_by_dom: dict[str, dict]) -> d
 
     Guarda tambem a SUBCONTA da Iugu (account_name) de cada fatura e a lista
     de subcontas por marca: as dividas estao espalhadas em ~10 das 15 contas.
+
+    `foraDoPainel` (01/09/2026): a marca BLOQUEADA por inadimplencia perde o
+    modulo `vendas` e cai fora do SQL_EMPRESAS -- ou seja, some do painel
+    exatamente quando vira inadimplente (Simone Modas dom 2107957 e VJ Modas
+    dom 2107964, bloqueadas em 17/08, foram o caso que a Laura reportou).
+    Antes essas faturas viravam so' um numero em `semDominio`. Agora saem
+    nomeadas pelo proprio odbc_domains (nome, CS, canal), pro painel listar
+    marca a marca sem readmiti-las nos KPIs. O agregado `semDominio` continua
+    contando TUDO que ficou de fora, inclusive dominio que nem existe na
+    odbc_domains e por isso nao tem nome pra mostrar.
     """
     def _iso(v):
         return v.isoformat()[:10] if hasattr(v, "isoformat") else (str(v)[:10] if v else "")
@@ -606,26 +627,11 @@ def build_inadimplencia(rows: list[dict], empresas_by_dom: dict[str, dict]) -> d
     for r in rows:
         candidatos.setdefault(str(r.get("fatura_id") or ""), []).append(r)
 
-    out: dict[str, dict] = {}
-    fora = {"qtFaturas": 0, "valor": 0.0, "subcontas": {}}
-    for cands in candidatos.values():
-        no_painel = [c for c in cands if str(c.get("domain_id") or "") in empresas_by_dom]
-        escolha = sorted(
-            no_painel or cands,
-            key=lambda c: (int(c.get("prio") or 9),
-                           -(c["dom_created"].toordinal() if c.get("dom_created") else 0)),
-        )[0]
-        dom = str(escolha.get("domain_id") or "")
-        if dom not in empresas_by_dom:
-            fora["qtFaturas"] += 1
-            fora["valor"] = round(fora["valor"] + int(escolha.get("total_cents") or 0) / 100.0, 2)
-            conta_f = (escolha.get("account_name") or "").strip()
-            if conta_f:
-                fora["subcontas"][conta_f] = fora["subcontas"].get(conta_f, 0) + 1
-            continue
-        slot = out.setdefault(dom, {"qtFaturas": 0, "valorEmAberto": 0.0,
-                                    "diasAtraso": 0, "vencimentoMaisAntigo": "",
-                                    "subcontas": [], "faturas": []})
+    def _novo_slot() -> dict:
+        return {"qtFaturas": 0, "valorEmAberto": 0.0, "diasAtraso": 0,
+                "vencimentoMaisAntigo": "", "subcontas": [], "faturas": []}
+
+    def _acumula(slot: dict, escolha: dict) -> None:
         venc = _iso(escolha.get("due_dt"))
         dias = int(escolha.get("dias_atraso") or 0)
         valor = round(int(escolha.get("total_cents") or 0) / 100.0, 2)
@@ -641,10 +647,56 @@ def build_inadimplencia(rows: list[dict], empresas_by_dom: dict[str, dict]) -> d
         if dias > slot["diasAtraso"]:
             slot["diasAtraso"] = dias
             slot["vencimentoMaisAntigo"] = venc
+
+    out: dict[str, dict] = {}
+    fora_dom: dict[str, dict] = {}
+    fora = {"qtFaturas": 0, "valor": 0.0, "subcontas": {}}
+    for cands in candidatos.values():
+        no_painel = [c for c in cands if str(c.get("domain_id") or "") in empresas_by_dom]
+        escolha = sorted(
+            no_painel or cands,
+            key=lambda c: (int(c.get("prio") or 9),
+                           -(c["dom_created"].toordinal() if c.get("dom_created") else 0)),
+        )[0]
+        dom = str(escolha.get("domain_id") or "")
+        if dom not in empresas_by_dom:
+            fora["qtFaturas"] += 1
+            fora["valor"] = round(fora["valor"] + int(escolha.get("total_cents") or 0) / 100.0, 2)
+            conta_f = (escolha.get("account_name") or "").strip()
+            if conta_f:
+                fora["subcontas"][conta_f] = fora["subcontas"].get(conta_f, 0) + 1
+            # so' entra na lista nomeada quem existe na odbc_domains -- sem nome
+            # nao ha o que a CS possa cobrar, fica so' no agregado acima
+            nome = (escolha.get("dom_name") or "").strip()
+            if nome:
+                slot_f = fora_dom.get(dom)
+                if slot_f is None:
+                    modulos = (escolha.get("dom_modulos") or "")
+                    partner = (escolha.get("dom_partner") or "")
+                    canal, starter = _classify_canal(partner)
+                    slot_f = fora_dom[dom] = {
+                        **_novo_slot(),
+                        "domain_id": dom,
+                        "name": nome,
+                        "cs": (escolha.get("dom_cs") or ""),
+                        "canal": canal,
+                        "partner_raw": partner,
+                        "starter_interno": starter,
+                        "modulos": modulos,
+                        # sem 'vendas' = ambiente desligado/bloqueado
+                        "bloqueada": "vendas" not in modulos.lower(),
+                    }
+                _acumula(slot_f, escolha)
+            continue
+        _acumula(out.setdefault(dom, _novo_slot()), escolha)
     for slot in out.values():
         slot["faturas"].sort(key=lambda f: f["venc"])
+    for slot in fora_dom.values():
+        slot["faturas"].sort(key=lambda f: f["venc"])
+    fora_lista = sorted(fora_dom.values(), key=lambda s: -s["diasAtraso"])
     return {"geradoEm": datetime.now(timezone.utc).isoformat(),
-            "reguaDias": REGUA_INADIMPLENCIA, "semDominio": fora, "dominios": out}
+            "reguaDias": REGUA_INADIMPLENCIA, "semDominio": fora,
+            "foraDoPainel": fora_lista, "dominios": out}
 
 
 # =============================================================================
@@ -779,10 +831,14 @@ def main() -> None:
     acima = [d for d in inad["dominios"].values() if d["diasAtraso"] > REGUA_INADIMPLENCIA]
     n_doms = len(inad["dominios"])
     contas = sorted({c for d in inad["dominios"].values() for c in d.get("subcontas", [])})
+    fora_lista = inad.get("foraDoPainel") or []
+    bloqueadas = [d for d in fora_lista if d.get("bloqueada")]
     print(f"[write] {OUT_INADIMP.name} ({n_doms} dominios com fatura vencida, "
           f"{len(acima)} com mais de {REGUA_INADIMPLENCIA} dias, "
           f"{len(contas)} subcontas Iugu; {inad['semDominio']['qtFaturas']} faturas "
-          f"fora do painel = R$ {inad['semDominio']['valor']:,.2f})")
+          f"fora do painel = R$ {inad['semDominio']['valor']:,.2f}; "
+          f"{len(fora_lista)} marcas identificadas fora do painel, "
+          f"{len(bloqueadas)} bloqueadas)")
 
     print("[ok] coleta BQ concluida. Rode fetch_ambiente.py e build_data.py em seguida.")
 

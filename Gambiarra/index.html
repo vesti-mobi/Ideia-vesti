@@ -301,6 +301,16 @@
       <div class="ch"><h4>Valor em aberto por CS</h4><div class="cw"><canvas id="chart-inad-cs"></canvas></div></div>
     </div>
     <div class="tbl-card"><h4>Marcas com fatura vencida em aberto</h4><div class="tbl-wrap"><table class="dt" id="tbl-inadimplentes"></table></div></div>
+    <div class="tbl-card" id="card-inad-fora" style="display:none">
+      <h4>⛔ Marcas fora do painel (bloqueadas)</h4>
+      <p class="hint" style="margin:0 0 10px;color:var(--g);font-size:12px">
+        Quando a marca é <strong>bloqueada</strong> ela perde o módulo <em>vendas</em> e sai da consulta que monta o painel —
+        ou seja, sumia da lista acima exatamente quando virava inadimplente. Estas continuam devendo e aparecem aqui,
+        <strong>sem entrar nos KPIs</strong> (não têm mais GMV, cadastro nem VestiPago para somar).
+      </p>
+      <span class="hint" id="inad-fora-hint"></span>
+      <div class="tbl-wrap"><table class="dt" id="tbl-inad-fora"></table></div>
+    </div>
   </div>
 
   <div id="tab-upgrade" class="tab-panel">

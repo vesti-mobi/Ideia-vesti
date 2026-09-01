@@ -347,6 +347,10 @@ def main():
         "reguaInadimplencia": inad_regua,
         # faturas vencidas que nao casaram com nenhuma marca do painel
         "inadSemDominio": inad.get("semDominio") or {"qtFaturas": 0, "valor": 0.0},
+        # dessas, as que deu pra NOMEAR pela odbc_domains: quase todas sao marcas
+        # bloqueadas, que perdem o modulo `vendas` e somem do SQL_EMPRESAS
+        # justamente quando viram inadimplentes. Ver build_inadimplencia.
+        "inadForaDoPainel": inad.get("foraDoPainel") or [],
         "pendentes": ["Reativacao", "Link compartilhado", "Clicks no link"],
     }
     out = ROOT / "dashboard_data.js"
