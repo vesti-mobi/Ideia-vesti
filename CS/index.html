@@ -2412,12 +2412,42 @@ function renderRegua(serie){
 /* --- gráfico de categorias (barras horizontais coloridas) ---
    Usado pelo risco de churn: vermelho, amarelo e verde, com contagem e
    percentual. Não usa o eixo de semanas porque é um retrato do momento. */
+/* Largura real de um texto, para a goteira do rótulo caber no nome em vez de
+   chutar um número. Um canvas só, reaproveitado — criar um por barra seria caro
+   no redraw do resize. */
+const medirTexto = (()=>{
+  let ctx = null;
+  return (t, fonte)=>{
+    if(!ctx) ctx = document.createElement('canvas').getContext('2d');
+    ctx.font = fonte;
+    return ctx.measureText(String(t==null?'':t)).width;
+  };
+})();
+const escapar = t => String(t==null?'':t)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
 function desenharCategorias(host, cats){
   if(!host) return;
   const draw = ()=>{
     host.innerHTML = '';
     const total = cats.reduce((a,c)=>a+c.v,0);
-    const W = Math.max(300, host.clientWidth), linha = 46, P = {t:14, l:62, r:16};
+    const W = Math.max(300, host.clientWidth), linha = 46;
+    /* O rótulo é escrito da direita para a esquerda a partir da goteira. Com ela
+       fixa em 62px, "Thamiris Ribeiro" começava em x negativo e aparecia cortado
+       na borda do SVG. Agora a goteira nasce do nome mais longo, com teto de 38%
+       da largura para a barra não virar um toco — e só quem estoura o teto é
+       encurtado, com o nome inteiro no title. */
+    const FONTE_ROT = '12.5px "Instrument Sans", sans-serif';
+    const teto = Math.round(W * 0.38);
+    const encurtar = t => {
+      let x = String(t==null?'':t);
+      if(medirTexto(x, FONTE_ROT) <= teto) return x;
+      while(x.length > 1 && medirTexto(x+'…', FONTE_ROT) > teto) x = x.slice(0,-1);
+      return x + '…';
+    };
+    const rotulos = cats.map(c=>encurtar(c.l));
+    const maiorRot = Math.ceil(Math.max(0, ...rotulos.map(t=>medirTexto(t, FONTE_ROT))));
+    const P = {t:14, l: Math.min(teto + 14, Math.max(62, maiorRot + 14)), r:16};
     const H = P.t + cats.length*linha + 24;
     const max = Math.max(1, ...cats.map(c=>c.v));
     const iw = W - P.l - P.r;
@@ -2427,7 +2457,8 @@ function desenharCategorias(host, cats){
       const w = Math.max(c.v>0?3:0, (c.v/max)*iw);
       const pct = total ? Math.round(c.v/total*100) : 0;
       s += `<text x="${P.l-10}" y="${y+17}" text-anchor="end" font-family="Instrument Sans, sans-serif"
-             font-size="12.5" fill="var(--ink-2)">${c.l}</text>`;
+             font-size="12.5" fill="var(--ink-2)">${escapar(rotulos[i])}`
+        + (rotulos[i] === c.l ? '' : `<title>${escapar(c.l)}</title>`) + `</text>`;
       s += `<rect x="${P.l}" y="${y+4}" width="${iw}" height="20" rx="4" fill="var(--line-2)"/>`;
       s += `<rect x="${P.l}" y="${y+4}" width="${w}" height="20" rx="4" fill="${c.cor}"/>`;
       /* A barra da maior categoria ocupa a faixa inteira, e aí o rótulo à
