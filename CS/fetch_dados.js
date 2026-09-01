@@ -151,6 +151,20 @@ const DIA = (col) => `FORMAT_DATE('%Y-%m-%d', DATE(CAST(${col} AS TIMESTAMP)))`;
 async function puxarBQ() {
   console.log('\n[BigQuery] projeto vesti-data-499015 / vestilake_BI');
 
+  /* `integration_owner` é a coluna que separa integração ATIVA (dona = VESTI) da
+     passiva. Ela está declarada no ETL do domains, mas NÃO existe na tabela do
+     espelho — referenciá-la direto derrubou a carga inteira em 01/09/2026
+     ("Name integration_owner not found inside d"). Coluna opcional não pode
+     quebrar o painel: o fetcher pergunta ao INFORMATION_SCHEMA e segue sem ela
+     quando não está lá. No dia em que o ETL recriar a tabela com a coluna, a
+     medida passa a existir sozinha, sem mexer em código. */
+  const colsDominios = await q('colunas de odbc_domains', `
+    SELECT column_name FROM ${DS}.INFORMATION_SCHEMA.COLUMNS
+    WHERE table_name = 'odbc_domains'`);
+  const TEM_OWNER = colsDominios.some(c => c.column_name === 'integration_owner');
+  console.log('  odbc_domains.integration_owner'.padEnd(44)
+    + (TEM_OWNER ? 'existe' : 'AUSENTE — "Integrações ativas" fica fora do painel').padStart(8));
+
   const cadastro = await q('cadastro de marcas (domínio + CS)', `
     WITH dom AS (
       SELECT CAST(ID AS STRING) id, name, angel_id, integration_type, integration_id, created_at,
@@ -186,7 +200,8 @@ async function puxarBQ() {
       SELECT CAST(id AS STRING) id, ANY_VALUE(name) nome
       FROM ${DS}.odbc_partners GROUP BY 1
     )
-    SELECT d.id, d.name nome, d.integration_type, d.integration_owner, i.nome integracao_nome,
+    SELECT d.id, d.name nome, d.integration_type, i.nome integracao_nome,
+           ${TEM_OWNER ? 'd.integration_owner' : 'CAST(NULL AS STRING) integration_owner'},
            a.name cs, c.tax_document cnpj, c.social_name, c.company_name, c.status status_empresa,
            SUBSTR(CAST(d.created_at AS STRING),1,10) criacao,
            p.nome canal,
@@ -512,7 +527,8 @@ async function puxarBQ() {
     FROM ${DS}.confeccao_tipo_empresa`);
 
   return { cadastro, cadastroFora, pedidos, ultimoPedido, vestipago, oraculoGmv, oraculoAtend,
-           interchange, mensalidade, faturas, implantacaoVP, implantacaoOraculo, filiaisNovas, coberturaTipo };
+           interchange, mensalidade, faturas, implantacaoVP, implantacaoOraculo, filiaisNovas, coberturaTipo,
+           temIntegrationOwner: TEM_OWNER };
 }
 
 // ============================================================ 1B. API DO TINO
@@ -1745,6 +1761,12 @@ function montar(bqd, hsd, tinoDados) {
            + 'O CS é o do domínio: a filial não tem anjo próprio.' },
   ];
 
+  /* Sem `integration_owner` no espelho não dá para dizer quem é ATIVA. Aí a regra
+     sai da lista inteira, em vez de aparecer como coluna de zeros — numa tabela
+     de bonificação, zero é lido como "esse CS não tem nenhuma", que seria falso. */
+  const METRICAS = bqd.temIntegrationOwner ? METRICAS_BONIFICACAO
+    : METRICAS_BONIFICACAO.filter(m => m.k !== 'integracoesAtivas');
+
   /* O HubSpot grava o mesmo responsável com nome curto na carteira e completo no
      dono do registro ("Jennyfer Rabelo" × "Jennyfer Rabelo dos Santos"). Sem
      juntar os dois, a mesma pessoa vira duas linhas na tabela de bonificação.
@@ -1880,7 +1902,7 @@ function montar(bqd, hsd, tinoDados) {
     const porSerie = new Map();     // cs|k -> [{mes, valor}]
     bonAcc.forEach((valor, ch) => {
       const [mes, cs, k] = ch.split('|');
-      const met = METRICAS_BONIFICACAO.find(x => x.k === k);
+      const met = METRICAS.find(x => x.k === k);
       if (!met || met.comparacao !== 'marcaDagua') return;
       const s = cs + '|' + k;
       if (!porSerie.has(s)) porSerie.set(s, []);
@@ -1894,7 +1916,7 @@ function montar(bqd, hsd, tinoDados) {
   }
   const bonLinhas = [...bonAcc.entries()].map(([ch, valor]) => {
     const [mes, cs, k] = ch.split('|');
-    const met = METRICAS_BONIFICACAO.find(x => x.k === k);
+    const met = METRICAS.find(x => x.k === k);
     let base = null;
     if (met && met.comparacao === 'mesAnterior') base = bonAcc.get(mesAntes(mes, 1) + '|' + cs + '|' + k) ?? 0;
     if (met && met.comparacao === 'anoAnterior') base = bonAcc.get(mesAntes(mes, 12) + '|' + cs + '|' + k) ?? 0;
@@ -2079,7 +2101,7 @@ function montar(bqd, hsd, tinoDados) {
     churn: { series: churnSeries.filter(doAnoCorrente) },
     bonificacao: {
       meses: bonMeses,
-      metricas: METRICAS_BONIFICACAO,
+      metricas: METRICAS,
       linhas: bonLinhas,
       detalhe: bonDetalhe,
       limiteTino: LIMITE_TINO,
