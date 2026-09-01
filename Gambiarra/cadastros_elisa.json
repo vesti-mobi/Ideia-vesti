@@ -4723,6 +4723,66 @@
     "qtProdutos1oMes": 22,
     "primeiroPedidoCadastrado": "2025-07-01T01:05:43+00:00"
   },
+  "731799": {
+    "qtProdutos": 2067,
+    "produtosPorMes": {
+      "2026-04": 56,
+      "2024-08": 53,
+      "2023-11": 61,
+      "2025-02": 56,
+      "2026-07": 59,
+      "2022-11": 56,
+      "2024-10": 60,
+      "2022-06": 12,
+      "2023-01": 20,
+      "2022-07": 21,
+      "2024-01": 24,
+      "2025-11": 26,
+      "2025-09": 28,
+      "2022-08": 30,
+      "2026-02": 31,
+      "2025-03": 31,
+      "2024-09": 34,
+      "2024-04": 34,
+      "2026-06": 34,
+      "2023-07": 36,
+      "2025-12": 37,
+      "2024-11": 37,
+      "2026-01": 37,
+      "2023-02": 37,
+      "2023-12": 37,
+      "2023-05": 38,
+      "2023-10": 38,
+      "2026-05": 39,
+      "2025-06": 40,
+      "2024-02": 40,
+      "2023-09": 40,
+      "2025-05": 40,
+      "2024-07": 41,
+      "2022-12": 41,
+      "2025-08": 41,
+      "2025-01": 41,
+      "2023-08": 42,
+      "2024-03": 42,
+      "2026-03": 43,
+      "2024-12": 43,
+      "2024-05": 44,
+      "2025-04": 44,
+      "2022-09": 45,
+      "2022-10": 45,
+      "2023-04": 45,
+      "2026-08": 46,
+      "2025-10": 47,
+      "2024-06": 47,
+      "2025-07": 48,
+      "2023-06": 48,
+      "2023-03": 52
+    },
+    "primeiroCadastroProduto": "2022-06-01T16:06:57",
+    "primeiroMes": "2022-06",
+    "qtProdutos1oMes": 12,
+    "primeiroPedidoCadastrado": "2025-07-01T12:56:32+00:00"
+  },
   "749878": {
     "qtProdutos": 1965,
     "produtosPorMes": {
@@ -31594,6 +31654,31 @@
     "primeiroMes": "2025-10",
     "qtProdutos1oMes": 1
   },
+  "606611": {
+    "qtProdutos": 77,
+    "produtosPorMes": {
+      "2025-11": 1,
+      "2023-07": 1,
+      "2026-01": 1,
+      "2023-05": 1,
+      "2022-07": 1,
+      "2023-04": 2,
+      "2022-05": 3,
+      "2023-03": 4,
+      "2022-04": 4,
+      "2022-12": 4,
+      "2022-09": 4,
+      "2022-10": 5,
+      "2022-06": 6,
+      "2022-03": 7,
+      "2022-01": 9,
+      "2022-08": 24
+    },
+    "primeiroCadastroProduto": "2022-01-12T13:08:42",
+    "primeiroMes": "2022-01",
+    "qtProdutos1oMes": 9,
+    "primeiroPedidoCadastrado": "2025-07-05T00:15:14+00:00"
+  },
   "1071612": {
     "qtProdutos": 219,
     "produtosPorMes": {
@@ -36340,16 +36425,6 @@
     "primeiroMes": "2024-05",
     "qtProdutos1oMes": 51
   },
-  "1995145": {
-    "qtProdutos": 6,
-    "produtosPorMes": {
-      "2026-05": 6
-    },
-    "primeiroCadastroProduto": "2026-05-22T10:05:16",
-    "primeiroMes": "2026-05",
-    "qtProdutos1oMes": 6,
-    "primeiroPedidoCadastrado": "2026-05-25T19:05:17+00:00"
-  },
   "2076887": {
     "qtProdutos": 25,
     "produtosPorMes": {
@@ -37342,6 +37417,14 @@
     "primeiroMes": "",
     "qtProdutos1oMes": 0
   },
+  "1101641": {
+    "primeiroPedidoCadastrado": "2026-04-17T18:55:44+00:00",
+    "qtProdutos": 0,
+    "produtosPorMes": {},
+    "primeiroCadastroProduto": "",
+    "primeiroMes": "",
+    "qtProdutos1oMes": 0
+  },
   "970563": {
     "primeiroPedidoCadastrado": "2026-01-16T15:43:14+00:00",
     "qtProdutos": 0,
@@ -37366,24 +37449,8 @@
     "primeiroMes": "",
     "qtProdutos1oMes": 0
   },
-  "1994087": {
-    "primeiroPedidoCadastrado": "2026-03-28T13:40:19+00:00",
-    "qtProdutos": 0,
-    "produtosPorMes": {},
-    "primeiroCadastroProduto": "",
-    "primeiroMes": "",
-    "qtProdutos1oMes": 0
-  },
   "1082680": {
     "primeiroPedidoCadastrado": "2026-01-13T13:16:52+00:00",
-    "qtProdutos": 0,
-    "produtosPorMes": {},
-    "primeiroCadastroProduto": "",
-    "primeiroMes": "",
-    "qtProdutos1oMes": 0
-  },
-  "1101641": {
-    "primeiroPedidoCadastrado": "2026-04-17T18:55:44+00:00",
     "qtProdutos": 0,
     "produtosPorMes": {},
     "primeiroCadastroProduto": "",
@@ -37406,6 +37473,14 @@
     "primeiroMes": "",
     "qtProdutos1oMes": 0
   },
+  "2035512": {
+    "primeiroPedidoCadastrado": "2026-05-08T16:19:44+00:00",
+    "qtProdutos": 0,
+    "produtosPorMes": {},
+    "primeiroCadastroProduto": "",
+    "primeiroMes": "",
+    "qtProdutos1oMes": 0
+  },
   "1839697": {
     "primeiroPedidoCadastrado": "2026-03-16T15:15:41+00:00",
     "qtProdutos": 0,
@@ -37414,8 +37489,8 @@
     "primeiroMes": "",
     "qtProdutos1oMes": 0
   },
-  "2035512": {
-    "primeiroPedidoCadastrado": "2026-05-08T16:19:44+00:00",
+  "1994087": {
+    "primeiroPedidoCadastrado": "2026-03-28T13:40:19+00:00",
     "qtProdutos": 0,
     "produtosPorMes": {},
     "primeiroCadastroProduto": "",
