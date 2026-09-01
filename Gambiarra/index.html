@@ -283,8 +283,11 @@
       fatura <em>cancelada</em> ou <em>estornada</em> fica de fora, porque não é dívida do lojista (a Iugu cancela a fatura
       antiga antes de gerar a próxima). Os <strong>dias de atraso contam do vencimento mais antigo</strong> ainda em aberto,
       não do último. Fonte: espelho da Iugu no BigQuery — não depende do filtro de período.
-      <br><strong>Tags:</strong> <span class="pill pill-inad-alerta">⚠️ Alerta</span> de 1 a 10 dias de atraso ·
-      <span class="pill pill-inad-bloq">⛔ Bloqueado</span> com 11 dias ou mais (linha em vermelho).
+      <br><strong>Ambiente:</strong> <span class="pill pill-amb-on">🟢 Ativa</span> ainda vendendo normalmente ·
+      <span class="pill pill-amb-off">⛔ Desligada</span> ambiente cortado, perdeu o módulo <em>vendas</em>
+      (linha em vermelho). A desligada não aparece em nenhuma outra aba do painel — não tem mais GMV,
+      cadastro nem VestiPago — e também não tem mensalidade a cobrar, porque a assinatura caiu junto.
+      A urgência está na coluna <strong>Dias em atraso</strong>, que ordena do pior para o melhor.
     </p>
     <div class="sub-filter">
       <label>Atraso mínimo:</label>
@@ -301,16 +304,6 @@
       <div class="ch"><h4>Valor em aberto por CS</h4><div class="cw"><canvas id="chart-inad-cs"></canvas></div></div>
     </div>
     <div class="tbl-card"><h4>Marcas com fatura vencida em aberto</h4><div class="tbl-wrap"><table class="dt" id="tbl-inadimplentes"></table></div></div>
-    <div class="tbl-card" id="card-inad-fora" style="display:none">
-      <h4>⛔ Marcas fora do painel (bloqueadas)</h4>
-      <p class="hint" style="margin:0 0 10px;color:var(--g);font-size:12px">
-        Quando a marca é <strong>bloqueada</strong> ela perde o módulo <em>vendas</em> e sai da consulta que monta o painel —
-        ou seja, sumia da lista acima exatamente quando virava inadimplente. Estas continuam devendo e aparecem aqui,
-        <strong>sem entrar nos KPIs</strong> (não têm mais GMV, cadastro nem VestiPago para somar).
-      </p>
-      <span class="hint" id="inad-fora-hint"></span>
-      <div class="tbl-wrap"><table class="dt" id="tbl-inad-fora"></table></div>
-    </div>
   </div>
 
   <div id="tab-upgrade" class="tab-panel">

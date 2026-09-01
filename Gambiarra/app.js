@@ -21,9 +21,10 @@ const isAtta   = (e) => ["atta","attasoft"].includes((e.partner_raw||"").toLower
 const isVesti  = (e) => ["vesti","varejo vesti"].includes((e.partner_raw||"").toLowerCase());
 const COLORS = ["#6C5CE7","#00B894","#F39C12","#E17055","#0984E3","#FD79A8","#00CEC9","#A29BFE","#D63031","#74B9FF","#FFB94A","#55EFC4"];
 const charts = {}; // canvas id -> Chart instance
-// Regua das TAGS de inadimplencia (pedido da Laura): 1 a 10 dias de atraso = alerta
-// (amarelo); 11 dias ou mais = bloqueado (vermelho). O atraso vem do vencimento MAIS
-// ANTIGO em aberto (ver build_inadimplencia em fetch_elisa_bq.py).
+// Corte da 1a faixa do grafico "marcas por faixa de atraso". Era tambem a regua das
+// TAGS alerta/bloqueado, removidas em 01/09/2026 quando as duas tabelas da aba viraram
+// uma so' -- "bloqueado" ali significava 11d+ de atraso e passou a colidir com a marca
+// DESLIGADA de verdade. O atraso vem do vencimento MAIS ANTIGO em aberto.
 const INAD_LIMITE_ALERTA = 10;
 
 // ---------- helpers ----------
@@ -56,21 +57,6 @@ function empresasFiltradas() {
     return true;
   });
 }
-function inadStatus(dias) {
-  const d = Number(dias) || 0;
-  if (d <= 0) return null;
-  return d <= INAD_LIMITE_ALERTA ? "alerta" : "bloqueado";
-}
-
-function inadBadge(dias) {
-  const st = inadStatus(dias);
-  if (!st) return "—";
-  const d = Number(dias) || 0;
-  return st === "alerta"
-    ? `<span class="pill pill-inad-alerta">⚠️ Alerta · ${d}d</span>`
-    : `<span class="pill pill-inad-bloq">⛔ Bloqueado · ${d}d</span>`;
-}
-
 function vpBadge(e) {
   if (e.temPixAtivo && e.temCartaoAtivo) return `<span class="pill pill-ambos">PIX + Cartão</span>`;
   if (e.temPixAtivo) return `<span class="pill pill-pix">só PIX</span>`;
@@ -415,11 +401,41 @@ function renderTable(tableId, columns, rows) {
 // Marcas com fatura vencida e ainda em aberto ha mais dias que a regua.
 // Nao depende do filtro de periodo -- e' uma foto de hoje, igual Sem VP/Travadas.
 // Os dias vem do vencimento MAIS ANTIGO em aberto (ver build_inadimplencia).
+// Devedoras de DENTRO do painel: continuam vendendo, ambiente ligado.
+function inadAtivas() {
+  return empresasFiltradas()
+    .filter(e => (e.faturasVencidas || 0) > 0)
+    .map(e => ({...e, _ativa: true,
+                _qtFaturas: e.faturasVencidas || 0,
+                _subcontas: e.subcontasIugu || []}));
+}
+
+// Devedoras DESLIGADAS: perderam o modulo `vendas` e nao estao em D.empresas.
+// Nao tem valor_mensal (a assinatura foi cortada junto), por isso o null.
+function inadDesligadas() {
+  return foraDoPainelBase()
+    .filter(e => state.empresa === "todas" || e.name === state.empresa)
+    .map(e => ({...e, _ativa: false,
+                _qtFaturas: e.qtFaturas || 0,
+                _subcontas: e.subcontas || [],
+                valor_mensal: null}));
+}
+
+// Lista unica da aba (decisao da Laura em 01/09/2026): ativas e desligadas na
+// MESMA tabela, com a coluna Ambiente como unica sinalizacao. A urgencia fica
+// na coluna numerica de dias, que ja ordena -- por isso a lista sai ordenada
+// do maior atraso pro menor.
 function marcasInadimplentes(minDias) {
   const min = minDias === undefined ? state.inadDias : minDias;
-  return empresasFiltradas()
-    .filter(e => (e.faturasVencidas || 0) > 0 && (e.diasAtraso || 0) > min)
+  return [...inadAtivas(), ...inadDesligadas()]
+    .filter(e => (e.diasAtraso || 0) > min)
     .sort((a, b) => (b.diasAtraso || 0) - (a.diasAtraso || 0));
+}
+
+function ambienteBadge(ativa) {
+  return ativa
+    ? `<span class="pill pill-amb-on">🟢 Ativa</span>`
+    : `<span class="pill pill-amb-off">⛔ Desligada</span>`;
 }
 
 function renderKpis() {
@@ -481,13 +497,14 @@ function renderKpis() {
   $("kpi-upgrade-sub").textContent = mesesUpg.length
     ? `${fmtBRL(state.upgMin)}+ em ${mesesUpg[0]} … ${mesesUpg[mesesUpg.length-1]}`
     : "sem meses fechados";
-  // Card da Home ignora o filtro da aba: mostra TODO mundo com fatura vencida,
-  // quebrado entre bloqueadas (11d+) e em alerta (1-10d).
+  // Card da Home ignora a regua da aba: mostra TODO mundo com fatura vencida,
+  // ativas E desligadas (decisao da Laura em 01/09/2026) -- e' o total real a
+  // receber, e bate com a tabela unica da aba.
   const inad = marcasInadimplentes(0);
-  const bloqN = inad.filter(e => inadStatus(e.diasAtraso) === "bloqueado").length;
+  const deslN = inad.filter(e => !e._ativa).length;
   $("kpi-inad").textContent = fmtInt(inad.length);
   $("kpi-inad-sub").textContent =
-    `${fmtInt(bloqN)} bloqueadas · ${fmtInt(inad.length - bloqN)} em alerta · `
+    `${fmtInt(deslN)} desligadas · ${fmtInt(inad.length - deslN)} ativas · `
     + `${fmtBRL(inad.reduce((s,e)=>s+(e.valorEmAberto||0),0))} em aberto`;
   $("kpi-cliques").textContent    = fmtInt(cliquesTot);
   $("kpi-links").textContent      = fmtInt(linksTot);
@@ -1008,7 +1025,7 @@ function renderTabTravadas() {
 // So' os filtros globais de CS/canal -- sem a regua de dias e sem o seletor de
 // empresa. E' o conjunto que o combobox precisa oferecer pra busca (ver
 // populaEmpresas): buscar "Simone" e nao achar nada dizia que a marca nao
-// existe, quando ela so' estava bloqueada, fora do painel e devendo.
+// existe, quando ela so' estava desligada, fora do painel e devendo.
 function foraDoPainelBase() {
   return (D.inadForaDoPainel || []).filter(e => {
     if (state.cs !== "todas" && e.cs !== state.cs) return false;
@@ -1017,79 +1034,28 @@ function foraDoPainelBase() {
   });
 }
 
-function marcasForaDoPainel(minDias) {
-  const min = minDias === undefined ? state.inadDias : minDias;
-  return foraDoPainelBase()
-    .filter(e => (e.diasAtraso || 0) > min)
-    .filter(e => state.empresa === "todas" || e.name === state.empresa)
-    .sort((a, b) => (b.diasAtraso || 0) - (a.diasAtraso || 0));
-}
-
-// usado pelo atalho no topo da aba (o card fica depois de uma tabela longa)
-function verInadFora() {
-  const card = $("card-inad-fora");
-  if (card) card.scrollIntoView({behavior:"smooth", block:"start"});
-}
-
-function renderInadFora() {
-  const card = $("card-inad-fora");
-  if (!card) return;
-  const lista = marcasForaDoPainel();
-  if (!lista.length) {
-    card.style.display = "none";
-    const tbl = $("tbl-inad-fora");
-    if (tbl) tbl.innerHTML = "";   // nao deixa a tabela anterior encalhada no DOM
-    return;
-  }
-  card.style.display = "";
-  const total = lista.reduce((s,e)=>s+(e.valorEmAberto||0), 0);
-  const bloq = lista.filter(e => e.bloqueada).length;
-  const hint = $("inad-fora-hint");
-  if (hint) hint.innerHTML =
-    `${fmtInt(lista.length)} marcas · ${fmtBRL(total)} em aberto `
-    + `<span class="pill pill-inad-bloq">${fmtInt(bloq)} bloqueadas</span>`;
-  renderTable("tbl-inad-fora", [
-    {label:"Marca", fn:r=>r.name, sort:r=>r.name},
-    {label:"Situação", fn:r=>inadBadge(r.diasAtraso), sort:r=>r.diasAtraso||0},
-    {label:"CS", fn:r=>r.cs||"—", sort:r=>r.cs||""},
-    {label:"Canal", fn:r=>canalDe(r), sort:r=>canalDe(r)},
-    {label:"Domínio", cls:"num", fn:r=>r.domain_id, sort:r=>+r.domain_id||0},
-    {label:"Venc. mais antigo", fn:r=>r.vencimentoMaisAntigo||"—", sort:r=>r.vencimentoMaisAntigo||""},
-    {label:"Dias em atraso", cls:"num", fn:r=>fmtInt(r.diasAtraso||0), sort:r=>r.diasAtraso||0},
-    {label:"Faturas vencidas", cls:"num", fn:r=>fmtInt(r.qtFaturas||0), sort:r=>r.qtFaturas||0},
-    {label:"Subconta Iugu", fn:r=>(r.subcontas||[]).join(", ")||"—", sort:r=>(r.subcontas||[])[0]||""},
-    {label:"Valor em aberto", cls:"num", fn:r=>fmtBRL(r.valorEmAberto||0), sort:r=>r.valorEmAberto||0},
-  ], lista.map(e=>({...e, _alert: !!e.bloqueada})));
-}
-
 function renderTabInadimplentes() {
   const lista = marcasInadimplentes();
   const total = lista.reduce((s,e)=>s+(e.valorEmAberto||0), 0);
-  const bloq = lista.filter(e => inadStatus(e.diasAtraso) === "bloqueado");
-  const alerta = lista.filter(e => inadStatus(e.diasAtraso) === "alerta");
+  const desl = lista.filter(e => !e._ativa);
   const hint = $("inad-hint");
-  // faturas que nao casaram com nenhuma marca do painel -- melhor dizer do que sumir.
-  // As que deu pra nomear vao na tabela de baixo (renderInadFora).
-  const fora = (D.inadSemDominio || {});
-  // atalho pra secao de baixo: ela fica depois de uma tabela longa e passava batido
-  const nFora = marcasForaDoPainel().length;
-  const foraTxt = nFora
-    ? ` · <a href="#card-inad-fora" class="hint" onclick="verInadFora();return false"`
-      + ` style="text-decoration:underline;cursor:pointer">⛔ +${fmtInt(nFora)} marcas bloqueadas,`
-      + ` fora do painel (${fmtBRL(marcasForaDoPainel().reduce((s,e)=>s+(e.valorEmAberto||0),0))}) →</a>`
-    : ((fora.qtFaturas || 0)
-        ? ` · <span class="hint">${fmtInt(fora.qtFaturas)} faturas sem marca no painel (${fmtBRL(fora.valor||0)})</span>`
-        : "");
+  // Faturas vencidas que nao casaram com marca NENHUMA (nem desligada) -- hoje
+  // sao 0, mas se o mapa customer->dominio falhar melhor dizer do que sumir.
+  // conta dos DADOS BRUTOS, nao da lista filtrada: e' uma propriedade do
+  // espelho da Iugu (fatura que nao casou com dominio nenhum), nao muda com
+  // regua nem com filtro de CS. Hoje da' 0 -- as 37 orfas foram todas nomeadas.
+  const orfas = (D.inadSemDominio || {}).qtFaturas || 0;
+  const nomeadas = (D.inadForaDoPainel || []).reduce((s,e)=>s+(e.qtFaturas||0), 0);
+  const sobra = Math.max(0, orfas - nomeadas);
+  const sobraTxt = sobra
+    ? ` · <span class="hint">${fmtInt(sobra)} faturas sem marca identificada</span>` : "";
   if (hint) hint.innerHTML = lista.length
     ? `${fmtInt(lista.length)} marcas · ${fmtBRL(total)} em aberto `
-      + `<span class="pill pill-inad-bloq">${fmtInt(bloq.length)} bloqueadas</span>`
-      + `<span class="pill pill-inad-alerta">${fmtInt(alerta.length)} em alerta</span>` + foraTxt
+      + `<span class="pill pill-amb-off">${fmtInt(desl.length)} desligadas</span>`
+      + `<span class="pill pill-amb-on">${fmtInt(lista.length - desl.length)} ativas</span>`
+      + sobraTxt
     : "nenhuma marca acima dessa régua";
 
-  // roda antes do early-return: a marca bloqueada pode ser a UNICA coisa a mostrar
-  renderInadFora();
-
-  // faixas cortadas na regua das tags: a primeira e' o amarelo (alerta), o resto e' bloqueio
   if (!lista.length) {
     const recado = "Nenhuma marca com fatura vencida nesses filtros";
     chartVazio("chart-inad-faixa", recado);
@@ -1097,10 +1063,10 @@ function renderTabInadimplentes() {
     renderTable("tbl-inadimplentes", [{label:"Marca", fn:r=>r.name}], []);
     return;
   }
-  const faixas = {"1-10d (alerta)":0,"11-30d":0,"31-60d":0,"61-90d":0,"90d+":0};
+  const faixas = {"1-10d":0,"11-30d":0,"31-60d":0,"61-90d":0,"90d+":0};
   for (const e of lista) {
     const d = e.diasAtraso || 0;
-    if (d<=INAD_LIMITE_ALERTA) faixas["1-10d (alerta)"]++;
+    if (d<=INAD_LIMITE_ALERTA) faixas["1-10d"]++;
     else if (d<=30) faixas["11-30d"]++;
     else if (d<=60) faixas["31-60d"]++;
     else if (d<=90) faixas["61-90d"]++;
@@ -1139,16 +1105,19 @@ function renderTabInadimplentes() {
   });
   renderTable("tbl-inadimplentes", [
     {label:"Marca", fn:r=>r.name, sort:r=>r.name},
-    {label:"Situação", fn:r=>inadBadge(r.diasAtraso), sort:r=>r.diasAtraso||0},
-    {label:"CS", fn:r=>r.cs, sort:r=>r.cs},
-    {label:"Canal", fn:r=>r.canal, sort:r=>r.canal},
+    // unica sinalizacao da linha: ligado x desligado. A urgencia fica nos dias.
+    {label:"Ambiente", fn:r=>ambienteBadge(r._ativa), sort:r=>r._ativa?1:0},
+    {label:"CS", fn:r=>r.cs||"—", sort:r=>r.cs||""},
+    {label:"Canal", fn:r=>canalDe(r), sort:r=>canalDe(r)},
+    {label:"Domínio", cls:"num", fn:r=>r.domain_id||"—", sort:r=>+r.domain_id||0},
     {label:"Venc. mais antigo", fn:r=>r.vencimentoMaisAntigo||"—", sort:r=>r.vencimentoMaisAntigo||""},
     {label:"Dias em atraso", cls:"num", fn:r=>fmtInt(r.diasAtraso||0), sort:r=>r.diasAtraso||0},
-    {label:"Faturas vencidas", cls:"num", fn:r=>fmtInt(r.faturasVencidas||0), sort:r=>r.faturasVencidas||0},
-    {label:"Subconta Iugu", fn:r=>(r.subcontasIugu||[]).join(", ")||"—", sort:r=>(r.subcontasIugu||[])[0]||""},
+    {label:"Faturas vencidas", cls:"num", fn:r=>fmtInt(r._qtFaturas||0), sort:r=>r._qtFaturas||0},
+    {label:"Subconta Iugu", fn:r=>(r._subcontas||[]).join(", ")||"—", sort:r=>(r._subcontas||[])[0]||""},
     {label:"Valor em aberto", cls:"num", fn:r=>fmtBRL(r.valorEmAberto||0), sort:r=>r.valorEmAberto||0},
-    {label:"Mensalidade", cls:"num", fn:r=>fmtBRL(r.valor_mensal), sort:r=>r.valor_mensal||0},
-  ], lista.map(e=>({...e, _alert: inadStatus(e.diasAtraso) === "bloqueado"})));
+    // desligada nao tem assinatura ativa, entao nao tem mensalidade a cobrar
+    {label:"Mensalidade", cls:"num", fn:r=>r.valor_mensal==null?"—":fmtBRL(r.valor_mensal), sort:r=>r.valor_mensal||0},
+  ], lista.map(e=>({...e, _alert: !e._ativa})));
 
   // rede de seguranca: canvas sem tamanho -> remede -> se persistir, barras HTML
   conferePosRender(["chart-inad-faixa","chart-inad-cs"], function(){
@@ -1539,15 +1508,15 @@ const _esc = (s) => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;","
 function populaEmpresas() {
   const lista = empresasFiltradas();
   const nomes = lista.map(e => e.name);
-  // Marca bloqueada perde o modulo `vendas` e nao esta em D.empresas -- mas TEM
+  // Marca desligada perde o modulo `vendas` e nao esta em D.empresas -- mas TEM
   // que ser encontravel aqui, senao a busca responde "nenhuma empresa" pra uma
   // marca que existe e esta devendo (caso Simone Modas / VJ Modas, 01/09/2026).
   const jaTem = new Set(nomes);
-  _cbx.bloqueadas = new Set(foraDoPainelBase().map(e => e.name).filter(n => !jaTem.has(n)));
-  _cbx.opcoes = [...nomes, ..._cbx.bloqueadas].sort((a,b)=>a.localeCompare(b,"pt-BR"));
+  _cbx.desligadas = new Set(foraDoPainelBase().map(e => e.name).filter(n => !jaTem.has(n)));
+  _cbx.opcoes = [...nomes, ..._cbx.desligadas].sort((a,b)=>a.localeCompare(b,"pt-BR"));
   const inp = $("filter-empresa-input");
-  inp.placeholder = _cbx.bloqueadas.size
-    ? `Todas (${lista.length} + ${_cbx.bloqueadas.size} bloqueadas) — digite para buscar`
+  inp.placeholder = _cbx.desligadas.size
+    ? `Todas (${lista.length} + ${_cbx.desligadas.size} desligadas) — digite para buscar`
     : `Todas (${lista.length}) — digite para buscar`;
   // se a empresa selecionada saiu da lista pelos outros filtros, volta pra "todas"
   if (state.empresa !== "todas" && !_cbx.opcoes.includes(state.empresa)) selecionaEmpresa("todas");
@@ -1568,8 +1537,8 @@ function renderCbxPanel(termo) {
       const i = _norm(n).indexOf(t);
       if (i >= 0) label = _esc(n.slice(0,i)) + "<mark>" + _esc(n.slice(i,i+termo.length)) + "</mark>" + _esc(n.slice(i+termo.length));
     }
-    // bloqueada: nao tem GMV/cadastro pra mostrar, so' aparece em Inadimplentes
-    if (_cbx.bloqueadas && _cbx.bloqueadas.has(n)) label = "⛔ " + label;
+    // desligada: nao tem GMV/cadastro pra mostrar, so' aparece em Inadimplentes
+    if (_cbx.desligadas && _cbx.desligadas.has(n)) label = "⛔ " + label;
     return `<div class="cbx-opt${n===state.empresa?" cur":""}" data-v="${_esc(n)}">${label}</div>`;
   }).join("") + (achados.length > 300 ? `<div class="cbx-empty">+${achados.length-300} … refine a busca</div>` : "");
   panel.querySelectorAll(".cbx-opt").forEach(o => o.addEventListener("mousedown", ev => {
@@ -1581,9 +1550,9 @@ function renderCbxPanel(termo) {
 // que tambem roda no blur so' pra repor o texto do campo. Marca bloqueada nao tem
 // dado em nenhuma outra aba, entao a busca leva direto pra onde ela existe.
 function escolheEmpresa(v) {
-  const bloqueada = v !== "todas" && _cbx.bloqueadas && _cbx.bloqueadas.has(v);
+  const desligada = v !== "todas" && _cbx.desligadas && _cbx.desligadas.has(v);
   selecionaEmpresa(v);
-  if (bloqueada && state.tab !== "inadimplentes") { switchTab("inadimplentes"); return; }
+  if (desligada && state.tab !== "inadimplentes") { switchTab("inadimplentes"); return; }
   renderActiveTab();
 }
 
