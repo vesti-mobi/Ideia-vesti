@@ -68,7 +68,7 @@ Precisa de:
   `vesti-mobi/dados` é público.
 
 Sem HubSpot o painel carrega mesmo assim: Cross-sell, Upsell, Reuniões e Tickets
-ficam vazias (e, na Bonificação, as colunas de reuniões e integrações). Sem a credencial do Tino, a aba do Tino e a coluna "Tino" da
+ficam vazias (e, na Bonificação, a coluna de reuniões). Sem a credencial do Tino, a aba do Tino e a coluna "Tino" da
 tabela geral ficam vazias — o resto carrega igual.
 
 ### Automático, todo dia às 04:00 BRT
@@ -105,7 +105,7 @@ de layout continua indo por `node publicar.js`.
 | Cross-sell / Upsell | tudo | HubSpot, pipeline **Expand (Upgrades)** |
 | Oráculo | atendimentos / % IA | `oraculo_Atendimentos` (`source` IA/HUMAN) |
 | Oráculo | GMV | `oraculo_Pedidos.Tipo_Venda_Oraculo` |
-| Bonificação | Integrações ativas | Marcas do CS que venderam no mês E têm `odbc_domains.integration_owner = 'VESTI'`. Definição da medida `Integracao Ativa` do Power BI "GMV - Métricas 2025": integração que a Vesti mantém, por oposição à do parceiro/ERP (a passiva). É estoque, não fluxo — não confundir com "Novas integrações" |
+| Bonificação | Integrações ativas | Marcas do CS que venderam no mês E têm `odbc_domains.integration_owner = 'VESTI'`. Definição da medida `Integracao Ativa` do Power BI "GMV - Métricas 2025": integração que a Vesti mantém, por oposição à do parceiro/ERP (a passiva). É estoque, não fluxo: conta quem TEM integração e vendeu, não quem integrou no mês |
 | Tabela geral | Tino / Oráculo / VestiPago | Tino: marca presente na base do produto (API do Tino). Oráculo: tem atendimento em `oraculo_Atendimentos`. VestiPago: tem conta de pagamento em `MongoDB_Payment_Companies` — é TER o produto, não usar; quem contratou e não transacionou aparece como Sim |
 | Tino | marcas, eventos, sessões, dias de acesso | **API do Tino** — `companies_chart`, `login_days`, `customer_kpis` |
 | VestiPago | valor / fee / antecipação | `MongoDB_Pedidos_Geral` com provider VestiPago |
@@ -238,7 +238,7 @@ por medição pedido a pedido (ressalva 4).
    comparam com a **marca d'água** do CS (Tino +40 eventos, mensalidade,
    integrações ativas), duas com
    o mesmo mês do ano passado (VestiPago, GMV) e três são contagem do próprio mês
-   (reuniões, integrações, varejos). Passar o mouse no número lista as marcas que
+   (reuniões, varejos). Passar o mouse no número lista as marcas que
    entraram nele. As três de dinheiro (mensalidade, VestiPago, GMV) mostram a
    variação em **porcentagem**, não em reais (27/08/2026) — o valor em R$ da
    diferença fica no title da célula.
@@ -252,9 +252,15 @@ por medição pedido a pedido (ressalva 4).
    | Mensalidade | 10 a cada R$ 1.000 acima da marca d'água, arredondando **para cima** |
    | VestiPago | 1 a cada 2% a mais que o mesmo mês do ano passado |
    | Reuniões | 1 cada |
-   | Integrações | 5 cada |
    | GMV | 1 a cada 1% a mais que o mesmo mês do ano passado |
    | Varejos | 10 cada |
+
+   **"Novas integrações" saiu da aba em 01/09/2026.** Media o fluxo — integração
+   nova fechada no mês — e dava 0 ou 1: foram 7 no time todo em 2026, e nunca duas
+   no mesmo mês para o mesmo CS. Valia 5 pontos cada e saiu junto com a coluna:
+   sem número na tabela de cima, não há o que converter. O retrato diário
+   (`integracoes_snapshot.json`) **continua sendo gravado** — é a única coisa que
+   registra quando uma integração começa, e um dia não fotografado não volta.
 
    **Integrações ativas não pontua.** Entrou como número, para a CS enxergar o
    estoque de marcas integradas pela Vesti que estão vendendo. Se um dia virar

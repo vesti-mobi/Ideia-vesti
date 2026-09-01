@@ -1519,11 +1519,11 @@ const TABS = [
       + '<b>Tino</b>, <b>mensalidade</b> e <b>integrações ativas</b> comparam com a <b>marca d\'água</b> do CS — o maior número '
       + 'que ele já registrou em um mês, contando só os meses anteriores ao escolhido; '
       + '<b>VestiPago</b> e <b>GMV</b> comparam com o mesmo mês do ano passado. Mensalidade, '
-      + 'VestiPago e GMV aparecem <b>em porcentagem</b> (o valor em reais da diferença fica no balãozinho do mouse). <b>Reuniões</b>, <b>novas integrações</b> e '
+      + 'VestiPago e GMV aparecem <b>em porcentagem</b> (o valor em reais da diferença fica no balãozinho do mouse). <b>Reuniões</b> e '
       + '<b>varejos</b> são contagem do próprio mês. '
       + '<b>Integrações ativas</b> é ESTOQUE, não fluxo: marcas do CS que venderam no mês e têm integração '
-      + 'da Vesti (<i>integration_owner</i> = VESTI), a mesma definição do Power BI — não confundir com '
-      + '<b>novas integrações</b>, que conta integração nova. Ela <b>não vale pontos</b>: entrou como número. '
+      + 'da Vesti (<i>integration_owner</i> = VESTI), a mesma definição do Power BI. '
+      + 'Ela <b>não vale pontos</b>: entrou como número. '
       + 'Passe o mouse no número para ver quais marcas entraram. '
       + 'A <b>pontuação</b> está na segunda tabela, embaixo desta, com a régua de cada regra — ela vale '
       + 'para <b>Thamiris, Gabriella e Luana</b>, de <b>julho de 2026</b> em diante. '
@@ -1665,7 +1665,6 @@ function linhasBonificacao(){
                       arredonda PARA CIMA: R$ 1.200 já são 20 pontos)
      VestiPago ...... 1 ponto a cada 2% a mais que o mesmo mês do ano passado
      Reuniões ....... 1 ponto cada
-     Integrações .... 5 pontos cada
      GMV ............ 1 ponto a cada 1% a mais que o mesmo mês do ano passado
      Varejos ........ 10 pontos cada
 
@@ -1691,8 +1690,6 @@ const REGRAS_PONTOS = [
     calc:r=>pontosPct(r,'vestipago',2) },
   { k:'reunioes', l:'Reuniões', regra:'1 pt por reunião',
     calc:r=>({p:(r.reunioes||0)*1, como:fmt.int(r.reunioes||0)+' × 1'}) },
-  { k:'integracoes', l:'Integrações', regra:'5 pts por integração nova',
-    calc:r=>({p:(r.integracoes||0)*5, como:fmt.int(r.integracoes||0)+' × 5'}) },
   { k:'gmv', l:'GMV', regra:'1 pt a cada 1% a mais que o mesmo mês do ano passado',
     calc:r=>pontosPct(r,'gmv',1) },
   { k:'filiais', l:'Varejos', regra:'10 pts por varejo novo',

@@ -1733,15 +1733,15 @@ function montar(bqd, hsd, tinoDados) {
       comparacao: 'nenhuma',
       regra: 'Reuniões do HubSpot no mês, pelo dono do registro. Inclui as presenciais e as de evento — '
            + 'a base não separa uma coisa da outra.' },
-    { k: 'integracoes', titulo: 'Novas integrações', unidade: 'integrações',
-      comparacao: 'nenhuma',
-      regra: 'Negócio de Integração GANHO no HubSpot dentro do mês (pipeline Expand). '
-           + 'É o único registro de integração nova que existe hoje: o cadastro guarda quem TEM integração, '
-           + 'não quando passou a ter. Por isso o fetcher começou a fotografar a carteira todo dia — '
-           + 'ver integracoes_snapshot.json.' },
-    /* ESTOQUE, não fluxo: não confundir com 'integracoes' logo acima, que conta
-       integração NOVA no mês. Esta conta quantas marcas integradas pela Vesti o
-       CS tinha vendendo no mês. */
+    /* "Novas integrações" saiu da bonificação em 01/09/2026 (Laura). Media o
+       fluxo — integração nova fechada no mês — e dava 0 ou 1: foram 7 no time
+       todo em 2026, e nunca duas no mesmo mês para o mesmo CS. Quem ficou é a de
+       ESTOQUE, logo abaixo. A coleta continua rodando (ver `registrarIntegracoes`
+       adiante): o retrato diário é a única coisa que registra QUANDO uma
+       integração começa, e parar de gravá-lo perderia história que não se
+       recupera depois. */
+    /* ESTOQUE, não fluxo: conta quantas marcas integradas pela Vesti o CS tinha
+       vendendo no mês. */
     { k: 'integracoesAtivas', titulo: 'Integrações ativas', unidade: 'marcas',
       comparacao: 'marcaDagua',
       regra: 'Marcas da carteira do CS que venderam no mês E têm integração da Vesti '
@@ -1858,23 +1858,13 @@ function montar(bqd, hsd, tinoDados) {
   });
   // Reuniões e integrações vêm do HubSpot
   (hsd.reunioes || []).forEach(r => somaBon(mesDe(r.data), normalizarCsNome(r.cs), 'reunioes', 1, r.cliente));
-  /* Integração nova tem duas fontes e elas se somam sem contar duas vezes: o
-     negócio ganho no HubSpot (o registro que existe hoje) e a detecção pelo
-     retrato diário do cadastro (o registro que passa a existir a partir de
-     agora — ver `registrarIntegracoes`). A chave de dedupe é mês+CS+marca. */
-  const jaContada = new Set();
-  const contarIntegracao = (mes, cs, cliente) => {
-    const ch = mes + '|' + cs + '|' + (cliente || '');
-    if (!mes || jaContada.has(ch)) return;
-    jaContada.add(ch);
-    somaBon(mes, cs, 'integracoes', 1, cliente);
-  };
-  (hsd.negocios || []).forEach(r => {
-    if (r.status !== 'Ganho' || r.produto !== 'Integração') return;
-    contarIntegracao(mesDe(r.data), normalizarCsNome(r.cs), r.cliente);
-  });
-  const integracoesDetectadas = registrarIntegracoes(porDom);
-  integracoesDetectadas.forEach(r => contarIntegracao(mesDe(r.data), r.cs, r.cliente));
+  /* O retrato diário da carteira continua sendo tirado mesmo sem a coluna de
+     "Novas integrações" que ele alimentava. Ele é a ÚNICA coisa que registra
+     quando uma integração começa — o cadastro guarda quem TEM, não desde
+     quando — e um dia não fotografado é um dia que não volta. Roda pelo efeito
+     colateral: grava integracoes_snapshot.json e integracoes_novas.json, que o
+     workflow commita. Se a coluna voltar, o histórico estará inteiro. */
+  registrarIntegracoes(porDom);
   /* Tino: a régua é por MARCA — só entra quem passou de 40 eventos no mês, e o
      que se conta é quantas marcas passaram, não quantos eventos. Por isso a
      soma é feita em dois tempos. */
