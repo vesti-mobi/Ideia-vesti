@@ -129,7 +129,7 @@ table.dt tr.row-alert td{background:rgba(225,112,85,.08)}
 .pill-nenhum{background:#FDEAEA;color:#E17055}
 /* tags da aba Inadimplentes: 1-10d de atraso = amarelo, 11d+ = vermelho (bloqueado) */
 .pill-sit-alerta{background:#FFF6D6;color:#8A6100;border:1px solid #F5C518}
-.pill-sit-atraso{background:#FDECE6;color:#A8430F;border:1px solid #E8743B}
+.pill-sit-canc{background:#EEEDF2;color:#4A4658;border:1px solid #9B96AD}
 .pill-sit-bloq{background:#FDE3E0;color:#A62016;border:1px solid #E74C3C}
 
 .sub-filter{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}

@@ -195,11 +195,10 @@ def _eventos_ambiente(emp: dict, amb: dict, pag: dict, piso: str,
     return unicos
 
 
-# Janela de "ainda da' pra recuperar" (decisao da Laura em 01/09/2026). Bloqueio
-# mais antigo que isso e' churn na pratica -- so' que NADA no dado diz isso: a
-# planilha do n8n ("Dominios Bloqueados Automacao") tem apenas Ligado? Sim/Nao,
-# nao existe estado "cancelado" em lugar nenhum. Por isso o corte e' por tempo.
-BLOQUEIO_RECENTE_DIAS = 90
+# Quanto tempo de cancelamento ainda aparece na aba (escolha da Laura, 90 dias).
+# Nao e' regra de negocio, e' so' recorte de historico: sem isso entram as 235
+# canceladas, muitas de mais de meio ano atras.
+CANCELADA_RECENTE_DIAS = 90
 
 # Mesmo conjunto do _classify_canal (fetch_elisa_bq.py) -- o front deriva o canal
 # de partner_raw + starter_interno, entao os dois campos precisam sair coerentes.
@@ -207,17 +206,25 @@ _STARTER_INTERNO = {"starter", "ve vantagens", "proroi", "up", "comfio",
                     "glads", "tizzefy", "sete", "zoom", "renan", "tizeefy"}
 
 
-def _bloqueadas_sem_divida(ambiente: dict, empresas_by_dom: dict,
-                           inad_dom: dict, inad_fora: list) -> list[dict]:
-    """Marcas bloqueadas pelo n8n que NAO tem fatura vencida em aberto.
+def _canceladas(ambiente: dict, empresas_by_dom: dict,
+                inad_dom: dict, inad_fora: list) -> list[dict]:
+    """Marcas CANCELADAS: cancelaram na Iugu e o ambiente foi cortado.
 
-    Some da aba Inadimplentes porque a Iugu cancela a fatura antiga antes de
-    gerar a proxima -- a divida desaparece do calculo e a marca bloqueada fica
-    invisivel. Aqui elas voltam, com valor zero e o `_semDivida` ligado pro
-    front nao mentir que ha atraso.
+    Definicao da Laura (01/09/2026):
+      - em alerta  = 1 a 10 dias de atraso
+      - bloqueada  = a partir de 11 dias (o n8n corta o ambiente)
+      - cancelada  = cancelaram na Iugu mesmo E o ambiente foi cortado
 
-    Nome cai em cascata: companies -> nome da planilha do n8n -> id do dominio
-    (28 das 78 nao tem nome em fonte nenhuma).
+    Aqui saem as canceladas. Sao reconheciveis pela combinacao: perdeu o modulo
+    `vendas` (ambiente cortado, logo nao esta em companies) E nao tem nenhuma
+    fatura vencida em aberto -- porque a fatura foi cancelada na Iugu. Sem isso
+    elas ficavam invisiveis no painel inteiro.
+
+    Nao basta o log do n8n dizer "desligado": 19 marcas estao desligadas la' com
+    o modulo `vendas` intacto e sem divida, o que nao e' cancelamento.
+
+    Nome cai em cascata: nome da planilha do n8n -> id do dominio (78 das 235
+    nao tem nome em fonte alguma).
     """
     hoje = date.today()
     ja_na_tabela = set(inad_dom) | {d.get("domain_id") for d in inad_fora}
@@ -225,27 +232,26 @@ def _bloqueadas_sem_divida(ambiente: dict, empresas_by_dom: dict,
     for dom, v in ambiente.items():
         if v.get("ligado") is not False or dom in ja_na_tabela:
             continue
-        bloq = _parse_iso_date(v.get("update"))
-        if not bloq:
+        if dom in empresas_by_dom:      # modulo `vendas` intacto = nao foi cortado
             continue
-        dias = (hoje - bloq).days
-        if dias > BLOQUEIO_RECENTE_DIAS:
+        corte = _parse_iso_date(v.get("update"))
+        if not corte:
             continue
-        emp = empresas_by_dom.get(dom) or {}
-        partner = emp.get("partner_raw") or (v.get("canalPlanilha") or "")
-        nome = (emp.get("name") or (v.get("nomePlanilha") or "").strip()
-                or f"Domínio {dom}")
+        dias = (hoje - corte).days
+        if dias > CANCELADA_RECENTE_DIAS:
+            continue
+        nome = (v.get("nomePlanilha") or "").strip()
         out.append({
             "domain_id": dom,
-            "name": nome,
-            "cs": emp.get("cs") or "",
-            "partner_raw": partner,
-            "starter_interno": partner.strip().lower() in _STARTER_INTERNO,
-            "bloqueadoEm": bloq.isoformat(),
-            "diasBloqueado": dias,
-            "semNome": not (emp.get("name") or (v.get("nomePlanilha") or "").strip()),
+            "name": nome or f"Domínio {dom}",
+            "cs": "",
+            "partner_raw": v.get("canalPlanilha") or "",
+            "starter_interno": (v.get("canalPlanilha") or "").strip().lower() in _STARTER_INTERNO,
+            "canceladoEm": corte.isoformat(),
+            "diasCancelada": dias,
+            "semNome": not nome,
         })
-    out.sort(key=lambda e: e["diasBloqueado"])
+    out.sort(key=lambda e: e["diasCancelada"])
     return out
 
 
@@ -292,8 +298,8 @@ def main():
     inad      = _load(inad_p) if inad_p.exists() else {"reguaDias": 15, "dominios": {}}
     inad_dom  = inad.get("dominios") or {}
     inad_regua = int(inad.get("reguaDias") or 15)
-    # data do bloqueio vem do log do n8n, nao da Iugu -- serve pra CS saber ha
-    # quanto tempo a marca esta cortada
+    # data do corte vem do log do n8n, nao da Iugu -- serve pra CS saber ha
+    # quanto tempo a marca esta bloqueada
     inad_fora = inad.get("foraDoPainel") or []
     for _f in inad_fora:
         _f["bloqueadoEm"] = ((ambiente.get(_f.get("domain_id")) or {}).get("update") or "")
@@ -410,11 +416,11 @@ def main():
         # bloqueadas, que perdem o modulo `vendas` e somem do SQL_EMPRESAS
         # justamente quando viram inadimplentes. Ver build_inadimplencia.
         "inadForaDoPainel": inad_fora,
-        # bloqueadas ha <= 90 dias que NAO tem fatura vencida em aberto (a Iugu
-        # cancelou a fatura). Entram na mesma tabela, com valor zero.
-        "inadBloqueadasSemDivida": _bloqueadas_sem_divida(
+        # canceladas na Iugu com o ambiente cortado, dos ultimos 90 dias.
+        # Entram na mesma tabela, sem divida em aberto.
+        "inadCanceladas": _canceladas(
             ambiente, {e["domain_id"]: e for e in empresas}, inad_dom, inad_fora),
-        "bloqueioRecenteDias": BLOQUEIO_RECENTE_DIAS,
+        "canceladaRecenteDias": CANCELADA_RECENTE_DIAS,
         "pendentes": ["Reativacao", "Link compartilhado", "Clicks no link"],
     }
     out = ROOT / "dashboard_data.js"

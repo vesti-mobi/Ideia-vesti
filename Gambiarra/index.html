@@ -283,17 +283,16 @@
       fatura <em>cancelada</em> ou <em>estornada</em> fica de fora, porque não é dívida do lojista (a Iugu cancela a fatura
       antiga antes de gerar a próxima). Os <strong>dias de atraso contam do vencimento mais antigo</strong> ainda em aberto,
       não do último. Fonte: espelho da Iugu no BigQuery — não depende do filtro de período.
-      <br><strong>Situação:</strong> <span class="pill pill-sit-alerta">⚠️ Em alerta</span> ativa, de 1 a 10 dias de
-      atraso — <strong>vai ser bloqueada aos 11 dias</strong>, ainda dá para evitar ·
-      <span class="pill pill-sit-atraso">🔴 Em atraso</span> ativa, já passou dos 11 dias e mesmo assim
-      <strong>não foi bloqueada</strong> ·
-      <span class="pill pill-sit-bloq">⛔ Bloqueada</span> ambiente cortado, perdeu o módulo <em>vendas</em>
-      (linha em vermelho). O corte de 11 dias é o do n8n “Bloqueio e Desbloqueio”, que bloqueia sozinho.
-      <br>A bloqueada não aparece em nenhuma outra aba do painel — não tem mais GMV, cadastro nem VestiPago —
-      e também não tem mensalidade a cobrar, porque a assinatura caiu junto. Parte delas está com
-      <strong>“—” em valor e dias</strong>: a Iugu já cancelou a fatura, então não há dívida em aberto,
-      mas a marca segue bloqueada. Essas entram só se o bloqueio foi há <strong>90 dias ou menos</strong> —
-      mais antigo que isso é churn na prática, e nada nos dados marca uma marca como cancelada.
+      <br><strong>Situação:</strong> <span class="pill pill-sit-alerta">⚠️ Em alerta</span> de 1 a 10 dias de
+      atraso — ainda dá para evitar o corte ·
+      <span class="pill pill-sit-bloq">⛔ Bloqueada</span> a partir de 11 dias, quando o n8n corta o
+      ambiente (linha em vermelho) ·
+      <span class="pill pill-sit-canc">⚫ Cancelada</span> cancelaram na Iugu e o ambiente foi cortado.
+      <br>A <strong>cancelada</strong> não tem fatura em aberto — a Iugu cancelou — então aparece com
+      <strong>“—” em valor e dias</strong>; o que a identifica é a soma de <em>sem dívida</em> com
+      <em>sem o módulo vendas</em>. Ela também não aparece em nenhuma outra aba do painel e não tem
+      mensalidade a cobrar, porque a assinatura caiu junto. Entram só as canceladas dos últimos
+      <strong>90 dias</strong>, senão a lista vira histórico de churn.
     </p>
     <div class="sub-filter">
       <label>Atraso mínimo:</label>
