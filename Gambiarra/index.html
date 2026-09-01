@@ -295,10 +295,16 @@
       <strong>90 dias</strong>, senão a lista vira histórico de churn.
     </p>
     <div class="sub-filter">
+      <label>Situação:</label>
+      <div class="canal-checks" id="filter-inad-sit">
+        <label class="chk"><input type="checkbox" value="alerta" checked> ⚠️ Em alerta</label>
+        <label class="chk"><input type="checkbox" value="bloqueada" checked> ⛔ Bloqueada</label>
+        <label class="chk"><input type="checkbox" value="cancelada" checked> ⚫ Cancelada</label>
+      </div>
       <label>Atraso mínimo:</label>
       <select class="f-select" id="filter-inad-dias">
         <option value="0" selected>todas (1 dia ou mais)</option>
-        <option value="10">só bloqueadas (mais de 10 dias)</option>
+        <option value="10">mais de 10 dias</option>
         <option value="30">mais de 30 dias</option>
         <option value="60">mais de 60 dias</option>
       </select>

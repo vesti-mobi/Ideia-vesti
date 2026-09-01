@@ -12,7 +12,7 @@ const fmtBRLCurto = (n) => {
 // state.chaves = lista de periodos selecionados (multi-selecao). 1 item = comportamento antigo.
 const CANAIS = ["Starter","Vesti","Uemtel","Atta","Parceiros"];
 const state = { periodo:"mensal", chaves:[], cs:"todas", canais:new Set(CANAIS), empresa:"todas", tab:"home", cadMes:"todos", upgMin:300000, soCoorte:true, reativOrigem:"todas", reativDrill:null, portesSel:new Set(),
-  inadDias:0 };
+  inadDias:0, situacoes:new Set(["alerta","bloqueada","cancelada"]) };
 const D = (typeof DADOS !== "undefined") ? DADOS : { empresas:[], mesesList:[], semanasList:[], anosList:[] };
 // parceiros que NAO entram no ranking "TOP 10 Parceiros" (viram canal proprio)
 const PARC_EXCL = new Set(["atta","attasoft","onix","uemtel","vesti","varejo vesti"]);
@@ -448,12 +448,14 @@ function marcasInadimplentes(minDias) {
 // Lista da TABELA = quem deve + as bloqueadas sem divida. A regua de atraso nao
 // se aplica a estas ultimas (nao ha atraso a filtrar), entao elas so' entram com
 // a regua em "todas" -- filtrar por dias de atraso e' pedir quem esta atrasado.
-function linhasInadimplentes(minDias) {
+function linhasInadimplentes(minDias, ignorarSituacao) {
   const min = minDias === undefined ? state.inadDias : minDias;
   // a regua e' de dias de ATRASO -- cancelada nao tem atraso a filtrar, entao
   // so' entra com a regua em "todas"
   const canc = min > 0 ? [] : inadCanceladas();
-  return [...marcasInadimplentes(min), ...canc];
+  const todas = [...marcasInadimplentes(min), ...canc];
+  // o card da Home ignora os filtros da aba (passa ignorarSituacao)
+  return ignorarSituacao ? todas : todas.filter(e => state.situacoes.has(situacaoDe(e)));
 }
 
 // 3 estados, definicao da Laura (01/09/2026):
@@ -540,7 +542,7 @@ function renderKpis() {
   // Card da Home ignora a regua da aba: mostra TODO mundo com fatura vencida,
   // ativas E desligadas (decisao da Laura em 01/09/2026) -- e' o total real a
   // receber, e bate com a tabela unica da aba.
-  const inad = linhasInadimplentes(0);
+  const inad = linhasInadimplentes(0, true);
   const nA = inad.filter(e => situacaoDe(e) === "alerta").length;
   const nB = inad.filter(e => situacaoDe(e) === "bloqueada").length;
   const nC = inad.filter(e => situacaoDe(e) === "cancelada").length;
@@ -1076,6 +1078,26 @@ function foraDoPainelBase() {
   });
 }
 
+function renderTabInadTabela(lista) {
+  renderTable("tbl-inadimplentes", [
+    {label:"Marca", fn:r=>r.name, sort:r=>r.name},
+    // unica sinalizacao da linha: alerta -> em atraso -> bloqueada
+    {label:"Situação", fn:r=>situacaoBadge(r), sort:r=>_SIT_PESO[situacaoDe(r)]},
+    {label:"CS", fn:r=>r.cs||"—", sort:r=>r.cs||""},
+    {label:"Canal", fn:r=>canalDe(r), sort:r=>canalDe(r)},
+    {label:"Domínio", cls:"num", fn:r=>r.domain_id||"—", sort:r=>+r.domain_id||0},
+    {label:"Bloqueado em", fn:r=>r.bloqueadoEm||"—", sort:r=>r.bloqueadoEm||""},
+    {label:"Venc. mais antigo", fn:r=>r.vencimentoMaisAntigo||"—", sort:r=>r.vencimentoMaisAntigo||""},
+    // sem divida em aberto nao ha atraso a mostrar -- "—" em vez de fingir zero
+    {label:"Dias em atraso", cls:"num", fn:r=>r._cancelada?"—":fmtInt(r.diasAtraso||0), sort:r=>r.diasAtraso||0},
+    {label:"Faturas vencidas", cls:"num", fn:r=>r._cancelada?"—":fmtInt(r._qtFaturas||0), sort:r=>r._qtFaturas||0},
+    {label:"Subconta Iugu", fn:r=>(r._subcontas||[]).join(", ")||"—", sort:r=>(r._subcontas||[])[0]||""},
+    {label:"Valor em aberto", cls:"num", fn:r=>r._cancelada?"—":fmtBRL(r.valorEmAberto||0), sort:r=>r.valorEmAberto||0},
+    // desligada nao tem assinatura ativa, entao nao tem mensalidade a cobrar
+    {label:"Mensalidade", cls:"num", fn:r=>r.valor_mensal==null?"—":fmtBRL(r.valor_mensal), sort:r=>r.valor_mensal||0},
+  ], lista.map(e=>({...e, _alert: !e._ativa})));
+}
+
 function renderTabInadimplentes() {
   const lista = linhasInadimplentes();          // inclui bloqueadas sem divida
   const devendo = lista.filter(e => !e._cancelada);   // base dos graficos
@@ -1097,17 +1119,30 @@ function renderTabInadimplentes() {
     ? ` · <span class="hint">${fmtInt(sobra)} faturas sem marca identificada</span>` : "";
   if (hint) hint.innerHTML = lista.length
     ? `${fmtInt(lista.length)} marcas · ${fmtBRL(total)} em aberto `
-      + `<span class="pill pill-sit-alerta">${fmtInt(nAlerta)} em alerta</span>`
-      + `<span class="pill pill-sit-bloq">${fmtInt(nBloq)} bloqueadas</span>`
-      + `<span class="pill pill-sit-canc">${fmtInt(nCanc)} canceladas</span>`
+      // pill zerada so' polui: com o filtro de situacao ligado, as outras somem
+      + (nAlerta ? `<span class="pill pill-sit-alerta">${fmtInt(nAlerta)} em alerta</span>` : "")
+      + (nBloq   ? `<span class="pill pill-sit-bloq">${fmtInt(nBloq)} bloqueadas</span>` : "")
+      + (nCanc   ? `<span class="pill pill-sit-canc">${fmtInt(nCanc)} canceladas</span>` : "")
       + sobraTxt
-    : "nenhuma marca acima dessa régua";
+    : (state.situacoes.size ? "nenhuma marca nesses filtros"
+                            : "marque ao menos uma situação acima");
 
   if (!lista.length) {
-    const recado = "Nenhuma marca com fatura vencida nesses filtros";
+    const recado = state.situacoes.size
+      ? "Nenhuma marca com fatura vencida nesses filtros"
+      : "Marque ao menos uma situação";
     chartVazio("chart-inad-faixa", recado);
     chartVazio("chart-inad-cs", recado);
     renderTable("tbl-inadimplentes", [{label:"Marca", fn:r=>r.name}], []);
+    return;
+  }
+  // cancelada nao tem atraso nem valor: se a lista so' tem cancelada, os dois
+  // graficos ficariam em escala zero -- melhor dizer que nao ha o que plotar
+  if (!devendo.length) {
+    const recado = "Sem dívida em aberto nesses filtros";
+    chartVazio("chart-inad-faixa", recado);
+    chartVazio("chart-inad-cs", recado);
+    renderTabInadTabela(lista);
     return;
   }
   const faixas = {"1-10d (alerta)":0,"11-30d":0,"31-60d":0,"61-90d":0,"90d+":0};
@@ -1150,23 +1185,7 @@ function renderTabInadimplentes() {
       plugins:{legend:{display:false}, valoresNaBarra:{fmt:fmtBRLCurto}},
       scales:{y:{ticks:{callback:v=>"R$"+fmtInt(v)}}}}
   });
-  renderTable("tbl-inadimplentes", [
-    {label:"Marca", fn:r=>r.name, sort:r=>r.name},
-    // unica sinalizacao da linha: alerta -> em atraso -> bloqueada
-    {label:"Situação", fn:r=>situacaoBadge(r), sort:r=>_SIT_PESO[situacaoDe(r)]},
-    {label:"CS", fn:r=>r.cs||"—", sort:r=>r.cs||""},
-    {label:"Canal", fn:r=>canalDe(r), sort:r=>canalDe(r)},
-    {label:"Domínio", cls:"num", fn:r=>r.domain_id||"—", sort:r=>+r.domain_id||0},
-    {label:"Bloqueado em", fn:r=>r.bloqueadoEm||"—", sort:r=>r.bloqueadoEm||""},
-    {label:"Venc. mais antigo", fn:r=>r.vencimentoMaisAntigo||"—", sort:r=>r.vencimentoMaisAntigo||""},
-    // sem divida em aberto nao ha atraso a mostrar -- "—" em vez de fingir zero
-    {label:"Dias em atraso", cls:"num", fn:r=>r._cancelada?"—":fmtInt(r.diasAtraso||0), sort:r=>r.diasAtraso||0},
-    {label:"Faturas vencidas", cls:"num", fn:r=>r._cancelada?"—":fmtInt(r._qtFaturas||0), sort:r=>r._qtFaturas||0},
-    {label:"Subconta Iugu", fn:r=>(r._subcontas||[]).join(", ")||"—", sort:r=>(r._subcontas||[])[0]||""},
-    {label:"Valor em aberto", cls:"num", fn:r=>r._cancelada?"—":fmtBRL(r.valorEmAberto||0), sort:r=>r.valorEmAberto||0},
-    // desligada nao tem assinatura ativa, entao nao tem mensalidade a cobrar
-    {label:"Mensalidade", cls:"num", fn:r=>r.valor_mensal==null?"—":fmtBRL(r.valor_mensal), sort:r=>r.valor_mensal||0},
-  ], lista.map(e=>({...e, _alert: !e._ativa})));
+  renderTabInadTabela(lista);
 
   // rede de seguranca: canvas sem tamanho -> remede -> se persistir, barras HTML
   conferePosRender(["chart-inad-faixa","chart-inad-cs"], function(){
@@ -1664,6 +1683,12 @@ function bind() {
   });
   bindEmpresaCbx();
   $("filter-cad-mes").addEventListener("change", e=>{ state.cadMes=e.target.value; renderActiveTab(); });
+  $("filter-inad-sit").addEventListener("change", e => {
+    const cb = e.target;
+    if (cb.tagName !== "INPUT") return;
+    if (cb.checked) state.situacoes.add(cb.value); else state.situacoes.delete(cb.value);
+    renderActiveTab();
+  });
   $("filter-inad-dias").value = String(state.inadDias);
   $("filter-inad-dias").addEventListener("change", e=>{ state.inadDias=Number(e.target.value)||0; renderActiveTab(); });
   $("filter-upg-min").addEventListener("change", e=>{ state.upgMin=Number(e.target.value)||300000; renderActiveTab(); });
