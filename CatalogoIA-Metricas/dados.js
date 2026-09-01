@@ -1,5 +1,5 @@
 window.DADOS = {
-  "gerado_em": "2026-08-31T18:26:56.980Z",
+  "gerado_em": "2026-09-01T00:14:04.032Z",
   "hoje": "2026-08-31",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
@@ -19,8 +19,8 @@ window.DADOS = {
     "com_conta": 10,
     "contas": 9,
     "produtos_total": 349,
-    "produtos_7d": 79,
-    "descricoes_total": 468,
+    "produtos_7d": 83,
+    "descricoes_total": 472,
     "total_estimado": true
   },
   "marcas": [
@@ -40,7 +40,7 @@ window.DADOS = {
       "envios": 209,
       "primeiro": "2026-08-10T19:02:35.392Z",
       "ultimo": "2026-08-27T19:14:21.254Z",
-      "dias": 3
+      "dias": 4
     },
     {
       "slug": "opera-kids",
@@ -86,15 +86,15 @@ window.DADOS = {
       "email": "anderson@mundotaci.com.br",
       "produtos": 43,
       "estimado": true,
-      "produtos_7d": 10,
+      "produtos_7d": 14,
       "ativa": true,
       "acessos": 0,
       "buscas": 0,
-      "descricoes": 10,
-      "envios": 10,
+      "descricoes": 14,
+      "envios": 14,
       "primeiro": "2026-08-27T10:08:32.689Z",
-      "ultimo": "2026-08-27T12:01:46.047Z",
-      "dias": 4
+      "ultimo": "2026-08-31T19:02:37.837Z",
+      "dias": 0
     },
     {
       "slug": "andressa-vesti",
@@ -416,9 +416,9 @@ window.DADOS = {
     {
       "inicio": "2026-08-31",
       "fim": "2026-09-06",
-      "produtos": 0,
-      "ativas": 0,
-      "usaram": 1,
+      "produtos": 4,
+      "ativas": 1,
+      "usaram": 2,
       "cadastros": 9,
       "novos": 0
     }
@@ -436,9 +436,9 @@ window.DADOS = {
         "paradas": 3,
         "com_conta": 10,
         "contas": 9,
-        "produtos_total": 234,
-        "produtos_7d": 72,
-        "descricoes_total": 313,
+        "produtos_total": 238,
+        "produtos_7d": 76,
+        "descricoes_total": 317,
         "total_estimado": true,
         "produtos_atribuidos": 5
       },
@@ -459,7 +459,7 @@ window.DADOS = {
           "envios": 184,
           "primeiro": "2026-08-11T18:28:02.542Z",
           "ultimo": "2026-08-27T19:14:21.254Z",
-          "dias": 3,
+          "dias": 4,
           "produtos_medidos": 132,
           "atribuido": 0
         },
@@ -489,18 +489,18 @@ window.DADOS = {
           "arquetipo": "inocente",
           "tem_conta": true,
           "email": "anderson@mundotaci.com.br",
-          "produtos": 10,
+          "produtos": 14,
           "estimado": false,
-          "produtos_7d": 10,
+          "produtos_7d": 14,
           "ativa": true,
           "acessos": 0,
           "buscas": 0,
-          "descricoes": 10,
-          "envios": 10,
+          "descricoes": 14,
+          "envios": 14,
           "primeiro": "2026-08-27T10:08:32.689Z",
-          "ultimo": "2026-08-27T12:01:46.047Z",
-          "dias": 4,
-          "produtos_medidos": 10,
+          "ultimo": "2026-08-31T19:02:37.837Z",
+          "dias": 0,
+          "produtos_medidos": 14,
           "atribuido": 0
         },
         {
@@ -889,12 +889,12 @@ window.DADOS = {
         {
           "inicio": "2026-08-31",
           "fim": "2026-09-06",
-          "produtos": 0,
-          "ativas": 0,
-          "usaram": 1,
+          "produtos": 4,
+          "ativas": 1,
+          "usaram": 2,
           "cadastros": 9,
           "novos": 0,
-          "produtos_medidos": 0,
+          "produtos_medidos": 4,
           "atribuido": 0
         }
       ]
@@ -911,11 +911,11 @@ window.DADOS = {
         "paradas": 1,
         "com_conta": 10,
         "contas": 9,
-        "produtos_total": 202,
+        "produtos_total": 198,
         "produtos_7d": 7,
         "descricoes_total": 65,
         "total_estimado": true,
-        "produtos_atribuidos": 183
+        "produtos_atribuidos": 179
       },
       "marcas": [
         {
@@ -964,7 +964,7 @@ window.DADOS = {
           "arquetipo": "inocente",
           "tem_conta": true,
           "email": "anderson@mundotaci.com.br",
-          "produtos": 34,
+          "produtos": 30,
           "estimado": true,
           "produtos_7d": 0,
           "ativa": false,
@@ -976,7 +976,7 @@ window.DADOS = {
           "ultimo": "",
           "dias": null,
           "produtos_medidos": 0,
-          "atribuido": 34
+          "atribuido": 30
         },
         {
           "slug": "andressa-vesti",
@@ -1353,24 +1353,24 @@ window.DADOS = {
         {
           "inicio": "2026-08-24",
           "fim": "2026-08-30",
-          "produtos": 11,
+          "produtos": 10,
           "ativas": 1,
           "usaram": 2,
           "cadastros": 9,
           "novos": 0,
           "produtos_medidos": 7,
-          "atribuido": 4
+          "atribuido": 3
         },
         {
           "inicio": "2026-08-31",
           "fim": "2026-09-06",
-          "produtos": 0,
+          "produtos": 1,
           "ativas": 0,
           "usaram": 1,
           "cadastros": 9,
           "novos": 0,
           "produtos_medidos": 0,
-          "atribuido": 0
+          "atribuido": 1
         }
       ]
     }
