@@ -152,12 +152,14 @@ async function puxarBQ() {
   console.log('\n[BigQuery] projeto vesti-data-499015 / vestilake_BI');
 
   /* `integration_owner` é a coluna que separa integração ATIVA (dona = VESTI) da
-     passiva. Ela está declarada no ETL do domains, mas NÃO existe na tabela do
-     espelho — referenciá-la direto derrubou a carga inteira em 01/09/2026
-     ("Name integration_owner not found inside d"). Coluna opcional não pode
-     quebrar o painel: o fetcher pergunta ao INFORMATION_SCHEMA e segue sem ela
-     quando não está lá. No dia em que o ETL recriar a tabela com a coluna, a
-     medida passa a existir sozinha, sem mexer em código. */
+     passiva. Ela EXISTE em odbc_domains — o "Name integration_owner not found
+     inside d" que derrubou a carga em 01/09/2026 falava da CTE `dom`, que
+     projeta um punhado de colunas e não incluía esta. Por isso ela é declarada
+     nos DOIS lugares: na CTE e no SELECT de fora.
+
+     A checagem no INFORMATION_SCHEMA fica como rede: o espelho é recriado por um
+     ETL que não é deste repositório, e uma coluna que sumir de lá não pode
+     derrubar a carga inteira de novo. Sem ela, a medida sai de cena sozinha. */
   const colsDominios = await q('colunas de odbc_domains', `
     SELECT column_name FROM ${DS}.INFORMATION_SCHEMA.COLUMNS
     WHERE table_name = 'odbc_domains'`);
@@ -169,6 +171,7 @@ async function puxarBQ() {
     WITH dom AS (
       SELECT CAST(ID AS STRING) id, name, angel_id, integration_type, integration_id, created_at,
              CAST(partner_id AS STRING) partner_id,
+             ${TEM_OWNER ? 'integration_owner' : 'CAST(NULL AS STRING) integration_owner'},
              ROW_NUMBER() OVER (PARTITION BY ID ORDER BY updated_At DESC) rn
       FROM ${DS}.odbc_domains
       WHERE (LOWER(IFNULL(modulos,'')) LIKE '%vendas%'
