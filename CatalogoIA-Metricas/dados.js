@@ -1,5 +1,5 @@
 window.DADOS = {
-  "gerado_em": "2026-09-01T15:47:56.823Z",
+  "gerado_em": "2026-09-01T22:55:09.087Z",
   "hoje": "2026-09-01",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
@@ -40,7 +40,7 @@ window.DADOS = {
       "envios": 209,
       "primeiro": "2026-08-10T19:02:35.392Z",
       "ultimo": "2026-08-27T19:14:21.254Z",
-      "dias": 4
+      "dias": 5
     },
     {
       "slug": "opera-kids",
@@ -52,12 +52,12 @@ window.DADOS = {
       "estimado": false,
       "produtos_7d": 56,
       "ativa": true,
-      "acessos": 72,
-      "buscas": 124,
+      "acessos": 73,
+      "buscas": 129,
       "descricoes": 132,
       "envios": 117,
       "primeiro": "2026-07-28T11:47:18.529Z",
-      "ultimo": "2026-09-01T13:04:31.871Z",
+      "ultimo": "2026-09-01T18:40:17.537Z",
       "dias": 0
     },
     {
@@ -94,7 +94,7 @@ window.DADOS = {
       "envios": 14,
       "primeiro": "2026-08-27T10:08:32.689Z",
       "ultimo": "2026-08-31T19:02:37.837Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "andressa-vesti",
@@ -495,7 +495,7 @@ window.DADOS = {
           "envios": 184,
           "primeiro": "2026-08-11T18:28:02.542Z",
           "ultimo": "2026-08-27T19:14:21.254Z",
-          "dias": 4,
+          "dias": 5,
           "produtos_medidos": 132,
           "atribuido": 0
         },
@@ -509,12 +509,12 @@ window.DADOS = {
           "estimado": true,
           "produtos_7d": 56,
           "ativa": true,
-          "acessos": 11,
-          "buscas": 62,
+          "acessos": 12,
+          "buscas": 67,
           "descricoes": 105,
           "envios": 102,
           "primeiro": "2026-08-18T13:22:59.954Z",
-          "ultimo": "2026-09-01T13:04:31.871Z",
+          "ultimo": "2026-09-01T18:40:17.537Z",
           "dias": 0,
           "produtos_medidos": 76,
           "atribuido": 5
@@ -535,7 +535,7 @@ window.DADOS = {
           "envios": 14,
           "primeiro": "2026-08-27T10:08:32.689Z",
           "ultimo": "2026-08-31T19:02:37.837Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 14,
           "atribuido": 0
         },
@@ -1130,7 +1130,7 @@ window.DADOS = {
           "envios": 3,
           "primeiro": "2026-08-12T12:05:03.861Z",
           "ultimo": "2026-08-31T17:32:53.474Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 2,
           "atribuido": 0
         },
