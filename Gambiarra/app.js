@@ -1005,18 +1005,30 @@ function renderTabTravadas() {
 // `vendas` e cai fora do SQL_EMPRESAS -- some do painel justo quando vira
 // inadimplente. Vem nomeada pela odbc_domains (ver foraDoPainel em
 // build_inadimplencia). Nao entra em KPI nenhum: e' so' listagem de cobranca.
+// So' os filtros globais de CS/canal -- sem a regua de dias e sem o seletor de
+// empresa. E' o conjunto que o combobox precisa oferecer pra busca (ver
+// populaEmpresas): buscar "Simone" e nao achar nada dizia que a marca nao
+// existe, quando ela so' estava bloqueada, fora do painel e devendo.
+function foraDoPainelBase() {
+  return (D.inadForaDoPainel || []).filter(e => {
+    if (state.cs !== "todas" && e.cs !== state.cs) return false;
+    if (!state.canais.has(canalDe(e))) return false;
+    return true;
+  });
+}
+
 function marcasForaDoPainel(minDias) {
   const min = minDias === undefined ? state.inadDias : minDias;
-  return (D.inadForaDoPainel || [])
-    .filter(e => {
-      if ((e.diasAtraso || 0) <= min) return false;
-      // mesmos filtros do topo (empresasFiltradas): a aba tem que ficar coerente
-      if (state.cs !== "todas" && e.cs !== state.cs) return false;
-      if (!state.canais.has(canalDe(e))) return false;
-      if (state.empresa !== "todas" && e.name !== state.empresa) return false;
-      return true;
-    })
+  return foraDoPainelBase()
+    .filter(e => (e.diasAtraso || 0) > min)
+    .filter(e => state.empresa === "todas" || e.name === state.empresa)
     .sort((a, b) => (b.diasAtraso || 0) - (a.diasAtraso || 0));
+}
+
+// usado pelo atalho no topo da aba (o card fica depois de uma tabela longa)
+function verInadFora() {
+  const card = $("card-inad-fora");
+  if (card) card.scrollIntoView({behavior:"smooth", block:"start"});
 }
 
 function renderInadFora() {
@@ -1059,9 +1071,15 @@ function renderTabInadimplentes() {
   // faturas que nao casaram com nenhuma marca do painel -- melhor dizer do que sumir.
   // As que deu pra nomear vao na tabela de baixo (renderInadFora).
   const fora = (D.inadSemDominio || {});
-  const foraTxt = (fora.qtFaturas || 0)
-    ? ` · <span class="hint">${fmtInt(fora.qtFaturas)} faturas sem marca no painel (${fmtBRL(fora.valor||0)})</span>`
-    : "";
+  // atalho pra secao de baixo: ela fica depois de uma tabela longa e passava batido
+  const nFora = marcasForaDoPainel().length;
+  const foraTxt = nFora
+    ? ` · <a href="#card-inad-fora" class="hint" onclick="verInadFora();return false"`
+      + ` style="text-decoration:underline;cursor:pointer">⛔ +${fmtInt(nFora)} marcas bloqueadas,`
+      + ` fora do painel (${fmtBRL(marcasForaDoPainel().reduce((s,e)=>s+(e.valorEmAberto||0),0))}) →</a>`
+    : ((fora.qtFaturas || 0)
+        ? ` · <span class="hint">${fmtInt(fora.qtFaturas)} faturas sem marca no painel (${fmtBRL(fora.valor||0)})</span>`
+        : "");
   if (hint) hint.innerHTML = lista.length
     ? `${fmtInt(lista.length)} marcas · ${fmtBRL(total)} em aberto `
       + `<span class="pill pill-inad-bloq">${fmtInt(bloq.length)} bloqueadas</span>`
@@ -1520,9 +1538,17 @@ const _esc = (s) => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;","
 
 function populaEmpresas() {
   const lista = empresasFiltradas();
-  _cbx.opcoes = lista.slice().sort((a,b)=>a.name.localeCompare(b.name,"pt-BR")).map(e=>e.name);
+  const nomes = lista.map(e => e.name);
+  // Marca bloqueada perde o modulo `vendas` e nao esta em D.empresas -- mas TEM
+  // que ser encontravel aqui, senao a busca responde "nenhuma empresa" pra uma
+  // marca que existe e esta devendo (caso Simone Modas / VJ Modas, 01/09/2026).
+  const jaTem = new Set(nomes);
+  _cbx.bloqueadas = new Set(foraDoPainelBase().map(e => e.name).filter(n => !jaTem.has(n)));
+  _cbx.opcoes = [...nomes, ..._cbx.bloqueadas].sort((a,b)=>a.localeCompare(b,"pt-BR"));
   const inp = $("filter-empresa-input");
-  inp.placeholder = `Todas (${lista.length}) — digite para buscar`;
+  inp.placeholder = _cbx.bloqueadas.size
+    ? `Todas (${lista.length} + ${_cbx.bloqueadas.size} bloqueadas) — digite para buscar`
+    : `Todas (${lista.length}) — digite para buscar`;
   // se a empresa selecionada saiu da lista pelos outros filtros, volta pra "todas"
   if (state.empresa !== "todas" && !_cbx.opcoes.includes(state.empresa)) selecionaEmpresa("todas");
   else if (state.empresa !== "todas") inp.value = state.empresa;
@@ -1542,11 +1568,23 @@ function renderCbxPanel(termo) {
       const i = _norm(n).indexOf(t);
       if (i >= 0) label = _esc(n.slice(0,i)) + "<mark>" + _esc(n.slice(i,i+termo.length)) + "</mark>" + _esc(n.slice(i+termo.length));
     }
+    // bloqueada: nao tem GMV/cadastro pra mostrar, so' aparece em Inadimplentes
+    if (_cbx.bloqueadas && _cbx.bloqueadas.has(n)) label = "⛔ " + label;
     return `<div class="cbx-opt${n===state.empresa?" cur":""}" data-v="${_esc(n)}">${label}</div>`;
   }).join("") + (achados.length > 300 ? `<div class="cbx-empty">+${achados.length-300} … refine a busca</div>` : "");
   panel.querySelectorAll(".cbx-opt").forEach(o => o.addEventListener("mousedown", ev => {
-    ev.preventDefault(); selecionaEmpresa(o.dataset.v); renderActiveTab();
+    ev.preventDefault(); escolheEmpresa(o.dataset.v);
   }));
+}
+
+// Escolha DELIBERADA de empresa (clique ou Enter) -- diferente de selecionaEmpresa,
+// que tambem roda no blur so' pra repor o texto do campo. Marca bloqueada nao tem
+// dado em nenhuma outra aba, entao a busca leva direto pra onde ela existe.
+function escolheEmpresa(v) {
+  const bloqueada = v !== "todas" && _cbx.bloqueadas && _cbx.bloqueadas.has(v);
+  selecionaEmpresa(v);
+  if (bloqueada && state.tab !== "inadimplentes") { switchTab("inadimplentes"); return; }
+  renderActiveTab();
 }
 
 function selecionaEmpresa(v) {
@@ -1575,7 +1613,7 @@ function bindEmpresaCbx() {
     } else if (ev.key === "Enter") {
       ev.preventDefault();
       const alvo = _cbx.hi >= 0 ? opts[_cbx.hi] : opts.find(o => o.dataset.v !== "todas") || opts[0];
-      if (alvo) { selecionaEmpresa(alvo.dataset.v); renderActiveTab(); }
+      if (alvo) escolheEmpresa(alvo.dataset.v);
     } else if (ev.key === "Escape") {
       selecionaEmpresa(state.empresa); inp.blur();
     }
