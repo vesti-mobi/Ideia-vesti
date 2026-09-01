@@ -244,27 +244,29 @@ por medição pedido a pedido (ressalva 4).
    diferença fica no title da célula.
 
    A **segunda tabela** converte esses mesmos números em pontos (régua da Laura,
-   27/08/2026), sem medir nada de novo:
+   revisada em 01/09/2026), sem medir nada de novo:
 
    | regra | pontos |
    |---|---|
    | Tino | 10 por cliente extra com 40+ eventos, acima da marca d'água |
-   | Mensalidade | 10 a cada R$ 1.000 acima da marca d'água, arredondando **para cima** |
-   | VestiPago | 1 a cada 2% a mais que o mesmo mês do ano passado |
+   | Mensalidade | meta 0: 3 a cada 1% acima da marca d'água |
+   | VestiPago | meta 40%: 2 a cada 1% acima dela, vs. o mesmo mês do ano passado |
    | Reuniões | 1 cada |
-   | GMV | 1 a cada 1% a mais que o mesmo mês do ano passado |
+   | Integrações ativas | 10 por integração acima da marca d'água |
+   | GMV | meta 10%: 2 a cada 1% acima dela, vs. o mesmo mês do ano passado |
    | Varejos | 10 cada |
 
-   **"Novas integrações" saiu da aba em 01/09/2026.** Media o fluxo — integração
-   nova fechada no mês — e dava 0 ou 1: foram 7 no time todo em 2026, e nunca duas
-   no mesmo mês para o mesmo CS. Valia 5 pontos cada e saiu junto com a coluna:
-   sem número na tabela de cima, não há o que converter. O retrato diário
-   (`integracoes_snapshot.json`) **continua sendo gravado** — é a única coisa que
-   registra quando uma integração começa, e um dia não fotografado não volta.
+   **Meta é piso, e não paga nada por si.** Bater exatamente 40% no VestiPago é
+   zero; 41% são 2 pontos. Só ponto fechado conta: 41,9% continua sendo 1 de
+   excedente, não 2.
 
-   **Integrações ativas não pontua.** Entrou como número, para a CS enxergar o
-   estoque de marcas integradas pela Vesti que estão vendendo. Se um dia virar
-   ponto, é só somar uma linha em `REGRAS_PONTOS` — a medida já está pronta.
+   **"Novas integrações" foi SUBSTITUÍDA por "Integrações ativas" em 01/09/2026.**
+   A antiga media o fluxo — integração nova fechada no mês — e dava 0 ou 1: foram
+   7 no time todo em 2026, e nunca duas no mesmo mês para o mesmo CS. A nova mede
+   o estoque e herdou a vaga de pontos, agora valendo 10 por integração acima da
+   marca d'água. O retrato diário (`integracoes_snapshot.json`) **continua sendo
+   gravado** mesmo sem a coluna que ele alimentava — é a única coisa que registra
+   quando uma integração começa, e um dia não fotografado não volta.
 
    A **marca d'água** (31/08/2026) é o maior número que aquele CS já registrou em
    um mês, contando só os meses **anteriores** ao escolhido — incluir o próprio mês

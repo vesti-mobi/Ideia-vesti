@@ -1656,54 +1656,69 @@ function linhasBonificacao(){
 /* ----------------------------------------------------------------------------
    PONTUAÇÃO DA BONIFICAÇÃO
    ----------------------------------------------------------------------------
-   A régua que a Laura passou em 27/08/2026. Cada regra vira pontos em cima do
+   A régua da Laura, revisada em 01/09/2026. Cada regra vira pontos em cima do
    MESMO número da tabela de cima — nada é medido de novo aqui, só convertido:
 
-     Tino ........... 10 pontos por cliente EXTRA com 40+ eventos acima da MARCA
-                      D'ÁGUA do CS (o maior mês que ele já fez)
-     Mensalidade .... 10 pontos a cada R$ 1.000 acima da MARCA D'ÁGUA (quebrado
-                      arredonda PARA CIMA: R$ 1.200 já são 20 pontos)
-     VestiPago ...... 1 ponto a cada 2% a mais que o mesmo mês do ano passado
-     Reuniões ....... 1 ponto cada
-     GMV ............ 1 ponto a cada 1% a mais que o mesmo mês do ano passado
-     Varejos ........ 10 pontos cada
+     Tino ............... 10 pontos por cliente EXTRA com 40+ eventos acima da
+                          MARCA D'ÁGUA do CS (o maior mês que ele já fez)
+     Mensalidade ........ meta 0: 3 pontos a cada 1% acima da MARCA D'ÁGUA
+     VestiPago .......... meta 40%: 2 pontos a cada 1% acima dela, contra o mesmo
+                          mês do ano passado (41% = 2 pts, 42% = 4 pts)
+     Reuniões ........... 1 ponto cada
+     Integrações ativas . 10 pontos por integração acima da MARCA D'ÁGUA
+     GMV ................ meta 10%: 2 pontos a cada 1% acima dela, contra o mesmo
+                          mês do ano passado (11% = 2 pts, 12% = 4 pts)
+     Varejos ............ 10 pontos cada
 
    Duas decisões que não estavam escritas na régua e valem dizer:
-   - queda não tira ponto. Mês que não bate a marca d'água (ou pior que o ano
-     passado) dá zero naquela regra, não pontuação negativa;
-   - a mensalidade é a única que arredonda para cima (foi o que ela pediu). Nas
-     porcentagens, só bloco fechado conta: 3,9% no VestiPago é 1 ponto, não 2.
+   - queda não tira ponto. Mês que não bate a marca d'água, ou que fica abaixo da
+     meta, dá zero naquela regra — nunca pontuação negativa;
+   - só ponto fechado conta: 41,9% no VestiPago são 1 ponto de excedente sobre a
+     meta de 40%, não 2. A meta em si não paga nada: bater exatamente 40% é zero.
 
-   Marca d'água (Laura, 31/08/2026): Tino e mensalidade comparavam com o mês
-   anterior e passaram a comparar com o recorde do CS. Na prática o ponto ficou
-   mais caro — só pontua quem faz o melhor mês da própria história. */
+   Histórico da régua:
+   - 31/08/2026: Tino e mensalidade trocaram o mês anterior pela marca d'água.
+   - 01/09/2026: "Novas integrações" (fluxo, 0 ou 1 por mês) foi SUBSTITUÍDA por
+     "Integrações ativas" (estoque), que herdou a vaga de pontos, agora valendo
+     10. Mensalidade virou percentual, e VestiPago e GMV ganharam meta — antes
+     qualquer crescimento pagava. */
 const REGRAS_PONTOS = [
   { k:'tino60', l:'Tino', regra:'10 pts por cliente extra (40+ eventos) acima da marca d\u2019água',
-    calc:r=>{ const extra = (r.tino60||0) - (r['_base_tino60']||0);
-              return extra>0 ? {p:extra*10, como:fmt.int(extra)+' cliente(s) extra × 10'} : {p:0} } },
-  { k:'mensalidade', l:'Mensalidade', regra:'10 pts a cada R$ 1k acima da marca d\u2019água (arredonda para cima)',
-    calc:r=>{ const extra = (r.mensalidade||0) - (r['_base_mensalidade']||0);
-              if(extra<=0) return {p:0};
-              const blocos = Math.ceil(extra/1000);
-              return {p:blocos*10, como:fmt.moneyCompact(extra)+' a mais = '+blocos+' × 1k × 10'} } },
-  { k:'vestipago', l:'VestiPago', regra:'1 pt a cada 2% a mais que o mesmo mês do ano passado',
-    calc:r=>pontosPct(r,'vestipago',2) },
+    calc:r=>pontosExtra(r,'tino60',10,'cliente(s)') },
+  { k:'mensalidade', l:'Mensalidade', regra:'3 pts a cada 1% acima da marca d\u2019água',
+    calc:r=>pontosPct(r,'mensalidade',0,3) },
+  { k:'vestipago', l:'VestiPago', regra:'meta 40%: 2 pts a cada 1% acima dela (vs. ano passado)',
+    calc:r=>pontosPct(r,'vestipago',40,2) },
   { k:'reunioes', l:'Reuniões', regra:'1 pt por reunião',
     calc:r=>({p:(r.reunioes||0)*1, como:fmt.int(r.reunioes||0)+' × 1'}) },
-  { k:'gmv', l:'GMV', regra:'1 pt a cada 1% a mais que o mesmo mês do ano passado',
-    calc:r=>pontosPct(r,'gmv',1) },
+  { k:'integracoesAtivas', l:'Integrações ativas', regra:'10 pts por integração acima da marca d\u2019água',
+    calc:r=>pontosExtra(r,'integracoesAtivas',10,'integração(ões)') },
+  { k:'gmv', l:'GMV', regra:'meta 10%: 2 pts a cada 1% acima dela (vs. ano passado)',
+    calc:r=>pontosPct(r,'gmv',10,2) },
   { k:'filiais', l:'Varejos', regra:'10 pts por varejo novo',
     calc:r=>({p:(r.filiais||0)*10, como:fmt.int(r.filiais||0)+' × 10'}) },
 ];
-/* Regras de crescimento percentual: conta quantos blocos fechados de `passo`%
-   a marca subiu. Sem base (ano passado zerado) não há porcentagem — e não dá
-   para chamar de crescimento o que não tem de onde crescer, então vale zero. */
-function pontosPct(r, k, passo){
+/* Regras de UNIDADE acima do comparativo: conta quantos a mais que a base, em
+   número inteiro. Tino e integrações ativas usam a marca d'água como base. */
+function pontosExtra(r, k, porUnidade, unidade){
+  const extra = (r[k]||0) - (r['_base_'+k]||0);
+  return extra > 0
+    ? {p: extra*porUnidade, como: fmt.int(extra)+' '+unidade+' × '+porUnidade}
+    : {p:0};
+}
+/* Regras de crescimento percentual (régua da Laura, 01/09/2026). Duas peças:
+   `meta` é o piso — só o que passa dela conta, e a meta em si não paga nada
+   (VestiPago 40%, GMV 10%, mensalidade 0); `porPonto` é quanto vale cada 1%
+   inteiro acima da meta. Só ponto fechado conta: 41,9% com meta 40 é 1 ponto de
+   excedente, não 2. Sem base não há porcentagem — e não dá para chamar de
+   crescimento o que não tem de onde crescer, então vale zero. */
+function pontosPct(r, k, meta, porPonto){
   const base = r['_base_'+k], v = r[k]||0;
-  if(!base) return {p:0, como: v ? 'sem base no ano anterior' : ''};
+  if(!base) return {p:0, como: v ? 'sem base para comparar' : ''};
   const pct = (v - base)/base*100;
-  if(pct <= 0) return {p:0};
-  const p = Math.floor(pct/passo);
+  if(pct <= meta) return {p:0, como: pct>0 ? fmt.pct1(pct)+' — abaixo da meta de '+meta+'%' : ''};
+  const acima = Math.floor(pct) - meta;
+  const p = acima * porPonto;
   /* Base minúscula em 2025 estoura a regra: quem tinha R$ 1,1 mil de GMV no ano
      passado e tem R$ 220 mil hoje cresce 19.000% e faria 19 mil pontos sozinho.
      Isso quase nunca é venda — é carteira que mudou de dono (a marca é creditada
@@ -1711,7 +1726,7 @@ function pontosPct(r, k, passo){
      existia. O ponto continua sendo o que a régra manda: quem decide se corta é
      a Laura. Aqui a célula só avisa, para ninguém ler o número como crescimento. */
   const suspeito = pct > 300;
-  return {p, como: fmt.pct1(pct)+' ÷ '+passo+'% = '+p
+  return {p, como: fmt.pct1(pct) + (meta ? ' − meta '+meta+'%' : '') + ' = '+acima+' × '+porPonto+' = '+p
     + (suspeito ? ' · base de '+(Number(mesBonificacao().slice(0,4))-1)+': '+fmt.moneyCompact(base) : ''),
     alerta: suspeito};
 }
