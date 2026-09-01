@@ -415,9 +415,27 @@ function inadAtivas() {
 function inadDesligadas() {
   return foraDoPainelBase()
     .filter(e => state.empresa === "todas" || e.name === state.empresa)
-    .map(e => ({...e, _ativa: false,
+    .map(e => ({...e, _ativa: false, _semDivida: false,
                 _qtFaturas: e.qtFaturas || 0,
                 _subcontas: e.subcontas || [],
+                valor_mensal: null}));
+}
+
+// Bloqueadas SEM divida em aberto: a Iugu cancelou a fatura antes de gerar a
+// proxima, entao a marca cortada sumia da aba mesmo estando bloqueada. Entram
+// com valor zero e `_semDivida` -- o front mostra "—" no lugar de fingir que o
+// atraso e' 0. Corte de 90 dias aplicado no build_data (BLOQUEIO_RECENTE_DIAS).
+function inadBloqueadasSemDivida() {
+  return (D.inadBloqueadasSemDivida || [])
+    .filter(e => {
+      if (state.cs !== "todas" && e.cs !== state.cs) return false;
+      if (!state.canais.has(canalDe(e))) return false;
+      if (state.empresa !== "todas" && e.name !== state.empresa) return false;
+      return true;
+    })
+    .map(e => ({...e, _ativa: false, _semDivida: true,
+                diasAtraso: 0, valorEmAberto: 0,
+                vencimentoMaisAntigo: "", _qtFaturas: 0, _subcontas: [],
                 valor_mensal: null}));
 }
 
@@ -432,11 +450,34 @@ function marcasInadimplentes(minDias) {
     .sort((a, b) => (b.diasAtraso || 0) - (a.diasAtraso || 0));
 }
 
-function ambienteBadge(ativa) {
-  return ativa
-    ? `<span class="pill pill-amb-on">🟢 Ativa</span>`
-    : `<span class="pill pill-amb-off">⛔ Desligada</span>`;
+// Lista da TABELA = quem deve + as bloqueadas sem divida. A regua de atraso nao
+// se aplica a estas ultimas (nao ha atraso a filtrar), entao elas so' entram com
+// a regua em "todas" -- filtrar por dias de atraso e' pedir quem esta atrasado.
+function linhasInadimplentes(minDias) {
+  const min = minDias === undefined ? state.inadDias : minDias;
+  const semDiv = min > 0 ? [] : inadBloqueadasSemDivida();
+  return [...marcasInadimplentes(min), ...semDiv];
 }
+
+// 3 estados, na ordem em que a marca cai neles. O corte de 11 dias e' o do n8n
+// ("Bloqueio e Desbloqueio"): fatura com 11 dias vencidos dispara o bloqueio.
+//   alerta  = ativa, 1-10d  -> vai ser bloqueada, da' pra evitar
+//   atraso  = ativa, 11d+   -> ja' passou do corte e NAO foi bloqueada
+//   bloqueada = ambiente desligado (com divida ou com a fatura ja' cancelada)
+function situacaoDe(r) {
+  if (!r._ativa) return "bloqueada";
+  return (r.diasAtraso || 0) <= INAD_LIMITE_ALERTA ? "alerta" : "atraso";
+}
+
+function situacaoBadge(r) {
+  const st = situacaoDe(r);
+  if (st === "alerta")  return `<span class="pill pill-sit-alerta">⚠️ Em alerta</span>`;
+  if (st === "atraso")  return `<span class="pill pill-sit-atraso">🔴 Em atraso</span>`;
+  return `<span class="pill pill-sit-bloq">⛔ Bloqueada</span>`;
+}
+
+// ordem pra coluna ordenar do menos pro mais grave
+const _SIT_PESO = {alerta: 0, atraso: 1, bloqueada: 2};
 
 function renderKpis() {
   const lista = empresasFiltradas();
@@ -500,11 +541,13 @@ function renderKpis() {
   // Card da Home ignora a regua da aba: mostra TODO mundo com fatura vencida,
   // ativas E desligadas (decisao da Laura em 01/09/2026) -- e' o total real a
   // receber, e bate com a tabela unica da aba.
-  const inad = marcasInadimplentes(0);
-  const deslN = inad.filter(e => !e._ativa).length;
+  const inad = linhasInadimplentes(0);
+  const nA = inad.filter(e => situacaoDe(e) === "alerta").length;
+  const nT = inad.filter(e => situacaoDe(e) === "atraso").length;
+  const nB = inad.filter(e => !e._ativa).length;
   $("kpi-inad").textContent = fmtInt(inad.length);
   $("kpi-inad-sub").textContent =
-    `${fmtInt(deslN)} desligadas · ${fmtInt(inad.length - deslN)} ativas · `
+    `${fmtInt(nA)} em alerta · ${fmtInt(nT)} em atraso · ${fmtInt(nB)} bloqueadas · `
     + `${fmtBRL(inad.reduce((s,e)=>s+(e.valorEmAberto||0),0))} em aberto`;
   $("kpi-cliques").textContent    = fmtInt(cliquesTot);
   $("kpi-links").textContent      = fmtInt(linksTot);
@@ -1035,9 +1078,13 @@ function foraDoPainelBase() {
 }
 
 function renderTabInadimplentes() {
-  const lista = marcasInadimplentes();
+  const lista = linhasInadimplentes();          // inclui bloqueadas sem divida
+  const devendo = lista.filter(e => !e._semDivida);   // base dos graficos
   const total = lista.reduce((s,e)=>s+(e.valorEmAberto||0), 0);
+  const nAlerta = lista.filter(e => situacaoDe(e) === "alerta").length;
+  const nAtraso = lista.filter(e => situacaoDe(e) === "atraso").length;
   const desl = lista.filter(e => !e._ativa);
+  const nSemDiv = lista.filter(e => e._semDivida).length;
   const hint = $("inad-hint");
   // Faturas vencidas que nao casaram com marca NENHUMA (nem desligada) -- hoje
   // sao 0, mas se o mapa customer->dominio falhar melhor dizer do que sumir.
@@ -1051,8 +1098,10 @@ function renderTabInadimplentes() {
     ? ` · <span class="hint">${fmtInt(sobra)} faturas sem marca identificada</span>` : "";
   if (hint) hint.innerHTML = lista.length
     ? `${fmtInt(lista.length)} marcas · ${fmtBRL(total)} em aberto `
-      + `<span class="pill pill-amb-off">${fmtInt(desl.length)} desligadas</span>`
-      + `<span class="pill pill-amb-on">${fmtInt(lista.length - desl.length)} ativas</span>`
+      + `<span class="pill pill-sit-alerta">${fmtInt(nAlerta)} em alerta</span>`
+      + `<span class="pill pill-sit-atraso">${fmtInt(nAtraso)} em atraso</span>`
+      + `<span class="pill pill-sit-bloq">${fmtInt(desl.length)} bloqueadas</span>`
+      + (nSemDiv ? ` <span class="hint">(${fmtInt(nSemDiv)} delas com a fatura já cancelada pela Iugu)</span>` : "")
       + sobraTxt
     : "nenhuma marca acima dessa régua";
 
@@ -1063,10 +1112,10 @@ function renderTabInadimplentes() {
     renderTable("tbl-inadimplentes", [{label:"Marca", fn:r=>r.name}], []);
     return;
   }
-  const faixas = {"1-10d":0,"11-30d":0,"31-60d":0,"61-90d":0,"90d+":0};
-  for (const e of lista) {
+  const faixas = {"1-10d (alerta)":0,"11-30d":0,"31-60d":0,"61-90d":0,"90d+":0};
+  for (const e of devendo) {
     const d = e.diasAtraso || 0;
-    if (d<=INAD_LIMITE_ALERTA) faixas["1-10d"]++;
+    if (d<=INAD_LIMITE_ALERTA) faixas["1-10d (alerta)"]++;
     else if (d<=30) faixas["11-30d"]++;
     else if (d<=60) faixas["31-60d"]++;
     else if (d<=90) faixas["61-90d"]++;
@@ -1086,7 +1135,7 @@ function renderTabInadimplentes() {
     options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
   });
   const porCs = {};
-  for (const e of lista) {
+  for (const e of devendo) {
     const cs = e.cs || "sem CS";
     porCs[cs] = (porCs[cs]||0) + (e.valorEmAberto||0);
   }
@@ -1105,16 +1154,18 @@ function renderTabInadimplentes() {
   });
   renderTable("tbl-inadimplentes", [
     {label:"Marca", fn:r=>r.name, sort:r=>r.name},
-    // unica sinalizacao da linha: ligado x desligado. A urgencia fica nos dias.
-    {label:"Ambiente", fn:r=>ambienteBadge(r._ativa), sort:r=>r._ativa?1:0},
+    // unica sinalizacao da linha: alerta -> em atraso -> bloqueada
+    {label:"Situação", fn:r=>situacaoBadge(r), sort:r=>_SIT_PESO[situacaoDe(r)]},
     {label:"CS", fn:r=>r.cs||"—", sort:r=>r.cs||""},
     {label:"Canal", fn:r=>canalDe(r), sort:r=>canalDe(r)},
     {label:"Domínio", cls:"num", fn:r=>r.domain_id||"—", sort:r=>+r.domain_id||0},
+    {label:"Bloqueado em", fn:r=>r.bloqueadoEm||"—", sort:r=>r.bloqueadoEm||""},
     {label:"Venc. mais antigo", fn:r=>r.vencimentoMaisAntigo||"—", sort:r=>r.vencimentoMaisAntigo||""},
-    {label:"Dias em atraso", cls:"num", fn:r=>fmtInt(r.diasAtraso||0), sort:r=>r.diasAtraso||0},
-    {label:"Faturas vencidas", cls:"num", fn:r=>fmtInt(r._qtFaturas||0), sort:r=>r._qtFaturas||0},
+    // sem divida em aberto nao ha atraso a mostrar -- "—" em vez de fingir zero
+    {label:"Dias em atraso", cls:"num", fn:r=>r._semDivida?"—":fmtInt(r.diasAtraso||0), sort:r=>r.diasAtraso||0},
+    {label:"Faturas vencidas", cls:"num", fn:r=>r._semDivida?"—":fmtInt(r._qtFaturas||0), sort:r=>r._qtFaturas||0},
     {label:"Subconta Iugu", fn:r=>(r._subcontas||[]).join(", ")||"—", sort:r=>(r._subcontas||[])[0]||""},
-    {label:"Valor em aberto", cls:"num", fn:r=>fmtBRL(r.valorEmAberto||0), sort:r=>r.valorEmAberto||0},
+    {label:"Valor em aberto", cls:"num", fn:r=>r._semDivida?"—":fmtBRL(r.valorEmAberto||0), sort:r=>r.valorEmAberto||0},
     // desligada nao tem assinatura ativa, entao nao tem mensalidade a cobrar
     {label:"Mensalidade", cls:"num", fn:r=>r.valor_mensal==null?"—":fmtBRL(r.valor_mensal), sort:r=>r.valor_mensal||0},
   ], lista.map(e=>({...e, _alert: !e._ativa})));

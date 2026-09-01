@@ -195,6 +195,60 @@ def _eventos_ambiente(emp: dict, amb: dict, pag: dict, piso: str,
     return unicos
 
 
+# Janela de "ainda da' pra recuperar" (decisao da Laura em 01/09/2026). Bloqueio
+# mais antigo que isso e' churn na pratica -- so' que NADA no dado diz isso: a
+# planilha do n8n ("Dominios Bloqueados Automacao") tem apenas Ligado? Sim/Nao,
+# nao existe estado "cancelado" em lugar nenhum. Por isso o corte e' por tempo.
+BLOQUEIO_RECENTE_DIAS = 90
+
+# Mesmo conjunto do _classify_canal (fetch_elisa_bq.py) -- o front deriva o canal
+# de partner_raw + starter_interno, entao os dois campos precisam sair coerentes.
+_STARTER_INTERNO = {"starter", "ve vantagens", "proroi", "up", "comfio",
+                    "glads", "tizzefy", "sete", "zoom", "renan", "tizeefy"}
+
+
+def _bloqueadas_sem_divida(ambiente: dict, empresas_by_dom: dict,
+                           inad_dom: dict, inad_fora: list) -> list[dict]:
+    """Marcas bloqueadas pelo n8n que NAO tem fatura vencida em aberto.
+
+    Some da aba Inadimplentes porque a Iugu cancela a fatura antiga antes de
+    gerar a proxima -- a divida desaparece do calculo e a marca bloqueada fica
+    invisivel. Aqui elas voltam, com valor zero e o `_semDivida` ligado pro
+    front nao mentir que ha atraso.
+
+    Nome cai em cascata: companies -> nome da planilha do n8n -> id do dominio
+    (28 das 78 nao tem nome em fonte nenhuma).
+    """
+    hoje = date.today()
+    ja_na_tabela = set(inad_dom) | {d.get("domain_id") for d in inad_fora}
+    out = []
+    for dom, v in ambiente.items():
+        if v.get("ligado") is not False or dom in ja_na_tabela:
+            continue
+        bloq = _parse_iso_date(v.get("update"))
+        if not bloq:
+            continue
+        dias = (hoje - bloq).days
+        if dias > BLOQUEIO_RECENTE_DIAS:
+            continue
+        emp = empresas_by_dom.get(dom) or {}
+        partner = emp.get("partner_raw") or (v.get("canalPlanilha") or "")
+        nome = (emp.get("name") or (v.get("nomePlanilha") or "").strip()
+                or f"Domínio {dom}")
+        out.append({
+            "domain_id": dom,
+            "name": nome,
+            "cs": emp.get("cs") or "",
+            "partner_raw": partner,
+            "starter_interno": partner.strip().lower() in _STARTER_INTERNO,
+            "bloqueadoEm": bloq.isoformat(),
+            "diasBloqueado": dias,
+            "semNome": not (emp.get("name") or (v.get("nomePlanilha") or "").strip()),
+        })
+    out.sort(key=lambda e: e["diasBloqueado"])
+    return out
+
+
 def _alertas(emp: dict, cad: dict, vp: dict, gmv_emp: dict) -> list[str]:
     out = []
     hoje = date.today()
@@ -238,6 +292,11 @@ def main():
     inad      = _load(inad_p) if inad_p.exists() else {"reguaDias": 15, "dominios": {}}
     inad_dom  = inad.get("dominios") or {}
     inad_regua = int(inad.get("reguaDias") or 15)
+    # data do bloqueio vem do log do n8n, nao da Iugu -- serve pra CS saber ha
+    # quanto tempo a marca esta cortada
+    inad_fora = inad.get("foraDoPainel") or []
+    for _f in inad_fora:
+        _f["bloqueadoEm"] = ((ambiente.get(_f.get("domain_id")) or {}).get("update") or "")
     pag_p     = ROOT / "pagamentos_elisa.json"
     pagtos    = _load(pag_p) if pag_p.exists() else {"piso": "", "dominios": {}}
     pag_piso  = pagtos.get("piso") or ""
@@ -350,7 +409,12 @@ def main():
         # dessas, as que deu pra NOMEAR pela odbc_domains: quase todas sao marcas
         # bloqueadas, que perdem o modulo `vendas` e somem do SQL_EMPRESAS
         # justamente quando viram inadimplentes. Ver build_inadimplencia.
-        "inadForaDoPainel": inad.get("foraDoPainel") or [],
+        "inadForaDoPainel": inad_fora,
+        # bloqueadas ha <= 90 dias que NAO tem fatura vencida em aberto (a Iugu
+        # cancelou a fatura). Entram na mesma tabela, com valor zero.
+        "inadBloqueadasSemDivida": _bloqueadas_sem_divida(
+            ambiente, {e["domain_id"]: e for e in empresas}, inad_dom, inad_fora),
+        "bloqueioRecenteDias": BLOQUEIO_RECENTE_DIAS,
         "pendentes": ["Reativacao", "Link compartilhado", "Clicks no link"],
     }
     out = ROOT / "dashboard_data.js"

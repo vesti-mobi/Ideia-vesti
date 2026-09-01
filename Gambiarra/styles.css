@@ -128,8 +128,9 @@ table.dt tr.row-alert td{background:rgba(225,112,85,.08)}
 .pill-ambos{background:linear-gradient(135deg,#E0F7F0,#F0EFFF);color:#5949d6}
 .pill-nenhum{background:#FDEAEA;color:#E17055}
 /* tags da aba Inadimplentes: 1-10d de atraso = amarelo, 11d+ = vermelho (bloqueado) */
-.pill-amb-on{background:#E3F7EC;color:#1B7A4B;border:1px solid #00B894}
-.pill-amb-off{background:#FDE3E0;color:#A62016;border:1px solid #E74C3C}
+.pill-sit-alerta{background:#FFF6D6;color:#8A6100;border:1px solid #F5C518}
+.pill-sit-atraso{background:#FDECE6;color:#A8430F;border:1px solid #E8743B}
+.pill-sit-bloq{background:#FDE3E0;color:#A62016;border:1px solid #E74C3C}
 
 .sub-filter{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .sub-filter label{font-size:12px;font-weight:600;color:var(--dk)}
