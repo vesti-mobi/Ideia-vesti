@@ -25,6 +25,9 @@ const charts = {}; // canvas id -> Chart instance
 // que corta o ambiente quando a fatura chega a 11 dias vencida. Serve tambem de corte
 // da 1a faixa do grafico. O atraso vem do vencimento MAIS ANTIGO em aberto.
 const INAD_LIMITE_ALERTA = 10;
+// Marca sem pagar ha mais que isso sai da aba (regra da Laura, 02/09/2026): passou
+// de cobranca pra caso de cancelamento, nao e' mais o que a CS persegue aqui.
+const INAD_ABANDONO_DIAS = 60;
 
 // ---------- helpers ----------
 function canalDe(e) {
@@ -410,11 +413,26 @@ function seguePagando(e) {
   return !!(venc && ult && ult > venc);
 }
 
-// Devedoras de DENTRO do painel: modulo `vendas` ligado e sem pagar desde o
-// vencimento em aberto.
+// Ha quantos dias a marca nao paga NADA. Quem nunca pagou conta a partir da
+// ENTRADA -- senao marca nova, com a 1a fatura vencendo ha 1 dia, sairia junto
+// com quem sumiu ha dois anos (casos Bela Eva e Maria Laura De Marqui, 02/09).
+function diasSemPagar(e) {
+  const ref = e.ultimoPagamento || (e.dataEntrada || "").slice(0, 10);
+  if (!ref) return null;
+  const t = new Date(ref + "T00:00:00").getTime();
+  return isNaN(t) ? null : Math.floor((Date.now() - t) / 86400000);
+}
+
+function abandonou(e) {
+  const d = diasSemPagar(e);
+  return d !== null && d > INAD_ABANDONO_DIAS;
+}
+
+// Devedoras de DENTRO do painel: modulo `vendas` ligado, sem pagar desde o
+// vencimento em aberto, e ainda dentro da janela de 60 dias sem pagar.
 function inadAtivas() {
   return empresasFiltradas()
-    .filter(e => (e.faturasVencidas || 0) > 0 && !seguePagando(e))
+    .filter(e => (e.faturasVencidas || 0) > 0 && !seguePagando(e) && !abandonou(e))
     .map(e => ({...e, _ativa: true,
                 _qtFaturas: e.faturasVencidas || 0,
                 _subcontas: e.subcontasIugu || []}));
@@ -1101,6 +1119,12 @@ function renderTabInadTabela(lista) {
     {label:"Venc. mais antigo", fn:r=>r.vencimentoMaisAntigo||"—", sort:r=>r.vencimentoMaisAntigo||""},
     // mostra a regra em tela: quem esta aqui NAO pagou depois desse vencimento
     {label:"Último pagamento", fn:r=>r.ultimoPagamento||"—", sort:r=>r.ultimoPagamento||""},
+    // e' o numero que a regra dos 60 dias usa; "nunca" conta da entrada
+    {label:"Dias sem pagar", cls:"num", fn:r=>{
+       const d = diasSemPagar(r);
+       if (d === null) return "—";
+       return r.ultimoPagamento ? fmtInt(d) : `${fmtInt(d)} (desde a entrada)`;
+     }, sort:r=>diasSemPagar(r) ?? -1},
     // sem divida em aberto nao ha atraso a mostrar -- "—" em vez de fingir zero
     {label:"Dias em atraso", cls:"num", fn:r=>r._semDivida?"—":fmtInt(r.diasAtraso||0), sort:r=>r.diasAtraso||0},
     {label:"Faturas vencidas", cls:"num", fn:r=>r._semDivida?"—":fmtInt(r._qtFaturas||0), sort:r=>r._qtFaturas||0},

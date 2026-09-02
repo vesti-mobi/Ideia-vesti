@@ -288,14 +288,16 @@
       <span class="pill pill-sit-bloq">⛔ Bloqueada</span> passou dos 11 dias e <strong>ainda não pagou</strong> ·
       <span class="pill pill-sit-canc">⚫ Cancelada</span> fatura ou assinatura cancelada na Iugu e
       <strong>módulo <em>vendas</em> desativado</strong>.
-      <br><strong>Quem continua pagando não aparece aqui.</strong> Marca com o módulo <em>vendas</em> ligado que
-      registrou pagamento <em>depois</em> do vencimento da fatura em aberto sai da lista — ela só pendurou uma
-      fatura antiga, não parou de pagar. Compare as colunas <strong>Venc. mais antigo</strong> e
-      <strong>Último pagamento</strong>: quem está na tabela não pagou nada desde aquele vencimento.
+      <br><strong>Duas saídas da lista.</strong> Marca com o módulo <em>vendas</em> ligado sai daqui se
+      <strong>(1)</strong> registrou pagamento <em>depois</em> do vencimento da fatura em aberto — só pendurou uma
+      fatura antiga, não parou de pagar; ou <strong>(2)</strong> está há <strong>mais de 60 dias sem pagar
+      nada</strong> — aí não é mais cobrança, é caso de cancelamento. Quem nunca pagou conta os 60 dias
+      <em>desde a entrada</em>, para marca nova com a primeira fatura vencendo não sair junto.
       <br>Cancelada não quer dizer sem dívida: quem foi cancelada e ainda tem fatura em aberto aparece com o
       valor real; quem já teve a fatura cancelada pela Iugu aparece com <strong>“—” em valor e dias</strong>, e
       dessas entram só as dos últimos <strong>90 dias</strong>. A cancelada não aparece em nenhuma outra aba do
-      painel e não tem mensalidade a cobrar, porque a assinatura caiu junto.
+      painel, não tem mensalidade a cobrar e não tem histórico de pagamento no espelho — por isso sai
+      <strong>“—”</strong> nas colunas de pagamento.
     </p>
     <div class="sub-filter">
       <label>Situação:</label>
