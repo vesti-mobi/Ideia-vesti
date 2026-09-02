@@ -1,0 +1,31 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Inadimplentes · Atta</title>
+<!--
+  Link dedicado do canal Atta. Nao duplica painel nenhum: aponta pro Gambiarra
+  publicado no GitHub Pages com o modo travado ligado (?only=inadimplentes&canal=Atta),
+  entao os dados seguem os mesmos, atualizados todo dia pelo workflow painel-elisa.yml.
+
+  ATENCAO: o travamento e' de VISTA, nao de dado. O dashboard_data.js carregado la'
+  dentro traz todas as marcas do painel -- quem abrir o devtools ve tudo. Antes de
+  mandar este link pra fora da Vesti, e' preciso gerar um dashboard_data so' com o
+  canal Atta. Ver o README desta pasta.
+-->
+<style>
+  html,body{margin:0;height:100%;background:#f4f4f7}
+  iframe{border:0;width:100%;height:100%;display:block}
+  .fallback{font:15px/1.6 system-ui,sans-serif;padding:32px;color:#333}
+  .fallback a{color:#6C5CE7}
+</style>
+<iframe
+  src="https://vesti-mobi.github.io/dados/Gambiarra/?only=inadimplentes&canal=Atta"
+  title="Marcas inadimplentes do canal Atta"
+  loading="eager"
+  referrerpolicy="no-referrer">
+  <div class="fallback">
+    Seu navegador não abriu o painel embutido.
+    <a href="https://vesti-mobi.github.io/dados/Gambiarra/?only=inadimplentes&canal=Atta">Abrir direto</a>.
+  </div>
+</iframe>

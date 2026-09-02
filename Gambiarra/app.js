@@ -1742,10 +1742,53 @@ function bind() {
   }));
 }
 
+// ---------- Modo travado (links dedicados) ----------
+// ?only=inadimplentes&canal=Atta  -> abre so' aquela aba, com o canal fixo e sem
+// os controles que quebrariam o recorte. Usado pelo link separado da Atta.
+// O filtro de Situacao continua livre -- e' o unico que a Laura pediu pra manter.
+//
+// ATENCAO: isto TRAVA A VISTA, nao esconde o dado. dashboard_data.js vem inteiro
+// pro navegador; quem abrir o devtools ve todas as marcas. Para link externo de
+// verdade e' preciso gerar um dashboard_data so' com o canal (ver README).
+function aplicaModoTravado() {
+  const q = new URLSearchParams(location.search);
+  const canal = q.get("canal");
+  const only = q.get("only");
+  if (!canal && !only) return;
+
+  if (canal) {
+    const alvo = CANAIS.find(c => c.toLowerCase() === canal.toLowerCase());
+    if (alvo) {
+      state.canais = new Set([alvo]);
+      const box = $("filter-canal");
+      if (box) {
+        box.querySelectorAll("input").forEach(cb => { cb.checked = cb.value === alvo; });
+        // some com as caixas e deixa o canal como rotulo fixo
+        box.innerHTML = `<span class="pill pill-ambos">${alvo}</span>`;
+      }
+      // seletor de empresa listaria marca de outro canal se o usuario limpasse
+      const emp = $("filter-empresa");
+      if (emp && emp.parentElement) emp.parentElement.style.display = "none";
+      document.title = `Gambiarra · ${alvo}`;
+      const sub = document.querySelector(".logo-wrap .sub");
+      if (sub) sub.textContent = `Painel Customer Success · canal ${alvo}`;
+    }
+  }
+
+  if (only) {
+    switchTab(only);
+    // sem home pra voltar: a barra de navegacao perde a funcao
+    const back = $("backNav");
+    if (back) back.classList.add("hidden");
+  }
+}
+
 (function init(){
   $("gerado-em").textContent = "Gerado em " + (D.geradoEm||"—").slice(0,16).replace("T"," ");
   normalizaCanal();
   marcaCoorte();
   buildAnual();
-  populaPeriodoValor(); populaCs(); populaEmpresas(); populaCadMesSelect(); bind(); renderActiveTab();
+  populaPeriodoValor(); populaCs(); populaEmpresas(); populaCadMesSelect(); bind();
+  aplicaModoTravado();
+  renderActiveTab();
 })();
