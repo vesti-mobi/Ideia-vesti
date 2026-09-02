@@ -203,8 +203,8 @@
     "canalPlanilha": ""
   },
   "1791824": {
-    "ligado": false,
-    "update": "2026-08-30",
+    "ligado": true,
+    "update": "2026-09-01",
     "religamentoReal": false,
     "nomePlanilha": "Camila Style",
     "canalPlanilha": "Uemtel"
@@ -296,7 +296,7 @@
   "85355": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Look Kids",
     "canalPlanilha": "Varejo Vesti"
   },
@@ -737,7 +737,7 @@
   "196201": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Sigui Atacado",
     "canalPlanilha": "Vesti"
   },
@@ -877,7 +877,7 @@
   "60719": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Shyros",
     "canalPlanilha": "Vesti"
   },
@@ -1351,8 +1351,8 @@
     "canalPlanilha": "Attasoft"
   },
   "844570": {
-    "ligado": false,
-    "update": "2026-08-30",
+    "ligado": true,
+    "update": "2026-09-01",
     "religamentoReal": false,
     "nomePlanilha": "Modas Itsen",
     "canalPlanilha": "Uemtel"
@@ -1366,7 +1366,7 @@
   },
   "1867647": {
     "ligado": true,
-    "update": "2026-07-31",
+    "update": "2026-09-01",
     "religamentoReal": false,
     "nomePlanilha": "Kalamarka Store",
     "canalPlanilha": "Uemtel"
@@ -1814,7 +1814,7 @@
   },
   "1618245": {
     "ligado": true,
-    "update": "2026-07-29",
+    "update": "2026-09-01",
     "religamentoReal": false,
     "nomePlanilha": "Malvada Night",
     "canalPlanilha": "Vesti"
@@ -1934,7 +1934,7 @@
   "460552": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Martina",
     "canalPlanilha": "Vesti"
   },
@@ -3775,7 +3775,7 @@
   "693434": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Nasmah",
     "canalPlanilha": "Vesti"
   },
@@ -3845,7 +3845,7 @@
   "3277": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "",
     "canalPlanilha": ""
   },
@@ -4033,7 +4033,7 @@
   },
   "130315": {
     "ligado": true,
-    "update": "2026-08-11",
+    "update": "2026-09-01",
     "religamentoReal": false,
     "nomePlanilha": "Ezee",
     "canalPlanilha": "Attasoft"
@@ -4384,7 +4384,7 @@
   "1316026": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "P.A Concept",
     "canalPlanilha": "Vesti"
   },
@@ -4958,7 +4958,7 @@
   "251048": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Santo Vício",
     "canalPlanilha": "Vesti"
   },
@@ -5301,14 +5301,14 @@
   "1437352": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Traffos Atacado",
     "canalPlanilha": "Vesti"
   },
   "1378010": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Monnika Marikinha",
     "canalPlanilha": "Starter"
   },
@@ -5455,7 +5455,7 @@
   "2041160": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "M.Arte",
     "canalPlanilha": "Uemtel"
   },
@@ -5587,7 +5587,7 @@
   },
   "1845879": {
     "ligado": true,
-    "update": "2026-08-03",
+    "update": "2026-09-01",
     "religamentoReal": false,
     "nomePlanilha": "Aderet Modas",
     "canalPlanilha": "Uemtel"
@@ -5621,8 +5621,8 @@
     "canalPlanilha": "Attasoft"
   },
   "1298864": {
-    "ligado": true,
-    "update": "2026-08-10",
+    "ligado": false,
+    "update": "2026-09-02",
     "religamentoReal": false,
     "nomePlanilha": "BH YOO CONFECÇÕES",
     "canalPlanilha": "Attasoft"
@@ -5999,9 +5999,9 @@
     "canalPlanilha": ""
   },
   "2069390": {
-    "ligado": false,
-    "update": "2026-07-14",
-    "religamentoReal": false,
+    "ligado": true,
+    "update": "2026-09-02",
+    "religamentoReal": true,
     "nomePlanilha": "",
     "canalPlanilha": ""
   },
@@ -6246,7 +6246,7 @@
   "1238997": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Monnika Marikinha Brand",
     "canalPlanilha": "N/A"
   },
@@ -6560,8 +6560,8 @@
   },
   "639305": {
     "ligado": true,
-    "update": "2026-07-22",
-    "religamentoReal": false,
+    "update": "2026-09-02",
+    "religamentoReal": true,
     "nomePlanilha": "Boutique Denise Santos",
     "canalPlanilha": "Varejo Vesti"
   },
@@ -7085,7 +7085,7 @@
   },
   "732216": {
     "ligado": true,
-    "update": "2026-08-01",
+    "update": "2026-09-01",
     "religamentoReal": false,
     "nomePlanilha": "Francelice",
     "canalPlanilha": ""
@@ -7107,7 +7107,7 @@
   "1217456": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "GO Padel",
     "canalPlanilha": "Vesti"
   },
@@ -7134,7 +7134,7 @@
   },
   "95387": {
     "ligado": true,
-    "update": "2026-08-03",
+    "update": "2026-09-01",
     "religamentoReal": false,
     "nomePlanilha": "Soror Clothing",
     "canalPlanilha": "Vesti"
@@ -7366,7 +7366,7 @@
   "138772": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Amy",
     "canalPlanilha": "Attasoft"
   },
@@ -7428,10 +7428,10 @@
   },
   "2108179": {
     "ligado": true,
-    "update": "2026-08-11",
+    "update": "2026-09-01",
     "religamentoReal": false,
-    "nomePlanilha": "",
-    "canalPlanilha": ""
+    "nomePlanilha": "New Sun",
+    "canalPlanilha": "Vesti"
   },
   "463391": {
     "ligado": true,
@@ -7604,15 +7604,29 @@
   "2138868": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Bela Eva",
     "canalPlanilha": "N/A"
   },
   "1854419": {
     "ligado": true,
     "update": "2026-09-01",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Keila Mello",
     "canalPlanilha": ""
+  },
+  "2126045": {
+    "ligado": false,
+    "update": "2026-09-02",
+    "religamentoReal": false,
+    "nomePlanilha": "Moda Bodys",
+    "canalPlanilha": "Uemtel"
+  },
+  "2125851": {
+    "ligado": false,
+    "update": "2026-09-02",
+    "religamentoReal": false,
+    "nomePlanilha": "Garra da Onça Dourado",
+    "canalPlanilha": "Uemtel"
   }
 }
