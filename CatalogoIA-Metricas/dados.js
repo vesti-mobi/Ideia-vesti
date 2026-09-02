@@ -1,5 +1,5 @@
 window.DADOS = {
-  "gerado_em": "2026-09-02T15:38:29.215Z",
+  "gerado_em": "2026-09-02T22:57:04.196Z",
   "hoje": "2026-09-02",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
@@ -13,14 +13,14 @@ window.DADOS = {
   "kpis": {
     "liberadas": 18,
     "ativas": 2,
-    "usando": 9,
-    "nunca_usaram": 9,
+    "usando": 10,
+    "nunca_usaram": 8,
     "paradas": 4,
-    "com_conta": 10,
-    "contas": 9,
+    "com_conta": 11,
+    "contas": 10,
     "produtos_total": 357,
     "produtos_7d": 24,
-    "descricoes_total": 481,
+    "descricoes_total": 484,
     "total_estimado": true
   },
   "marcas": [
@@ -40,7 +40,7 @@ window.DADOS = {
       "envios": 209,
       "primeiro": "2026-08-10T19:02:35.392Z",
       "ultimo": "2026-08-27T19:14:21.254Z",
-      "dias": 5
+      "dias": 6
     },
     {
       "slug": "opera-kids",
@@ -52,12 +52,12 @@ window.DADOS = {
       "estimado": false,
       "produtos_7d": 1,
       "ativa": false,
-      "acessos": 73,
-      "buscas": 129,
-      "descricoes": 132,
-      "envios": 117,
+      "acessos": 74,
+      "buscas": 139,
+      "descricoes": 133,
+      "envios": 118,
       "primeiro": "2026-07-28T11:47:18.529Z",
-      "ultimo": "2026-09-01T18:40:17.537Z",
+      "ultimo": "2026-09-02T17:11:58.593Z",
       "dias": 0
     },
     {
@@ -94,7 +94,7 @@ window.DADOS = {
       "envios": 14,
       "primeiro": "2026-08-27T10:08:32.689Z",
       "ultimo": "2026-08-31T19:02:37.837Z",
-      "dias": 1
+      "dias": 2
     },
     {
       "slug": "andressa-vesti",
@@ -226,19 +226,19 @@ window.DADOS = {
       "slug": "kauly",
       "nome": "Kauly",
       "arquetipo": "governante",
-      "tem_conta": false,
-      "email": "",
+      "tem_conta": true,
+      "email": "marketing@kauly.com.br",
       "produtos": 0,
       "estimado": false,
       "produtos_7d": 0,
       "ativa": false,
-      "acessos": 0,
-      "buscas": 0,
-      "descricoes": 0,
+      "acessos": 1,
+      "buscas": 3,
+      "descricoes": 2,
       "envios": 0,
-      "primeiro": "",
-      "ultimo": "",
-      "dias": null
+      "primeiro": "2026-09-02T19:08:41.700Z",
+      "ultimo": "2026-09-02T19:10:32.276Z",
+      "dias": 0
     },
     {
       "slug": "luciana-pais",
@@ -452,11 +452,11 @@ window.DADOS = {
     {
       "inicio": "2026-08-31",
       "fim": "2026-09-06",
-      "produtos": 12,
+      "produtos": 13,
       "ativas": 2,
-      "usaram": 4,
-      "cadastros": 9,
-      "novos": 0
+      "usaram": 5,
+      "cadastros": 10,
+      "novos": 1
     }
   ],
   "apps": {
@@ -467,14 +467,14 @@ window.DADOS = {
       "kpis": {
         "liberadas": 18,
         "ativas": 1,
-        "usando": 6,
-        "nunca_usaram": 12,
+        "usando": 7,
+        "nunca_usaram": 11,
         "paradas": 3,
-        "com_conta": 10,
-        "contas": 9,
+        "com_conta": 11,
+        "contas": 10,
         "produtos_total": 238,
         "produtos_7d": 16,
-        "descricoes_total": 317,
+        "descricoes_total": 320,
         "total_estimado": true,
         "produtos_atribuidos": 5
       },
@@ -495,7 +495,7 @@ window.DADOS = {
           "envios": 184,
           "primeiro": "2026-08-11T18:28:02.542Z",
           "ultimo": "2026-08-27T19:14:21.254Z",
-          "dias": 5,
+          "dias": 6,
           "produtos_medidos": 132,
           "atribuido": 0
         },
@@ -509,12 +509,12 @@ window.DADOS = {
           "estimado": true,
           "produtos_7d": 1,
           "ativa": false,
-          "acessos": 12,
-          "buscas": 67,
-          "descricoes": 105,
-          "envios": 102,
+          "acessos": 13,
+          "buscas": 77,
+          "descricoes": 106,
+          "envios": 103,
           "primeiro": "2026-08-18T13:22:59.954Z",
-          "ultimo": "2026-09-01T18:40:17.537Z",
+          "ultimo": "2026-09-02T17:11:58.593Z",
           "dias": 0,
           "produtos_medidos": 76,
           "atribuido": 5
@@ -535,7 +535,7 @@ window.DADOS = {
           "envios": 14,
           "primeiro": "2026-08-27T10:08:32.689Z",
           "ultimo": "2026-08-31T19:02:37.837Z",
-          "dias": 1,
+          "dias": 2,
           "produtos_medidos": 14,
           "atribuido": 0
         },
@@ -663,19 +663,19 @@ window.DADOS = {
           "slug": "kauly",
           "nome": "Kauly",
           "arquetipo": "governante",
-          "tem_conta": false,
-          "email": "",
+          "tem_conta": true,
+          "email": "marketing@kauly.com.br",
           "produtos": 0,
           "estimado": false,
           "produtos_7d": 0,
           "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
+          "acessos": 1,
+          "buscas": 3,
+          "descricoes": 2,
           "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null,
+          "primeiro": "2026-09-02T19:08:41.700Z",
+          "ultimo": "2026-09-02T19:10:32.276Z",
+          "dias": 0,
           "produtos_medidos": 0,
           "atribuido": 0
         },
@@ -965,12 +965,12 @@ window.DADOS = {
         {
           "inicio": "2026-08-31",
           "fim": "2026-09-06",
-          "produtos": 4,
+          "produtos": 5,
           "ativas": 1,
-          "usaram": 2,
-          "cadastros": 9,
-          "novos": 0,
-          "produtos_medidos": 4,
+          "usaram": 3,
+          "cadastros": 10,
+          "novos": 1,
+          "produtos_medidos": 5,
           "atribuido": 0
         }
       ]
@@ -985,8 +985,8 @@ window.DADOS = {
         "usando": 9,
         "nunca_usaram": 9,
         "paradas": 1,
-        "com_conta": 10,
-        "contas": 9,
+        "com_conta": 11,
+        "contas": 10,
         "produtos_total": 206,
         "produtos_7d": 8,
         "descricoes_total": 74,
@@ -1130,7 +1130,7 @@ window.DADOS = {
           "envios": 3,
           "primeiro": "2026-08-12T12:05:03.861Z",
           "ultimo": "2026-08-31T17:32:53.474Z",
-          "dias": 1,
+          "dias": 2,
           "produtos_medidos": 2,
           "atribuido": 0
         },
@@ -1218,8 +1218,8 @@ window.DADOS = {
           "slug": "kauly",
           "nome": "Kauly",
           "arquetipo": "governante",
-          "tem_conta": false,
-          "email": "",
+          "tem_conta": true,
+          "email": "marketing@kauly.com.br",
           "produtos": 0,
           "estimado": false,
           "produtos_7d": 0,
@@ -1480,13 +1480,13 @@ window.DADOS = {
         {
           "inicio": "2026-08-31",
           "fim": "2026-09-06",
-          "produtos": 9,
+          "produtos": 10,
           "ativas": 1,
           "usaram": 3,
-          "cadastros": 9,
-          "novos": 0,
+          "cadastros": 10,
+          "novos": 1,
           "produtos_medidos": 8,
-          "atribuido": 1
+          "atribuido": 2
         }
       ]
     }
