@@ -400,10 +400,21 @@ function renderTable(tableId, columns, rows) {
 // Marcas com fatura vencida e ainda em aberto ha mais dias que a regua.
 // Nao depende do filtro de periodo -- e' uma foto de hoje, igual Sem VP/Travadas.
 // Os dias vem do vencimento MAIS ANTIGO em aberto (ver build_inadimplencia).
-// Devedoras de DENTRO do painel: continuam vendendo, ambiente ligado.
+// Marca que PAGOU depois do vencimento da fatura mais antiga em aberto continua
+// cliente pagante: pendurou uma fatura velha, mas nao parou de pagar. Sai da aba
+// (regra da Laura, 02/09/2026) -- "bloqueada = passou dos 11 dias E AINDA NAO
+// PAGOU". Sem isso a G&B Bros aparecia com 331 dias tendo pago em 06/07/2026.
+function seguePagando(e) {
+  const venc = e.vencimentoMaisAntigo || "";
+  const ult = e.ultimoPagamento || "";
+  return !!(venc && ult && ult > venc);
+}
+
+// Devedoras de DENTRO do painel: modulo `vendas` ligado e sem pagar desde o
+// vencimento em aberto.
 function inadAtivas() {
   return empresasFiltradas()
-    .filter(e => (e.faturasVencidas || 0) > 0)
+    .filter(e => (e.faturasVencidas || 0) > 0 && !seguePagando(e))
     .map(e => ({...e, _ativa: true,
                 _qtFaturas: e.faturasVencidas || 0,
                 _subcontas: e.subcontasIugu || []}));
@@ -1088,6 +1099,8 @@ function renderTabInadTabela(lista) {
     {label:"Domínio", cls:"num", fn:r=>r.domain_id||"—", sort:r=>+r.domain_id||0},
     {label:"Bloqueado em", fn:r=>r.bloqueadoEm||"—", sort:r=>r.bloqueadoEm||""},
     {label:"Venc. mais antigo", fn:r=>r.vencimentoMaisAntigo||"—", sort:r=>r.vencimentoMaisAntigo||""},
+    // mostra a regra em tela: quem esta aqui NAO pagou depois desse vencimento
+    {label:"Último pagamento", fn:r=>r.ultimoPagamento||"—", sort:r=>r.ultimoPagamento||""},
     // sem divida em aberto nao ha atraso a mostrar -- "—" em vez de fingir zero
     {label:"Dias em atraso", cls:"num", fn:r=>r._semDivida?"—":fmtInt(r.diasAtraso||0), sort:r=>r.diasAtraso||0},
     {label:"Faturas vencidas", cls:"num", fn:r=>r._semDivida?"—":fmtInt(r._qtFaturas||0), sort:r=>r._qtFaturas||0},

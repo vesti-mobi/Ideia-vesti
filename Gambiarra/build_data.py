@@ -301,12 +301,16 @@ def main():
     # data do corte vem do log do n8n, nao da Iugu -- serve pra CS saber ha
     # quanto tempo a marca esta bloqueada
     inad_fora = inad.get("foraDoPainel") or []
-    for _f in inad_fora:
-        _f["bloqueadoEm"] = ((ambiente.get(_f.get("domain_id")) or {}).get("update") or "")
     pag_p     = ROOT / "pagamentos_elisa.json"
     pagtos    = _load(pag_p) if pag_p.exists() else {"piso": "", "dominios": {}}
     pag_piso  = pagtos.get("piso") or ""
     pag_dom   = pagtos.get("dominios") or {}
+    for _f in inad_fora:
+        _f["bloqueadoEm"] = ((ambiente.get(_f.get("domain_id")) or {}).get("update") or "")
+        # ultimoPagamento nao entra aqui: build_pagamentos (fetch_elisa_bq) so'
+        # guarda dominio do painel, entao cancelada nunca tem data. A coluna sai
+        # "—" pra elas -- a regra de "continua pagando" so' vale pra quem tem o
+        # modulo ligado, que e' justamente quem TEM o dado.
 
     enriched = []
     meses_set: set[str] = set()
@@ -382,6 +386,12 @@ def main():
             # Inadimplencia (faturas vencidas e em aberto na Iugu). A regua de
             # dias fica no front -- aqui vai o atraso cru do vencimento MAIS
             # ANTIGO em aberto. Ver SQL_INADIMPLENTES em fetch_elisa_bq.py.
+            # Ultima fatura PAGA (datas vem ordenada asc do BQ). O front compara
+            # com vencimentoMaisAntigo: quem pagou DEPOIS do vencimento em aberto
+            # continua cliente pagante -- so' pendurou uma fatura velha -- e sai da
+            # aba Inadimplentes (regra da Laura, 02/09/2026). Era o que fazia a
+            # G&B Bros aparecer com 331 dias de atraso tendo pago em julho.
+            "ultimoPagamento": ((pag_dom.get(dom) or {}).get("datas") or [""])[-1],
             "faturasVencidas": (inad_dom.get(dom) or {}).get("qtFaturas", 0),
             "valorEmAberto": (inad_dom.get(dom) or {}).get("valorEmAberto", 0.0),
             "diasAtraso": (inad_dom.get(dom) or {}).get("diasAtraso", 0),

@@ -283,17 +283,19 @@
       fatura <em>cancelada</em> ou <em>estornada</em> fica de fora, porque não é dívida do lojista (a Iugu cancela a fatura
       antiga antes de gerar a próxima). Os <strong>dias de atraso contam do vencimento mais antigo</strong> ainda em aberto,
       não do último. Fonte: espelho da Iugu no BigQuery — não depende do filtro de período.
-      <br><strong>Situação:</strong> <span class="pill pill-sit-alerta">⚠️ Em alerta</span> de 1 a 10 dias de
-      atraso, com o módulo <em>vendas</em> ativo — ainda dá para evitar o corte ·
-      <span class="pill pill-sit-bloq">⛔ Bloqueada</span> a partir de 11 dias, quando o n8n corta o acesso;
-      a marca segue cliente ·
-      <span class="pill pill-sit-canc">⚫ Cancelada</span> <strong>módulo <em>vendas</em> desabilitado</strong>
-      — é assim que a Vesti cancela.
-      <br>Cancelada <strong>não quer dizer sem dívida</strong>: a Eruthy está cancelada há quase um ano e ainda
-      deve R$ 600. Quem foi cancelada e ainda tem fatura em aberto aparece com o valor real; quem já teve a
-      fatura cancelada pela Iugu aparece com <strong>“—” em valor e dias</strong>, e dessas entram só as dos
-      últimos <strong>90 dias</strong>, senão a lista vira histórico de churn. A cancelada não aparece em
-      nenhuma outra aba do painel e não tem mensalidade a cobrar, porque a assinatura caiu junto.
+      <br><strong>Situação:</strong> <span class="pill pill-sit-alerta">⚠️ Em alerta</span> fatura atrasada
+      há menos de 11 dias ·
+      <span class="pill pill-sit-bloq">⛔ Bloqueada</span> passou dos 11 dias e <strong>ainda não pagou</strong> ·
+      <span class="pill pill-sit-canc">⚫ Cancelada</span> fatura ou assinatura cancelada na Iugu e
+      <strong>módulo <em>vendas</em> desativado</strong>.
+      <br><strong>Quem continua pagando não aparece aqui.</strong> Marca com o módulo <em>vendas</em> ligado que
+      registrou pagamento <em>depois</em> do vencimento da fatura em aberto sai da lista — ela só pendurou uma
+      fatura antiga, não parou de pagar. Compare as colunas <strong>Venc. mais antigo</strong> e
+      <strong>Último pagamento</strong>: quem está na tabela não pagou nada desde aquele vencimento.
+      <br>Cancelada não quer dizer sem dívida: quem foi cancelada e ainda tem fatura em aberto aparece com o
+      valor real; quem já teve a fatura cancelada pela Iugu aparece com <strong>“—” em valor e dias</strong>, e
+      dessas entram só as dos últimos <strong>90 dias</strong>. A cancelada não aparece em nenhuma outra aba do
+      painel e não tem mensalidade a cobrar, porque a assinatura caiu junto.
     </p>
     <div class="sub-filter">
       <label>Situação:</label>
