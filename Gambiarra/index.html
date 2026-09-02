@@ -284,15 +284,16 @@
       antiga antes de gerar a próxima). Os <strong>dias de atraso contam do vencimento mais antigo</strong> ainda em aberto,
       não do último. Fonte: espelho da Iugu no BigQuery — não depende do filtro de período.
       <br><strong>Situação:</strong> <span class="pill pill-sit-alerta">⚠️ Em alerta</span> de 1 a 10 dias de
-      atraso — ainda dá para evitar o corte ·
-      <span class="pill pill-sit-bloq">⛔ Bloqueada</span> a partir de 11 dias, quando o n8n corta o
-      ambiente (linha em vermelho) ·
-      <span class="pill pill-sit-canc">⚫ Cancelada</span> cancelaram na Iugu e o ambiente foi cortado.
-      <br>A <strong>cancelada</strong> não tem fatura em aberto — a Iugu cancelou — então aparece com
-      <strong>“—” em valor e dias</strong>; o que a identifica é a soma de <em>sem dívida</em> com
-      <em>sem o módulo vendas</em>. Ela também não aparece em nenhuma outra aba do painel e não tem
-      mensalidade a cobrar, porque a assinatura caiu junto. Entram só as canceladas dos últimos
-      <strong>90 dias</strong>, senão a lista vira histórico de churn.
+      atraso, com o módulo <em>vendas</em> ativo — ainda dá para evitar o corte ·
+      <span class="pill pill-sit-bloq">⛔ Bloqueada</span> a partir de 11 dias, quando o n8n corta o acesso;
+      a marca segue cliente ·
+      <span class="pill pill-sit-canc">⚫ Cancelada</span> <strong>módulo <em>vendas</em> desabilitado</strong>
+      — é assim que a Vesti cancela.
+      <br>Cancelada <strong>não quer dizer sem dívida</strong>: a Eruthy está cancelada há quase um ano e ainda
+      deve R$ 600. Quem foi cancelada e ainda tem fatura em aberto aparece com o valor real; quem já teve a
+      fatura cancelada pela Iugu aparece com <strong>“—” em valor e dias</strong>, e dessas entram só as dos
+      últimos <strong>90 dias</strong>, senão a lista vira histórico de churn. A cancelada não aparece em
+      nenhuma outra aba do painel e não tem mensalidade a cobrar, porque a assinatura caiu junto.
     </p>
     <div class="sub-filter">
       <label>Situação:</label>

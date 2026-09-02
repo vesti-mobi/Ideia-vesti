@@ -409,20 +409,21 @@ function inadAtivas() {
                 _subcontas: e.subcontasIugu || []}));
 }
 
-// Devedoras DESLIGADAS: perderam o modulo `vendas` e nao estao em D.empresas.
-// Nao tem valor_mensal (a assinatura foi cortada junto), por isso o null.
+// CANCELADAS QUE AINDA DEVEM: perderam o modulo `vendas` mas tem fatura vencida
+// em aberto. Sao canceladas pela regra (modulo cortado) e mostram o valor real --
+// e' divida viva, nao historico. Sem valor_mensal: a assinatura caiu junto.
 function inadDesligadas() {
   return foraDoPainelBase()
     .filter(e => state.empresa === "todas" || e.name === state.empresa)
-    .map(e => ({...e, _ativa: false, _cancelada: false,
+    .map(e => ({...e, _ativa: false, _semDivida: false,
                 _qtFaturas: e.qtFaturas || 0,
                 _subcontas: e.subcontas || [],
                 valor_mensal: null}));
 }
 
-// CANCELADAS: cancelaram na Iugu e o ambiente foi cortado. Nao tem fatura em
-// aberto (a Iugu cancelou), entao sumiam da aba mesmo tendo virado churn. Entram
-// com `_cancelada` -- as colunas de divida mostram "—" em vez de fingir zero.
+// CANCELADAS SEM DIVIDA: modulo cortado e a Iugu ja' cancelou a fatura, entao nao
+// ha nada em aberto. Sumiam do painel inteiro. Entram com `_semDivida` -- as
+// colunas de divida mostram "—" em vez de fingir zero.
 // Recorte de 90 dias aplicado no build_data (CANCELADA_RECENTE_DIAS).
 function inadCanceladas() {
   return (D.inadCanceladas || [])
@@ -432,7 +433,7 @@ function inadCanceladas() {
       if (state.empresa !== "todas" && e.name !== state.empresa) return false;
       return true;
     })
-    .map(e => ({...e, _ativa: false, _cancelada: true,
+    .map(e => ({...e, _ativa: false, _semDivida: true,
                 diasAtraso: 0, valorEmAberto: 0,
                 vencimentoMaisAntigo: "", _qtFaturas: 0, _subcontas: [],
                 bloqueadoEm: e.canceladoEm, valor_mensal: null}));
@@ -458,17 +459,16 @@ function linhasInadimplentes(minDias, ignorarSituacao) {
   return ignorarSituacao ? todas : todas.filter(e => state.situacoes.has(situacaoDe(e)));
 }
 
-// 3 estados, definicao da Laura (01/09/2026):
-//   em alerta = 1 a 10 dias de atraso, ainda da' pra evitar o corte
-//   bloqueada = a partir de 11 dias -- o n8n ("Bloqueio e Desbloqueio") corta
-//               o ambiente. Entra aqui tambem quem ja' perdeu o modulo `vendas`
-//               e continua com fatura em aberto.
-//   cancelada = cancelaram na Iugu mesmo E o ambiente foi cortado: sem fatura
-//               em aberto (a Iugu cancelou) e sem o modulo `vendas`.
+// 3 estados, definicao da Laura (01-02/09/2026):
+//   em alerta = modulo `vendas` ativo, 1 a 10 dias de atraso
+//   bloqueada = modulo `vendas` ativo, a partir de 11 dias -- o n8n
+//               ("Bloqueio e Desbloqueio") corta o acesso, mas a marca segue cliente
+//   cancelada = MODULO `vendas` DESABILITADO. E' assim que a Vesti cancela: tira o
+//               modulo. Vale tendo divida em aberto ou nao -- a Eruthy esta
+//               cancelada ha 337 dias e ainda deve R$ 600.
 function situacaoDe(r) {
-  if (r._cancelada) return "cancelada";
-  if (!r._ativa || (r.diasAtraso || 0) > INAD_LIMITE_ALERTA) return "bloqueada";
-  return "alerta";
+  if (!r._ativa) return "cancelada";
+  return (r.diasAtraso || 0) > INAD_LIMITE_ALERTA ? "bloqueada" : "alerta";
 }
 
 function situacaoBadge(r) {
@@ -1089,10 +1089,10 @@ function renderTabInadTabela(lista) {
     {label:"Bloqueado em", fn:r=>r.bloqueadoEm||"—", sort:r=>r.bloqueadoEm||""},
     {label:"Venc. mais antigo", fn:r=>r.vencimentoMaisAntigo||"—", sort:r=>r.vencimentoMaisAntigo||""},
     // sem divida em aberto nao ha atraso a mostrar -- "—" em vez de fingir zero
-    {label:"Dias em atraso", cls:"num", fn:r=>r._cancelada?"—":fmtInt(r.diasAtraso||0), sort:r=>r.diasAtraso||0},
-    {label:"Faturas vencidas", cls:"num", fn:r=>r._cancelada?"—":fmtInt(r._qtFaturas||0), sort:r=>r._qtFaturas||0},
+    {label:"Dias em atraso", cls:"num", fn:r=>r._semDivida?"—":fmtInt(r.diasAtraso||0), sort:r=>r.diasAtraso||0},
+    {label:"Faturas vencidas", cls:"num", fn:r=>r._semDivida?"—":fmtInt(r._qtFaturas||0), sort:r=>r._qtFaturas||0},
     {label:"Subconta Iugu", fn:r=>(r._subcontas||[]).join(", ")||"—", sort:r=>(r._subcontas||[])[0]||""},
-    {label:"Valor em aberto", cls:"num", fn:r=>r._cancelada?"—":fmtBRL(r.valorEmAberto||0), sort:r=>r.valorEmAberto||0},
+    {label:"Valor em aberto", cls:"num", fn:r=>r._semDivida?"—":fmtBRL(r.valorEmAberto||0), sort:r=>r.valorEmAberto||0},
     // desligada nao tem assinatura ativa, entao nao tem mensalidade a cobrar
     {label:"Mensalidade", cls:"num", fn:r=>r.valor_mensal==null?"—":fmtBRL(r.valor_mensal), sort:r=>r.valor_mensal||0},
   ], lista.map(e=>({...e, _alert: !e._ativa})));
@@ -1100,12 +1100,12 @@ function renderTabInadTabela(lista) {
 
 function renderTabInadimplentes() {
   const lista = linhasInadimplentes();          // inclui bloqueadas sem divida
-  const devendo = lista.filter(e => !e._cancelada);   // base dos graficos
+  const devendo = lista.filter(e => !e._semDivida);   // base dos graficos
   const total = lista.reduce((s,e)=>s+(e.valorEmAberto||0), 0);
   const nAlerta = lista.filter(e => situacaoDe(e) === "alerta").length;
   const nBloq   = lista.filter(e => situacaoDe(e) === "bloqueada").length;
   const desl    = lista.filter(e => !e._ativa);
-  const nCanc   = lista.filter(e => e._cancelada).length;
+  const nCanc   = lista.filter(e => situacaoDe(e) === "cancelada").length;
   const hint = $("inad-hint");
   // Faturas vencidas que nao casaram com marca NENHUMA (nem desligada) -- hoje
   // sao 0, mas se o mapa customer->dominio falhar melhor dizer do que sumir.
