@@ -307,6 +307,20 @@ def main():
     pag_dom   = pagtos.get("dominios") or {}
     for _f in inad_fora:
         _f["bloqueadoEm"] = ((ambiente.get(_f.get("domain_id")) or {}).get("update") or "")
+    # Mesma janela das canceladas sem divida: cancelamento com mais de 90 dias e'
+    # historico, nao cobranca. Aqui nao da' pra usar "dias sem pagar" (cancelada
+    # nao tem historico de pagamento no espelho -- ver build_pagamentos), entao a
+    # referencia e' a data do corte no n8n e, na falta dela, o vencimento da
+    # fatura em aberto: se a fatura esta aberta ha 338 dias, ninguem pagou nada.
+    # contado ANTES do filtro de 90 dias: fatura de marca que foi identificada e
+    # so' nao esta em tela nao pode aparecer como "sem marca identificada"
+    _faturas_nomeadas = sum(f.get("qtFaturas", 0) for f in inad_fora)
+    _hoje = date.today()
+    def _idade_cancelamento(f: dict) -> int:
+        ref = _parse_iso_date(f.get("bloqueadoEm")) or _parse_iso_date(f.get("vencimentoMaisAntigo"))
+        return (_hoje - ref).days if ref else 0
+    inad_fora = [f for f in inad_fora
+                 if _idade_cancelamento(f) <= CANCELADA_RECENTE_DIAS]
         # ultimoPagamento nao entra aqui: build_pagamentos (fetch_elisa_bq) so'
         # guarda dominio do painel, entao cancelada nunca tem data. A coluna sai
         # "—" pra elas -- a regra de "continua pagando" so' vale pra quem tem o
@@ -431,6 +445,9 @@ def main():
         "inadCanceladas": _canceladas(
             ambiente, {e["domain_id"]: e for e in empresas}, inad_dom, inad_fora),
         "canceladaRecenteDias": CANCELADA_RECENTE_DIAS,
+        # faturas vencidas que nao casaram com marca nenhuma (nem cancelada)
+        "inadFaturasSemNome": max(0, int((inad.get("semDominio") or {}).get("qtFaturas") or 0)
+                                     - _faturas_nomeadas),
         "pendentes": ["Reativacao", "Link compartilhado", "Clicks no link"],
     }
     out = ROOT / "dashboard_data.js"

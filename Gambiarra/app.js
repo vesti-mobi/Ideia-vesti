@@ -1146,12 +1146,10 @@ function renderTabInadimplentes() {
   const hint = $("inad-hint");
   // Faturas vencidas que nao casaram com marca NENHUMA (nem desligada) -- hoje
   // sao 0, mas se o mapa customer->dominio falhar melhor dizer do que sumir.
-  // conta dos DADOS BRUTOS, nao da lista filtrada: e' uma propriedade do
-  // espelho da Iugu (fatura que nao casou com dominio nenhum), nao muda com
-  // regua nem com filtro de CS. Hoje da' 0 -- as 37 orfas foram todas nomeadas.
-  const orfas = (D.inadSemDominio || {}).qtFaturas || 0;
-  const nomeadas = (D.inadForaDoPainel || []).reduce((s,e)=>s+(e.qtFaturas||0), 0);
-  const sobra = Math.max(0, orfas - nomeadas);
+  // vem pronto do build_data, contado antes de qualquer filtro: e' fatura que nao
+  // casou com marca NENHUMA no espelho da Iugu. Nao muda com regua nem com CS, e
+  // nao confunde com marca que foi identificada mas nao esta em tela.
+  const sobra = D.inadFaturasSemNome || 0;
   const sobraTxt = sobra
     ? ` · <span class="hint">${fmtInt(sobra)} faturas sem marca identificada</span>` : "";
   if (hint) hint.innerHTML = lista.length
