@@ -1169,7 +1169,219 @@ function negociosDe(categoria){
     .map(n=>Object.assign({}, n, {cs: normalizarCs(n.cs) || CS_POR_CLIENTE[n.cliente] || 'Sem CS'}));
 }
 
+/* ==========================================================================
+   VISÃO GERAL — não mede nada de novo: junta números que já existem nas
+   outras abas (clientes, clientesSeries, negocios, tickets, reunioes, tino,
+   oraculo, vestiPago), comparando o período escolhido no filtro contra um
+   período anterior de MESMO TAMANHO em dias corridos. Quem quiser "semana
+   passada" ou "mês passado" escolhe isso no próprio seletor de período — a
+   conta de "anterior" segue o mesmo recorte.
+   ========================================================================== */
+function periodoAnterior(p){
+  p = p || periodo();
+  const dias = diasEntre(p.ini, p.fim) + 1;
+  return { ini: somarDias(p.ini, -dias), fim: somarDias(p.ini, -1) };
+}
+/* Starter/Pro sai do TEXTO do campo Plano (ex.: "Assinatura: Plano PRO"),
+   não de um código — por isso é busca por trecho, não igualdade. */
+function planoBucket(plano){
+  const s = String(plano||'').toLowerCase();
+  if(s.includes('starter')) return 'Starter';
+  if(s.includes('pro')) return 'Pro';
+  return 'Outro';
+}
+function novasVendasNoPeriodo(p){
+  return DATA.clientes.filter(c=>c.dataCadastro>=p.ini && c.dataCadastro<=p.fim);
+}
+function churnsNoPeriodo(p){
+  return DATA.clientes.filter(c=>c.dataChurn && c.dataChurn>=p.ini && c.dataChurn<=p.fim);
+}
+function reunioesNoPeriodo(p){
+  return DATA.reunioes.filter(r=>r.data && r.data>=p.ini && r.data<=p.fim && r.resultado!=='Agendada');
+}
+function negociosGanhosNoPeriodo(categoria, p){
+  return negociosDe(categoria).filter(n=>n.status==='Ganho' && n.data>=p.ini && n.data<=p.fim);
+}
+/* Mensalidade/pedidos por domínio numa janela QUALQUER — não dá para usar
+   clientesAgregados(), que só enxerga o período global do filtro, porque aqui
+   é preciso somar o período atual e o anterior ao mesmo tempo. */
+function pedidosPorDominioEm(p){
+  const acc = {};
+  DATA.clientesSeries.forEach(x=>{
+    const d = String(x.data).slice(0,10);
+    if(d<p.ini || d>p.fim) return;
+    const k = x.dominio || x.cliente;
+    const a = acc[k] || (acc[k]={pedidos:0,valorPedidos:0});
+    a.pedidos += x.pedidos||0; a.valorPedidos += x.valorPedidos||0;
+  });
+  return acc;
+}
+function implantadosNoPeriodo(p){
+  const conta = tabela => tabela.filter(x=>x.implantado && x.implantado>=p.ini && x.implantado<=p.fim);
+  return { tino: conta(DATA.tino.tabela), oraculo: conta(DATA.oraculo.tabela), vestiPago: conta(DATA.vestiPago.tabela) };
+}
+function marcasImplantadasNoPeriodo(p){
+  const imp = implantadosNoPeriodo(p);
+  return [...new Set([...imp.tino, ...imp.oraculo, ...imp.vestiPago].map(x=>x.cliente))];
+}
+/* Marcos de volume: só entre quem foi IMPLANTADO (Tino/Oráculo/VestiPago) no
+   próprio período — é o ramp-up pós-implantação, não qualquer marca grande
+   que já vendia R$100k por mês antes disso. */
+function marcasAcima100k(p){
+  const pedidosPorDom = pedidosPorDominioEm(p);
+  return marcasImplantadasNoPeriodo(p).map(nome=>{
+    const dom = DOM_POR_CLIENTE[nome];
+    const a = pedidosPorDom[dom] || pedidosPorDom[nome] || {pedidos:0,valorPedidos:0};
+    return {nome, cs: CS_POR_CLIENTE[nome]||'Sem CS', pedidos:a.pedidos, valor:a.valorPedidos};
+  }).filter(x=>x.valor>=100000).sort((a,b)=>b.valor-a.valor);
+}
+/* Funil de integrações: FOTO DO MOMENTO — tickets ainda abertos no pipeline
+   "Integrações" do HubSpot, por estágio. Não dá "entraram/saíram por semana"
+   porque não existe um retrato diário do estágio de cada ticket (diferente de
+   integracoes_snapshot.json, que só fotografa "tem integração ativa"). A
+   ordem tenta seguir o funil do onboarding; estágio que não bate com nenhum
+   nome conhecido entra no fim, do maior para o menor. */
+function funilIntegracoes(){
+  const tk = DATA.tickets.filter(t=>/integra/i.test(t.pipeline||'') && t.situacao!=='Encerrado');
+  const porEstagio = {};
+  tk.forEach(t=>{ const e = t.estagio || '—'; porEstagio[e]=(porEstagio[e]||0)+1 });
+  const ORDEM = ['day one','configura','treinamento','implant'];
+  const chaves = Object.keys(porEstagio);
+  chaves.sort((a,b)=>{
+    const ia = ORDEM.findIndex(x=>a.toLowerCase().includes(x));
+    const ib = ORDEM.findIndex(x=>b.toLowerCase().includes(x));
+    if(ia===-1 && ib===-1) return porEstagio[b]-porEstagio[a];
+    if(ia===-1) return 1; if(ib===-1) return -1;
+    return ia-ib;
+  });
+  const cores = ['var(--acc)','var(--acc-2)','var(--gold)','var(--pos)','var(--ink-3)'];
+  return chaves.length ? chaves.map((k,i)=>({l:k, v:porEstagio[k], cor:cores[i%cores.length]}))
+    : [{l:'Nenhum ticket aberto no pipeline "Integrações"', v:0, cor:'var(--ink-3)'}];
+}
+function categoriasNovasVendas(){
+  const p = periodo(), ant = periodoAnterior(p);
+  const atual = novasVendasNoPeriodo(p), anterior = novasVendasNoPeriodo(ant);
+  const conta = (lista,plano) => lista.filter(c=>planoBucket(c.plano)===plano).length;
+  return [
+    {l:'Starter — este período', v:conta(atual,'Starter'), cor:'var(--acc)'},
+    {l:'Starter — período anterior', v:conta(anterior,'Starter'), cor:'var(--acc-2)'},
+    {l:'Pro — este período', v:conta(atual,'Pro'), cor:'var(--acc)'},
+    {l:'Pro — período anterior', v:conta(anterior,'Pro'), cor:'var(--acc-2)'},
+    {l:'Outro — este período', v:conta(atual,'Outro'), cor:'var(--acc)'},
+    {l:'Outro — período anterior', v:conta(anterior,'Outro'), cor:'var(--acc-2)'},
+  ];
+}
+function categoriasImplantados(){
+  const imp = implantadosNoPeriodo(periodo());
+  return [
+    {l:'Tino', v:imp.tino.length, cor:'var(--acc)'},
+    {l:'Oráculo', v:imp.oraculo.length, cor:'var(--acc-2)'},
+    {l:'VestiPago', v:imp.vestiPago.length, cor:'var(--gold)'},
+  ];
+}
+function categoriasMarcos(){
+  const p = periodo();
+  const nomes = marcasImplantadasNoPeriodo(p);
+  const pedidosPorDom = pedidosPorDominioEm(p);
+  const linhas = nomes.map(nome=>{
+    const dom = DOM_POR_CLIENTE[nome];
+    return pedidosPorDom[dom] || pedidosPorDom[nome] || {pedidos:0,valorPedidos:0};
+  });
+  return [
+    {l:'5+ pedidos pagos', v:linhas.filter(x=>x.pedidos>=5).length, cor:'var(--acc)'},
+    {l:'25+ pedidos pagos', v:linhas.filter(x=>x.pedidos>=25).length, cor:'var(--acc-2)'},
+    {l:'R$100k+ de GMV', v:linhas.filter(x=>x.valorPedidos>=100000).length, cor:'var(--gold)'},
+  ];
+}
+function kpisVisaoGeral(){
+  const p = periodo(), ant = periodoAnterior(p);
+  const delta = (a,b)=> a>b ? `+${fmt.int(a-b)} vs período anterior`
+    : a<b ? `${fmt.int(a-b)} vs período anterior` : 'igual ao período anterior';
+  const novasAtual = novasVendasNoPeriodo(p).length, novasAnt = novasVendasNoPeriodo(ant).length;
+  const churnAtual = churnsNoPeriodo(p).length, churnAnt = churnsNoPeriodo(ant).length;
+  const reunAtual = reunioesNoPeriodo(p).length, reunAnt = reunioesNoPeriodo(ant).length;
+  const negAtual = [...negociosGanhosNoPeriodo('cross',p), ...negociosGanhosNoPeriodo('up',p)];
+  const negAnt = [...negociosGanhosNoPeriodo('cross',ant), ...negociosGanhosNoPeriodo('up',ant)];
+  return [
+    {l:'Novas vendas', v:fmt.int(novasAtual), s:delta(novasAtual,novasAnt)},
+    {l:'Churn', v:fmt.int(churnAtual), s:delta(churnAtual,churnAnt)},
+    {l:'Reuniões realizadas', v:fmt.int(reunAtual), s:delta(reunAtual,reunAnt)},
+    {l:'Negócios ganhos (cross-sell + upgrade)', v:fmt.moneyCompact(soma(negAtual,'valor')),
+     s:fmt.int(negAtual.length)+' negócios · '+delta(negAtual.length,negAnt.length)},
+  ];
+}
+/* Segunda fileira de cards: as listas cruas por trás de cada número acima —
+   mesma ideia da segunda tabela da Bonificação (renderPontos), só que aqui são
+   quatro listas curtas em vez de uma tabela de pontuação. */
+function renderListasVisaoGeral(){
+  const p = periodo();
+  const wrap = el('div',{class:'charts two'});
+
+  const listaCard = (titulo, linhas, colunas) => {
+    const card = el('div',{class:'table-card'});
+    const head = el('div',{class:'table-head'});
+    head.innerHTML = `<h3>${titulo}</h3><span class="count">${linhas.length} ${linhas.length===1?'registro':'registros'}</span>`;
+    card.appendChild(head);
+    if(!linhas.length){
+      card.appendChild(el('div',{class:'empty'},
+        `<h4>Nada por aqui no período</h4><p>Amplie o período no filtro acima para ver registros.</p>`));
+      return card;
+    }
+    const scroll = el('div',{class:'table-scroll'});
+    let html = '<table><thead><tr>'+colunas.map(c=>`<th${c.r?' class="r"':''}>${c.l}</th>`).join('')+'</tr></thead><tbody>';
+    linhas.forEach(r=>{
+      html += '<tr>'+colunas.map(c=>`<td${c.r?' class="r num"':''}>${c.f?c.f(r[c.k]):(r[c.k]??'—')}</td>`).join('')+'</tr>';
+    });
+    html += '</tbody></table>';
+    scroll.innerHTML = html;
+    card.appendChild(scroll);
+    return card;
+  };
+
+  wrap.appendChild(listaCard('Novas vendas no período',
+    novasVendasNoPeriodo(p).map(c=>({nome:c.nome, plano:planoBucket(c.plano), cs:c.cs, dataCadastro:c.dataCadastro})),
+    [{k:'nome', l:'Cliente'}, {k:'plano', l:'Plano'}, {k:'cs', l:'CS'},
+     {k:'dataCadastro', l:'Cadastro', f:fmt.date}]));
+
+  wrap.appendChild(listaCard('Marcas com churn no período',
+    churnsNoPeriodo(p).map(c=>({nome:c.nome, plano:c.plano, cs:c.cs, data:c.dataChurn})),
+    [{k:'nome', l:'Cliente'}, {k:'plano', l:'Plano'}, {k:'cs', l:'CS'},
+     {k:'data', l:'Data do churn', f:fmt.date}]));
+
+  wrap.appendChild(listaCard('Novas marcas usando acima de R$100k no período',
+    marcasAcima100k(p),
+    [{k:'nome', l:'Cliente'}, {k:'cs', l:'CS'},
+     {k:'valor', l:'GMV no período', r:true, f:fmt.money}]));
+
+  wrap.appendChild(listaCard('Reuniões no período',
+    reunioesNoPeriodo(p).slice().sort((a,b)=>String(b.data).localeCompare(String(a.data))).slice(0,50)
+      .map(r=>({cliente:r.cliente, cs:r.cs, data:r.data, resultado:r.resultado})),
+    [{k:'cliente', l:'Cliente'}, {k:'cs', l:'CS'}, {k:'data', l:'Data', f:fmt.date}, {k:'resultado', l:'Resultado'}]));
+
+  return wrap;
+}
+
 const TABS = [
+  {
+    id:'visaoGeral', grupo:'Visão geral', nav:'Visão geral', cor:'#2E7D46', cor2:'#1E74C8',
+    titulo:'Visão geral',
+    desc:'Retrato do período escolhido no filtro, contra um <b>período anterior de mesmo tamanho</b> em dias corridos — quem quiser semana passada ou mês passado escolhe isso no próprio seletor de período, o "anterior" acompanha. Nada aqui é medido de novo: cada número já existe em alguma aba abaixo, só reorganizado. '
+      + '<b>Novas vendas</b> = marcas com data de cadastro dentro do período, separadas em Starter/Pro pelo texto do campo Plano (o resto cai em "Outro"). '
+      + '<b>Funil de integrações</b> é uma <b>foto do momento</b>: tickets ainda abertos no pipeline "Integrações" do HubSpot, por estágio — sem "entraram/saíram" por semana, porque não existe hoje um retrato diário do estágio de cada ticket (diferente do <code>integracoes_snapshot.json</code>, que só fotografa quem TEM integração ativa). '
+      + '<b>Marcos de volume</b> olha só quem foi <b>implantado</b> (Tino, Oráculo ou VestiPago) dentro do próprio período, e quantas dessas marcas já bateram 5 pedidos, 25 pedidos ou R$100k de GMV no mesmo período — é o ramp-up pós-implantação, não qualquer marca grande que já vendia isso antes.',
+    filtros:['periodo'],
+    semTabela:true,
+    linhas:()=>[],
+    kpis:()=>kpisVisaoGeral(),
+    duasColunas:true,
+    graficos:[
+      {t:'Novas vendas por plano', categorias:()=>categoriasNovasVendas()},
+      {t:'Funil de integrações (foto do momento)', categorias:()=>funilIntegracoes()},
+      {t:'Produtos implantados no período', categorias:()=>categoriasImplantados()},
+      {t:'Marcos de volume — marcas implantadas no período', categorias:()=>categoriasMarcos()},
+    ],
+    extra:()=>renderListasVisaoGeral(),
+  },
   {
     id:'clientes', grupo:'Carteira', nav:'Tabela geral', cor:'#0E7A73', cor2:'#B7791F',
     titulo:'Tabela geral dos clientes',
@@ -1880,7 +2092,7 @@ const FILTROS_PADRAO_BASE = { cliente:'', statusDeal:'todos', situacao:'Cancelad
 const filtrosPadrao = ()=>Object.assign({}, FILTROS_PADRAO_BASE,
   { periodo: periodoPadrao(), canais: new Set(), cs: new Set() });
 const estado = {
-  aba: 'clientes',
+  aba: 'visaoGeral',
   filtros: filtrosPadrao(),
   ordem: {}, // { abaId: {k, dir} }
 };
@@ -2143,9 +2355,12 @@ function renderPagina(){
     });
   }
 
-  page.appendChild(renderTabela(t, rows));
+  /* semTabela: aba sem tabela principal por cliente/registro (hoje só a Visão
+     geral) — o conteúdo inteiro vem dos gráficos de categoria e do extra. */
+  if(!t.semTabela) page.appendChild(renderTabela(t, rows));
   /* Espaço para uma segunda tabela na aba, quando a primeira não conta a
-     história inteira — hoje só a Bonificação usa, para a pontuação. */
+     história inteira — Bonificação usa para a pontuação, Visão geral para as
+     listas por trás de cada KPI. */
   if(t.extra){ const ex = t.extra(rows); if(ex) page.appendChild(ex) }
   ultimoRender = { rows, colunas:t.colunas };
 }
