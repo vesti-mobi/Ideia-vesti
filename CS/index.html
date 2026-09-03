@@ -1235,28 +1235,22 @@ function marcasAcima100k(p){
     return {nome, cs: CS_POR_CLIENTE[nome]||'Sem CS', pedidos:a.pedidos, valor:a.valorPedidos};
   }).filter(x=>x.valor>=100000).sort((a,b)=>b.valor-a.valor);
 }
-/* Funil de integrações: FOTO DO MOMENTO — tickets ainda abertos no pipeline
-   "Integrações" do HubSpot, por estágio. Não dá "entraram/saíram por semana"
-   porque não existe um retrato diário do estágio de cada ticket (diferente de
-   integracoes_snapshot.json, que só fotografa "tem integração ativa"). A
-   ordem tenta seguir o funil do onboarding; estágio que não bate com nenhum
-   nome conhecido entra no fim, do maior para o menor. */
+/* Funil de onboarding: negócios em andamento nos pipelines de CS que têm um
+   estágio "Implantado" — hoje são quatro (Sucesso do Cliente, Sucesso do
+   cliente - Integração, Sucesso do Cliente - Plataforma, CS - Starter). NÃO é
+   o pipeline de TICKET "Integrações" (esse tem 1 ticket, fechado, de março —
+   não é o que alimenta isso). O fetch_dados.js já normaliza os nomes de
+   estágio de cada pipeline (ex.: "Configurações" x "Cadastro de produtos",
+   "Treinamento de vendas" x "1º/2º Treinamento") nas 5 fases abaixo. FOTO DO
+   MOMENTO: é a contagem de negócios abertos agora em cada fase — os marcos de
+   depois do "Implantado" (5/25 pedidos, R$100k) já são medidos direto dos
+   pedidos pagos, no bloco "Marcos de volume". */
 function funilIntegracoes(){
-  const tk = DATA.tickets.filter(t=>/integra/i.test(t.pipeline||'') && t.situacao!=='Encerrado');
+  const ORDEM = ['Novo cliente','Day one','Configuração','Treinamento','Implantado'];
   const porEstagio = {};
-  tk.forEach(t=>{ const e = t.estagio || '—'; porEstagio[e]=(porEstagio[e]||0)+1 });
-  const ORDEM = ['day one','configura','treinamento','implant'];
-  const chaves = Object.keys(porEstagio);
-  chaves.sort((a,b)=>{
-    const ia = ORDEM.findIndex(x=>a.toLowerCase().includes(x));
-    const ib = ORDEM.findIndex(x=>b.toLowerCase().includes(x));
-    if(ia===-1 && ib===-1) return porEstagio[b]-porEstagio[a];
-    if(ia===-1) return 1; if(ib===-1) return -1;
-    return ia-ib;
-  });
+  (DATA.onboarding||[]).forEach(o=>{ porEstagio[o.estagio]=(porEstagio[o.estagio]||0)+1 });
   const cores = ['var(--acc)','var(--acc-2)','var(--gold)','var(--pos)','var(--ink-3)'];
-  return chaves.length ? chaves.map((k,i)=>({l:k, v:porEstagio[k], cor:cores[i%cores.length]}))
-    : [{l:'Nenhum ticket aberto no pipeline "Integrações"', v:0, cor:'var(--ink-3)'}];
+  return ORDEM.map((l,i)=>({l, v:porEstagio[l]||0, cor:cores[i%cores.length]}));
 }
 function categoriasNovasVendas(){
   const p = periodo(), ant = periodoAnterior(p);
@@ -1367,7 +1361,7 @@ const TABS = [
     titulo:'Visão geral',
     desc:'Retrato do período escolhido no filtro, contra um <b>período anterior de mesmo tamanho</b> em dias corridos — quem quiser semana passada ou mês passado escolhe isso no próprio seletor de período, o "anterior" acompanha. Nada aqui é medido de novo: cada número já existe em alguma aba abaixo, só reorganizado. '
       + '<b>Novas vendas</b> = marcas com data de cadastro dentro do período, separadas em Starter/Pro pelo texto do campo Plano (o resto cai em "Outro"). '
-      + '<b>Funil de integrações</b> é uma <b>foto do momento</b>: tickets ainda abertos no pipeline "Integrações" do HubSpot, por estágio — sem "entraram/saíram" por semana, porque não existe hoje um retrato diário do estágio de cada ticket (diferente do <code>integracoes_snapshot.json</code>, que só fotografa quem TEM integração ativa). '
+      + '<b>Funil de onboarding</b> é uma <b>foto do momento</b>: negócios em andamento nos pipelines de CS que levam a marca a "Implantado" (Sucesso do Cliente, Sucesso do cliente - Integração, Sucesso do Cliente - Plataforma e CS - Starter), por fase — não é o pipeline de ticket "Integrações", que praticamente não é usado. Sem "entraram/saíram" por semana, porque não existe hoje um retrato diário da fase de cada negócio (diferente do <code>integracoes_snapshot.json</code>, que só fotografa quem TEM integração ativa). '
       + '<b>Marcos de volume</b> olha só quem foi <b>implantado</b> (Tino, Oráculo ou VestiPago) dentro do próprio período, e quantas dessas marcas já bateram 5 pedidos, 25 pedidos ou R$100k de GMV no mesmo período — é o ramp-up pós-implantação, não qualquer marca grande que já vendia isso antes.',
     filtros:['periodo'],
     semTabela:true,
@@ -1376,7 +1370,7 @@ const TABS = [
     duasColunas:true,
     graficos:[
       {t:'Novas vendas por plano', categorias:()=>categoriasNovasVendas()},
-      {t:'Funil de integrações (foto do momento)', categorias:()=>funilIntegracoes()},
+      {t:'Funil de onboarding (foto do momento)', categorias:()=>funilIntegracoes()},
       {t:'Produtos implantados no período', categorias:()=>categoriasImplantados()},
       {t:'Marcos de volume — marcas implantadas no período', categorias:()=>categoriasMarcos()},
     ],

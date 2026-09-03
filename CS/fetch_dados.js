@@ -868,7 +868,75 @@ async function puxarHubSpot() {
 
   const tickets = await puxarTickets(owners);
 
-  return { negocios, reunioes, tickets };
+  const onboarding = await puxarOnboarding(pipes, owners).catch(e => {
+    console.log('  onboarding falhou: ' + e.message.slice(0, 160));
+    return [];
+  });
+
+  return { negocios, reunioes, tickets, onboarding };
+}
+
+/* ------------------------------------------------------- onboarding (CS)
+   O funil "novo cliente -> implantado" NÃO vive no pipeline de TICKET
+   "Integrações" (esse tem 1 ticket fechado, de março — não é o que alimenta
+   isso). Vive em pipelines de NEGÓCIO: hoje são quatro — "Sucesso do
+   Cliente", "Sucesso do cliente - Integração", "Sucesso do Cliente -
+   Plataforma" e "CS - Starter" —, cada um com sua própria variação de nomes
+   de estágio (ex.: "Configurações" x "Cadastro de produtos", "Treinamento de
+   vendas" x "1º/2º Treinamento"). Achar esses pipelines por NOME é frágil (o
+   time já renomeia pipeline); achar por terem um estágio chamado exatamente
+   "Implantado" é o que os une de verdade e continua funcionando se entrar um
+   quinto pipeline nessa família amanhã.
+
+   Só os estágios ATÉ "Implantado" entram no funil. Os marcos de depois (5/25
+   pedidos, 100k) já são medidos direto dos PEDIDOS PAGOS na aba Visão geral —
+   mais confiável que uma etapa de CRM que ninguém garante estar em dia — e
+   estágios de perda/pós-venda (Perdido (Churn), Pendente de Pagamento,
+   Repassado, Parceiros, Apenas VestiPago) ficam de fora por não serem
+   onboarding em andamento. */
+const BUCKET_ONBOARDING = [
+  { l: 'Novo cliente', re: /novo cliente|boas-vindas/i },
+  { l: 'Day one', re: /day one/i },
+  { l: 'Configuração', re: /configura|cadastro de produto/i },
+  { l: 'Treinamento', re: /treinamento/i },
+  { l: 'Implantado', re: /^implantado$/i },
+];
+function bucketOnboarding(estagio) {
+  const b = BUCKET_ONBOARDING.find(x => x.re.test(estagio || ''));
+  return b ? b.l : null;
+}
+async function puxarOnboarding(pipes, owners) {
+  const alvo = (pipes.results || [])
+    .filter(p => (p.stages || []).some(s => /^implantado$/i.test((s.label || '').trim())));
+  console.log('  pipelines de onboarding (têm estágio "Implantado")'.padEnd(44) + String(alvo.length).padStart(8));
+  if (!alvo.length) return [];
+  alvo.forEach(p => console.log('    - ' + p.label));
+
+  const nomeEstagio = {};
+  alvo.forEach(p => p.stages.forEach(s => { nomeEstagio[s.id] = (s.label || '').trim(); }));
+
+  const filterGroups = alvo.map(p => ({ filters: [{ propertyName: 'pipeline', operator: 'EQ', value: p.id }] }));
+  const deals = await buscarTudo('deals',
+    ['dealname', 'dealstage', 'pipeline', 'createdate', 'hubspot_owner_id'],
+    filterGroups,
+    [{ propertyName: 'createdate', direction: 'DESCENDING' }]);
+  console.log('  negócios nesses pipelines'.padEnd(44) + String(deals.length).padStart(8));
+
+  const { empresaDo, nome: nomeEmpresa } = await empresasAssociadas('deals', deals.map(d => d.id));
+
+  const linhas = deals.map(d => {
+    const p = d.properties;
+    const bucket = bucketOnboarding(nomeEstagio[p.dealstage]);
+    if (!bucket) return null;   // fora do funil: pós-implantação, churn, admin
+    return {
+      cliente: nomeEmpresa[empresaDo[d.id]] || p.dealname || '(sem empresa)',
+      estagio: bucket,
+      cs: owners[p.hubspot_owner_id] || '',
+      data: iso(p.createdate),
+    };
+  }).filter(Boolean);
+  console.log('  em onboarding (novo cliente..implantado)'.padEnd(44) + String(linhas.length).padStart(8));
+  return linhas;
 }
 
 /* ------------------------------------------------------------- reuniões
@@ -2108,6 +2176,7 @@ function montar(bqd, hsd, tinoDados) {
     },
     reunioes: hsd.reunioes,
     tickets,
+    onboarding: hsd.onboarding || [],
   };
 }
 
@@ -2119,7 +2188,7 @@ function montar(bqd, hsd, tinoDados) {
   const bqd = await puxarBQ();
   const hsd = await puxarHubSpot().catch(e => {
     console.log('  HubSpot falhou: ' + e.message.slice(0, 160));
-    return { negocios: [], reunioes: [], tickets: [] };
+    return { negocios: [], reunioes: [], tickets: [], onboarding: [] };
   });
   /* Tino: se a API cair, o painel carrega sem a aba em vez de abortar a carga
      inteira — o resto dos dados não tem nada a ver com ela. */
@@ -2142,6 +2211,7 @@ function montar(bqd, hsd, tinoDados) {
     + ' (' + data.reunioes.filter(r => r.resultado === 'Fechou negócio').length + ' com negócio fechado)');
   console.log('  tickets         ' + data.tickets.length
     + ' (' + data.tickets.filter(t => t.situacao === 'Aberto').length + ' abertos)');
+  console.log('  onboarding      ' + data.onboarding.length + ' negócios em andamento');
   console.log('  canais          ' + data.meta.canais.join(', '));
   console.log('  oráculo         ' + data.oraculo.tabela.length + ' marcas / ' + tam(data.oraculo.series) + ' dias-marca');
   console.log('  tino            ' + data.tino.tabela.length + ' marcas com o produto / '
