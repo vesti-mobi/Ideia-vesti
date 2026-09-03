@@ -1,6 +1,6 @@
 window.DADOS = {
-  "gerado_em": "2026-09-02T22:57:04.196Z",
-  "hoje": "2026-09-02",
+  "gerado_em": "2026-09-03T15:29:19.562Z",
+  "hoje": "2026-09-03",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
   "auto_publica_desde": "2026-08-10",
@@ -13,14 +13,14 @@ window.DADOS = {
   "kpis": {
     "liberadas": 18,
     "ativas": 2,
-    "usando": 10,
-    "nunca_usaram": 8,
+    "usando": 11,
+    "nunca_usaram": 7,
     "paradas": 4,
     "com_conta": 11,
     "contas": 10,
     "produtos_total": 357,
-    "produtos_7d": 24,
-    "descricoes_total": 484,
+    "produtos_7d": 13,
+    "descricoes_total": 485,
     "total_estimado": true
   },
   "marcas": [
@@ -32,7 +32,7 @@ window.DADOS = {
       "email": "nicoboco.shop@nicoboco.com.br",
       "produtos": 134,
       "estimado": false,
-      "produtos_7d": 1,
+      "produtos_7d": 0,
       "ativa": false,
       "acessos": 62,
       "buscas": 322,
@@ -86,7 +86,7 @@ window.DADOS = {
       "email": "anderson@mundotaci.com.br",
       "produtos": 43,
       "estimado": true,
-      "produtos_7d": 14,
+      "produtos_7d": 4,
       "ativa": true,
       "acessos": 0,
       "buscas": 0,
@@ -112,7 +112,7 @@ window.DADOS = {
       "envios": 12,
       "primeiro": "2026-08-10T16:01:03.796Z",
       "ultimo": "2026-08-20T11:06:21.271Z",
-      "dias": 13
+      "dias": 14
     },
     {
       "slug": "monnika-marikinha",
@@ -130,7 +130,7 @@ window.DADOS = {
       "envios": 5,
       "primeiro": "2026-08-06T14:16:43.085Z",
       "ultimo": "2026-08-21T01:34:35.135Z",
-      "dias": 12
+      "dias": 13
     },
     {
       "slug": "optimist-jeans",
@@ -148,7 +148,7 @@ window.DADOS = {
       "envios": 5,
       "primeiro": "2026-08-07T13:23:05.929Z",
       "ultimo": "2026-08-07T14:55:31.596Z",
-      "dias": 26
+      "dias": 27
     },
     {
       "slug": "optimist-feirinha",
@@ -166,7 +166,7 @@ window.DADOS = {
       "envios": 2,
       "primeiro": "2026-08-07T13:33:14.591Z",
       "ultimo": "2026-08-07T14:33:01.598Z",
-      "dias": 26
+      "dias": 27
     },
     {
       "slug": "anne-blanc",
@@ -233,11 +233,11 @@ window.DADOS = {
       "produtos_7d": 0,
       "ativa": false,
       "acessos": 1,
-      "buscas": 3,
-      "descricoes": 2,
+      "buscas": 4,
+      "descricoes": 3,
       "envios": 0,
       "primeiro": "2026-09-02T19:08:41.700Z",
-      "ultimo": "2026-09-02T19:10:32.276Z",
+      "ultimo": "2026-09-03T14:49:14.758Z",
       "dias": 0
     },
     {
@@ -247,7 +247,7 @@ window.DADOS = {
       "tem_conta": false,
       "email": "",
       "produtos": 0,
-      "estimado": false,
+      "estimado": true,
       "produtos_7d": 0,
       "ativa": false,
       "acessos": 0,
@@ -255,8 +255,8 @@ window.DADOS = {
       "descricoes": 0,
       "envios": 0,
       "primeiro": "",
-      "ultimo": "",
-      "dias": null
+      "ultimo": "2026-09-03T15:12:18.694Z",
+      "dias": 0
     },
     {
       "slug": "murano",
@@ -328,7 +328,7 @@ window.DADOS = {
       "envios": 0,
       "primeiro": "2026-08-04T14:28:52.117Z",
       "ultimo": "2026-09-01T13:07:03.363Z",
-      "dias": 1
+      "dias": 2
     },
     {
       "slug": "ttng",
@@ -473,8 +473,8 @@ window.DADOS = {
         "com_conta": 11,
         "contas": 10,
         "produtos_total": 238,
-        "produtos_7d": 16,
-        "descricoes_total": 320,
+        "produtos_7d": 5,
+        "descricoes_total": 321,
         "total_estimado": true,
         "produtos_atribuidos": 5
       },
@@ -487,7 +487,7 @@ window.DADOS = {
           "email": "nicoboco.shop@nicoboco.com.br",
           "produtos": 132,
           "estimado": false,
-          "produtos_7d": 1,
+          "produtos_7d": 0,
           "ativa": false,
           "acessos": 53,
           "buscas": 282,
@@ -527,7 +527,7 @@ window.DADOS = {
           "email": "anderson@mundotaci.com.br",
           "produtos": 14,
           "estimado": false,
-          "produtos_7d": 14,
+          "produtos_7d": 4,
           "ativa": true,
           "acessos": 0,
           "buscas": 0,
@@ -555,7 +555,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-21T01:32:04.730Z",
           "ultimo": "2026-08-21T01:32:24.963Z",
-          "dias": 12,
+          "dias": 13,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -575,7 +575,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-21T01:34:17.651Z",
           "ultimo": "2026-08-21T01:34:35.135Z",
-          "dias": 12,
+          "dias": 13,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -595,7 +595,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-13T17:14:37.157Z",
           "ultimo": "2026-08-20T11:06:21.271Z",
-          "dias": 13,
+          "dias": 14,
           "produtos_medidos": 3,
           "atribuido": 0
         },
@@ -670,11 +670,11 @@ window.DADOS = {
           "produtos_7d": 0,
           "ativa": false,
           "acessos": 1,
-          "buscas": 3,
-          "descricoes": 2,
+          "buscas": 4,
+          "descricoes": 3,
           "envios": 0,
           "primeiro": "2026-09-02T19:08:41.700Z",
-          "ultimo": "2026-09-02T19:10:32.276Z",
+          "ultimo": "2026-09-03T11:42:22.151Z",
           "dias": 0,
           "produtos_medidos": 0,
           "atribuido": 0
@@ -1070,7 +1070,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T12:06:46.387Z",
           "ultimo": "2026-08-20T02:30:36.116Z",
-          "dias": 13,
+          "dias": 14,
           "produtos_medidos": 0,
           "atribuido": 8
         },
@@ -1330,7 +1330,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T11:49:43.332Z",
           "ultimo": "2026-09-01T13:07:03.363Z",
-          "dias": 1,
+          "dias": 2,
           "produtos_medidos": 0,
           "atribuido": 0
         },
