@@ -1,5 +1,5 @@
 window.DADOS = {
-  "gerado_em": "2026-09-03T15:29:19.562Z",
+  "gerado_em": "2026-09-03T23:01:10.503Z",
   "hoje": "2026-09-03",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
@@ -12,15 +12,15 @@ window.DADOS = {
   },
   "kpis": {
     "liberadas": 18,
-    "ativas": 2,
+    "ativas": 4,
     "usando": 11,
     "nunca_usaram": 7,
-    "paradas": 4,
+    "paradas": 3,
     "com_conta": 11,
     "contas": 10,
-    "produtos_total": 357,
-    "produtos_7d": 13,
-    "descricoes_total": 485,
+    "produtos_total": 376,
+    "produtos_7d": 32,
+    "descricoes_total": 504,
     "total_estimado": true
   },
   "marcas": [
@@ -30,17 +30,17 @@ window.DADOS = {
       "arquetipo": "explorador",
       "tem_conta": true,
       "email": "nicoboco.shop@nicoboco.com.br",
-      "produtos": 134,
+      "produtos": 146,
       "estimado": false,
-      "produtos_7d": 0,
-      "ativa": false,
+      "produtos_7d": 12,
+      "ativa": true,
       "acessos": 62,
       "buscas": 322,
-      "descricoes": 183,
-      "envios": 209,
+      "descricoes": 195,
+      "envios": 221,
       "primeiro": "2026-08-10T19:02:35.392Z",
-      "ultimo": "2026-08-27T19:14:21.254Z",
-      "dias": 6
+      "ultimo": "2026-09-03T22:55:57.729Z",
+      "dias": 0
     },
     {
       "slug": "opera-kids",
@@ -58,7 +58,7 @@ window.DADOS = {
       "envios": 118,
       "primeiro": "2026-07-28T11:47:18.529Z",
       "ultimo": "2026-09-02T17:11:58.593Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "amiska",
@@ -76,7 +76,7 @@ window.DADOS = {
       "envios": 62,
       "primeiro": "2026-07-28T18:41:18.639Z",
       "ultimo": "2026-09-02T15:34:00.156Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "petit",
@@ -94,7 +94,25 @@ window.DADOS = {
       "envios": 14,
       "primeiro": "2026-08-27T10:08:32.689Z",
       "ultimo": "2026-08-31T19:02:37.837Z",
-      "dias": 2
+      "dias": 3
+    },
+    {
+      "slug": "monnika-marikinha",
+      "nome": "Monnika Marikinha",
+      "arquetipo": "amante",
+      "tem_conta": true,
+      "email": "monnikamarikinhaloja@gmail.com",
+      "produtos": 11,
+      "estimado": false,
+      "produtos_7d": 6,
+      "ativa": true,
+      "acessos": 2,
+      "buscas": 1,
+      "descricoes": 11,
+      "envios": 11,
+      "primeiro": "2026-08-06T14:16:43.085Z",
+      "ultimo": "2026-09-03T17:32:55.872Z",
+      "dias": 0
     },
     {
       "slug": "andressa-vesti",
@@ -113,24 +131,6 @@ window.DADOS = {
       "primeiro": "2026-08-10T16:01:03.796Z",
       "ultimo": "2026-08-20T11:06:21.271Z",
       "dias": 14
-    },
-    {
-      "slug": "monnika-marikinha",
-      "nome": "Monnika Marikinha",
-      "arquetipo": "amante",
-      "tem_conta": true,
-      "email": "monnikamarikinhaloja@gmail.com",
-      "produtos": 5,
-      "estimado": false,
-      "produtos_7d": 0,
-      "ativa": false,
-      "acessos": 2,
-      "buscas": 1,
-      "descricoes": 5,
-      "envios": 5,
-      "primeiro": "2026-08-06T14:16:43.085Z",
-      "ultimo": "2026-08-21T01:34:35.135Z",
-      "dias": 13
     },
     {
       "slug": "optimist-jeans",
@@ -167,6 +167,24 @@ window.DADOS = {
       "primeiro": "2026-08-07T13:33:14.591Z",
       "ultimo": "2026-08-07T14:33:01.598Z",
       "dias": 27
+    },
+    {
+      "slug": "kauly",
+      "nome": "Kauly",
+      "arquetipo": "governante",
+      "tem_conta": true,
+      "email": "marketing@kauly.com.br",
+      "produtos": 1,
+      "estimado": false,
+      "produtos_7d": 1,
+      "ativa": false,
+      "acessos": 2,
+      "buscas": 7,
+      "descricoes": 4,
+      "envios": 2,
+      "primeiro": "2026-09-02T19:08:41.700Z",
+      "ultimo": "2026-09-03T18:57:52.751Z",
+      "dias": 0
     },
     {
       "slug": "anne-blanc",
@@ -221,24 +239,6 @@ window.DADOS = {
       "primeiro": "",
       "ultimo": "",
       "dias": null
-    },
-    {
-      "slug": "kauly",
-      "nome": "Kauly",
-      "arquetipo": "governante",
-      "tem_conta": true,
-      "email": "marketing@kauly.com.br",
-      "produtos": 0,
-      "estimado": false,
-      "produtos_7d": 0,
-      "ativa": false,
-      "acessos": 1,
-      "buscas": 4,
-      "descricoes": 3,
-      "envios": 0,
-      "primeiro": "2026-09-02T19:08:41.700Z",
-      "ultimo": "2026-09-03T14:49:14.758Z",
-      "dias": 0
     },
     {
       "slug": "luciana-pais",
@@ -452,9 +452,9 @@ window.DADOS = {
     {
       "inicio": "2026-08-31",
       "fim": "2026-09-06",
-      "produtos": 13,
-      "ativas": 2,
-      "usaram": 5,
+      "produtos": 32,
+      "ativas": 4,
+      "usaram": 7,
       "cadastros": 10,
       "novos": 1
     }
@@ -466,15 +466,15 @@ window.DADOS = {
       "prefixo": "app:auto:",
       "kpis": {
         "liberadas": 18,
-        "ativas": 1,
+        "ativas": 3,
         "usando": 7,
         "nunca_usaram": 11,
-        "paradas": 3,
+        "paradas": 2,
         "com_conta": 11,
         "contas": 10,
-        "produtos_total": 238,
-        "produtos_7d": 5,
-        "descricoes_total": 321,
+        "produtos_total": 257,
+        "produtos_7d": 24,
+        "descricoes_total": 340,
         "total_estimado": true,
         "produtos_atribuidos": 5
       },
@@ -485,18 +485,18 @@ window.DADOS = {
           "arquetipo": "explorador",
           "tem_conta": true,
           "email": "nicoboco.shop@nicoboco.com.br",
-          "produtos": 132,
+          "produtos": 144,
           "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
+          "produtos_7d": 12,
+          "ativa": true,
           "acessos": 53,
           "buscas": 282,
-          "descricoes": 180,
-          "envios": 184,
+          "descricoes": 192,
+          "envios": 196,
           "primeiro": "2026-08-11T18:28:02.542Z",
-          "ultimo": "2026-08-27T19:14:21.254Z",
-          "dias": 6,
-          "produtos_medidos": 132,
+          "ultimo": "2026-09-03T22:55:57.729Z",
+          "dias": 0,
+          "produtos_medidos": 144,
           "atribuido": 0
         },
         {
@@ -515,7 +515,7 @@ window.DADOS = {
           "envios": 103,
           "primeiro": "2026-08-18T13:22:59.954Z",
           "ultimo": "2026-09-02T17:11:58.593Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 76,
           "atribuido": 5
         },
@@ -535,8 +535,28 @@ window.DADOS = {
           "envios": 14,
           "primeiro": "2026-08-27T10:08:32.689Z",
           "ultimo": "2026-08-31T19:02:37.837Z",
-          "dias": 2,
+          "dias": 3,
           "produtos_medidos": 14,
+          "atribuido": 0
+        },
+        {
+          "slug": "monnika-marikinha",
+          "nome": "Monnika Marikinha",
+          "arquetipo": "amante",
+          "tem_conta": true,
+          "email": "monnikamarikinhaloja@gmail.com",
+          "produtos": 10,
+          "estimado": false,
+          "produtos_7d": 6,
+          "ativa": true,
+          "acessos": 0,
+          "buscas": 0,
+          "descricoes": 10,
+          "envios": 10,
+          "primeiro": "2026-08-21T01:34:17.651Z",
+          "ultimo": "2026-09-03T17:32:55.872Z",
+          "dias": 0,
+          "produtos_medidos": 10,
           "atribuido": 0
         },
         {
@@ -560,26 +580,6 @@ window.DADOS = {
           "atribuido": 0
         },
         {
-          "slug": "monnika-marikinha",
-          "nome": "Monnika Marikinha",
-          "arquetipo": "amante",
-          "tem_conta": true,
-          "email": "monnikamarikinhaloja@gmail.com",
-          "produtos": 4,
-          "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 4,
-          "envios": 4,
-          "primeiro": "2026-08-21T01:34:17.651Z",
-          "ultimo": "2026-08-21T01:34:35.135Z",
-          "dias": 13,
-          "produtos_medidos": 4,
-          "atribuido": 0
-        },
-        {
           "slug": "andressa-vesti",
           "nome": "Andressa Vesti",
           "arquetipo": "rebelde",
@@ -597,6 +597,26 @@ window.DADOS = {
           "ultimo": "2026-08-20T11:06:21.271Z",
           "dias": 14,
           "produtos_medidos": 3,
+          "atribuido": 0
+        },
+        {
+          "slug": "kauly",
+          "nome": "Kauly",
+          "arquetipo": "governante",
+          "tem_conta": true,
+          "email": "marketing@kauly.com.br",
+          "produtos": 1,
+          "estimado": false,
+          "produtos_7d": 1,
+          "ativa": false,
+          "acessos": 2,
+          "buscas": 7,
+          "descricoes": 4,
+          "envios": 2,
+          "primeiro": "2026-09-02T19:08:41.700Z",
+          "ultimo": "2026-09-03T18:57:52.751Z",
+          "dias": 0,
+          "produtos_medidos": 1,
           "atribuido": 0
         },
         {
@@ -656,26 +676,6 @@ window.DADOS = {
           "primeiro": "",
           "ultimo": "",
           "dias": null,
-          "produtos_medidos": 0,
-          "atribuido": 0
-        },
-        {
-          "slug": "kauly",
-          "nome": "Kauly",
-          "arquetipo": "governante",
-          "tem_conta": true,
-          "email": "marketing@kauly.com.br",
-          "produtos": 0,
-          "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 1,
-          "buscas": 4,
-          "descricoes": 3,
-          "envios": 0,
-          "primeiro": "2026-09-02T19:08:41.700Z",
-          "ultimo": "2026-09-03T11:42:22.151Z",
-          "dias": 0,
           "produtos_medidos": 0,
           "atribuido": 0
         },
@@ -965,12 +965,12 @@ window.DADOS = {
         {
           "inicio": "2026-08-31",
           "fim": "2026-09-06",
-          "produtos": 5,
-          "ativas": 1,
-          "usaram": 3,
+          "produtos": 24,
+          "ativas": 3,
+          "usaram": 5,
           "cadastros": 10,
           "novos": 1,
-          "produtos_medidos": 5,
+          "produtos_medidos": 24,
           "atribuido": 0
         }
       ]
@@ -982,16 +982,16 @@ window.DADOS = {
       "kpis": {
         "liberadas": 18,
         "ativas": 1,
-        "usando": 9,
-        "nunca_usaram": 9,
+        "usando": 10,
+        "nunca_usaram": 8,
         "paradas": 1,
         "com_conta": 11,
         "contas": 10,
-        "produtos_total": 206,
+        "produtos_total": 207,
         "produtos_7d": 8,
         "descricoes_total": 74,
         "total_estimado": true,
-        "produtos_atribuidos": 179
+        "produtos_atribuidos": 180
       },
       "marcas": [
         {
@@ -1030,7 +1030,7 @@ window.DADOS = {
           "envios": 27,
           "primeiro": "2026-08-17T12:54:41.838Z",
           "ultimo": "2026-09-02T15:33:58.537Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 25,
           "atribuido": 52
         },
@@ -1130,7 +1130,7 @@ window.DADOS = {
           "envios": 3,
           "primeiro": "2026-08-12T12:05:03.861Z",
           "ultimo": "2026-08-31T17:32:53.474Z",
-          "dias": 2,
+          "dias": 3,
           "produtos_medidos": 2,
           "atribuido": 0
         },
@@ -1153,6 +1153,26 @@ window.DADOS = {
           "dias": null,
           "produtos_medidos": 0,
           "atribuido": 2
+        },
+        {
+          "slug": "kauly",
+          "nome": "Kauly",
+          "arquetipo": "governante",
+          "tem_conta": true,
+          "email": "marketing@kauly.com.br",
+          "produtos": 1,
+          "estimado": true,
+          "produtos_7d": 0,
+          "ativa": false,
+          "acessos": 0,
+          "buscas": 0,
+          "descricoes": 0,
+          "envios": 0,
+          "primeiro": "",
+          "ultimo": "",
+          "dias": null,
+          "produtos_medidos": 0,
+          "atribuido": 1
         },
         {
           "slug": "anne-blanc",
@@ -1200,26 +1220,6 @@ window.DADOS = {
           "arquetipo": "",
           "tem_conta": false,
           "email": "",
-          "produtos": 0,
-          "estimado": false,
-          "produtos_7d": 0,
-          "ativa": false,
-          "acessos": 0,
-          "buscas": 0,
-          "descricoes": 0,
-          "envios": 0,
-          "primeiro": "",
-          "ultimo": "",
-          "dias": null,
-          "produtos_medidos": 0,
-          "atribuido": 0
-        },
-        {
-          "slug": "kauly",
-          "nome": "Kauly",
-          "arquetipo": "governante",
-          "tem_conta": true,
-          "email": "marketing@kauly.com.br",
           "produtos": 0,
           "estimado": false,
           "produtos_7d": 0,
@@ -1458,35 +1458,35 @@ window.DADOS = {
         {
           "inicio": "2026-08-17",
           "fim": "2026-08-23",
-          "produtos": 15,
+          "produtos": 14,
           "ativas": 2,
           "usaram": 4,
           "cadastros": 9,
           "novos": 0,
           "produtos_medidos": 12,
-          "atribuido": 3
+          "atribuido": 2
         },
         {
           "inicio": "2026-08-24",
           "fim": "2026-08-30",
-          "produtos": 10,
+          "produtos": 9,
           "ativas": 1,
           "usaram": 2,
           "cadastros": 9,
           "novos": 0,
           "produtos_medidos": 7,
-          "atribuido": 3
+          "atribuido": 2
         },
         {
           "inicio": "2026-08-31",
           "fim": "2026-09-06",
-          "produtos": 10,
+          "produtos": 13,
           "ativas": 1,
           "usaram": 3,
           "cadastros": 10,
           "novos": 1,
           "produtos_medidos": 8,
-          "atribuido": 2
+          "atribuido": 5
         }
       ]
     }
