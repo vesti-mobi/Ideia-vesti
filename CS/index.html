@@ -1371,7 +1371,7 @@ const TABS = [
     graficos:[
       {t:'Novas vendas por plano', categorias:()=>categoriasNovasVendas()},
       {t:'Funil de onboarding (foto do momento)', categorias:()=>funilIntegracoes()},
-      {t:'Produtos implantados no período', categorias:()=>categoriasImplantados()},
+      {t:'Produtos implantados no período', categorias:()=>categoriasImplantados(), pizza:true},
       {t:'Marcos de volume — marcas implantadas no período', categorias:()=>categoriasMarcos()},
     ],
     extra:()=>renderListasVisaoGeral(),
@@ -2344,7 +2344,8 @@ function renderPagina(){
     page.appendChild(wrap);
     t.graficos.forEach((g,i)=>{
       const host = document.getElementById(`ch-${t.id}-${i}`);
-      if(g.categorias) desenharCategorias(host, cats[i]);
+      if(g.pizza) desenharPizza(host, cats[i]);
+      else if(g.categorias) desenharCategorias(host, cats[i]);
       else desenhar(host, serie, g.s);
     });
   }
@@ -2646,6 +2647,47 @@ const medirTexto = (()=>{
 })();
 const escapar = t => String(t==null?'':t)
   .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* --- gráfico de pizza --- SVG puro, como o resto dos gráficos daqui. Só faz
+   sentido onde a pergunta é "fatia de quê" — hoje só "Produtos implantados no
+   período". A legenda (cor -> rótulo) já vem do card-head; aqui dentro cada
+   fatia grande o suficiente ganha o número absoluto (não a %), porque é o
+   número que a CS quer ler primeiro. */
+function desenharPizza(host, cats){
+  if(!host) return;
+  const draw = ()=>{
+    const total = cats.reduce((a,c)=>a+c.v,0);
+    const W = Math.max(240, host.clientWidth), H = 200;
+    const cx = W/2, cy = H/2, r = Math.min(W,H)/2 - 8;
+    let ang = -Math.PI/2;   // começa no topo, sentido horário
+    let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">`;
+    if(!total){
+      s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="var(--line-2)"/>`
+        + `<text x="${cx}" y="${cy+4}" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12.5" fill="var(--ink-3)">sem dado no período</text>`;
+    } else {
+      cats.filter(c=>c.v>0).forEach(c=>{
+        const frac = c.v/total;
+        const a0 = ang, a1 = ang + frac*Math.PI*2; ang = a1;
+        const x0 = cx + r*Math.cos(a0), y0 = cy + r*Math.sin(a0);
+        const x1 = cx + r*Math.cos(a1), y1 = cy + r*Math.sin(a1);
+        const grande = (a1-a0) > Math.PI ? 1 : 0;
+        // fatia única (100% do total) não desenha em arco — vira o círculo inteiro
+        s += frac >= 0.9995
+          ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${c.cor}"/>`
+          : `<path d="M${cx},${cy} L${x0},${y0} A${r},${r} 0 ${grande} 1 ${x1},${y1} Z" fill="${c.cor}" stroke="var(--surface)" stroke-width="1.5"/>`;
+        if(frac >= 0.045){   // fatia fina demais não cabe o número dentro
+          const amid = (a0+a1)/2;
+          const lx = cx + r*0.64*Math.cos(amid), ly = cy + r*0.64*Math.sin(amid);
+          s += `<text x="${lx}" y="${ly+4}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#fff">${fmt.int(c.v)}</text>`;
+        }
+      });
+    }
+    s += `</svg>`;
+    host.innerHTML = s;
+  };
+  draw();
+  host._redraw = draw;
+}
 
 function desenharCategorias(host, cats){
   if(!host) return;
