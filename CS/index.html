@@ -1224,17 +1224,6 @@ function marcasImplantadasNoPeriodo(p){
   const imp = implantadosNoPeriodo(p);
   return [...new Set([...imp.tino, ...imp.oraculo, ...imp.vestiPago].map(x=>x.cliente))];
 }
-/* Marcos de volume: só entre quem foi IMPLANTADO (Tino/Oráculo/VestiPago) no
-   próprio período — é o ramp-up pós-implantação, não qualquer marca grande
-   que já vendia R$100k por mês antes disso. */
-function marcasAcima100k(p){
-  const pedidosPorDom = pedidosPorDominioEm(p);
-  return marcasImplantadasNoPeriodo(p).map(nome=>{
-    const dom = DOM_POR_CLIENTE[nome];
-    const a = pedidosPorDom[dom] || pedidosPorDom[nome] || {pedidos:0,valorPedidos:0};
-    return {nome, cs: CS_POR_CLIENTE[nome]||'Sem CS', pedidos:a.pedidos, valor:a.valorPedidos};
-  }).filter(x=>x.valor>=100000).sort((a,b)=>b.valor-a.valor);
-}
 /* Funil de onboarding: negócios em andamento nos pipelines de CS que têm um
    estágio "Implantado" — hoje são quatro (Sucesso do Cliente, Sucesso do
    cliente - Integração, Sucesso do Cliente - Plataforma, CS - Starter). NÃO é
@@ -1247,44 +1236,72 @@ function marcasAcima100k(p){
    pedidos pagos, no bloco "Marcos de volume". */
 function funilIntegracoes(){
   const ORDEM = ['Novo cliente','Day one','Configuração','Treinamento','Implantado'];
-  const porEstagio = {};
-  (DATA.onboarding||[]).forEach(o=>{ porEstagio[o.estagio]=(porEstagio[o.estagio]||0)+1 });
+  const porEstagio = {}, quemPorEstagio = {};
+  (DATA.onboarding||[]).forEach(o=>{
+    porEstagio[o.estagio]=(porEstagio[o.estagio]||0)+1;
+    (quemPorEstagio[o.estagio] || (quemPorEstagio[o.estagio]=[])).push(o.cliente);
+  });
   const cores = ['var(--acc)','var(--acc-2)','var(--gold)','var(--pos)','var(--ink-3)'];
-  return ORDEM.map((l,i)=>({l, v:porEstagio[l]||0, cor:cores[i%cores.length]}));
+  return ORDEM.map((l,i)=>({l, v:porEstagio[l]||0, cor:cores[i%cores.length], quem:quemPorEstagio[l]||[]}));
 }
 function categoriasNovasVendas(){
   const p = periodo(), ant = periodoAnterior(p);
   const atual = novasVendasNoPeriodo(p), anterior = novasVendasNoPeriodo(ant);
-  const conta = (lista,plano) => lista.filter(c=>planoBucket(c.plano)===plano).length;
+  const linha = (l,lista,plano,cor) => {
+    const nomes = lista.filter(c=>planoBucket(c.plano)===plano).map(c=>c.nome);
+    return {l, v:nomes.length, cor, quem:nomes};
+  };
   return [
-    {l:'Starter — este período', v:conta(atual,'Starter'), cor:'var(--acc)'},
-    {l:'Starter — período anterior', v:conta(anterior,'Starter'), cor:'var(--acc-2)'},
-    {l:'Pro — este período', v:conta(atual,'Pro'), cor:'var(--acc)'},
-    {l:'Pro — período anterior', v:conta(anterior,'Pro'), cor:'var(--acc-2)'},
-    {l:'Outro — este período', v:conta(atual,'Outro'), cor:'var(--acc)'},
-    {l:'Outro — período anterior', v:conta(anterior,'Outro'), cor:'var(--acc-2)'},
+    linha('Starter — este período', atual, 'Starter', 'var(--acc)'),
+    linha('Starter — período anterior', anterior, 'Starter', 'var(--acc-2)'),
+    linha('Pro — este período', atual, 'Pro', 'var(--acc)'),
+    linha('Pro — período anterior', anterior, 'Pro', 'var(--acc-2)'),
+    linha('Outro — este período', atual, 'Outro', 'var(--acc)'),
+    linha('Outro — período anterior', anterior, 'Outro', 'var(--acc-2)'),
   ];
 }
 function categoriasImplantados(){
   const imp = implantadosNoPeriodo(periodo());
   return [
-    {l:'Tino', v:imp.tino.length, cor:'var(--acc)'},
-    {l:'Oráculo', v:imp.oraculo.length, cor:'var(--acc-2)'},
-    {l:'VestiPago', v:imp.vestiPago.length, cor:'var(--gold)'},
+    {l:'Tino', v:imp.tino.length, cor:'var(--acc)', quem:imp.tino.map(x=>x.cliente)},
+    {l:'Oráculo', v:imp.oraculo.length, cor:'var(--acc-2)', quem:imp.oraculo.map(x=>x.cliente)},
+    {l:'VestiPago', v:imp.vestiPago.length, cor:'var(--gold)', quem:imp.vestiPago.map(x=>x.cliente)},
   ];
 }
+/* Marcos de volume: só entre quem foi IMPLANTADO (Tino/Oráculo/VestiPago) no
+   próprio período — é o ramp-up pós-implantação, não qualquer marca grande
+   que já vendia R$100k por mês antes disso. */
 function categoriasMarcos(){
   const p = periodo();
   const nomes = marcasImplantadasNoPeriodo(p);
   const pedidosPorDom = pedidosPorDominioEm(p);
   const linhas = nomes.map(nome=>{
     const dom = DOM_POR_CLIENTE[nome];
-    return pedidosPorDom[dom] || pedidosPorDom[nome] || {pedidos:0,valorPedidos:0};
+    const a = pedidosPorDom[dom] || pedidosPorDom[nome] || {pedidos:0,valorPedidos:0};
+    return {nome, pedidos:a.pedidos, valor:a.valorPedidos};
   });
+  const bucket = (l,filtro,cor) => { const q=linhas.filter(filtro); return {l, v:q.length, cor, quem:q.map(x=>x.nome)} };
   return [
-    {l:'5+ pedidos pagos', v:linhas.filter(x=>x.pedidos>=5).length, cor:'var(--acc)'},
-    {l:'25+ pedidos pagos', v:linhas.filter(x=>x.pedidos>=25).length, cor:'var(--acc-2)'},
-    {l:'R$100k+ de GMV', v:linhas.filter(x=>x.valorPedidos>=100000).length, cor:'var(--gold)'},
+    bucket('5+ pedidos pagos', x=>x.pedidos>=5, 'var(--acc)'),
+    bucket('25+ pedidos pagos', x=>x.pedidos>=25, 'var(--acc-2)'),
+    bucket('R$100k+ de GMV', x=>x.valorPedidos>=100000, 'var(--gold)'),
+  ];
+}
+/* Negócios ganhos por categoria — o mesmo par este-período x período-anterior
+   das Novas vendas, só que para Cross-sell (produto novo na carteira) e
+   Upgrade (expansão do que já tem). Reaproveita negociosGanhosNoPeriodo, que
+   já é a mesma fonte das abas Cross-sell e Upsell. */
+function categoriasNegocios(){
+  const p = periodo(), ant = periodoAnterior(p);
+  const linha = (l,categoria,per,cor) => {
+    const ns = negociosGanhosNoPeriodo(categoria,per);
+    return {l, v:ns.length, cor, quem:ns.map(n=>n.cliente)};
+  };
+  return [
+    linha('Cross-sell — este período', 'cross', p, 'var(--acc)'),
+    linha('Cross-sell — período anterior', 'cross', ant, 'var(--acc-2)'),
+    linha('Upgrade — este período', 'up', p, 'var(--acc)'),
+    linha('Upgrade — período anterior', 'up', ant, 'var(--acc-2)'),
   ];
 }
 function kpisVisaoGeral(){
@@ -1304,63 +1321,54 @@ function kpisVisaoGeral(){
      s:fmt.int(negAtual.length)+' negócios · '+delta(negAtual.length,negAnt.length)},
   ];
 }
-/* Segunda fileira de cards: as listas cruas por trás de cada número acima —
-   mesma ideia da segunda tabela da Bonificação (renderPontos), só que aqui são
-   quatro listas curtas em vez de uma tabela de pontuação. */
-function renderListasVisaoGeral(){
-  const p = periodo();
-  const wrap = el('div',{class:'charts two'});
 
-  const listaCard = (titulo, linhas, colunas) => {
-    const card = el('div',{class:'table-card'});
-    const head = el('div',{class:'table-head'});
-    head.innerHTML = `<h3>${titulo}</h3><span class="count">${linhas.length} ${linhas.length===1?'registro':'registros'}</span>`;
-    card.appendChild(head);
-    if(!linhas.length){
-      card.appendChild(el('div',{class:'empty'},
-        `<h4>Nada por aqui no período</h4><p>Amplie o período no filtro acima para ver registros.</p>`));
-      return card;
-    }
-    const scroll = el('div',{class:'table-scroll'});
-    let html = '<table><thead><tr>'+colunas.map(c=>`<th${c.r?' class="r"':''}>${c.l}</th>`).join('')+'</tr></thead><tbody>';
-    linhas.forEach(r=>{
-      html += '<tr>'+colunas.map(c=>`<td${c.r?' class="r num"':''}>${c.f?c.f(r[c.k]):(r[c.k]??'—')}</td>`).join('')+'</tr>';
-    });
-    html += '</tbody></table>';
-    scroll.innerHTML = html;
-    card.appendChild(scroll);
+/* Resumo "marca -> quantos e quando foi a última vez" — usado no extra das
+   abas Reuniões, Cross-sell e Upsell. Não mede nada de novo: agrega as MESMAS
+   linhas que a tabela da aba já mostra (por isso recebe `rows`, já filtrado
+   por período/CS/status como o resto da aba). */
+function resumoPorCliente(rows, chave, campoData){
+  const acc = new Map();
+  rows.forEach(r=>{
+    const nome = r[chave]; if(!nome) return;
+    const a = acc.get(nome) || {nome, cs: r.cs||'Sem CS', qtd:0, valor:0, ultima:null};
+    a.qtd++; a.valor += (r.valor||0);
+    const d = r[campoData];
+    if(d && (!a.ultima || d>a.ultima)) a.ultima = d;
+    acc.set(nome, a);
+  });
+  return [...acc.values()].sort((a,b)=> b.qtd-a.qtd || String(b.ultima||'').localeCompare(String(a.ultima||'')));
+}
+/* Card de lista simples — mesma casca visual da tabela principal
+   (table-card/table-scroll), sem ordenação nem export: é um resumo, não uma
+   tabela de trabalho nova. */
+function cardLista(titulo, linhas, colunas){
+  const card = el('div',{class:'table-card'});
+  const head = el('div',{class:'table-head'});
+  head.innerHTML = `<h3>${titulo}</h3><span class="count">${linhas.length} ${linhas.length===1?'registro':'registros'}</span>`;
+  card.appendChild(head);
+  if(!linhas.length){
+    card.appendChild(el('div',{class:'empty'},
+      `<h4>Nada por aqui com esses filtros</h4><p>Amplie o período ou limpe a busca para ver registros.</p>`));
     return card;
-  };
-
-  wrap.appendChild(listaCard('Novas vendas no período',
-    novasVendasNoPeriodo(p).map(c=>({nome:c.nome, plano:planoBucket(c.plano), cs:c.cs, dataCadastro:c.dataCadastro})),
-    [{k:'nome', l:'Cliente'}, {k:'plano', l:'Plano'}, {k:'cs', l:'CS'},
-     {k:'dataCadastro', l:'Cadastro', f:fmt.date}]));
-
-  wrap.appendChild(listaCard('Marcas com churn no período',
-    churnsNoPeriodo(p).map(c=>({nome:c.nome, plano:c.plano, cs:c.cs, data:c.dataChurn})),
-    [{k:'nome', l:'Cliente'}, {k:'plano', l:'Plano'}, {k:'cs', l:'CS'},
-     {k:'data', l:'Data do churn', f:fmt.date}]));
-
-  wrap.appendChild(listaCard('Novas marcas usando acima de R$100k no período',
-    marcasAcima100k(p),
-    [{k:'nome', l:'Cliente'}, {k:'cs', l:'CS'},
-     {k:'valor', l:'GMV no período', r:true, f:fmt.money}]));
-
-  wrap.appendChild(listaCard('Reuniões no período',
-    reunioesNoPeriodo(p).slice().sort((a,b)=>String(b.data).localeCompare(String(a.data))).slice(0,50)
-      .map(r=>({cliente:r.cliente, cs:r.cs, data:r.data, resultado:r.resultado})),
-    [{k:'cliente', l:'Cliente'}, {k:'cs', l:'CS'}, {k:'data', l:'Data', f:fmt.date}, {k:'resultado', l:'Resultado'}]));
-
-  return wrap;
+  }
+  const scroll = el('div',{class:'table-scroll'});
+  let html = '<table><thead><tr>'+colunas.map(c=>`<th${c.r?' class="r"':''}>${c.l}</th>`).join('')+'</tr></thead><tbody>';
+  linhas.forEach(r=>{
+    html += '<tr>'+colunas.map(c=>`<td${c.r?' class="r num"':''}>${c.f?c.f(r[c.k]):(r[c.k]??'—')}</td>`).join('')+'</tr>';
+  });
+  html += '</tbody></table>';
+  scroll.innerHTML = html;
+  card.appendChild(scroll);
+  return card;
 }
 
 const TABS = [
   {
     id:'visaoGeral', grupo:'Visão geral', nav:'Visão geral', cor:'#2E7D46', cor2:'#1E74C8',
     titulo:'Visão geral',
-    desc:'Retrato do período escolhido no filtro, contra um <b>período anterior de mesmo tamanho</b> em dias corridos — quem quiser semana passada ou mês passado escolhe isso no próprio seletor de período, o "anterior" acompanha. Nada aqui é medido de novo: cada número já existe em alguma aba abaixo, só reorganizado. '
+    desc:'Retrato do período escolhido no filtro, contra um <b>período anterior de mesmo tamanho</b> em dias corridos — quem quiser semana passada ou mês passado escolhe isso no próprio seletor de período, o "anterior" acompanha. Nada aqui é medido de novo: cada número já existe em alguma aba abaixo, só reorganizado. <b>Passe o mouse em qualquer barra ou fatia</b> pra ver quais marcas formam aquele número. '
       + '<b>Novas vendas</b> = marcas com data de cadastro dentro do período, separadas em Starter/Pro pelo texto do campo Plano (o resto cai em "Outro"). '
+      + '<b>Negócios</b> é Cross-sell (produto novo na carteira) e Upgrade (expansão do que já tem) — mesma fonte das abas Cross-sell e Upsell, só que fechados no período. '
       + '<b>Funil de onboarding</b> é uma <b>foto do momento</b>: negócios em andamento nos pipelines de CS que levam a marca a "Implantado" (Sucesso do Cliente, Sucesso do cliente - Integração, Sucesso do Cliente - Plataforma e CS - Starter), por fase — não é o pipeline de ticket "Integrações", que praticamente não é usado. Sem "entraram/saíram" por semana, porque não existe hoje um retrato diário da fase de cada negócio (diferente do <code>integracoes_snapshot.json</code>, que só fotografa quem TEM integração ativa). '
       + '<b>Marcos de volume</b> olha só quem foi <b>implantado</b> (Tino, Oráculo ou VestiPago) dentro do próprio período, e quantas dessas marcas já bateram 5 pedidos, 25 pedidos ou R$100k de GMV no mesmo período — é o ramp-up pós-implantação, não qualquer marca grande que já vendia isso antes.',
     filtros:['periodo'],
@@ -1370,11 +1378,11 @@ const TABS = [
     duasColunas:true,
     graficos:[
       {t:'Novas vendas por plano', categorias:()=>categoriasNovasVendas()},
+      {t:'Negócios por categoria (cross-sell x upgrade)', categorias:()=>categoriasNegocios()},
       {t:'Funil de onboarding (foto do momento)', categorias:()=>funilIntegracoes()},
       {t:'Produtos implantados no período', categorias:()=>categoriasImplantados(), pizza:true},
       {t:'Marcos de volume — marcas implantadas no período', categorias:()=>categoriasMarcos()},
     ],
-    extra:()=>renderListasVisaoGeral(),
   },
   {
     id:'clientes', grupo:'Carteira', nav:'Tabela geral', cor:'#0E7A73', cor2:'#B7791F',
@@ -1429,7 +1437,11 @@ const TABS = [
       {k:'status', l:'Status', tipo:'ganho'},
     ],
     linhas:()=>negociosDe('cross'),
-    kpis:(rows)=>kpisDeal(rows)
+    kpis:(rows)=>kpisDeal(rows),
+    extra:(rows)=>cardLista('Marcas × negócios de cross-sell na visão',
+      resumoPorCliente(rows,'cliente','data'),
+      [{k:'nome', l:'Cliente'}, {k:'cs', l:'CS'}, {k:'qtd', l:'Negócios', r:true},
+       {k:'valor', l:'Valor total', r:true, f:fmt.money}, {k:'ultima', l:'Mais recente', f:fmt.date}])
   },
   {
     id:'upsell', grupo:'Crescimento', nav:'Upsell', cor:'#8046C4', cor2:'#12968D',
@@ -1445,7 +1457,11 @@ const TABS = [
       {k:'status', l:'Status', tipo:'ganho'},
     ],
     linhas:()=>negociosDe('up'),
-    kpis:(rows)=>kpisDeal(rows)
+    kpis:(rows)=>kpisDeal(rows),
+    extra:(rows)=>cardLista('Marcas × negócios de upgrade na visão',
+      resumoPorCliente(rows,'cliente','data'),
+      [{k:'nome', l:'Cliente'}, {k:'cs', l:'CS'}, {k:'qtd', l:'Negócios', r:true},
+       {k:'valor', l:'Valor total', r:true, f:fmt.money}, {k:'ultima', l:'Mais recente', f:fmt.date}])
   },
   {
     id:'oraculo', grupo:'Produtos', nav:'Uso do Oráculo', cor:'#1E74C8', cor2:'#B7791F',
@@ -1669,7 +1685,11 @@ const TABS = [
         {l:'Valor fechado', v:fmt.moneyCompact(soma(rows,'valor')), s:'negócios creditados às reuniões'},
         {l:'Clientes atendidos', v:fmt.int(new Set(rows.map(r=>r.cliente)).size), s:'empresas distintas'},
       ];
-    }
+    },
+    extra:(rows)=>cardLista('Marcas × reuniões na visão',
+      resumoPorCliente(rows,'cliente','data'),
+      [{k:'nome', l:'Cliente'}, {k:'cs', l:'CS'}, {k:'qtd', l:'Reuniões', r:true},
+       {k:'ultima', l:'Última reunião', f:fmt.date}])
   },
   {
     id:'tickets', grupo:'Operação', nav:'Tickets', cor:'#1E74C8', cor2:'#C0453B',
@@ -2648,6 +2668,15 @@ const medirTexto = (()=>{
 const escapar = t => String(t==null?'':t)
   .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
+/* Texto do tooltip nativo (title) com a lista de marcas por trás de uma barra
+   ou fatia — mesma régua da Bonificação (quem.slice(0,40).join(', ')), pra
+   não estourar o balãozinho do navegador com centenas de nomes. */
+function tituloQuem(lista){
+  if(!lista || !lista.length) return '';
+  const CAP = 40;
+  return lista.slice(0,CAP).join(', ') + (lista.length>CAP ? ' … +'+(lista.length-CAP)+' mais' : '');
+}
+
 /* --- gráfico de pizza --- SVG puro, como o resto dos gráficos daqui. Só faz
    sentido onde a pergunta é "fatia de quê" — hoje só "Produtos implantados no
    período". A legenda (cor -> rótulo) já vem do card-head; aqui dentro cada
@@ -2671,10 +2700,11 @@ function desenharPizza(host, cats){
         const x0 = cx + r*Math.cos(a0), y0 = cy + r*Math.sin(a0);
         const x1 = cx + r*Math.cos(a1), y1 = cy + r*Math.sin(a1);
         const grande = (a1-a0) > Math.PI ? 1 : 0;
+        const tit = c.quem && c.quem.length ? `<title>${c.l}: ${escapar(tituloQuem(c.quem))}</title>` : '';
         // fatia única (100% do total) não desenha em arco — vira o círculo inteiro
         s += frac >= 0.9995
-          ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${c.cor}"/>`
-          : `<path d="M${cx},${cy} L${x0},${y0} A${r},${r} 0 ${grande} 1 ${x1},${y1} Z" fill="${c.cor}" stroke="var(--surface)" stroke-width="1.5"/>`;
+          ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${c.cor}">${tit}</circle>`
+          : `<path d="M${cx},${cy} L${x0},${y0} A${r},${r} 0 ${grande} 1 ${x1},${y1} Z" fill="${c.cor}" stroke="var(--surface)" stroke-width="1.5">${tit}</path>`;
         if(frac >= 0.045){   // fatia fina demais não cabe o número dentro
           const amid = (a0+a1)/2;
           const lx = cx + r*0.64*Math.cos(amid), ly = cy + r*0.64*Math.sin(amid);
@@ -2735,6 +2765,13 @@ function desenharCategorias(host, cats){
              fill="${cabeFora?'var(--ink)':'#fff'}">${fmt.int(c.v)}</text>`;
       s += `<text x="${tx}" y="${y+33}" text-anchor="${anc}" font-family="IBM Plex Mono, monospace" font-size="10"
              fill="${cabeFora?'var(--ink-3)':'var(--ink-3)'}">${pct}%</text>`;
+      /* Faixa invisível cobrindo a linha inteira (rótulo + barra), por cima do
+         resto: é o que deixa o hover funcionar mesmo numa barra de 3px ou
+         zerada, sem depender de acertar o pixel certo. */
+      if(c.quem && c.quem.length){
+        s += `<rect x="${P.l-10}" y="${y}" width="${W-P.r-(P.l-10)}" height="${linha}" fill="transparent">
+                <title>${c.l}: ${escapar(tituloQuem(c.quem))}</title></rect>`;
+      }
     });
     s += `<text x="${P.l}" y="${H-4}" font-family="IBM Plex Mono, monospace" font-size="10"
            fill="var(--ink-3)">${fmt.int(total)} marcas ativas na visão</text>`;
