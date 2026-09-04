@@ -13,6 +13,14 @@
 # RELCS2_TINO_USER / RELCS2_TINO_PASS — a credencial do painel do Tino, a mesma
 # que o relatoriocs2 usa. Sem ela a carga roda igual, só que a aba do Tino e a
 # coluna "Tino" da tabela geral ficam vazias.
+#
+# Antes da carga, sincronizar_cs.js corrige o CS responsável (angel_id) de
+# odbc_domains no BigQuery comparando com o Postgres de produção via Metabase
+# (secrets METABASE_URL, METABASE_API_KEY) — achado em 04/09/2026: a troca de
+# CS no admin da Vesti às vezes não atualiza o updated_at da linha, e a
+# réplica pro BigQuery usa esse campo pra saber o que sincronizar, então a
+# troca fica invisível pra sempre. Sem esses secrets, ou se o Metabase cair,
+# o passo avisa e segue sem travar a carga — o espelho fica como estava.
 
 name: Painel de Clientes CS
 
@@ -43,6 +51,13 @@ jobs:
         run: |
           printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
+
+      - name: Sincronizar CS responsável (Metabase -> BigQuery)
+        working-directory: CS
+        env:
+          METABASE_URL: ${{ secrets.METABASE_URL }}
+          METABASE_API_KEY: ${{ secrets.METABASE_API_KEY }}
+        run: node sincronizar_cs.js
 
       - name: Rodar carga (BigQuery + HubSpot + Tino)
         working-directory: CS

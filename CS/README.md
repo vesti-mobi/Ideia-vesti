@@ -7,6 +7,7 @@ index.html          o painel (layout + lógica, sem dependência externa)
 publicar.js         sobe para vesti-mobi/dados/CS via Git Data API
 dados.js            dados reais gerados pelo fetcher — window.PAINEL_DATA
 fetch_dados.js      carga: BigQuery + HubSpot + Tino -> dados.js
+sincronizar_cs.js    roda ANTES do fetch: corrige angel_id no BigQuery comparando com a produção (Metabase)
 carregar_tipo_empresa.js   leva a classificação Atacado × Varejo para o BigQuery
 integracoes_snapshot.json  retrato de quem tem integração, da última carga
 integracoes_novas.json     histórico das integrações detectadas como novas
@@ -61,25 +62,49 @@ node fetch_dados.js      # ~2 min
 Precisa de:
 - **BigQuery** — service account em `GOOGLE_APPLICATION_CREDENTIALS`. O fallback é
   `C:\Users\Laura\Downloads\vesti-data-499015-7ea468dae45e.json`, a mesma chave que o
-  PainelElisa usa. Só roda `SELECT`.
+  PainelElisa usa. O `fetch_dados.js` em si só roda `SELECT` — quem escreve é o
+  `sincronizar_cs.js` (ver abaixo), e só na coluna `angel_id`.
 - **HubSpot** — `HUBSPOT_TOKEN`; por padrão lê de `../CS-Sucesso-do-cliente/.env`.
 - **Tino** — `TINO_USER` / `TINO_PASS`, a mesma credencial do painel
   `admin.tino.vesti.com.br`. **Sem valor padrão no código de propósito**: o
   `vesti-mobi/dados` é público.
+- **Metabase** (opcional) — `METABASE_URL` / `METABASE_API_KEY`, só para o
+  `sincronizar_cs.js`. Sem eles esse passo é pulado e o `angel_id` fica do jeito
+  que estava no espelho — o resto da carga roda igual.
 
 Sem HubSpot o painel carrega mesmo assim: Cross-sell, Upsell, Reuniões e Tickets
 ficam vazias (e, na Bonificação, a coluna de reuniões). Sem a credencial do Tino, a aba do Tino e a coluna "Tino" da
 tabela geral ficam vazias — o resto carrega igual.
 
+### CS responsável desatualizado no BigQuery (04/09/2026)
+
+Descoberto com a Laura: trocar o CS responsável no admin da Vesti (campo
+`angel_id` de `domains`) às vezes não atualiza o `updated_at` da linha, e a
+réplica Vesti → BigQuery usa esse campo para saber o que sincronizar — a troca
+fica **invisível pro espelho para sempre**, até algo mais tocar aquela linha.
+Confirmado comparando o Postgres de produção (via Metabase) contra o
+`vestilake_BI.odbc_domains`: 36 marcas da carteira ativa divergentes no dia da
+descoberta, entre elas a MissManu (BigQuery dizia Tatiane Ayres, produção já
+tinha Thamiris Ribeiro havia semanas).
+
+`sincronizar_cs.js` roda **antes** do `fetch_dados.js` na carga automática:
+compara `angel_id` de cada domínio da carteira ativa entre o Postgres de
+produção (Metabase, banco "Vesti") e o BigQuery, e corrige no BigQuery só as
+linhas que divergem — nunca a tabela inteira. Isso conserta o dado na fonte
+que o painel lê, então beneficia qualquer outro painel da Vesti que também use
+`odbc_domains`, não só este. Se o Metabase cair ou faltar credencial, o passo
+avisa e segue sem corrigir nada — não trava a carga.
+
 ### Automático, todo dia às 04:00 BRT
 
-O workflow `.github/workflows/painel-clientes-cs.yml` no `vesti-mobi/dados` roda a
-mesma carga (`node CS/fetch_dados.js`) às 07:00 UTC e commita o `CS/dados.js`.
-Como o painel inteiro — todas as abas, tabelas e gráficos — lê desse único
-arquivo, uma carga atualiza tudo. Usa os secrets `GCP_SA_KEY` e `HUBSPOT_TOKEN`,
-que já existem no repositório, e aborta sem commitar se o `dados.js` sair com
-menos de 1 MB (sinal de que alguma fonte falhou). Dá para rodar na mão pela aba
-Actions ("Painel de Clientes CS" → Run workflow). A cópia local do arquivo é o
+O workflow `.github/workflows/painel-clientes-cs.yml` no `vesti-mobi/dados` roda
+`node CS/sincronizar_cs.js` e depois `node CS/fetch_dados.js` às 07:00 UTC, e
+commita o `CS/dados.js`. Como o painel inteiro — todas as abas, tabelas e
+gráficos — lê desse único arquivo, uma carga atualiza tudo. Usa os secrets
+`GCP_SA_KEY`, `HUBSPOT_TOKEN`, `METABASE_URL` e `METABASE_API_KEY`, que já
+existem no repositório, e aborta sem commitar se o `dados.js` sair com menos de
+1 MB (sinal de que alguma fonte falhou). Dá para rodar na mão pela aba Actions
+("Painel de Clientes CS" → Run workflow). A cópia local do arquivo é o
 `atualizar-painel.yml` aqui na pasta.
 
 ⚠️ O `index.html` e o `README.md` **não** são publicados pelo workflow — mudança
