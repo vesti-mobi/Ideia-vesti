@@ -2060,7 +2060,7 @@
   "1509874": {
     "ligado": true,
     "update": "2026-09-04",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Alarí Bolsas",
     "canalPlanilha": "Starter"
   },
@@ -2578,7 +2578,7 @@
   "1957538": {
     "ligado": true,
     "update": "2026-09-04",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Ilse Modas",
     "canalPlanilha": "Starter"
   },
@@ -3089,7 +3089,7 @@
   "1579693": {
     "ligado": true,
     "update": "2026-09-04",
-    "religamentoReal": true,
+    "religamentoReal": false,
     "nomePlanilha": "Confecções Abel Modas",
     "canalPlanilha": "Starter"
   },
@@ -3612,8 +3612,8 @@
     "canalPlanilha": "Vesti"
   },
   "1232863": {
-    "ligado": true,
-    "update": "2026-08-04",
+    "ligado": false,
+    "update": "2026-09-05",
     "religamentoReal": false,
     "nomePlanilha": "Califor",
     "canalPlanilha": "Vesti"
@@ -7642,5 +7642,12 @@
     "religamentoReal": false,
     "nomePlanilha": "Montaria Fashion",
     "canalPlanilha": "Attasoft"
+  },
+  "2131435": {
+    "ligado": false,
+    "update": "2026-09-05",
+    "religamentoReal": false,
+    "nomePlanilha": "Modas Migdam",
+    "canalPlanilha": "Uemtel"
   }
 }

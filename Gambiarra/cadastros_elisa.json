@@ -30335,18 +30335,6 @@
     "qtProdutos1oMes": 8,
     "primeiroPedidoCadastrado": "2026-04-02T15:28:52+00:00"
   },
-  "2028188": {
-    "qtProdutos": 25,
-    "produtosPorMes": {
-      "2026-04": 1,
-      "2026-06": 7,
-      "2026-05": 17
-    },
-    "primeiroCadastroProduto": "2026-04-24T21:22:27",
-    "primeiroMes": "2026-04",
-    "qtProdutos1oMes": 1,
-    "primeiroPedidoCadastrado": "2026-05-15T13:56:24+00:00"
-  },
   "107524": {
     "qtProdutos": 454,
     "produtosPorMes": {
@@ -31889,6 +31877,29 @@
     "qtProdutos1oMes": 31,
     "primeiroPedidoCadastrado": "2025-09-02T14:34:35+00:00"
   },
+  "1509874": {
+    "qtProdutos": 90,
+    "produtosPorMes": {
+      "2025-11": 1,
+      "2025-05": 1,
+      "2026-04": 2,
+      "2025-12": 2,
+      "2026-02": 2,
+      "2026-06": 3,
+      "2025-06": 3,
+      "2025-09": 3,
+      "2025-10": 3,
+      "2026-03": 5,
+      "2026-07": 5,
+      "2025-08": 16,
+      "2025-04": 22,
+      "2025-02": 22
+    },
+    "primeiroCadastroProduto": "2025-02-26T10:12:23",
+    "primeiroMes": "2025-02",
+    "qtProdutos1oMes": 22,
+    "primeiroPedidoCadastrado": "2025-07-20T23:38:45+00:00"
+  },
   "1589515": {
     "qtProdutos": 4,
     "produtosPorMes": {
@@ -32257,6 +32268,21 @@
     "primeiroMes": "2025-03",
     "qtProdutos1oMes": 23,
     "primeiroPedidoCadastrado": "2025-07-01T16:42:06+00:00"
+  },
+  "1579693": {
+    "qtProdutos": 35,
+    "produtosPorMes": {
+      "2026-08": 1,
+      "2026-07": 1,
+      "2026-05": 2,
+      "2026-06": 6,
+      "2026-04": 8,
+      "2026-03": 17
+    },
+    "primeiroCadastroProduto": "2026-03-11T18:28:48",
+    "primeiroMes": "2026-03",
+    "qtProdutos1oMes": 17,
+    "primeiroPedidoCadastrado": "2026-03-11T21:38:12+00:00"
   },
   "1592879": {
     "qtProdutos": 20,
@@ -37586,24 +37612,8 @@
     "primeiroMes": "2026-07",
     "qtProdutos1oMes": 50
   },
-  "1833521": {
-    "primeiroPedidoCadastrado": "2026-01-26T18:21:56+00:00",
-    "qtProdutos": 0,
-    "produtosPorMes": {},
-    "primeiroCadastroProduto": "",
-    "primeiroMes": "",
-    "qtProdutos1oMes": 0
-  },
-  "1300009": {
-    "primeiroPedidoCadastrado": "2026-01-06T17:10:18+00:00",
-    "qtProdutos": 0,
-    "produtosPorMes": {},
-    "primeiroCadastroProduto": "",
-    "primeiroMes": "",
-    "qtProdutos1oMes": 0
-  },
-  "1010908": {
-    "primeiroPedidoCadastrado": "2026-01-16T11:38:37+00:00",
+  "1082680": {
+    "primeiroPedidoCadastrado": "2026-01-13T13:16:52+00:00",
     "qtProdutos": 0,
     "produtosPorMes": {},
     "primeiroCadastroProduto": "",
@@ -37618,40 +37628,8 @@
     "primeiroMes": "",
     "qtProdutos1oMes": 0
   },
-  "2035512": {
-    "primeiroPedidoCadastrado": "2026-05-08T16:19:44+00:00",
-    "qtProdutos": 0,
-    "produtosPorMes": {},
-    "primeiroCadastroProduto": "",
-    "primeiroMes": "",
-    "qtProdutos1oMes": 0
-  },
-  "1737241": {
-    "primeiroPedidoCadastrado": "2026-01-07T18:31:58+00:00",
-    "qtProdutos": 0,
-    "produtosPorMes": {},
-    "primeiroCadastroProduto": "",
-    "primeiroMes": "",
-    "qtProdutos1oMes": 0
-  },
   "1994087": {
     "primeiroPedidoCadastrado": "2026-03-28T13:40:19+00:00",
-    "qtProdutos": 0,
-    "produtosPorMes": {},
-    "primeiroCadastroProduto": "",
-    "primeiroMes": "",
-    "qtProdutos1oMes": 0
-  },
-  "1082680": {
-    "primeiroPedidoCadastrado": "2026-01-13T13:16:52+00:00",
-    "qtProdutos": 0,
-    "produtosPorMes": {},
-    "primeiroCadastroProduto": "",
-    "primeiroMes": "",
-    "qtProdutos1oMes": 0
-  },
-  "1426269": {
-    "primeiroPedidoCadastrado": "2026-05-25T13:25:38+00:00",
     "qtProdutos": 0,
     "produtosPorMes": {},
     "primeiroCadastroProduto": "",
@@ -37666,8 +37644,56 @@
     "primeiroMes": "",
     "qtProdutos1oMes": 0
   },
+  "1833521": {
+    "primeiroPedidoCadastrado": "2026-01-26T18:21:56+00:00",
+    "qtProdutos": 0,
+    "produtosPorMes": {},
+    "primeiroCadastroProduto": "",
+    "primeiroMes": "",
+    "qtProdutos1oMes": 0
+  },
+  "1737241": {
+    "primeiroPedidoCadastrado": "2026-01-07T18:31:58+00:00",
+    "qtProdutos": 0,
+    "produtosPorMes": {},
+    "primeiroCadastroProduto": "",
+    "primeiroMes": "",
+    "qtProdutos1oMes": 0
+  },
+  "1010908": {
+    "primeiroPedidoCadastrado": "2026-01-16T11:38:37+00:00",
+    "qtProdutos": 0,
+    "produtosPorMes": {},
+    "primeiroCadastroProduto": "",
+    "primeiroMes": "",
+    "qtProdutos1oMes": 0
+  },
   "970563": {
     "primeiroPedidoCadastrado": "2026-01-16T15:43:14+00:00",
+    "qtProdutos": 0,
+    "produtosPorMes": {},
+    "primeiroCadastroProduto": "",
+    "primeiroMes": "",
+    "qtProdutos1oMes": 0
+  },
+  "1300009": {
+    "primeiroPedidoCadastrado": "2026-01-06T17:10:18+00:00",
+    "qtProdutos": 0,
+    "produtosPorMes": {},
+    "primeiroCadastroProduto": "",
+    "primeiroMes": "",
+    "qtProdutos1oMes": 0
+  },
+  "1426269": {
+    "primeiroPedidoCadastrado": "2026-05-25T13:25:38+00:00",
+    "qtProdutos": 0,
+    "produtosPorMes": {},
+    "primeiroCadastroProduto": "",
+    "primeiroMes": "",
+    "qtProdutos1oMes": 0
+  },
+  "2035512": {
+    "primeiroPedidoCadastrado": "2026-05-08T16:19:44+00:00",
     "qtProdutos": 0,
     "produtosPorMes": {},
     "primeiroCadastroProduto": "",
