@@ -1,6 +1,6 @@
 window.DADOS = {
-  "gerado_em": "2026-09-04T22:39:33.713Z",
-  "hoje": "2026-09-04",
+  "gerado_em": "2026-09-05T14:15:03.131Z",
+  "hoje": "2026-09-05",
   "medindo_desde": "2026-07-24T17:20:05.000Z",
   "apps_desde": "2026-08-11T18:28:02.542Z",
   "auto_publica_desde": "2026-08-10",
@@ -40,7 +40,7 @@ window.DADOS = {
       "envios": 230,
       "primeiro": "2026-08-10T19:02:35.392Z",
       "ultimo": "2026-09-04T14:04:41.629Z",
-      "dias": 0
+      "dias": 1
     },
     {
       "slug": "opera-kids",
@@ -130,7 +130,7 @@ window.DADOS = {
       "envios": 12,
       "primeiro": "2026-08-10T16:01:03.796Z",
       "ultimo": "2026-08-20T11:06:21.271Z",
-      "dias": 15
+      "dias": 16
     },
     {
       "slug": "kauly",
@@ -346,7 +346,7 @@ window.DADOS = {
       "envios": 0,
       "primeiro": "2026-08-04T14:28:52.117Z",
       "ultimo": "2026-09-01T13:07:03.363Z",
-      "dias": 3
+      "dias": 4
     },
     {
       "slug": "ttng",
@@ -513,7 +513,7 @@ window.DADOS = {
           "envios": 205,
           "primeiro": "2026-08-11T18:28:02.542Z",
           "ultimo": "2026-09-04T14:04:41.629Z",
-          "dias": 0,
+          "dias": 1,
           "produtos_medidos": 153,
           "atribuido": 0
         },
@@ -613,7 +613,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-21T01:32:04.730Z",
           "ultimo": "2026-08-21T01:32:24.963Z",
-          "dias": 14,
+          "dias": 15,
           "produtos_medidos": 4,
           "atribuido": 0
         },
@@ -633,7 +633,7 @@ window.DADOS = {
           "envios": 4,
           "primeiro": "2026-08-13T17:14:37.157Z",
           "ultimo": "2026-08-20T11:06:21.271Z",
-          "dias": 15,
+          "dias": 16,
           "produtos_medidos": 3,
           "atribuido": 0
         },
@@ -1108,7 +1108,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T12:06:46.387Z",
           "ultimo": "2026-08-20T02:30:36.116Z",
-          "dias": 15,
+          "dias": 16,
           "produtos_medidos": 0,
           "atribuido": 8
         },
@@ -1388,7 +1388,7 @@ window.DADOS = {
           "envios": 0,
           "primeiro": "2026-08-14T11:49:43.332Z",
           "ultimo": "2026-09-01T13:07:03.363Z",
-          "dias": 3,
+          "dias": 4,
           "produtos_medidos": 0,
           "atribuido": 0
         },
