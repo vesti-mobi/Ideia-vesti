@@ -14,11 +14,11 @@
     "canalPlanilha": ""
   },
   "460703": {
-    "ligado": true,
-    "update": "2025-11-07",
+    "ligado": false,
+    "update": "2026-09-07",
     "religamentoReal": false,
-    "nomePlanilha": "",
-    "canalPlanilha": ""
+    "nomePlanilha": "ALINE ROLIM",
+    "canalPlanilha": "Vesti"
   },
   "1329765": {
     "ligado": false,
@@ -2478,8 +2478,8 @@
     "canalPlanilha": "Uemtel"
   },
   "1942327": {
-    "ligado": true,
-    "update": "2026-06-30",
+    "ligado": false,
+    "update": "2026-09-07",
     "religamentoReal": false,
     "nomePlanilha": "Grit Move",
     "canalPlanilha": "Vesti"
