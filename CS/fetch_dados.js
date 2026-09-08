@@ -882,29 +882,24 @@ async function puxarHubSpot() {
    isso). Vive em pipelines de NEGÓCIO: hoje são quatro — "Sucesso do
    Cliente", "Sucesso do cliente - Integração", "Sucesso do Cliente -
    Plataforma" e "CS - Starter" —, cada um com sua própria variação de nomes
-   de estágio (ex.: "Configurações" x "Cadastro de produtos", "Treinamento de
-   vendas" x "1º/2º Treinamento"). Achar esses pipelines por NOME é frágil (o
-   time já renomeia pipeline); achar por terem um estágio chamado exatamente
+   de estágio (ex.: "Configurações" x "Cadastro de produtos", "5 Pedidos
+   Pagos" x "10 vendas"). Achar esses pipelines por NOME é frágil (o time já
+   renomeia pipeline); achar por terem um estágio chamado exatamente
    "Implantado" é o que os une de verdade e continua funcionando se entrar um
    quinto pipeline nessa família amanhã.
 
-   Só os estágios ATÉ "Implantado" entram no funil. Os marcos de depois (5/25
-   pedidos, 100k) já são medidos direto dos PEDIDOS PAGOS na aba Visão geral —
-   mais confiável que uma etapa de CRM que ninguém garante estar em dia — e
-   estágios de perda/pós-venda (Perdido (Churn), Pendente de Pagamento,
-   Repassado, Parceiros, Apenas VestiPago) ficam de fora por não serem
-   onboarding em andamento. */
-const BUCKET_ONBOARDING = [
-  { l: 'Novo cliente', re: /novo cliente|boas-vindas/i },
-  { l: 'Day one', re: /day one/i },
-  { l: 'Configuração', re: /configura|cadastro de produto/i },
-  { l: 'Treinamento', re: /treinamento/i },
-  { l: 'Implantado', re: /^implantado$/i },
-];
-function bucketOnboarding(estagio) {
-  const b = BUCKET_ONBOARDING.find(x => x.re.test(estagio || ''));
-  return b ? b.l : null;
-}
+   Traz TODO negócio desses 4 pipelines, em QUALQUER estágio — onboarding em
+   andamento, marco de volume pós-implantação (5/25/80 pedidos, 100k) e
+   Perdido (Churn) incluídos. Quem decide o que fazer com cada estágio é o
+   painel (Visão geral), não o fetcher — experimento de 08/09/2026 pra
+   comparar Novas vendas/Churn/Marcos de volume medidos pelo HubSpot contra a
+   mesma leitura via BigQuery/Iugu/pedidos pagos.
+
+   `fechadoEm` é uma APROXIMAÇÃO de "quando entrou no estágio atual": o
+   HubSpot não dá o histórico de troca de estágio sem a API de histórico de
+   propriedades (cara demais pra rodar aqui todo dia), então usa `closedate`
+   quando existe e, sem ela, `hs_lastmodifieddate` — é a mesma limitação que
+   se aplica a "quando esse negócio virou Perdido (Churn)". */
 async function puxarOnboarding(pipes, owners) {
   const alvo = (pipes.results || [])
     .filter(p => (p.stages || []).some(s => /^implantado$/i.test((s.label || '').trim())));
@@ -912,12 +907,15 @@ async function puxarOnboarding(pipes, owners) {
   if (!alvo.length) return [];
   alvo.forEach(p => console.log('    - ' + p.label));
 
-  const nomeEstagio = {};
-  alvo.forEach(p => p.stages.forEach(s => { nomeEstagio[s.id] = (s.label || '').trim(); }));
+  const nomeEstagio = {}, nomePipeline = {};
+  alvo.forEach(p => {
+    nomePipeline[p.id] = (p.label || '').trim();
+    p.stages.forEach(s => { nomeEstagio[s.id] = (s.label || '').trim(); });
+  });
 
   const filterGroups = alvo.map(p => ({ filters: [{ propertyName: 'pipeline', operator: 'EQ', value: p.id }] }));
   const deals = await buscarTudo('deals',
-    ['dealname', 'dealstage', 'pipeline', 'createdate', 'hubspot_owner_id'],
+    ['dealname', 'dealstage', 'pipeline', 'createdate', 'closedate', 'hs_lastmodifieddate', 'hubspot_owner_id'],
     filterGroups,
     [{ propertyName: 'createdate', direction: 'DESCENDING' }]);
   console.log('  negócios nesses pipelines'.padEnd(44) + String(deals.length).padStart(8));
@@ -926,16 +924,16 @@ async function puxarOnboarding(pipes, owners) {
 
   const linhas = deals.map(d => {
     const p = d.properties;
-    const bucket = bucketOnboarding(nomeEstagio[p.dealstage]);
-    if (!bucket) return null;   // fora do funil: pós-implantação, churn, admin
     return {
       cliente: nomeEmpresa[empresaDo[d.id]] || p.dealname || '(sem empresa)',
-      estagio: bucket,
+      pipeline: nomePipeline[p.pipeline] || '—',
+      estagio: nomeEstagio[p.dealstage] || '—',
       cs: owners[p.hubspot_owner_id] || '',
       data: iso(p.createdate),
+      fechadoEm: iso(p.closedate) || iso(p.hs_lastmodifieddate),
     };
-  }).filter(Boolean);
-  console.log('  em onboarding (novo cliente..implantado)'.padEnd(44) + String(linhas.length).padStart(8));
+  });
+  console.log('  negócios com pipeline/estágio resolvidos'.padEnd(44) + String(linhas.length).padStart(8));
   return linhas;
 }
 

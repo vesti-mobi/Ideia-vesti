@@ -1182,19 +1182,37 @@ function periodoAnterior(p){
   const dias = diasEntre(p.ini, p.fim) + 1;
   return { ini: somarDias(p.ini, -dias), fim: somarDias(p.ini, -1) };
 }
-/* Starter/Pro sai do TEXTO do campo Plano (ex.: "Assinatura: Plano PRO"),
-   não de um código — por isso é busca por trecho, não igualdade. */
-function planoBucket(plano){
-  const s = String(plano||'').toLowerCase();
-  if(s.includes('starter')) return 'Starter';
-  if(s.includes('pro')) return 'Pro';
-  return 'Outro';
+/* EXPERIMENTO 08/09/2026 (pedido da Laura): "puxar tudo do HubSpot", pra
+   comparar contra a mesma leitura via BigQuery/Iugu/pedidos pagos. Os 4
+   blocos abaixo (Novas vendas, Churn, Marcos de volume, Produtos
+   implantados) trocaram de fonte — cada função diz exatamente de qual
+   campo/estágio do HubSpot tira o número. Ficam só Reuniões e Negócios
+   (cross-sell/upgrade), que já eram HubSpot desde o início.
+
+   Fonte única agora: `DATA.onboarding` — TODO negócio dos 4 pipelines de CS
+   (Sucesso do Cliente / Integração / Plataforma / CS - Starter), em
+   QUALQUER estágio (o fetch_dados.js não filtra mais nenhum). Cada linha
+   tem `pipeline`, `estagio` (nome cru do HubSpot), `data` (createdate) e
+   `fechadoEm` (closedate, ou hs_lastmodifieddate quando não há closedate —
+   o HubSpot não guarda "data que entrou nesse estágio" sem a API de
+   histórico de propriedades, cara demais pra rodar aqui todo dia). */
+function planoBucketHS(pipeline){
+  return /starter/i.test(pipeline||'') ? 'Starter' : 'Pro';
 }
+/* Novas vendas = negócio CRIADO no período, em qualquer um dos 4 pipelines
+   de CS. Campo do HubSpot: `createdate` do negócio (-> `data`). Plano:
+   Starter = pipeline "CS - Starter"; Pro = as outras 3 (não têm campo de
+   plano próprio, então é o pipeline que decide). */
 function novasVendasNoPeriodo(p){
-  return DATA.clientes.filter(c=>c.dataCadastro>=p.ini && c.dataCadastro<=p.fim);
+  return (DATA.onboarding||[]).filter(o=>o.data>=p.ini && o.data<=p.fim);
 }
+/* Churn = negócio cujo estágio ATUAL é "Perdido (Churn)" (existe nos 4
+   pipelines, sempre com esse nome). Campo de data: `fechadoEm`
+   (closedate/hs_lastmodifieddate) — aproximado, não é a data exata da troca
+   de estágio. */
 function churnsNoPeriodo(p){
-  return DATA.clientes.filter(c=>c.dataChurn && c.dataChurn>=p.ini && c.dataChurn<=p.fim);
+  return (DATA.onboarding||[]).filter(o=>/perdido\s*\(churn\)/i.test(o.estagio||'')
+    && o.fechadoEm>=p.ini && o.fechadoEm<=p.fim);
 }
 function reunioesNoPeriodo(p){
   return DATA.reunioes.filter(r=>r.data && r.data>=p.ini && r.data<=p.fim && r.resultado!=='Agendada');
@@ -1202,44 +1220,33 @@ function reunioesNoPeriodo(p){
 function negociosGanhosNoPeriodo(categoria, p){
   return negociosDe(categoria).filter(n=>n.status==='Ganho' && n.data>=p.ini && n.data<=p.fim);
 }
-/* Mensalidade/pedidos por domínio numa janela QUALQUER — não dá para usar
-   clientesAgregados(), que só enxerga o período global do filtro, porque aqui
-   é preciso somar o período atual e o anterior ao mesmo tempo. */
-function pedidosPorDominioEm(p){
-  const acc = {};
-  DATA.clientesSeries.forEach(x=>{
-    const d = String(x.data).slice(0,10);
-    if(d<p.ini || d>p.fim) return;
-    const k = x.dominio || x.cliente;
-    const a = acc[k] || (acc[k]={pedidos:0,valorPedidos:0});
-    a.pedidos += x.pedidos||0; a.valorPedidos += x.valorPedidos||0;
-  });
-  return acc;
-}
-function implantadosNoPeriodo(p){
-  const conta = tabela => tabela.filter(x=>x.implantado && x.implantado>=p.ini && x.implantado<=p.fim);
-  return { tino: conta(DATA.tino.tabela), oraculo: conta(DATA.oraculo.tabela), vestiPago: conta(DATA.vestiPago.tabela) };
-}
-function marcasImplantadasNoPeriodo(p){
-  const imp = implantadosNoPeriodo(p);
-  return [...new Set([...imp.tino, ...imp.oraculo, ...imp.vestiPago].map(x=>x.cliente))];
-}
 /* Funil de onboarding: negócios em andamento nos pipelines de CS que têm um
    estágio "Implantado" — hoje são quatro (Sucesso do Cliente, Sucesso do
    cliente - Integração, Sucesso do Cliente - Plataforma, CS - Starter). NÃO é
    o pipeline de TICKET "Integrações" (esse tem 1 ticket, fechado, de março —
-   não é o que alimenta isso). O fetch_dados.js já normaliza os nomes de
-   estágio de cada pipeline (ex.: "Configurações" x "Cadastro de produtos",
-   "Treinamento de vendas" x "1º/2º Treinamento") nas 5 fases abaixo. FOTO DO
-   MOMENTO: é a contagem de negócios abertos agora em cada fase — os marcos de
-   depois do "Implantado" (5/25 pedidos, R$100k) já são medidos direto dos
-   pedidos pagos, no bloco "Marcos de volume". */
+   não é o que alimenta isso). Campo do HubSpot: `estagio` (nome cru),
+   agrupado aqui nas 5 fases do funil — o fetch_dados.js não filtra mais,
+   então é o painel que decide o que é "onboarding em andamento" e o que é
+   marco/churn (funções abaixo). FOTO DO MOMENTO: contagem de negócios
+   parados em cada fase agora, não um fluxo por semana. */
+const BUCKET_ONBOARDING = [
+  { l: 'Novo cliente', re: /novo cliente|boas-vindas/i },
+  { l: 'Day one', re: /day one/i },
+  { l: 'Configuração', re: /configura|cadastro de produto/i },
+  { l: 'Treinamento', re: /treinamento/i },
+  { l: 'Implantado', re: /^implantado$/i },
+];
+function bucketOnboarding(estagio){
+  const b = BUCKET_ONBOARDING.find(x=>x.re.test(estagio||''));
+  return b ? b.l : null;
+}
 function funilIntegracoes(){
-  const ORDEM = ['Novo cliente','Day one','Configuração','Treinamento','Implantado'];
+  const ORDEM = BUCKET_ONBOARDING.map(b=>b.l);
   const porEstagio = {}, quemPorEstagio = {};
   (DATA.onboarding||[]).forEach(o=>{
-    porEstagio[o.estagio]=(porEstagio[o.estagio]||0)+1;
-    (quemPorEstagio[o.estagio] || (quemPorEstagio[o.estagio]=[])).push(o.cliente);
+    const b = bucketOnboarding(o.estagio); if(!b) return;
+    porEstagio[b]=(porEstagio[b]||0)+1;
+    (quemPorEstagio[b] || (quemPorEstagio[b]=[])).push(o.cliente);
   });
   const cores = ['var(--acc)','var(--acc-2)','var(--gold)','var(--pos)','var(--ink-3)'];
   return ORDEM.map((l,i)=>({l, v:porEstagio[l]||0, cor:cores[i%cores.length], quem:quemPorEstagio[l]||[]}));
@@ -1248,7 +1255,7 @@ function categoriasNovasVendas(){
   const p = periodo(), ant = periodoAnterior(p);
   const atual = novasVendasNoPeriodo(p), anterior = novasVendasNoPeriodo(ant);
   const linha = (l,lista,plano,cor) => {
-    const nomes = lista.filter(c=>planoBucket(c.plano)===plano).map(c=>c.nome);
+    const nomes = lista.filter(o=>planoBucketHS(o.pipeline)===plano).map(o=>o.cliente);
     return {l, v:nomes.length, cor, quem:nomes};
   };
   return [
@@ -1256,36 +1263,52 @@ function categoriasNovasVendas(){
     linha('Starter — período anterior', anterior, 'Starter', 'var(--acc-2)'),
     linha('Pro — este período', atual, 'Pro', 'var(--acc)'),
     linha('Pro — período anterior', anterior, 'Pro', 'var(--acc-2)'),
-    linha('Outro — este período', atual, 'Outro', 'var(--acc)'),
-    linha('Outro — período anterior', anterior, 'Outro', 'var(--acc-2)'),
   ];
 }
+/* Produtos implantados: negócios de CROSS-SELL (produto novo na carteira,
+   pipeline "Expand (Upgrades)") marcados como Ganho no período, contados por
+   produto — mesmo campo `produto` que as abas Cross-sell/Upsell usam
+   (extraído do NOME do negócio no HubSpot). Isto é DIFERENTE do que a
+   versão anterior media (Tino/Oráculo/VestiPago via API do Tino e BigQuery,
+   contando quem TEM o produto ativo): aqui só entra quem chegou pelo
+   pipeline de cross-sell — marca que já nasceu com o produto (ex.: no plano)
+   não aparece. */
 function categoriasImplantados(){
-  const imp = implantadosNoPeriodo(periodo());
-  return [
-    {l:'Tino', v:imp.tino.length, cor:'var(--acc)', quem:imp.tino.map(x=>x.cliente)},
-    {l:'Oráculo', v:imp.oraculo.length, cor:'var(--acc-2)', quem:imp.oraculo.map(x=>x.cliente)},
-    {l:'VestiPago', v:imp.vestiPago.length, cor:'var(--gold)', quem:imp.vestiPago.map(x=>x.cliente)},
-  ];
-}
-/* Marcos de volume: só entre quem foi IMPLANTADO (Tino/Oráculo/VestiPago) no
-   próprio período — é o ramp-up pós-implantação, não qualquer marca grande
-   que já vendia R$100k por mês antes disso. */
-function categoriasMarcos(){
   const p = periodo();
-  const nomes = marcasImplantadasNoPeriodo(p);
-  const pedidosPorDom = pedidosPorDominioEm(p);
-  const linhas = nomes.map(nome=>{
-    const dom = DOM_POR_CLIENTE[nome];
-    const a = pedidosPorDom[dom] || pedidosPorDom[nome] || {pedidos:0,valorPedidos:0};
-    return {nome, pedidos:a.pedidos, valor:a.valorPedidos};
-  });
-  const bucket = (l,filtro,cor) => { const q=linhas.filter(filtro); return {l, v:q.length, cor, quem:q.map(x=>x.nome)} };
-  return [
-    bucket('5+ pedidos pagos', x=>x.pedidos>=5, 'var(--acc)'),
-    bucket('25+ pedidos pagos', x=>x.pedidos>=25, 'var(--acc-2)'),
-    bucket('R$100k+ de GMV', x=>x.valorPedidos>=100000, 'var(--gold)'),
+  const ganhos = DATA.negocios.filter(n=>n.categoria==='cross' && n.status==='Ganho'
+    && n.data>=p.ini && n.data<=p.fim);
+  const produtos = [
+    {l:'Tino', cor:'var(--acc)'}, {l:'Oráculo', cor:'var(--acc-2)'}, {l:'VestiPago', cor:'var(--gold)'},
   ];
+  return produtos.map(pr => {
+    const q = ganhos.filter(n=>n.produto===pr.l);
+    return {l:pr.l, v:q.length, cor:pr.cor, quem:q.map(n=>n.cliente)};
+  });
+}
+/* Marcos de volume: estágios de PÓS-implantação nos mesmos 4 pipelines de CS
+   — "5/25/80 ou mais Pedidos Pagos" em três deles, "10/25 vendas", "80
+   Vendas", "100k - UPgrade" no "CS - Starter" (nomenclatura própria desse
+   pipeline, não padronizada com os outros três — por isso os rótulos batem
+   com o HubSpot ao pé da letra, em vez de forçar um "5+/25+/100k" único que
+   inventaria uma correspondência entre escalas diferentes). FOTO DO
+   MOMENTO: negócio parado nesse estágio agora, e não o período escolhido no
+   filtro — o "no período" da versão anterior (pedidos pagos de verdade) não
+   tem equivalente aqui, porque o HubSpot só guarda o estágio atual. */
+function categoriasMarcos(){
+  const rows = (DATA.onboarding||[]).filter(o=>{
+    if(bucketOnboarding(o.estagio)) return false;                 // onboarding em andamento
+    if(/perdido\s*\(churn\)/i.test(o.estagio||'')) return false;  // é churn, não marco
+    return /pedido|venda|100k/i.test(o.estagio||'');
+  });
+  const porEstagio = {}, quemPorEstagio = {};
+  rows.forEach(o=>{
+    const e = o.estagio || '—';
+    porEstagio[e]=(porEstagio[e]||0)+1;
+    (quemPorEstagio[e] || (quemPorEstagio[e]=[])).push(o.cliente);
+  });
+  const cores = ['var(--acc)','var(--acc-2)','var(--gold)','var(--pos)','var(--ink-3)','#B54A72','#1E74C8'];
+  return Object.keys(porEstagio).sort((a,b)=>porEstagio[b]-porEstagio[a])
+    .map((l,i)=>({l, v:porEstagio[l], cor:cores[i%cores.length], quem:quemPorEstagio[l]}));
 }
 /* Negócios ganhos por categoria — o mesmo par este-período x período-anterior
    das Novas vendas, só que para Cross-sell (produto novo na carteira) e
@@ -1366,22 +1389,24 @@ const TABS = [
   {
     id:'visaoGeral', grupo:'Visão geral', nav:'Visão geral', cor:'#2E7D46', cor2:'#1E74C8',
     titulo:'Visão geral',
-    desc:'Retrato do período escolhido no filtro, contra um <b>período anterior de mesmo tamanho</b> em dias corridos — quem quiser semana passada ou mês passado escolhe isso no próprio seletor de período, o "anterior" acompanha. Nada aqui é medido de novo: cada número já existe em alguma aba abaixo, só reorganizado. <b>Passe o mouse em qualquer barra ou fatia</b> pra ver quais marcas formam aquele número. '
-      + '<b>Novas vendas</b> = marcas com data de cadastro dentro do período, separadas em Starter/Pro pelo texto do campo Plano (o resto cai em "Outro"). '
+    desc:'<b>Experimento de 08/09/2026: tudo aqui vem do HubSpot agora</b> (menos Reuniões e Negócios, que já eram), pra comparar contra a leitura via BigQuery/Iugu/pedidos pagos que valia antes — os números podem não bater com o resto do painel de propósito. Fonte única: os 4 pipelines de negócio de CS (Sucesso do Cliente, Sucesso do cliente - Integração, Sucesso do Cliente - Plataforma, CS - Starter — achados pelo estágio "Implantado", não pelo nome). Retrato do período escolhido no filtro, contra um <b>período anterior de mesmo tamanho</b> em dias corridos. <b>Passe o mouse em qualquer barra ou fatia</b> pra ver quais marcas formam aquele número. '
+      + '<b>Novas vendas</b> = negócio criado (campo <code>createdate</code>) no período, em qualquer um dos 4 pipelines; Starter = pipeline "CS - Starter", Pro = os outros três (não existe campo de plano nesses negócios). '
+      + '<b>Churn</b> = negócio cujo estágio atual é "Perdido (Churn)" (existe nos 4 pipelines); a data é <code>closedate</code> ou, sem ela, <code>hs_lastmodifieddate</code> — o HubSpot não guarda quando o negócio ENTROU nesse estágio, só a última mexida nele. '
       + '<b>Negócios</b> é Cross-sell (produto novo na carteira) e Upgrade (expansão do que já tem) — mesma fonte das abas Cross-sell e Upsell, só que fechados no período. '
-      + '<b>Funil de onboarding</b> é uma <b>foto do momento</b>: negócios em andamento nos pipelines de CS que levam a marca a "Implantado" (Sucesso do Cliente, Sucesso do cliente - Integração, Sucesso do Cliente - Plataforma e CS - Starter), por fase — não é o pipeline de ticket "Integrações", que praticamente não é usado. Sem "entraram/saíram" por semana, porque não existe hoje um retrato diário da fase de cada negócio (diferente do <code>integracoes_snapshot.json</code>, que só fotografa quem TEM integração ativa). '
-      + '<b>Marcos de volume</b> olha só quem foi <b>implantado</b> (Tino, Oráculo ou VestiPago) dentro do próprio período, e quantas dessas marcas já bateram 5 pedidos, 25 pedidos ou R$100k de GMV no mesmo período — é o ramp-up pós-implantação, não qualquer marca grande que já vendia isso antes.',
+      + '<b>Funil de onboarding</b> é uma <b>foto do momento</b>: negócios ainda em andamento nesses 4 pipelines, por fase (campo <code>estagio</code> cru do HubSpot, agrupado em 5 nomes). '
+      + '<b>Produtos implantados</b> trocou de significado: agora é negócio de <b>cross-sell ganho no período</b> por produto (Tino/Oráculo/VestiPago, extraído do nome do negócio) — não "quem tem o produto ativo" como antes, então marca que já nasceu com o produto no plano não entra aqui. '
+      + '<b>Marcos de volume</b> também é <b>foto do momento</b>, não "no período": negócio parado agora nos estágios de pós-implantação desses pipelines ("5/25/80 ou mais Pedidos Pagos", ou "10/25 vendas"/"80 Vendas"/"100k - UPgrade" no CS - Starter, que usa escala própria) — os rótulos ficam com o nome exato do HubSpot, sem forçar uma escala única entre pipelines diferentes.',
     filtros:['periodo'],
     semTabela:true,
     linhas:()=>[],
     kpis:()=>kpisVisaoGeral(),
     duasColunas:true,
     graficos:[
-      {t:'Novas vendas por plano', categorias:()=>categoriasNovasVendas()},
+      {t:'Novas vendas por plano (HubSpot)', categorias:()=>categoriasNovasVendas()},
       {t:'Negócios por categoria (cross-sell x upgrade)', categorias:()=>categoriasNegocios()},
       {t:'Funil de onboarding (foto do momento)', categorias:()=>funilIntegracoes()},
-      {t:'Produtos implantados no período', categorias:()=>categoriasImplantados(), pizza:true},
-      {t:'Marcos de volume — marcas implantadas no período', categorias:()=>categoriasMarcos()},
+      {t:'Produtos implantados — cross-sell ganho no período (HubSpot)', categorias:()=>categoriasImplantados(), pizza:true},
+      {t:'Marcos de volume — foto do momento (HubSpot)', categorias:()=>categoriasMarcos()},
     ],
   },
   {
