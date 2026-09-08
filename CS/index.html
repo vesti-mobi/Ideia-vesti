@@ -1265,25 +1265,29 @@ function categoriasNovasVendas(){
     linha('Pro — período anterior', anterior, 'Pro', 'var(--acc-2)'),
   ];
 }
-/* Produtos implantados: negócios de CROSS-SELL (produto novo na carteira,
-   pipeline "Expand (Upgrades)") marcados como Ganho no período, contados por
-   produto — mesmo campo `produto` que as abas Cross-sell/Upsell usam
-   (extraído do NOME do negócio no HubSpot). Isto é DIFERENTE do que a
-   versão anterior media (Tino/Oráculo/VestiPago via API do Tino e BigQuery,
-   contando quem TEM o produto ativo): aqui só entra quem chegou pelo
-   pipeline de cross-sell — marca que já nasceu com o produto (ex.: no plano)
-   não aparece. */
+/* Produtos implantados — híbrido (pedido da Laura em 08/09/2026: Tino e
+   VestiPago ainda não têm esse dado no HubSpot). Oráculo continua vindo de
+   negócio de CROSS-SELL (pipeline "Expand (Upgrades)") marcado como Ganho
+   no período, campo `produto` (extraído do NOME do negócio no HubSpot) —
+   só entra quem chegou por um negócio de cross-sell, marca que já nasceu
+   com o Oráculo no plano não aparece. Tino e VestiPago voltam pra fonte de
+   antes do experimento: "tem o produto implantado" — Tino pela API do
+   próprio produto, VestiPago por ter conta de pagamento criada no BigQuery
+   — dentro do período escolhido. */
+function implantadosNoPeriodo(p){
+  const conta = tabela => tabela.filter(x=>x.implantado && x.implantado>=p.ini && x.implantado<=p.fim);
+  return { tino: conta(DATA.tino.tabela), vestiPago: conta(DATA.vestiPago.tabela) };
+}
 function categoriasImplantados(){
   const p = periodo();
-  const ganhos = DATA.negocios.filter(n=>n.categoria==='cross' && n.status==='Ganho'
-    && n.data>=p.ini && n.data<=p.fim);
-  const produtos = [
-    {l:'Tino', cor:'var(--acc)'}, {l:'Oráculo', cor:'var(--acc-2)'}, {l:'VestiPago', cor:'var(--gold)'},
+  const oraculoGanhos = DATA.negocios.filter(n=>n.categoria==='cross' && n.status==='Ganho'
+    && n.produto==='Oráculo' && n.data>=p.ini && n.data<=p.fim);
+  const imp = implantadosNoPeriodo(p);
+  return [
+    {l:'Tino', v:imp.tino.length, cor:'var(--acc)', quem:imp.tino.map(x=>x.cliente)},
+    {l:'Oráculo', v:oraculoGanhos.length, cor:'var(--acc-2)', quem:oraculoGanhos.map(n=>n.cliente)},
+    {l:'VestiPago', v:imp.vestiPago.length, cor:'var(--gold)', quem:imp.vestiPago.map(x=>x.cliente)},
   ];
-  return produtos.map(pr => {
-    const q = ganhos.filter(n=>n.produto===pr.l);
-    return {l:pr.l, v:q.length, cor:pr.cor, quem:q.map(n=>n.cliente)};
-  });
 }
 /* Marcos de volume: estágios de PÓS-implantação nos mesmos 4 pipelines de CS
    — "5/25/80 ou mais Pedidos Pagos" em três deles, "10/25 vendas", "80
@@ -1389,12 +1393,12 @@ const TABS = [
   {
     id:'visaoGeral', grupo:'Visão geral', nav:'Visão geral', cor:'#2E7D46', cor2:'#1E74C8',
     titulo:'Visão geral',
-    desc:'<b>Experimento de 08/09/2026: tudo aqui vem do HubSpot agora</b> (menos Reuniões e Negócios, que já eram), pra comparar contra a leitura via BigQuery/Iugu/pedidos pagos que valia antes — os números podem não bater com o resto do painel de propósito. Fonte única: os 4 pipelines de negócio de CS (Sucesso do Cliente, Sucesso do cliente - Integração, Sucesso do Cliente - Plataforma, CS - Starter — achados pelo estágio "Implantado", não pelo nome). Retrato do período escolhido no filtro, contra um <b>período anterior de mesmo tamanho</b> em dias corridos. <b>Passe o mouse em qualquer barra ou fatia</b> pra ver quais marcas formam aquele número. '
+    desc:'<b>Experimento de 08/09/2026: a maior parte daqui vem do HubSpot agora</b> (Novas vendas, Churn, Funil de onboarding, Marcos de volume, e Oráculo dentro de Produtos implantados — Reuniões e Negócios já eram), pra comparar contra a leitura via BigQuery/Iugu/pedidos pagos que valia antes — os números podem não bater com o resto do painel de propósito. Tino e VestiPago em Produtos implantados continuam na fonte antiga: esse dado ainda não existe no HubSpot. Fonte HubSpot: os 4 pipelines de negócio de CS (Sucesso do Cliente, Sucesso do cliente - Integração, Sucesso do Cliente - Plataforma, CS - Starter — achados pelo estágio "Implantado", não pelo nome). Retrato do período escolhido no filtro, contra um <b>período anterior de mesmo tamanho</b> em dias corridos. <b>Passe o mouse em qualquer barra ou fatia</b> pra ver quais marcas formam aquele número. '
       + '<b>Novas vendas</b> = negócio criado (campo <code>createdate</code>) no período, em qualquer um dos 4 pipelines; Starter = pipeline "CS - Starter", Pro = os outros três (não existe campo de plano nesses negócios). '
       + '<b>Churn</b> = negócio cujo estágio atual é "Perdido (Churn)" (existe nos 4 pipelines); a data é <code>closedate</code> ou, sem ela, <code>hs_lastmodifieddate</code> — o HubSpot não guarda quando o negócio ENTROU nesse estágio, só a última mexida nele. '
       + '<b>Negócios</b> é Cross-sell (produto novo na carteira) e Upgrade (expansão do que já tem) — mesma fonte das abas Cross-sell e Upsell, só que fechados no período. '
       + '<b>Funil de onboarding</b> é uma <b>foto do momento</b>: negócios ainda em andamento nesses 4 pipelines, por fase (campo <code>estagio</code> cru do HubSpot, agrupado em 5 nomes). '
-      + '<b>Produtos implantados</b> trocou de significado: agora é negócio de <b>cross-sell ganho no período</b> por produto (Tino/Oráculo/VestiPago, extraído do nome do negócio) — não "quem tem o produto ativo" como antes, então marca que já nasceu com o produto no plano não entra aqui. '
+      + '<b>Produtos implantados</b> é híbrido: <b>Oráculo</b> vem de negócio de cross-sell <b>ganho no período</b> (produto extraído do nome do negócio) — marca que já nasceu com o Oráculo no plano não entra aqui; <b>Tino</b> e <b>VestiPago</b> ainda não têm esse dado no HubSpot, então continuam na fonte de antes: "tem o produto implantado" dentro do período (API do Tino / conta de pagamento criada no BigQuery). '
       + '<b>Marcos de volume</b> também é <b>foto do momento</b>, não "no período": negócio parado agora nos estágios de pós-implantação desses pipelines ("5/25/80 ou mais Pedidos Pagos", ou "10/25 vendas"/"80 Vendas"/"100k - UPgrade" no CS - Starter, que usa escala própria) — os rótulos ficam com o nome exato do HubSpot, sem forçar uma escala única entre pipelines diferentes.',
     filtros:['periodo'],
     semTabela:true,
@@ -1405,7 +1409,7 @@ const TABS = [
       {t:'Novas vendas por plano (HubSpot)', categorias:()=>categoriasNovasVendas()},
       {t:'Negócios por categoria (cross-sell x upgrade)', categorias:()=>categoriasNegocios()},
       {t:'Funil de onboarding (foto do momento)', categorias:()=>funilIntegracoes()},
-      {t:'Produtos implantados — cross-sell ganho no período (HubSpot)', categorias:()=>categoriasImplantados(), pizza:true},
+      {t:'Produtos implantados no período', categorias:()=>categoriasImplantados(), pizza:true},
       {t:'Marcos de volume — foto do momento (HubSpot)', categorias:()=>categoriasMarcos()},
     ],
   },
